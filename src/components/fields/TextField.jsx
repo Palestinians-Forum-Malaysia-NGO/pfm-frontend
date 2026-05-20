@@ -23,7 +23,7 @@ function InputField(props) {
  : state === "error"
  ? "!border-red-500 text-red-500 placeholder:text-red-500"
  : state === "success"
- ? "!border-green-500 text-green-500 placeholder:text-green-500"
+ ? "!border-green text-green placeholder:text-green"
  : disabled === true
  ? "!border-none !bg-gray-100"
  : "border-gray-200"

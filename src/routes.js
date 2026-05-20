@@ -5,6 +5,13 @@ import MainDashboard from "views/admin/default";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn from "views/auth/SignIn";
+import ManagerDashboard from "views/manager/default";
+import MemberDashboard from "views/member/default";
+import Home from "views/public/home";
+import About from "views/public/about";
+import PublicEvents from "views/public/events";
+import Donate from "views/public/donate";
+import Contact from "views/public/contact";
 
 // Icon Imports
 import {
@@ -123,6 +130,97 @@ const routes = [
     component: <Placeholder pageName="Settings" />,
     section: "ACCOUNT",
   },
+
+  // ── MANAGER ──────────────────────────────────────────────────────────────────
+  {
+    name: "Dashboard",
+    layout: "/manager",
+    path: "default",
+    icon: <MdHome className="h-5 w-5" />,
+    component: <ManagerDashboard />,
+    section: "MAIN",
+  },
+  {
+    name: "Members",
+    layout: "/manager",
+    path: "members",
+    icon: <MdPeople className="h-5 w-5" />,
+    component: <Placeholder pageName="Members" />,
+    section: "MAIN",
+  },
+  {
+    name: "Donations",
+    layout: "/manager",
+    path: "donations",
+    icon: <MdFavorite className="h-5 w-5" />,
+    component: <Placeholder pageName="Donations" />,
+    section: "MAIN",
+  },
+  {
+    name: "Events",
+    layout: "/manager",
+    path: "events",
+    icon: <MdEvent className="h-5 w-5" />,
+    component: <Placeholder pageName="Events" />,
+    section: "MAIN",
+  },
+  {
+    name: "Profile",
+    layout: "/manager",
+    path: "profile",
+    icon: <MdPerson className="h-5 w-5" />,
+    component: <Profile />,
+    section: "ACCOUNT",
+  },
+
+  // ── MEMBER ───────────────────────────────────────────────────────────────────
+  {
+    name: "Home",
+    layout: "/member",
+    path: "default",
+    icon: <MdHome className="h-5 w-5" />,
+    component: <MemberDashboard />,
+    section: "MAIN",
+  },
+  {
+    name: "News & Updates",
+    layout: "/member",
+    path: "news",
+    icon: <MdFeed className="h-5 w-5" />,
+    component: <Placeholder pageName="News & Updates" />,
+    section: "MAIN",
+  },
+  {
+    name: "Events",
+    layout: "/member",
+    path: "events",
+    icon: <MdEvent className="h-5 w-5" />,
+    component: <Placeholder pageName="Events" />,
+    section: "MAIN",
+  },
+  {
+    name: "My Donations",
+    layout: "/member",
+    path: "donations",
+    icon: <MdFavorite className="h-5 w-5" />,
+    component: <Placeholder pageName="My Donations" />,
+    section: "COMMUNITY",
+  },
+  {
+    name: "Profile",
+    layout: "/member",
+    path: "profile",
+    icon: <MdPerson className="h-5 w-5" />,
+    component: <Profile />,
+    section: "ACCOUNT",
+  },
+
+  // ── PUBLIC ───────────────────────────────────────────────────────────────────
+  { name: "Home",    layout: "/", path: "/",        component: <Home /> },
+  { name: "About",   layout: "/", path: "/about",   component: <About /> },
+  { name: "Events",  layout: "/", path: "/events",  component: <PublicEvents /> },
+  { name: "Donate",  layout: "/", path: "/donate",  component: <Donate /> },
+  { name: "Contact", layout: "/", path: "/contact", component: <Contact /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
   {

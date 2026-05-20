@@ -308,7 +308,6 @@ module.exports = {
         800: "#1e293b",
         900: "#0f172a",
       },
-      brand: "#007A3D",
       pfmRed: {
         50: "#FCEAEC",
         100: "#F7C5CA",
