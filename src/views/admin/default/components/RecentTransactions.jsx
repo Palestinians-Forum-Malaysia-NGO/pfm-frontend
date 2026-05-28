@@ -1,9 +1,9 @@
-import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
+﻿import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
 const TYPE_STYLES = {
   Donation: {
-    badge: "border border-brand-300 text-brand-600 bg-brand-50",
-    amount: "text-brand-600",
+    badge: "border border-green/50 text-[#006833] bg-green/10",
+    amount: "text-[#006833]",
     icon: MdArrowUpward,
   },
   "Aid Sent": {

@@ -12,7 +12,7 @@
  : color === "blue"
  ? "checked:bg-blue-500"
  : color === "green"
- ? "checked:bg-green-500"
+ ? "checked:bg-green"
  : color === "yellow"
  ? "checked:bg-yellow-500"
  : color === "orange"
@@ -35,7 +35,7 @@
  ? "checked:bg-indigo-500"
  : color === "gray"
  ? "checked:bg-gray-500"
- : "checked:bg-brand-500"
+ : "checked:bg-green"
  } ${extra}`}
  name="weekly"
  {...rest}

@@ -1,8 +1,17 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { MdSearch } from "react-icons/md";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
-const CheckSimpleBoxGroup = ({ label, field, options, formData, updateFormData, errors, required = false }) => {
+const CheckSimpleBoxGroup = ({
+  label, field, options, formData,
+  updateFormData, errors, required = false, rules = [],
+}) => {
   const [search, setSearch] = useState("");
+  const [localError, setLocalError] = useState(null);
+
+  const externalError = errors?.[field];
+  const displayError = localError || externalError;
 
   const isSelected = (id) => (formData[field] || []).includes(id);
 
@@ -12,17 +21,18 @@ const CheckSimpleBoxGroup = ({ label, field, options, formData, updateFormData, 
 
   const toggleSelection = (id) => {
     const selected = formData[field] || [];
-    updateFormData(
-      field,
-      selected.includes(id) ? selected.filter((i) => i !== id) : [...selected, id]
-    );
+    const next = selected.includes(id)
+      ? selected.filter((i) => i !== id)
+      : [...selected, id];
+    updateFormData(field, next);
+    setLocalError(validate(next, rules));
   };
 
   return (
-    <div className="mb-5">
+    <div className={WRAPPER}>
       <div className="w-full space-y-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-slate-900">
+          <label className={LABEL}>
             {label} {required && <span className="text-red-500">*</span>}
           </label>
           {filteredOptions.length > 0 && (
@@ -40,15 +50,11 @@ const CheckSimpleBoxGroup = ({ label, field, options, formData, updateFormData, 
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none transition-all focus:border-green placeholder:text-slate-400"
+              className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none transition-all focus:border-green focus:bg-slate-100/70 placeholder:text-slate-400"
             />
           </div>
           {search && (
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="text-xs text-slate-400 hover:text-slate-600"
-            >
+            <button type="button" onClick={() => setSearch("")} className="text-xs text-slate-400 hover:text-slate-600">
               Clear
             </button>
           )}
@@ -78,12 +84,12 @@ const CheckSimpleBoxGroup = ({ label, field, options, formData, updateFormData, 
               );
             })
           ) : (
-            <p className="py-4 text-center text-sm text-slate-400 w-full">No results found</p>
+            <p className="w-full py-4 text-center text-sm text-slate-400">No results found</p>
           )}
         </div>
       </div>
 
-      {errors?.[field] && <p className="mt-1.5 text-xs text-red-500">{errors[field]}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

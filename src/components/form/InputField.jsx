@@ -1,44 +1,61 @@
-﻿import React from "react";
+import React, { useState } from "react";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, LABEL_DARK, ERROR_MSG, inputCls } from "./utils/fieldStyles";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
-  return path
-    .split(/[.[\]]/).filter(Boolean)
+  return path.split(/[.[\]]/).filter(Boolean)
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, variant = "default" }) => {
+const InputField = ({
+  label, field, type = "text", required = true,
+  placeholder = "", formData, errors, updateFormData,
+  variant = "default", rules = [],
+}) => {
+  const [touched, setTouched] = useState(false);
+  const [localError, setLocalError] = useState(null);
+
   const value = getNestedValue(formData, field) ?? "";
-  const error = getNestedValue(errors, field);
+  const externalError = getNestedValue(errors, field);
+  const displayError = localError || externalError;
 
   const dateProps = type === "date" ? { min: "1900-01-01", max: "2099-12-31" } : {};
 
-  const inputClass = variant === "dark"
+  const handleChange = (e) => {
+    const next = type === "email" ? e.target.value.toLowerCase() : e.target.value;
+    updateFormData(field, next);
+    if (touched) setLocalError(validate(next, rules));
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setLocalError(validate(value, rules));
+  };
+
+  const fieldCls = variant === "dark"
     ? `h-10 w-full border-b bg-transparent px-0 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:outline-none ${
-        error ? "border-red-400" : "border-slate-600 focus:border-green/75"
+        displayError ? "border-red-400" : "border-slate-600 focus:border-green/75"
       }`
-    : `h-12 w-full rounded-xl border px-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:outline-none ${
-        error ? "border-red-400 bg-red-50 focus:border-red-500" : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70/70"
-      }`;
+    : inputCls(!!displayError);
 
   return (
-    <div className="mb-4">
+    <div className={WRAPPER}>
       {label && (
-        <label className={`mb-1.5 block text-sm font-medium ${variant === "dark" ? "text-slate-400" : "text-slate-900"}`}>
+        <label className={variant === "dark" ? LABEL_DARK : LABEL}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-
       <input
         type={type}
         value={value}
-        onChange={(e) => updateFormData(field, type === "email" ? e.target.value.toLowerCase() : e.target.value)}
+        onChange={handleChange}
+        onBlur={handleBlur}
         placeholder={placeholder}
         {...dateProps}
-        className={inputClass}
+        className={fieldCls}
       />
-
-      {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

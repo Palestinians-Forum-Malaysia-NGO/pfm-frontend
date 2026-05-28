@@ -1,28 +1,40 @@
-﻿import React from "react";
+import React, { useState } from "react";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
-  return path
-    .split(/[.[\]]/).filter(Boolean)
+  return path.split(/[.[\]]/).filter(Boolean)
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const RadioField = ({ label, field, options, formData, errors, updateFormData, required = true }) => {
+const RadioField = ({
+  label, field, options, formData, errors,
+  updateFormData, required = true, rules = [],
+}) => {
+  const [localError, setLocalError] = useState(null);
+
   const value = getNestedValue(formData, field);
-  const error = getNestedValue(errors, field);
+  const externalError = getNestedValue(errors, field);
+  const displayError = localError || externalError;
+
+  const handleChange = (optValue) => {
+    updateFormData(field, optValue);
+    setLocalError(validate(optValue, rules));
+  };
 
   return (
-    <div className="mb-4">
-      <label className="mb-1.5 block text-sm font-medium text-slate-900">
+    <div className={WRAPPER}>
+      <label className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <div className="flex gap-2">
         {options.map((opt) => (
           <label
-            key={opt.label}
+            key={opt.value}
             className={`flex flex-1 cursor-pointer items-center justify-center rounded-xl border px-3 py-3 text-sm font-medium transition-all ${
-              error ? "border-red-400" : ""
+              displayError ? "border-red-400" : ""
             } ${
               value === opt.value
                 ? "border-green bg-green/10 text-[#006833]"
@@ -34,7 +46,7 @@ const RadioField = ({ label, field, options, formData, errors, updateFormData, r
               name={field}
               value={opt.value}
               checked={value === opt.value}
-              onChange={() => updateFormData(field, opt.value)}
+              onChange={() => handleChange(opt.value)}
               className="hidden"
             />
             {opt.label}
@@ -42,7 +54,7 @@ const RadioField = ({ label, field, options, formData, errors, updateFormData, r
         ))}
       </div>
 
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

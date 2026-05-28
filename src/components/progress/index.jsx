@@ -13,7 +13,7 @@
  : color === "blue"
  ? "bg-blue-500"
  : color === "green"
- ? "bg-green-500"
+ ? "bg-green"
  : color === "yellow"
  ? "bg-yellow-500"
  : color === "orange"
@@ -36,7 +36,7 @@
  ? "bg-indigo-500"
  : color === "gray"
  ? "bg-gray-500"
- : "bg-brand-500"
+ : "bg-green"
  }`}
  style={{ width: `${value}%` }}
  />

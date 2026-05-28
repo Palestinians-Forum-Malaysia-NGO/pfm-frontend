@@ -1,5 +1,7 @@
-﻿import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdExpandMore } from "react-icons/md";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "./utils/fieldStyles";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
@@ -10,16 +12,18 @@ const getNestedValue = (obj, path) => {
 const SearchableSelect = ({
   label, field, options = [], required = true,
   formData, errors, updateFormData,
-  placeholder = "Select...", actions = []
+  placeholder = "Select...", actions = [], rules = [],
 }) => {
   const containerRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [localError, setLocalError] = useState(null);
 
   const selectedValue = getNestedValue(formData, field) ?? "";
   const selectedOption = options.find((opt) => opt.value === selectedValue);
   const selectedLabel = selectedOption?.label ?? selectedValue ?? "";
-  const error = getNestedValue(errors, field);
+  const externalError = getNestedValue(errors, field);
+  const displayError = localError || externalError;
 
   const filteredOptions = useMemo(() =>
     options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())),
@@ -29,35 +33,33 @@ const SearchableSelect = ({
   useEffect(() => {
     const handler = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
+        if (isOpen) {
+          setLocalError(validate(selectedValue, rules));
+        }
         setIsOpen(false);
         setSearch("");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  }, [isOpen, selectedValue, rules]);
 
   const handleSelect = (option) => {
     updateFormData(field, option.value);
+    setLocalError(validate(option.value, rules));
     setIsOpen(false);
     setSearch("");
   };
 
   return (
-    <div className="relative mb-4" ref={containerRef}>
-      <label className="mb-1.5 block text-sm font-medium text-slate-900">
+    <div className={`relative ${WRAPPER}`} ref={containerRef}>
+      <label className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <div
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex h-12 w-full cursor-pointer items-center justify-between rounded-xl border px-3 text-sm outline-none transition-all ${
-          isOpen
-            ? "border-green bg-white"
-            : error
-            ? "border-red-400 bg-red-50"
-            : "border-slate-200 bg-slate-50 hover:border-slate-300"
-        }`}
+        className={dropdownTriggerCls(isOpen, !!displayError)}
       >
         <span className={selectedLabel ? "text-slate-900" : "text-slate-400"}>
           {selectedLabel || placeholder}
@@ -66,19 +68,15 @@ const SearchableSelect = ({
       </div>
 
       {isOpen && (
-        <div
-          className="absolute z-[9999] mt-1 rounded-xl border border-slate-100 bg-white p-2 shadow-lg shadow-slate-200/40"
-          style={{ width: containerRef.current?.offsetWidth ?? "100%" }}
-        >
+        <div className={dropdownPanelCls} style={{ width: containerRef.current?.offsetWidth ?? "100%" }}>
           <input
             type="text"
             placeholder="Search..."
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="mb-2 h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition-all focus:border-green focus:bg-slate-100/70 placeholder:text-slate-400"
+            className={dropdownSearchCls}
           />
-
           <ul className="max-h-52 overflow-y-auto">
             {filteredOptions.map((opt) => (
               <li
@@ -91,7 +89,7 @@ const SearchableSelect = ({
             ))}
 
             {!filteredOptions.length && actions.length > 0 && (
-              <div className="border-t border-slate-100 pt-2 mt-1">
+              <div className="mt-1 border-t border-slate-100 pt-2">
                 <p className="px-3 py-1.5 text-xs text-slate-400">No results found</p>
                 {actions.map((action, i) => (
                   <li
@@ -113,7 +111,7 @@ const SearchableSelect = ({
         </div>
       )}
 
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

@@ -1,9 +1,9 @@
-/* eslint-disable */
+﻿/* eslint-disable */
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdChevronRight } from "react-icons/md";
 
-const SECTION_ORDER = ["MAIN", "COMMUNITY", "ACCOUNT"];
+const SECTION_ORDER = ["MAIN", "COMMUNITY", "SYSTEM", "ACCOUNT"];
 
 // ── Single nav item (with or without children) ─────────────────────────────────
 function NavItem({ route }) {
@@ -32,21 +32,21 @@ function NavItem({ route }) {
         <button
           onClick={() => setOpen((o) => !o)}
           className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150 ${
-            parentActive ? "bg-brand/10" : "hover:bg-gray-100"
+            parentActive ? "bg-green/10" : "hover:bg-gray-100"
           }`}
         >
           <span
             className={`flex-shrink-0 transition-colors ${
               parentActive
-                ? "text-brand"
-                : "text-gray-400 group-hover:text-brand"
+                ? "text-green"
+                : "text-gray-400 group-hover:text-green"
             }`}
           >
             {route.icon}
           </span>
           <span
             className={`flex-1 text-left text-sm font-medium transition-colors ${
-              parentActive ? "text-brand" : "text-navy-700"
+              parentActive ? "text-green" : "text-navy-700"
             }`}
           >
             {route.name}
@@ -72,13 +72,13 @@ function NavItem({ route }) {
                   <div
                     className={`flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm transition-all duration-150 ${
                       active
-                        ? "font-semibold text-brand"
+                        ? "font-semibold text-green"
                         : "font-medium text-gray-500 hover:text-navy-700"
                     }`}
                   >
                     <span
                       className={`h-1.5 w-1.5 flex-shrink-0 rounded-full transition-colors ${
-                        active ? "bg-brand" : "bg-gray-300"
+                        active ? "bg-green" : "bg-gray-300"
                       }`}
                     />
                     {child.name}
@@ -98,28 +98,28 @@ function NavItem({ route }) {
       <div
         className={`group mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150 ${
           parentActive
-            ? "bg-brand shadow-md shadow-brand/20"
+            ? "border-l-4 border-green text-green bg-green/10"
             : "hover:bg-gray-100"
         }`}
       >
         <span
           className={`flex-shrink-0 transition-colors ${
             parentActive
-              ? "text-white"
-              : "text-gray-400 group-hover:text-brand"
+              ? "text-green"
+              : "text-gray-400 group-hover:text-green"
           }`}
         >
           {route.icon}
         </span>
         <span
           className={`flex-1 text-sm font-medium transition-colors ${
-            parentActive ? "text-white" : "text-navy-700"
+            parentActive ? "text-green" : "text-navy-700"
           }`}
         >
           {route.name}
         </span>
         {parentActive && (
-          <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+          <span className="h-1.5 w-1.5 rounded-full bg-green/60" />
         )}
       </div>
     </Link>
@@ -127,10 +127,10 @@ function NavItem({ route }) {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
-export function SidebarLinks({ routes }) {
+export function SidebarLinks({ routes, layout = "/admin" }) {
   const grouped = SECTION_ORDER.reduce((acc, section) => {
     const items = routes.filter(
-      (r) => r.layout === "/admin" && r.section === section
+      (r) => r.layout === layout && r.section === section
     );
     if (items.length) acc[section] = items;
     return acc;

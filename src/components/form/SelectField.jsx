@@ -1,28 +1,47 @@
-﻿import React from "react";
+import React, { useState } from "react";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
-  return path
-    .split(/[.[\]]/).filter(Boolean)
+  return path.split(/[.[\]]/).filter(Boolean)
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData }) => {
+const SelectField = ({
+  label, field, options, required = true,
+  formData, errors, updateFormData, rules = [],
+}) => {
+  const [touched, setTouched] = useState(false);
+  const [localError, setLocalError] = useState(null);
+
   const value = getNestedValue(formData, field) ?? "";
-  const error = getNestedValue(errors, field);
+  const externalError = getNestedValue(errors, field);
+  const displayError = localError || externalError;
+
+  const handleChange = (e) => {
+    updateFormData(field, e.target.value);
+    if (touched) setLocalError(validate(e.target.value, rules));
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setLocalError(validate(value, rules));
+  };
 
   return (
-    <div className="mb-4">
-      <label className="mb-1.5 block text-sm font-medium text-slate-900">
+    <div className={WRAPPER}>
+      <label className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <select
         value={value}
-        onChange={(e) => updateFormData(field, e.target.value)}
+        onChange={handleChange}
+        onBlur={handleBlur}
         className={`h-12 w-full cursor-pointer rounded-xl border px-3 text-sm text-slate-900 outline-none transition-all focus:outline-none ${
-          error
-            ? "border-red-400 bg-red-50 focus:border-red-500"
+          displayError
+            ? "border-red-400 bg-red-50 focus:border-red-400"
             : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70"
         }`}
       >
@@ -38,7 +57,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         )}
       </select>
 
-      {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

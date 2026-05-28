@@ -14,7 +14,7 @@
  : color === "blue"
  ? "checked:!border-blue-500 checked:before:!bg-blue-500"
  : color === "green"
- ? "checked:!border-green-500 checked:before:!bg-green-500"
+ ? "checked:!border-green checked:before:!bg-green"
  : color === "yellow"
  ? "checked:!border-yellow-500 checked:before:!bg-yellow-500"
  : color === "orange"
@@ -37,7 +37,7 @@
  ? "checked:!border-indigo-500 checked:before:!bg-indigo-500"
  : color === "gray"
  ? "checked:!border-gray-500 checked:before:!bg-gray-500"
- : "checked:!border-brand-500 checked:before:!bg-brand-500"
+ : "checked:!border-green checked:before:!bg-green"
  } `}
  {...rest}
  />

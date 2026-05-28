@@ -1,65 +1,88 @@
-﻿import Footer from "components/footer/FooterAuthDefault";
-import authImg from "assets/img/auth/auth.png";
-import { Link, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import logo from "assets/brand/LOGO-wbg.png";
 import routes from "routes.js";
+
 export default function Auth() {
- const getRoutes = (routes) => {
- return routes.map((prop, key) => {
- if (prop.layout === "/auth") {
- return (
- <Route path={`/${prop.path}`} element={prop.component} key={key} />
- );
- } else {
- return null;
- }
- });
- };
- document.documentElement.dir = "ltr";
- return (
- <div>
- <div className="relative float-right h-full min-h-screen w-full !bg-white">
- <main className={`mx-auto min-h-screen`}>
- <div className="relative flex">
- <div className="mx-auto flex min-h-full w-full flex-col justify-start pt-12 md:max-w-[75%] lg:max-w-[1013px] lg:px-8 lg:pt-0 xl:min-h-[100vh] xl:max-w-[1383px] xl:px-0 xl:pl-[70px]">
- <div className="mb-auto flex flex-col pl-5 pr-5 md:pr-0 md:pl-12 lg:max-w-[48%] lg:pl-0 xl:max-w-full">
- <Link to="/admin" className="mt-0 w-max lg:pt-10">
- <div className="mx-auto flex h-fit w-fit items-center hover:cursor-pointer">
- <svg
- width="8"
- height="12"
- viewBox="0 0 8 12"
- fill="none"
- xmlns="http://www.w3.org/2000/svg"
- >
- <path
- d="M6.70994 2.11997L2.82994 5.99997L6.70994 9.87997C7.09994 10.27 7.09994 10.9 6.70994 11.29C6.31994 11.68 5.68994 11.68 5.29994 11.29L0.709941 6.69997C0.319941 6.30997 0.319941 5.67997 0.709941 5.28997L5.29994 0.699971C5.68994 0.309971 6.31994 0.309971 6.70994 0.699971C7.08994 1.08997 7.09994 1.72997 6.70994 2.11997V2.11997Z"
- fill="#A3AED0"
- />
- </svg>
- <p className="ml-3 text-sm text-gray-600">
- Back to Dashboard
- </p>
- </div>
- </Link>
- <Routes>
- {getRoutes(routes)}
- <Route
- path="/"
- element={<Navigate to="/auth/sign-in" replace />}
- />
- </Routes>
- <div className="absolute right-0 hidden h-full min-h-screen md:block lg:w-[49vw] 2xl:w-[44vw]">
- <div
- className="absolute flex h-full w-full items-end justify-center bg-cover bg-center lg:rounded-bl-[120px] xl:rounded-bl-[200px]"
- style={{ backgroundImage: `url(${authImg})` }}
- />
- </div>
- </div>
- <Footer />
- </div>
- </div>
- </main>
- </div>
- </div>
- );
+  const getRoutes = () =>
+    routes.map((route, key) =>
+      route.layout === "/auth" ? (
+        <Route path={`/${route.path}`} element={route.component} key={key} />
+      ) : null
+    );
+
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+
+      {/* ── Left — Brand panel ── */}
+      <div className="relative hidden flex-col items-center justify-between bg-green px-10 py-14 lg:flex lg:w-[42%] rounded-br-[100px]">
+
+        {/* Decorative layer — clipped separately so the panel curve isn't cut */}
+        <div className="absolute inset-0 overflow-hidden rounded-br-[100px]">
+          {/* Subtle grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+          {/* Glow blobs */}
+          <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-[80px]" />
+          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-[#005629]/40 blur-[80px]" />
+        </div>
+
+        {/* Top — flag labels */}
+        <div className="relative z-10 flex items-center gap-2">
+          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium tracking-widest text-white/70 uppercase">
+            🇲🇾 Malaysia · Palestine 🇵🇸
+          </span>
+        </div>
+
+        {/* Center — logo + identity */}
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="mb-7 flex h-44 w-44 items-center justify-center rounded-3xl bg-white p-4 shadow-2xl">
+            <img src={logo} alt="PFM" className="h-full w-full object-contain" />
+          </div>
+
+          <p className="text-xl font-bold leading-snug text-white" dir="rtl">
+            المنتدى الفلسطيني ماليزيا
+          </p>
+          <p className="mt-1.5 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
+            Palestinian Forum Malaysia
+          </p>
+
+          <div className="my-6 h-px w-10 bg-white/30" />
+
+          <p className="max-w-[260px] text-sm leading-relaxed text-white/80">
+            Standing in solidarity with Palestine — for justice, dignity, and freedom.
+          </p>
+        </div>
+
+        {/* Bottom — version badge */}
+        <div className="relative z-10">
+          <span className="text-xs text-white/40">PFM Portal v1.0</span>
+        </div>
+      </div>
+
+      {/* ── Right — Form panel ── */}
+      <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-[58%]">
+
+        {/* Mobile logo */}
+        <div className="mb-8 flex flex-col items-center lg:hidden">
+          <img src={logo} alt="PFM" className="h-20 w-20 object-contain" />
+          <p className="mt-2 text-sm font-semibold text-navy-700">Palestinian Forum Malaysia</p>
+        </div>
+
+        <div className="w-full max-w-[420px]">
+          <Routes>
+            {getRoutes()}
+            <Route path="/" element={<Navigate to="/auth/sign-in" replace />} />
+          </Routes>
+        </div>
+
+      </div>
+
+    </div>
+  );
 }

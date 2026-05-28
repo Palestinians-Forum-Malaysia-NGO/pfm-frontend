@@ -1,4 +1,4 @@
-import {
+﻿import {
   MdFavorite,
   MdCampaign,
   MdPeople,
@@ -18,8 +18,8 @@ const STATS = [
     value: "RM 125,000",
     sub: "All time received",
     icon: MdFavorite,
-    iconBg: "bg-brand-50",
-    iconColor: "text-brand-500",
+    iconBg: "bg-green/10",
+    iconColor: "text-green",
     trend: 12,
   },
   {

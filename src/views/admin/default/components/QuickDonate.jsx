@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { MdFavorite } from "react-icons/md";
 
 const PRESET_AMOUNTS = [50, 100, 200, 500];
@@ -29,7 +29,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
         <select
           value={campaign}
           onChange={(e) => setCampaign(e.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-brand-400 focus:bg-white/15"
+          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-green/75 focus:bg-white/15"
         >
           <option value="" className="text-navy-700">
             Select from favorites...
@@ -57,7 +57,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
         <select
           value={beneficiary}
           onChange={(e) => setBeneficiary(e.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-brand-400 focus:bg-white/15"
+          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-green/75 focus:bg-white/15"
         >
           <option value="" className="text-navy-700">
             Select beneficiary...
@@ -80,7 +80,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
               onClick={() => setAmount(String(p))}
               className={`rounded-xl py-2 text-xs font-bold transition ${
                 amount === String(p)
-                  ? "bg-brand-500 text-white"
+                  ? "bg-green text-white"
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
               }`}
             >
@@ -93,7 +93,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
           placeholder="Or enter amount..."
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition focus:border-brand-400 focus:bg-white/15"
+          className="mt-1 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition focus:border-green/75 focus:bg-white/15"
         />
       </div>
 
@@ -106,7 +106,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
           type="checkbox"
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
-          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-brand-500"
+          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-green"
         />
         <span className="text-xs leading-relaxed text-gray-400">
           I confirm that this donation is for charitable purposes only. I will
@@ -119,7 +119,7 @@ const QuickDonate = ({ campaigns, beneficiaries }) => {
         disabled={!isReady}
         className={`w-full rounded-xl py-3.5 text-sm font-black tracking-wider transition ${
           isReady
-            ? "bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700"
+            ? "bg-green text-white hover:bg-[#006833] active:bg-[#005629]"
             : "cursor-not-allowed bg-white/10 text-gray-500"
         }`}
       >

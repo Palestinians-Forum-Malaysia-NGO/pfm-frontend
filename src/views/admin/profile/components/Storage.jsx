@@ -1,4 +1,4 @@
-import Card from "components/card";
+﻿import Card from "components/card";
 import CardMenu from "components/card/CardMenu";
 import React from "react";
 import { BsCloudCheck } from "react-icons/bs";
@@ -10,7 +10,7 @@ const Storage = () => {
       </div>
       {/* Your storage */}
       <div className="mb-auto flex flex-col items-center justify-center">
-        <div className="mt-2 flex items-center justify-center rounded-full bg-lightPrimary p-[26px] text-5xl font-bold text-brand-500 dark:!bg-navy-700 dark:text-white">
+        <div className="mt-2 flex items-center justify-center rounded-full bg-lightPrimary p-[26px] text-5xl font-bold text-green dark:!bg-navy-700 dark:text-white">
           <BsCloudCheck />
         </div>
         <h4 className="mb-px mt-3 text-2xl font-bold text-navy-700 dark:text-white">
@@ -29,7 +29,7 @@ const Storage = () => {
           <p className="text-sm font-medium text-gray-600">50 GB</p>
         </div>
         <div className="mt-2 flex h-3 w-full items-center rounded-full bg-lightPrimary dark:!bg-navy-700">
-          <span className="h-full w-1/2 rounded-full bg-brand-500 dark:!bg-white" />
+          <span className="h-full w-1/2 rounded-full bg-green dark:!bg-white" />
         </div>
       </div>
     </Card>
