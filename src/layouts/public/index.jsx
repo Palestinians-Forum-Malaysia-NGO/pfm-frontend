@@ -1,7 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import PublicNavbar from "components/navbar/PublicNavbar";
-import Footer from "components/footer/Footer";
 import routes from "routes.js";
 
 export default function PublicLayout() {
