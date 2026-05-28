@@ -157,8 +157,11 @@ const ComingSoon = () => {
             <div className="flex items-center gap-2">
               {[
                 { href: "",   icon: <FaWhatsapp size={14} />,   label: "WhatsApp" },
+                
                 { href: "",   icon: <FaInstagram size={14} />,  label: "Instagram" },
+                
                 { href: "",   icon: <FaFacebook size={14} />,   label: "Facebook" },
+                
                 { href: "",   icon: <MdEmail size={15} />,      label: "Email" },
               ].map(({ href, icon, label }) => (
                 <a key={label} href={href}
