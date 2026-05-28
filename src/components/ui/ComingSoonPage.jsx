@@ -1,5 +1,6 @@
 import React from "react";
-import { MdRocketLaunch, MdArrowBack } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
+import { FaHandHoldingHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -45,7 +46,7 @@ const ComingSoonPage = ({
       <div className="relative mb-8">
         <span className="absolute inset-0 animate-ping rounded-3xl bg-green/15 [animation-duration:2.5s]" />
         <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-lg shadow-green/10 ring-1 ring-green/20 text-green">
-          {icon ?? <MdRocketLaunch className="h-11 w-11" />}
+          {icon ?? <FaHandHoldingHeart className="h-11 w-11" />}
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MdEmail, MdPeople, MdVolunteerActivism, MdCampaign } from "react-icons/md";
-import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
+import { MdPeople, MdCampaign } from "react-icons/md";
+import { FaHandHoldingHeart } from "react-icons/fa";
 import logo from "assets/brand/LOGO-wbg.png";
 
 const PILLARS = [
@@ -15,7 +15,7 @@ const PILLARS = [
     desc:  "Raising awareness and championing justice for Palestine",
   },
   {
-    icon: <MdVolunteerActivism className="h-5 w-5" />,
+    icon: <FaHandHoldingHeart className="h-5 w-5" />,
     title: "Humanitarian Aid",
     desc:  "Coordinating donations, relief, and on-ground support",
   },
@@ -145,36 +145,6 @@ const ComingSoon = () => {
 
            
           </main>
-
-          {/* ── Footer ── */}
-          <footer className="relative z-10 fade-up flex flex-col items-center gap-3 px-6 py-5 sm:flex-row sm:justify-between sm:px-10"
-            style={{ animationDelay: "0.7s", borderTop: "1px solid #007A3D10" }}>
-
-            <p className="text-xs text-slate-400 text-center sm:text-left">
-              © {new Date().getFullYear()} Palestinian Forum Malaysia (PFM). All rights reserved.
-            </p>
-
-            <div className="flex items-center gap-2">
-              {[
-                { href: "",   icon: <FaWhatsapp size={14} />,   label: "WhatsApp" },
-                
-                { href: "",   icon: <FaInstagram size={14} />,  label: "Instagram" },
-                
-                { href: "",   icon: <FaFacebook size={14} />,   label: "Facebook" },
-                
-                { href: "",   icon: <MdEmail size={15} />,      label: "Email" },
-              ].map(({ href, icon, label }) => (
-                <a key={label} href={href}
-                  target={href.startsWith("mailto") ? undefined : "_blank"}
-                  rel="noreferrer" title={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
-                  style={{ borderColor: "#007A3D25", background: "#007A3D08", color: "#007A3D" }}>
-                  {icon}
-                </a>
-              ))}
-            </div>
-
-          </footer>
 
         </div>
       </section>

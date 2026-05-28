@@ -1,5 +1,5 @@
 import React from "react";
-import { MdRocketLaunch } from "react-icons/md";
+import { FaHandHoldingHeart } from "react-icons/fa";
 
 /**
  * Full-section "Coming Soon" placeholder.
@@ -23,7 +23,7 @@ const ComingSoon = ({
       <span className="absolute inset-0 animate-ping rounded-2xl bg-green/20 [animation-duration:2s]" />
       <span className="absolute inset-0 rounded-2xl bg-green/10" />
       <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-green/10 text-green ring-1 ring-green/20">
-        {icon ?? <MdRocketLaunch className="h-9 w-9" />}
+        {icon ?? <FaHandHoldingHeart className="h-9 w-9" />}
       </div>
     </div>
 
