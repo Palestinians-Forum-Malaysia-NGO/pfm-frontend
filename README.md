@@ -1,103 +1,210 @@
-# [Horizon UI TailwindCSS React ⚡️](https://horizon-ui.com/horizon-tailwind-react) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=Check%20Horizon%20UI,%20the%20trendiest%20open-source%20admin%20template%20for%20%23tailwindcss%20and%20%23react!%0A%0Ahorizon-ui.com%20)
+# PFM Frontend Portal
 
-![version](https://img.shields.io/badge/version-2.0.0-brightgreen.svg)
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
-[![GitHub issues open](https://img.shields.io/github/issues/horizon-ui/horizon-tailwind-react.svg?maxAge=2592000)](https://github.com/horizon-ui/horizon-tailwind-react/issues?q=is%3Aopen+is%3Aissue)
-
-<p>&nbsp;</p>
-
-[<img alt="Horizon UI - Tailwind CSS React Admin dashboard template" src="https://i.ibb.co/1zhBQ2J/horizon-ui-tailwind-2.png" />](https://github.com/horizon-ui/horizon-tailwind-react)
-
-<p>&nbsp;</p>
-
-Get started and build your dream web app with Horizon UI, the trendiest & innovative Open Source Admin Template for Tailwind CSS & React!
+**Palestinian Forum Malaysia (PFM)** — official member portal frontend.  
+Built with React, Tailwind CSS, and React Router v6.
 
 ---
 
-### Introduction
+## Tech Stack
 
-Designed for those who like modern UI elements and beautiful websites. Made of hundred of elements, designed blocks and fully coded pages, Horizon UI is ready to help you create stunning websites and webapps.
+| Layer       | Technology                        |
+|-------------|-----------------------------------|
+| Framework   | React 19                          |
+| Routing     | React Router v6                   |
+| Styling     | Tailwind CSS v3                   |
+| Icons       | react-icons (MD + FI + FA)        |
+| Build tool  | Create React App (react-scripts)  |
+| Deployment  | Vercel                            |
 
-Save hundreds of hours trying to create and develop a dashboard from scratch.
-The fastest, most responsive & trendiest dashboard for Tailwind CSS is here. Seriously.
+---
 
-With Horizon UI you will find many examples for pages like NFTs Pages,
-Authentication Pages, Profile and so on. Just choose between a Basic Design or a cover and you are good to go!
+## Getting Started
 
-### 🎉 [NEW] Horizon UI Components
-
-All the main components from both versions, this will help you to see and interact with all & the latest added components of Horizon (also, new components are on the way, stay tuned)! ⚡️
-<a href="https://horizon-ui.com/components/?ref=readme-horizon-tailwind-react" target="_blank">See all components</a>
-
-### Documentation
-
-Each element is well presented in a very complex documentation. You can read more about the <a href="https://horizon-ui.com/docs-tailwind/docs/react/installation?ref=readme-horizon-tailwind-react" target="_blank">documentation here.</a>
-
-### Quick Start
-
-Install Horizon UI by running either of the following:
-
-- Install NodeJS LTS from [NodeJs Official Page](https://nodejs.org/en/?ref=horizon-documentation) (NOTE: Product only works with LTS version).
-
-Clone the repository with the following command:
+**Prerequisites:** Node.js LTS
 
 ```bash
-git clone https://github.com/horizon-ui/horizon-tailwind-react.git
-```
+# 1. Clone the repo
+git clone https://github.com/adnanmadi241/pfm-frontend.git
+cd pfm-frontend
 
-Run in terminal this command:
-
-```bash
+# 2. Install dependencies
 npm install
+
+# 3. Start dev server
+npm run dev
 ```
 
-Then run this command to start your local server
-
-```bash
-npm start
-```
-
-### Example Pages
-
-If you want to get inspiration or just show something directly to your clients, you can jump start your development with our pre-built example pages. You will be able to quickly set up the basic structure for your web project.
-
-View <a href="https://horizon-ui.com/horizon-tailwind-react/?ref=readme-horizon-tailwind-react" target="_blank">example pages here.</a>
-
-### Versions
-
-| Free Version                                                                                                                                          | PRO Version                                                                                                                                                    |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [![Horizon UI Tailwind CSS React](https://i.ibb.co/1zhBQ2J/horizon-ui-tailwind-2.png)](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-react) | [![Horizon UI Tailwind CSS React PRO](https://i.ibb.co/d0cVzKB/horizon-ui-pro-tailwind.png)](https://www.horizon-ui.com/pro?ref=readme-horizon-tailwind-react) |
-
-### Figma Version
-
-Horizon UI is available in Figma format as well! Check it out on Figma
-Community! 🎨
-[See the Horizon UI Figma design files](https://bit.ly/horizon-figma)
-
-### Reporting Issues
-
-We use GitHub Issues as the official bug tracker for the Horizon UI. Here are
-some advices for our users that want to report an issue:
-
-1. Make sure that you are using the latest version of the Horizon UI Dashbaord.
-   Check the CHANGELOG from your dashboard on our
-   [CHANGE LOG File](https://github.com/horizon-ui/horizon-tailwind-react/blob/main/CHANGELOG.md?ref=readme-horizon-tailwind-react).
-2. Providing us reproducible steps for the issue will shorten the time it takes
-   for it to be fixed.
-3. Some issues may be browser specific, so specifying in what browser you
-   encountered the issue might help.
+App runs at **http://localhost:3000**
 
 ---
 
-### Community
+## Scripts
 
-Connect with the community! Feel free to ask questions, report issues, and meet new people that already use Horizon UI!
+| Command           | Description                        |
+|-------------------|------------------------------------|
+| `npm run dev`     | Start development server           |
+| `npm start`       | Alias for dev server               |
+| `npm run build`   | Production build → `/build`        |
+| `npm test`        | Run test suite                     |
+| `npm run pretty`  | Format code with Prettier          |
 
-💬 [Join the #HorizonUI Discord Community!](https://discord.gg/f6tEKFBd4m)
+---
 
-### Copyright and license
+## Project Structure
 
-⭐️ [Copyright 2023 Horizon UI ](https://www.horizon-ui.com/?ref=readme-horizon-tailwind-react)
+```
+src/
+├── assets/
+│   └── brand/              # LOGO.jpg, LOGO-wbg.png
+├── components/
+│   ├── ui/                 # Reusable UI components
+│   │   ├── buttons/        # Button, IconButton, RowIconButton, PrevButton, NextButton
+│   │   ├── modals/         # Modal (base), ConfirmModal
+│   │   ├── form/           # FormHeader
+│   │   ├── PageHeader.jsx
+│   │   ├── FilterSelect.jsx
+│   │   ├── ComingSoon.jsx
+│   │   └── ComingSoonPage.jsx
+│   ├── form/               # InputField, PasswordField, SelectField, SearchInput, ToggleInput …
+│   ├── features/
+│   │   └── users/          # useUsers hook, userService, UserDeleteModal
+│   ├── home/               # ComingSoon (public landing page)
+│   ├── navbar/
+│   ├── sidebar/
+│   ├── footer/
+│   ├── loading/
+│   └── empty/
+├── layouts/
+│   ├── admin/              # Admin layout + routes
+│   ├── manager/            # Manager layout
+│   ├── member/             # Member layout
+│   └── public/             # Public layout
+├── views/
+│   ├── admin/
+│   │   ├── default/        # Dashboard
+│   │   ├── users/          # Users CRUD (index, create, detail, edit)
+│   │   ├── profile/
+│   │   └── placeholder/    # Coming soon for unbuilt sections
+│   ├── manager/
+│   ├── member/
+│   └── public/
+│       └── home/           # Public landing page
+├── routes.js               # Route definitions with sidebar children
+└── constants/
+```
 
-📄 [Horizon UI License](https://www.simmmple.com/licenses?ref=readme-horizon-tailwind-react)
+---
+
+## Layouts & Routes
+
+| Layout  | Base path      | Role        |
+|---------|----------------|-------------|
+| Public  | `/`            | Visitors    |
+| Admin   | `/admin`       | Admins      |
+| Manager | `/manager`     | Managers    |
+| Member  | `/member`      | Members     |
+
+---
+
+## Features
+
+### ✅ Built
+- **Users** — full CRUD: list with filters/search/pagination, create, view detail, edit, delete modal
+- **Public home** — Coming Soon landing page with email notification
+- **UI system** — reusable Modal, ConfirmModal, Button variants, SearchInput, FilterSelect, PageHeader, FormHeader, ComingSoonPage
+
+### 🚧 Coming Soon
+- Members management
+- Events
+- Donations
+- Reports
+
+---
+
+## Reusable Components
+
+### Buttons
+```jsx
+<Button variant="primary | secondary | ghost | danger" text="..." icon={...} />
+<RowIconButton variant="default | primary | danger" icon={...} onClick={...} />
+```
+
+### Modal
+```jsx
+<Modal open={open} onClose={onClose} title="..." size="sm | md | lg | xl" footer={...}>
+  {/* body content */}
+</Modal>
+
+<ConfirmModal open={open} onClose={onClose} onConfirm={fn}
+  title="..." message="..." confirmText="..." confirmVariant="danger" />
+```
+
+### Forms
+```jsx
+<InputField    label="..." field="name"  formData={...} errors={...} updateFormData={...} />
+<SelectField   label="..." field="role"  options={[...]} formData={...} errors={...} updateFormData={...} />
+<PasswordField label="..." field="pass"  formData={...} errors={...} updateFormData={...} />
+<ToggleInput   label="..." field="active" formData={...} updateFormData={...} />
+<SearchInput   value={...} onChange={fn} placeholder="..." />
+<FilterSelect  value={...} onChange={fn} options={[...]} />
+```
+
+### Coming Soon
+```jsx
+// Section-level placeholder
+<ComingSoon title="Reports" />
+
+// Full-page route placeholder
+<ComingSoonPage title="Events" icon={<MdEvent />} backPath="/admin/default" />
+```
+
+---
+
+## Deployment (Vercel)
+
+The project is pre-configured for Vercel via `vercel.json`:
+
+```json
+{
+  "buildCommand": "CI=false npm run build",
+  "outputDirectory": "build",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+**Deploy steps:**
+1. Push to GitHub
+2. Import repo on [vercel.com](https://vercel.com)
+3. Vercel auto-detects CRA — click Deploy
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local` for local development:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable             | Description              |
+|----------------------|--------------------------|
+| `REACT_APP_API_URL`  | Backend API base URL     |
+
+Set these in **Vercel → Project → Settings → Environment Variables** for production.
+
+---
+
+## Brand
+
+| Asset              | Path                        |
+|--------------------|-----------------------------|
+| Logo (white bg)    | `src/assets/brand/LOGO-wbg.png` |
+| Logo (solid)       | `src/assets/brand/LOGO.jpg`     |
+| Brand green        | `#007A3D`                       |
+
+---
+
+## License
+
+© 2025 Palestinian Forum Malaysia (PFM). All rights reserved.
