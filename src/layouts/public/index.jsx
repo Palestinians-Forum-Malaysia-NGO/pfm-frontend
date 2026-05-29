@@ -2,6 +2,9 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import routes from "routes.js";
 
+import PublicNavbar from "components/navbar/PublicNavbar";
+import Footer from "components/footer/Footer";
+
 export default function PublicLayout() {
   const getRoutes = () =>
     routes
@@ -12,11 +15,13 @@ export default function PublicLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
+      <PublicNavbar />
       <main className="flex-1">
         <Routes>
           {getRoutes()}
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
