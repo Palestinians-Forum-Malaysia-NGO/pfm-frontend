@@ -53,13 +53,13 @@ const Modal = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-200 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300 ${
         shown ? "bg-black/40" : "bg-black/0"
       }`}
       onClick={closeOnBackdrop ? onClose : undefined}
     >
       <div
-        className={`relative w-full ${SIZES[size]} rounded-2xl bg-white shadow-2xl transition-all duration-200 ${
+        className={`relative w-full ${SIZES[size]} rounded-2xl bg-white shadow-2xl transition-all duration-300 ${
           shown
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-4 scale-95 opacity-0"
@@ -82,7 +82,7 @@ const Modal = ({
             <button
               type="button"
               onClick={onClose}
-              className="ml-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-all duration-200 hover:bg-slate-100 hover:text-slate-600"
+              className="ml-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-all duration-300 ease-in-out hover:bg-slate-100 hover:text-slate-600"
             >
               <MdClose className="h-4 w-4" />
             </button>

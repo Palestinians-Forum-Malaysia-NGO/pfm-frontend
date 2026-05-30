@@ -5,6 +5,8 @@ import { FiSliders } from "react-icons/fi";
 import { useUsers } from "components/features/users/hooks/useUsers";
 import UserDeleteModal from "components/features/users/components/UserDeleteModal";
 import Button from "components/ui/buttons/Button";
+import PrevButton from "components/ui/buttons/PrevButton";
+import NextButton from "components/ui/buttons/NextButton";
 import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
@@ -141,7 +143,7 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 rounded-xl border border-slate-200 ">
+    <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl border border-slate-200">
 
       <PageHeader
         icon={<MdManageAccounts className="h-5 w-5" />}
@@ -158,7 +160,7 @@ export default function UsersPage() {
           <button
             key={card.key}
             onClick={card.onClick}
-            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 active:scale-[0.97] ${
+            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
               card.active
                 ? "border-green/30 bg-green/5 shadow-sm"
                 : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
@@ -193,10 +195,10 @@ export default function UsersPage() {
           <div className="relative sm:hidden">
             <button
               onClick={() => setShowMobileFilters((s) => !s)}
-              className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-all duration-200 ${
+              className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
                 showMobileFilters
                   ? "border-blue-300 bg-blue-50 text-blue-600"
-                  : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+                  : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100/50"
               }`}
             >
               <FiSliders className="h-4 w-4" />
@@ -210,8 +212,8 @@ export default function UsersPage() {
 
           {/* Desktop dropdowns + clear — hidden on mobile, inline via contents on sm+ */}
           <div className="hidden sm:contents">
-            <FilterSelect value={roleFilter}   onChange={handleRoleChange}   options={ROLE_OPTIONS}   />
-            <FilterSelect value={statusFilter} onChange={handleStatusChange} options={STATUS_OPTIONS} />
+            <FilterSelect value={roleFilter}   onChange={handleRoleChange}   options={ROLE_OPTIONS}   icon={<MdShield className="h-3.5 w-3.5" />} />
+            <FilterSelect value={statusFilter} onChange={handleStatusChange} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
             {activeFiltersCount > 0 && (
               <Button
                 variant="danger"
@@ -226,8 +228,8 @@ export default function UsersPage() {
         {/* Mobile expanded filters */}
         {showMobileFilters && (
           <div className="mt-3 flex flex-col gap-3 sm:hidden">
-            <FilterSelect value={roleFilter}   onChange={handleRoleChange}   options={ROLE_OPTIONS}   className="w-full" />
-            <FilterSelect value={statusFilter} onChange={handleStatusChange} options={STATUS_OPTIONS} className="w-full" />
+            <FilterSelect value={roleFilter}   onChange={handleRoleChange}   options={ROLE_OPTIONS}   icon={<MdShield className="h-3.5 w-3.5" />} className="w-full" />
+            <FilterSelect value={statusFilter} onChange={handleStatusChange} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} className="w-full" />
             {activeFiltersCount > 0 && (
               <Button
                 variant="danger"
@@ -288,7 +290,7 @@ export default function UsersPage() {
                       <tr
                         key={user.id}
                         onClick={() => navigate(`/admin/users/${user.id}`)}
-                        className="bg-white hover:bg-slate-50 cursor-pointer transition-colors duration-150"
+                        className="bg-white hover:bg-slate-50 cursor-pointer transition-colors duration-150 ease-in-out"
                       >
                         {/* Checkbox — stop propagation */}
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -359,54 +361,50 @@ export default function UsersPage() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between rounded-b-xl border border-slate-200 bg-slate-50 px-5 py-3.5">
+              <div className="flex flex-col gap-3 rounded-b-xl border border-slate-200 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
 
-                {/* Left — result count */}
-                <div className="flex items-center gap-2">
-                  
+                {/* Result count */}
+                <div className="flex items-center justify-center gap-2 sm:justify-start">
+                  <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                    {filtered.length}
+                  </span>
                   <span className="text-xs text-slate-400">
-                  page {" "}
+                    results &mdash; page{" "}
                     <span className="font-semibold text-slate-600">{page}</span>
                     {" of "}
                     <span className="font-semibold text-slate-600">{totalPages}</span>
                   </span>
                 </div>
 
-                {/* Right — navigation */}
-                <div className="flex items-center gap-1">
-                  <button
+                {/* Navigation */}
+                <div className={`flex items-center justify-center gap-1 sm:justify-end ${totalPages <= 1 ? "pointer-events-none opacity-40" : ""}`}>
+                  <PrevButton
+                    text="Prev"
+                    icon={<MdChevronLeft className="h-3.5 w-3.5" />}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 pl-2 pr-3 text-xs font-medium text-slate-500 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.97] disabled:opacity-35 disabled:pointer-events-none"
-                  >
-                    <MdChevronLeft className="h-3.5 w-3.5" />
-                    Prev
-                  </button>
+                  />
 
-                  <div className="flex items-center gap-1 px-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200 active:scale-[0.97] ${
-                          p === page
-                            ? "bg-green text-white shadow-sm shadow-green/30"
-                            : "text-slate-500 hover:bg-slate-100"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-1.5 px-2">
+                    {[0, 1, 2].map((i) => {
+                      const pos = page === 1 ? 0 : page === totalPages ? 2 : 1;
+                      return (
+                        <span
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all duration-200 ease-in-out ${
+                            i === pos ? "w-4 bg-green" : "w-1.5 bg-slate-300"
+                          }`}
+                        />
+                      );
+                    })}
                   </div>
 
-                  <button
+                  <NextButton
+                    text="Next"
+                    icon={<MdChevronRight className="h-3.5 w-3.5" />}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 pl-3 pr-2 text-xs font-medium text-slate-500 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.97] disabled:opacity-35 disabled:pointer-events-none"
-                  >
-                    Next
-                    <MdChevronRight className="h-3.5 w-3.5" />
-                  </button>
+                  />
                 </div>
               </div>
             </>

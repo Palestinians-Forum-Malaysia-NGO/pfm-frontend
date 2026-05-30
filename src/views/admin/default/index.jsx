@@ -118,7 +118,7 @@ const AS_OF = new Date().toLocaleDateString("en-MY", {
 
 const Dashboard = () => {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* ── Stat cards ── */}
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {STATS.map((s) => (
@@ -127,9 +127,9 @@ const Dashboard = () => {
       </div>
 
       {/* ── Main grid: left (2/3) + right (1/3) ── */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Left column */}
-        <div className="flex flex-col gap-6 lg:col-span-2">
+        <div className="flex flex-col gap-4 lg:col-span-2">
           <BalanceCard
             total="RM 125,000"
             available="RM 48,200"

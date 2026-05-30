@@ -28,14 +28,14 @@ const EmptyState = ({
         {action.href ? (
           <a
             href={action.href}
-            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-colors hover:bg-[#006833]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833]"
           >
             {action.label}
           </a>
         ) : (
           <button
             onClick={action.onClick}
-            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-colors hover:bg-[#006833]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833]"
           >
             {action.label}
           </button>

@@ -43,7 +43,7 @@ const ComingSoon = ({
     {action && (
       <button
         onClick={action.onClick}
-        className="mt-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.97]"
+        className="mt-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 ease-in-out hover:border-slate-300 hover:bg-slate-50 active:scale-[0.97]"
       >
         {action.label}
       </button>

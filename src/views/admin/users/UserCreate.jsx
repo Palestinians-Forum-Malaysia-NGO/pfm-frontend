@@ -7,6 +7,7 @@ import {
 } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
+import AlertBanner from "components/ui/AlertBanner";
 
 const ROLE_OPTIONS = [
   { value: "admin",           label: "Admin" },
@@ -78,11 +79,7 @@ export default function UserCreate() {
       {/* ── Form card ── */}
       <div className="">
 
-        {saveError && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {saveError}
-          </div>
-        )}
+        <AlertBanner message={saveError} />
 
         <form onSubmit={handleSubmit} noValidate>
 
@@ -138,7 +135,7 @@ export default function UserCreate() {
           />
 
           {/* Actions */}
-          <div className="mt-2 flex gap-3">
+          <div className="mt-4 flex gap-3">
             <Button
               variant="ghost"
               text="Cancel"
