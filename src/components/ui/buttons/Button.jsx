@@ -1,10 +1,10 @@
 import React from "react";
 
 const variants = {
-  primary:   "bg-green text-white border-green hover:bg-[#006833] hover:border-[#006833] active:bg-[#005629]",
-  secondary: "bg-white text-green border-green hover:bg-green/10 active:bg-green/20",
-  ghost:     "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100",
-  danger:    "bg-white text-red-500 border-red-300 hover:bg-red-50 hover:border-red-400 active:bg-red-100",
+  primary:   "bg-green text-white border-green enabled:hover:bg-[#006833] enabled:hover:border-[#006833] enabled:active:bg-[#005629]",
+  secondary: "bg-slate-50 text-green border-green enabled:hover:bg-green/10 enabled:active:bg-green/20",
+  ghost:     "bg-slate-50 text-slate-500 border-slate-200 enabled:hover:border-slate-300 enabled:hover:bg-slate-100/50 enabled:active:bg-slate-100",
+  danger:    "bg-white text-red-500 border-red-300 enabled:hover:bg-red-50 enabled:hover:border-red-400 enabled:active:bg-red-100",
 };
 
 const Button = ({
@@ -26,10 +26,10 @@ const Button = ({
       disabled={isDisabled}
       className={`
         inline-flex min-w-0 max-w-full items-center justify-center gap-2
-        rounded-full border px-4 py-2.5 text-sm font-medium
+        rounded-full border px-5 py-2.5 text-sm font-medium
         transition-all duration-200 ease-in-out
-        active:scale-[0.97]
-        disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none
+        enabled:hover:-translate-y-px enabled:active:translate-y-0 enabled:active:scale-[0.98]
+        disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none
         ${variants[variant]} ${className}
       `}
     >

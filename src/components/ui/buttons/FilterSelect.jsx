@@ -30,12 +30,12 @@ const FilterSelect = ({ value, onChange, options, icon, disabled = false, classN
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
         className={`
-          inline-flex min-w-0 max-w-full w-full cursor-pointer appearance-none items-center justify-center
-          rounded-full border border-slate-200 bg-slate-50
+          w-full cursor-pointer appearance-none
+          rounded-full border border-slate-200 bg-white
           ${icon ? "pl-9" : "pl-5"} pr-9 py-2.5
           text-sm font-medium text-slate-700
           transition-all duration-200 ease-in-out
-          outline-none focus:border-green hover:bg-slate-100/50
+          outline-none focus:border-green
           disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none
         `}
       >

@@ -8,11 +8,11 @@ const PrevButton = ({ onClick, disabled, text = "Back", icon, className = "" }) 
     disabled={disabled}
     className={`
       inline-flex min-w-0 max-w-full items-center justify-center gap-2
-      rounded-xl border border-slate-200 bg-white px-4 py-2.5
+      rounded-full border border-slate-200 bg-slate-50 px-4 py-2
       text-sm font-medium text-slate-500
       transition-all duration-200 ease-in-out
-      hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100 active:scale-[0.97]
-      disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none
+      enabled:hover:-translate-y-px enabled:hover:border-slate-300 enabled:hover:bg-slate-100/50 enabled:active:translate-y-0 enabled:active:bg-slate-100 enabled:active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none
       ${className}
     `}
   >

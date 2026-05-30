@@ -8,11 +8,11 @@ const NextButton = ({ onClick, disabled, loading, text = "Next", icon, className
     disabled={disabled || loading}
     className={`
       inline-flex min-w-0 max-w-full items-center justify-center gap-2
-      rounded-xl border border-green bg-white px-4 py-2.5
+      rounded-full border border-green bg-white px-4 py-2
       text-sm font-medium text-green
       transition-all duration-200 ease-in-out
-      hover:bg-green/10 active:bg-green/15 active:scale-[0.97]
-      disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none
+      enabled:hover:-translate-y-px enabled:hover:bg-green/10 enabled:active:translate-y-0 enabled:active:bg-green/15 enabled:active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none
       ${className}
     `}
   >
