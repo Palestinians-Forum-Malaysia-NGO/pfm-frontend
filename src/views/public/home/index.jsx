@@ -1,10 +1,26 @@
 import React from "react";
+import HeroSection       from "components/public/home/HeroSection";
+import ImpactStats       from "components/public/home/ImpactStats";
+import AboutPFM          from "components/public/home/AboutPFM";
+import ProjectCategories from "components/public/home/ProjectCategories";
+import ValuesVision      from "components/public/home/ValuesVision";
+import NewsHighlights    from "components/public/home/NewsHighlights";
+import Testimonials      from "components/public/home/Testimonials";
+import PartnersCarousel  from "components/public/home/PartnersCarousel";
+import WhatsAppFloatButton from "components/public/home/WhatsAppFloatButton";
 
-const Home = () => 
-    
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Personal Finance Manager</h1>
-        <p className="text-lg text-gray-600 mb-8">Your all-in-one solution for managing your finances.</p>
-    </div>;
-
-export default Home;
+export default function Home() {
+  return (
+    <>
+      <HeroSection />
+      <ImpactStats />
+      <AboutPFM />
+      <ProjectCategories />
+      <ValuesVision />
+      <NewsHighlights />
+      <Testimonials />
+      <PartnersCarousel />
+      <WhatsAppFloatButton phone="60123456789" />
+    </>
+  );
+}
