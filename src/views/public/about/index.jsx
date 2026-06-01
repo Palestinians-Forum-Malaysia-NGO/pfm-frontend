@@ -1,10 +1,24 @@
 import React from "react";
+import AboutHero      from "components/public/about/AboutHero";
+import MissionVision  from "components/public/about/MissionVision";
+import CoverageMap    from "components/public/about/CoverageMap";
+import Objectives     from "components/public/about/Objectives";
+import CoreValues     from "components/public/about/CoreValues";
+import PartnersGallery from "components/public/about/PartnersGallery";
+import ReportsSection from "components/public/about/ReportsSection";
+import CallToAction   from "components/public/about/CallToAction";
 
-const About = () => (
-  <div className="mx-auto max-w-3xl px-4 py-16">
-    <h1 className="text-3xl font-bold text-navy-700">About PFM</h1>
-    <p className="mt-4 text-slate-500">About page — coming soon.</p>
-  </div>
-);
-
-export default About;
+export default function About() {
+  return (
+    <>
+      <AboutHero />
+      <MissionVision />
+      <CoverageMap />
+      <Objectives />
+      <CoreValues />
+      <PartnersGallery />
+      <ReportsSection />
+      <CallToAction />
+    </>
+  );
+}
