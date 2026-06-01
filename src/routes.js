@@ -7,8 +7,12 @@ import MembersPage from "views/admin/members";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn from "views/auth/SignIn";
-import ManagerDashboard from "views/manager/default";
-import MemberDashboard from "views/member/default";
+import ManagerDashboard      from "views/manager/default";
+import MemberDashboard       from "views/member/default";
+import BeneficiaryDashboard  from "views/beneficiary/default";
+import BeneficiaryRequests   from "views/beneficiary/requests";
+import BeneficiaryProfile    from "views/beneficiary/profile";
+import BeneficiarySettings   from "views/beneficiary/settings";
 import Home from "views/public/home";
 import About from "views/public/about";
 import PublicEvents from "views/public/events";
@@ -28,6 +32,7 @@ import {
   MdLock,
   MdBarChart,
   MdManageAccounts,
+  MdAssignment,
 } from "react-icons/md";
 
 const routes = [
@@ -228,6 +233,40 @@ const routes = [
     path: "profile",
     icon: <MdPerson className="h-5 w-5" />,
     component: <Profile />,
+    section: "ACCOUNT",
+  },
+
+  // ── BENEFICIARY ──────────────────────────────────────────────────────────────
+  {
+    name: "Dashboard",
+    layout: "/beneficiary",
+    path: "default",
+    icon: <MdHome className="h-5 w-5" />,
+    component: <BeneficiaryDashboard />,
+    section: "MAIN",
+  },
+  {
+    name: "My Requests",
+    layout: "/beneficiary",
+    path: "requests",
+    icon: <MdAssignment className="h-5 w-5" />,
+    component: <BeneficiaryRequests />,
+    section: "MAIN",
+  },
+  {
+    name: "Profile",
+    layout: "/beneficiary",
+    path: "profile",
+    icon: <MdPerson className="h-5 w-5" />,
+    component: <BeneficiaryProfile />,
+    section: "ACCOUNT",
+  },
+  {
+    name: "Settings",
+    layout: "/beneficiary",
+    path: "settings",
+    icon: <MdSettings className="h-5 w-5" />,
+    component: <BeneficiarySettings />,
     section: "ACCOUNT",
   },
 
