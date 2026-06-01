@@ -3,6 +3,7 @@ import React from "react";
 // Page Imports
 import MainDashboard from "views/admin/default";
 import UsersPage from "views/admin/users";
+import MembersPage from "views/admin/members";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn from "views/auth/SignIn";
@@ -67,12 +68,11 @@ const routes = [
     layout: "/admin",
     path: "members",
     icon: <MdPeople className="h-5 w-5" />,
-    component: <Placeholder pageName="Members" />,
+    component: <MembersPage />,
     section: "COMMUNITY",
     children: [
-      { name: "All Members",         path: "members" },
-      { name: "Add Member",          path: "members/add" },
-      { name: "Roles & Permissions", path: "members/roles" },
+      { name: "All Members", path: "members" },
+      { name: "Add Member",  path: "members/create" },
     ],
   },
   {
