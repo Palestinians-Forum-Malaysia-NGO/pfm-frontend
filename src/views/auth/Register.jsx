@@ -17,10 +17,10 @@ const RULES = {
    Step 1 — Registration form
 ────────────────────────────────────────────── */
 const RegisterStep = ({ onOtpRequired }) => {
+  const { execute: register, loading, error } = useRegister();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors]     = useState({});
-  const [apiError, setApiError] = useState("");
-  const [loading, setLoading]   = useState(false);
 
   const updateFormData = (field, value) =>
     setFormData((p) => ({ ...p, [field]: value }));
@@ -35,33 +35,11 @@ const RegisterStep = ({ onOtpRequired }) => {
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     setErrors({});
-    setApiError("");
-    setLoading(true);
     try {
-      const data = await authService.register(formData);
-      // Store tokens if returned at registration
-      if (data.access) setTokens({ access: data.access, refresh: data.refresh });
-      // Proceed to OTP step if required
-      if (data.requires_otp) {
-        onOtpRequired({ email: formData.email, channel: data.channel });
-      } else {
-        onOtpRequired({ email: formData.email, channel: "email" });
-      }
-    } catch (err) {
-      const res = err.response?.data;
-      if (res && typeof res === "object" && !res.detail) {
-        const fieldErrors = {};
-        Object.entries(res).forEach(([key, val]) => {
-          fieldErrors[key] = Array.isArray(val) ? val[0] : val;
-        });
-        setErrors(fieldErrors);
-      } else {
-        setApiError(
-          res?.detail ?? res?.non_field_errors?.[0] ?? "Registration failed. Please try again."
-        );
-      }
-    } finally {
-      setLoading(false);
+      const data = await register(formData);
+      onOtpRequired({ email: formData.email, channel: data.channel ?? "email" });
+    } catch {
+      // error handled by useRegister
     }
   };
 
@@ -75,7 +53,7 @@ const RegisterStep = ({ onOtpRequired }) => {
         <p className="mt-1 text-sm text-slate-400">Join the PFM community portal.</p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={error} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
         <InputField

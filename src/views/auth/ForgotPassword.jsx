@@ -11,11 +11,11 @@ const EMAIL_RULES = [{ required: true, message: "Email is required" }, { email: 
 export default function ForgotPassword() {
   const navigate = useNavigate();
 
+  const { execute: forgotPassword, loading, error } = useForgotPassword();
+
   const [formData, setFormData] = useState({ email: "" });
   const [errors, setErrors]     = useState({});
-  const [apiError, setApiError] = useState("");
   const [sent, setSent]         = useState(false);
-  const [loading, setLoading]   = useState(false);
 
   const updateFormData = (field, value) =>
     setFormData((p) => ({ ...p, [field]: value }));
@@ -26,17 +26,11 @@ export default function ForgotPassword() {
     if (err) { setErrors({ email: err }); return; }
 
     setErrors({});
-    setApiError("");
-    setLoading(true);
     try {
-      await authService.forgotPassword({ email: formData.email });
+      await forgotPassword({ email: formData.email });
       setSent(true);
-    } catch (err) {
-      setApiError(
-        err.response?.data?.detail ?? "Could not send reset email. Please try again."
-      );
-    } finally {
-      setLoading(false);
+    } catch {
+      // error handled by useForgotPassword
     }
   };
 
@@ -88,7 +82,7 @@ export default function ForgotPassword() {
         </p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={error} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
         <InputField
@@ -101,6 +95,7 @@ export default function ForgotPassword() {
         <button
           type="submit"
           disabled={loading}
+
           className="mt-4 flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading

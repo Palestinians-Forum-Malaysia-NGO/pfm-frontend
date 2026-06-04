@@ -16,15 +16,15 @@ export default function ResetPassword() {
   const location  = useLocation();
   const prefilled = location.state?.email ?? "";
 
-  const [email, setEmail]         = useState(prefilled);
-  const [otp, setOtp]             = useState("");
-  const [formData, setFormData]   = useState({ new_password: "" });
-  const [errors, setErrors]       = useState({});
-  const [apiError, setApiError]   = useState("");
-  const [loading, setLoading]     = useState(false);
-  const [done, setDone]           = useState(false);
-  const [resending, setResending] = useState(false);
-  const [resent, setResent]       = useState(false);
+  const { execute: resetPassword, loading, error }    = useResetPassword();
+  const { execute: resendOtp, loading: resending }    = useResendOtp();
+
+  const [email, setEmail]       = useState(prefilled);
+  const [otp, setOtp]           = useState("");
+  const [formData, setFormData] = useState({ new_password: "" });
+  const [errors, setErrors]     = useState({});
+  const [done, setDone]         = useState(false);
+  const [resent, setResent]     = useState(false);
 
   const updateFormData = (field, value) =>
     setFormData((p) => ({ ...p, [field]: value }));
@@ -36,34 +36,21 @@ export default function ResetPassword() {
     if (!otp.trim()) { setErrors({ otp: "OTP code is required" }); return; }
 
     setErrors({});
-    setApiError("");
-    setLoading(true);
     try {
-      await authService.resetPassword({
-        email,
-        otp: otp.trim(),
-        new_password: formData.new_password,
-      });
+      await resetPassword({ email, otp: otp.trim(), new_password: formData.new_password });
       setDone(true);
-    } catch (err) {
-      setApiError(
-        err.response?.data?.detail ?? "Reset failed. Check your code and try again."
-      );
-    } finally {
-      setLoading(false);
+    } catch {
+      // error handled by useResetPassword
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     setResent(false);
     try {
-      await authService.resendOtp({ email, purpose: "password_reset" });
+      await resendOtp({ email, purpose: "password_reset" });
       setResent(true);
     } catch {
-      setApiError("Failed to resend code. Please try again.");
-    } finally {
-      setResending(false);
+      // error handled by useResendOtp
     }
   };
 
@@ -109,7 +96,7 @@ export default function ResetPassword() {
         </p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={error} />
       {resent && <AlertBanner message="A new code has been sent." variant="success" />}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
