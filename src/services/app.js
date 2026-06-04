@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "components/features/auth/utils";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "https://pfm-backend-production-eb4a.up.railway.app/api";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://pfm-backend-production-eb4a.up.railway.app";
 
 const api = axios.create({
   baseURL: BASE_URL,
