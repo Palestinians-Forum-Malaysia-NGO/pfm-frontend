@@ -4,7 +4,7 @@ import { MdLockReset, MdArrowBack, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
 import { validate }  from "components/form/utils/validation";
-import authService   from "components/features/auth/services/authService";
+import { useResetPassword, useResendOtp } from "components/features/auth/hooks";
 
 const PASSWORD_RULES = [
   { required: true, message: "New password is required" },

@@ -46,3 +46,22 @@ export const isTokenExpired = (token) => {
   if (!decoded?.exp) return true;
   return Date.now() >= decoded.exp * 1000;
 };
+
+/** ── DRF error parser ── */
+
+/**
+ * Extracts a human-readable error message from any Axios/DRF error.
+ * Handles: detail string, non_field_errors, field-level errors, plain strings.
+ */
+export const extractError = (err, fallback = "Something went wrong. Please try again.") => {
+  const res = err?.response?.data;
+  if (!res) return err?.message ?? fallback;
+  if (typeof res === "string")            return res;
+  if (res.detail)                         return res.detail;
+  if (res.non_field_errors?.[0])          return res.non_field_errors[0];
+  // First field-level error
+  const firstField = Object.values(res)[0];
+  if (Array.isArray(firstField))          return firstField[0];
+  if (typeof firstField === "string")     return firstField;
+  return fallback;
+};

@@ -4,7 +4,7 @@ import { MdLockReset, MdArrowBack } from "react-icons/md";
 import InputField  from "components/form/InputField";
 import AlertBanner from "components/ui/AlertBanner";
 import { validate } from "components/form/utils/validation";
-import authService  from "components/features/auth/services/authService";
+import { useForgotPassword } from "components/features/auth/hooks";
 
 const EMAIL_RULES = [{ required: true, message: "Email is required" }, { email: true }];
 

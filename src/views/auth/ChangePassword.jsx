@@ -3,7 +3,7 @@ import { MdLock, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
 import { validate }  from "components/form/utils/validation";
-import authService   from "components/features/auth/services/authService";
+import { usePasswordChange } from "components/features/auth/hooks";
 
 const RULES = {
   old_password: [{ required: true, message: "Current password is required" }],

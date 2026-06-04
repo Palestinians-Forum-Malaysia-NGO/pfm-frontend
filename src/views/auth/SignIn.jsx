@@ -1,12 +1,12 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { MdEmail, MdArrowBack } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
 import { validate }  from "components/form/utils/validation";
 import Checkbox      from "components/checkbox";
-import useAuth       from "components/features/auth/hooks/useAuth";
-import authService   from "components/features/auth/services/authService";
+import { useAuth, useLogin, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 
 const EMAIL_RULES    = [{ required: true }, { email: true }];
 const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password must be at least 8 characters" }];
@@ -14,13 +14,12 @@ const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password m
 /* ──────────────────────────────────────────────
    Step 1 — Email + Password
 ────────────────────────────────────────────── */
-const LoginStep = ({ onOtpRequired, onError }) => {
-  const { login, completeLogin } = useAuth();
+const LoginStep = ({ onOtpRequired }) => {
+  const { completeLogin }                        = useAuth();
+  const { execute: login, loading, error: loginError } = useLogin();
   const [formData, setFormData]         = useState({ email: "", password: "" });
   const [errors, setErrors]             = useState({});
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
-  const [loading, setLoading]           = useState(false);
-  const [apiError, setApiError]         = useState("");
 
   const updateFormData = (field, value) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -35,30 +34,16 @@ const LoginStep = ({ onOtpRequired, onError }) => {
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     setErrors({});
-    setApiError("");
-    setLoading(true);
 
     try {
       const data = await login({ email: formData.email, password: formData.password });
-
       if (data.requires_otp) {
         onOtpRequired({ email: formData.email, channel: data.channel });
       } else {
-        // No OTP — fetch user profile and navigate by role
         await completeLogin();
       }
-    } catch (err) {
-      const res = err.response?.data;
-      const msg =
-        res?.detail                          // DRF standard
-        ?? res?.non_field_errors?.[0]        // dj-rest-auth
-        ?? res?.email?.[0]                   // field error
-        ?? res?.password?.[0]               // field error
-        ?? (typeof res === "string" ? res : null)
-        ?? "Invalid email or password. Please try again.";
-      setApiError(msg);
-    } finally {
-      setLoading(false);
+    } catch {
+      // error state handled by useLogin hook
     }
   };
 
@@ -72,7 +57,7 @@ const LoginStep = ({ onOtpRequired, onError }) => {
         <p className="mt-1 text-sm text-slate-400">Sign in to your PFM account to continue.</p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={loginError} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
         <InputField
@@ -110,11 +95,11 @@ const LoginStep = ({ onOtpRequired, onError }) => {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-slate-400">
-        Need access?{" "}
-        <a href="#" className="font-medium text-green transition-colors duration-200 hover:text-[#006833]">
-          Contact the administrator
-        </a>
+      <p className="mt-6 text-center text-sm text-slate-400">
+        Don't have an account?{" "}
+        <Link to="/auth/register" className="font-medium text-green transition-colors duration-200 hover:text-[#006833]">
+          Create one
+        </Link>
       </p>
     </>
   );
@@ -124,42 +109,33 @@ const LoginStep = ({ onOtpRequired, onError }) => {
    Step 2 — OTP Verification
 ────────────────────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
-  const { verifyOtp } = useAuth();
-  const [code, setCode]           = useState("");
-  const [loading, setLoading]     = useState(false);
-  const [apiError, setApiError]   = useState("");
-  const [resent, setResent]       = useState(false);
-  const [resending, setResending] = useState(false);
+  const { completeLogin }                                    = useAuth();
+  const { execute: verifyOtp, loading, error: otpError }    = useVerifyOtp();
+  const { execute: resendOtp, loading: resending }          = useResendOtp();
+  const [code, setCode]   = useState("");
+  const [resent, setResent] = useState(false);
 
   const isReady = code.trim().length === 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isReady) return;
-    setApiError("");
-    setLoading(true);
     try {
       await verifyOtp({ email, code: code.trim() });
-    } catch (err) {
-      const res = err.response?.data;
-      const msg = res?.detail ?? res?.code?.[0] ?? "Invalid or expired code. Please try again.";
-      setApiError(msg);
-    } finally {
-      setLoading(false);
+      await completeLogin();
+    } catch {
+      // error state handled by useVerifyOtp hook
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     setResent(false);
     setCode("");
     try {
-      await authService.resendOtp({ email, purpose: "login" });
+      await resendOtp({ email, purpose: "login" });
       setResent(true);
     } catch {
-      setApiError("Failed to resend code. Please try again.");
-    } finally {
-      setResending(false);
+      // error handled by useResendOtp
     }
   };
 
@@ -180,7 +156,7 @@ const OtpStep = ({ email, channel, onBack }) => {
         </p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={otpError} />
       {resent && <AlertBanner message="A new code has been sent." variant="success" />}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -42,11 +42,10 @@ export const AuthProvider = ({ children }) => {
     return me;
   }, [navigate]);
 
-  /* ── Step 2b: Verify OTP (6-char code) then complete login ── */
-  const verifyOtp = useCallback(async ({ email, code }) => {
+  /* ── Step 2b: Verify OTP (6-char code) — works for login & register ── */
+  const verifyOtp = useCallback(async ({ email, code, purpose = OTP_PURPOSE.LOGIN }) => {
     setError(null);
-    const data = await authService.verifyOtp({ email, code, purpose: OTP_PURPOSE.LOGIN });
-    // Response includes fresh tokens after OTP verification
+    const data = await authService.verifyOtp({ email, code, purpose });
     if (data.access) setTokens({ access: data.access, refresh: data.refresh });
     return completeLogin();
   }, [completeLogin]);
