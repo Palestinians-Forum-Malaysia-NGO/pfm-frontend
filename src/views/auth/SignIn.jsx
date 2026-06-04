@@ -1,28 +1,34 @@
 import React, { useState } from "react";
-import InputField from "components/form/InputField";
+import { MdEmail, MdArrowBack } from "react-icons/md";
+import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
-import { validate } from "components/form/utils/validation";
-import Checkbox from "components/checkbox";
+import AlertBanner   from "components/ui/AlertBanner";
+import { validate }  from "components/form/utils/validation";
+import Checkbox      from "components/checkbox";
+import useAuth       from "components/features/auth/hooks/useAuth";
+import authService   from "components/features/auth/services/authService";
 
 const EMAIL_RULES    = [{ required: true }, { email: true }];
 const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password must be at least 8 characters" }];
 
-export default function SignIn() {
+/* ──────────────────────────────────────────────
+   Step 1 — Email + Password
+────────────────────────────────────────────── */
+const LoginStep = ({ onOtpRequired, onError }) => {
+  const { login } = useAuth();
   const [formData, setFormData]         = useState({ email: "", password: "" });
   const [errors, setErrors]             = useState({});
-  const [apiError, setApiError]         = useState("");
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [loading, setLoading]           = useState(false);
+  const [apiError, setApiError]         = useState("");
 
   const updateFormData = (field, value) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Catch any fields the user never touched (skipped blur)
     const newErrors = {};
-    const emailErr    = validate(formData.email, EMAIL_RULES);
+    const emailErr    = validate(formData.email,    EMAIL_RULES);
     const passwordErr = validate(formData.password, PASSWORD_RULES);
     if (emailErr)    newErrors.email    = emailErr;
     if (passwordErr) newErrors.password = passwordErr;
@@ -31,100 +37,202 @@ export default function SignIn() {
     setErrors({});
     setApiError("");
     setLoading(true);
+
     try {
-      // TODO: call auth service
+      const data = await login({ email: formData.email, password: formData.password });
+      if (data.requires_otp) {
+        onOtpRequired({ email: formData.email, channel: data.channel });
+      }
+      // If no OTP needed, AuthContext handles routing
     } catch (err) {
-      setApiError(err?.message || "Invalid email or password. Please try again.");
+      const msg = err.response?.data?.detail
+        ?? err.response?.data?.non_field_errors?.[0]
+        ?? "Invalid email or password. Please try again.";
+      setApiError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
-
-      {/* Header */}
+    <>
       <div className="mb-7">
         <span className="inline-block rounded-full bg-green/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-green">
           Portal Access
         </span>
         <h1 className="mt-3 text-2xl font-bold text-navy-700">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Sign in to your PFM account to continue.
-        </p>
+        <p className="mt-1 text-sm text-slate-400">Sign in to your PFM account to continue.</p>
       </div>
 
-      {/* API error banner */}
-      {apiError && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {apiError}
-        </div>
-      )}
+      <AlertBanner message={apiError} />
 
-      {/* Form */}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
         <InputField
-          label="Email address"
-          field="email"
-          type="email"
+          label="Email address" field="email" type="email"
           placeholder="you@example.com"
-          formData={formData}
-          errors={errors}
-          updateFormData={updateFormData}
-          rules={EMAIL_RULES}
+          formData={formData} errors={errors}
+          updateFormData={updateFormData} rules={EMAIL_RULES}
         />
-
         <PasswordField
-          label="Password"
-          field="password"
+          label="Password" field="password"
           placeholder="Enter your password"
-          formData={formData}
-          errors={errors}
-          updateFormData={updateFormData}
-          rules={PASSWORD_RULES}
+          formData={formData} errors={errors}
+          updateFormData={updateFormData} rules={PASSWORD_RULES}
         />
 
-        {/* Remember + Forgot */}
         <div className="mb-5 flex items-center justify-between">
           <label className="flex cursor-pointer items-center gap-2">
-            <Checkbox
-              color="green"
-              checked={keepLoggedIn}
-              onChange={(e) => setKeepLoggedIn(e.target.checked)}
-              extra="cursor-pointer"
-            />
+            <Checkbox color="green" checked={keepLoggedIn} onChange={(e) => setKeepLoggedIn(e.target.checked)} extra="cursor-pointer" />
             <span className="text-sm text-slate-600">Remember me</span>
           </label>
-          <a
-            href="#"
-            className="text-sm font-medium text-green transition-colors duration-200 hover:text-[#006833]"
-          >
+          <a href="/auth/forgot-password" className="text-sm font-medium text-green transition-colors duration-200 hover:text-[#006833]">
             Forgot password?
           </a>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:bg-[#005629] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:pointer-events-none"
+          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:bg-[#005629] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-          ) : (
-            "Sign In"
-          )}
+          {loading
+            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            : "Sign In"
+          }
         </button>
       </form>
 
-      {/* Footer */}
       <p className="mt-6 text-center text-xs text-slate-400">
         Need access?{" "}
         <a href="#" className="font-medium text-green transition-colors duration-200 hover:text-[#006833]">
           Contact the administrator
         </a>
       </p>
+    </>
+  );
+};
 
+/* ──────────────────────────────────────────────
+   Step 2 — OTP Verification
+────────────────────────────────────────────── */
+const OtpStep = ({ email, channel, onBack }) => {
+  const { verifyOtp } = useAuth();
+  const [otp, setOtp]           = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [resent, setResent]     = useState(false);
+  const [resending, setResending] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (otp.trim().length < 4) return;
+    setApiError("");
+    setLoading(true);
+    try {
+      await verifyOtp({ email, otp: otp.trim() });
+    } catch (err) {
+      const msg = err.response?.data?.detail ?? "Invalid or expired OTP. Please try again.";
+      setApiError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    setResent(false);
+    try {
+      await authService.resendOtp({ email, purpose: "login" });
+      setResent(true);
+    } catch {
+      setApiError("Failed to resend OTP. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="mb-7">
+        <button onClick={onBack} className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700">
+          <MdArrowBack className="h-4 w-4" /> Back
+        </button>
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10">
+          <MdEmail className="h-6 w-6 text-green" />
+        </div>
+        <h1 className="mt-4 text-2xl font-bold text-navy-700">Verify your identity</h1>
+        <p className="mt-1 text-sm text-slate-400">
+          We sent a code via <span className="font-semibold text-slate-600">{channel}</span> to{" "}
+          <span className="font-semibold text-slate-600">{email}</span>
+        </p>
+      </div>
+
+      <AlertBanner message={apiError} />
+      {resent && <AlertBanner message="A new OTP has been sent." variant="success" />}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-700">OTP Code</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={8}
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            placeholder="Enter OTP code"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xl font-bold tracking-[0.5em] text-slate-900 outline-none transition-all duration-200 focus:border-green focus:bg-white placeholder:tracking-normal placeholder:text-base placeholder:font-normal"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || otp.trim().length < 4}
+          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading
+            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            : "Verify & Sign In"
+          }
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-slate-400">
+        Didn't receive it?{" "}
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          className="font-medium text-green transition-colors hover:text-[#006833] disabled:opacity-50"
+        >
+          {resending ? "Sending..." : "Resend OTP"}
+        </button>
+      </p>
+    </>
+  );
+};
+
+/* ──────────────────────────────────────────────
+   Main SignIn — orchestrates steps
+────────────────────────────────────────────── */
+export default function SignIn() {
+  const [step, setStep]       = useState("login"); // "login" | "otp"
+  const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
+
+  return (
+    <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
+      {step === "login" ? (
+        <LoginStep
+          onOtpRequired={({ email, channel }) => {
+            setOtpMeta({ email, channel });
+            setStep("otp");
+          }}
+        />
+      ) : (
+        <OtpStep
+          email={otpMeta.email}
+          channel={otpMeta.channel}
+          onBack={() => setStep("login")}
+        />
+      )}
     </div>
   );
 }

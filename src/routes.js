@@ -6,7 +6,11 @@ import UsersPage from "views/admin/users";
 import MembersPage from "views/admin/members";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
-import SignIn from "views/auth/SignIn";
+import SignIn          from "views/auth/SignIn";
+import Register        from "views/auth/Register";
+import ForgotPassword  from "views/auth/ForgotPassword";
+import ResetPassword   from "views/auth/ResetPassword";
+import ChangePassword  from "views/auth/ChangePassword";
 import ManagerDashboard      from "views/manager/default";
 import MemberDashboard       from "views/member/default";
 import BeneficiaryDashboard  from "views/beneficiary/default";
@@ -278,13 +282,11 @@ const routes = [
   { name: "Contact", layout: "/", path: "/contact", component: <Contact /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
-  {
-    name: "Sign In",
-    layout: "/auth",
-    path: "sign-in",
-    icon: <MdLock className="h-5 w-5" />,
-    component: <SignIn />,
-  },
+  { name: "Sign In",         layout: "/auth", path: "sign-in",         component: <SignIn /> },
+  { name: "Register",        layout: "/auth", path: "register",        component: <Register /> },
+  { name: "Forgot Password", layout: "/auth", path: "forgot-password", component: <ForgotPassword /> },
+  { name: "Reset Password",  layout: "/auth", path: "reset-password",  component: <ResetPassword /> },
+  { name: "Change Password", layout: "/auth", path: "change-password", component: <ChangePassword /> },
 ];
 
 export default routes;
