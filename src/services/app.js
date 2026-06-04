@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "components/features/auth/utils";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "https://pfm-backend-production-eb4a.up.railway.app";
+const BASE_URL = process.env.REACT_APP_API_URL || "https://pfm-backend-production-eb4a.up.railway.app/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -25,7 +25,10 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    if (error.response?.status === 401 && !original._retry) {
+    // Skip refresh logic for auth endpoints — a 401 there means wrong credentials,
+    // not an expired token. Let the error propagate to the caller.
+    const isAuthEndpoint = original.url?.includes("/auth/");
+    if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true;
       const refresh = getRefreshToken();
 

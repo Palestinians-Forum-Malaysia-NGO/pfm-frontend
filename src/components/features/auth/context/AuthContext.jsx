@@ -23,7 +23,10 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  /* ── Login (step 1) — returns raw response so caller can check requires_otp ── */
+  /* ── Step 1: Login — stores tokens, returns raw response ──
+     Caller checks requires_otp:
+       true  → show OTP step → call verifyOtp()
+       false → call completeLogin()                          */
   const login = useCallback(async ({ email, password }) => {
     setError(null);
     const data = await authService.login({ email, password });
@@ -31,29 +34,30 @@ export const AuthProvider = ({ children }) => {
     return data;
   }, []);
 
-  /* ── OTP verify (step 2) ── */
-  const verifyOtp = useCallback(async ({ email, otp }) => {
-    setError(null);
-    const data = await authService.verifyOtp({ email, otp, purpose: OTP_PURPOSE.LOGIN });
-    if (data.access) setTokens({ access: data.access, refresh: data.refresh });
-
+  /* ── Step 2a: Complete login when no OTP required ── */
+  const completeLogin = useCallback(async () => {
     const me = await authService.getMe();
     setUser(me);
     navigate(getRoleHome(me.role));
     return me;
   }, [navigate]);
 
-  /* ── Direct login (no OTP) ── */
+  /* ── Step 2b: Verify OTP (6-char code) then complete login ── */
+  const verifyOtp = useCallback(async ({ email, code }) => {
+    setError(null);
+    const data = await authService.verifyOtp({ email, code, purpose: OTP_PURPOSE.LOGIN });
+    // Response includes fresh tokens after OTP verification
+    if (data.access) setTokens({ access: data.access, refresh: data.refresh });
+    return completeLogin();
+  }, [completeLogin]);
+
+  /* ── Direct login (no OTP — single call) ── */
   const loginDirect = useCallback(async ({ email, password }) => {
     setError(null);
     const data = await authService.login({ email, password });
     setTokens({ access: data.access, refresh: data.refresh });
-
-    const me = await authService.getMe();
-    setUser(me);
-    navigate(getRoleHome(me.role));
-    return me;
-  }, [navigate]);
+    return completeLogin();
+  }, [completeLogin]);
 
   /* ── Logout ── */
   const logout = useCallback(() => {
@@ -65,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       user, loading, error,
-      login, verifyOtp, loginDirect, logout,
+      login, completeLogin, verifyOtp, loginDirect, logout,
       isAuthenticated: !!user,
     }}>
       {children}

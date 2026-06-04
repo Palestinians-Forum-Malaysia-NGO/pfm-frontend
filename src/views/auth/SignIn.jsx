@@ -15,7 +15,7 @@ const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password m
    Step 1 — Email + Password
 ────────────────────────────────────────────── */
 const LoginStep = ({ onOtpRequired, onError }) => {
-  const { login } = useAuth();
+  const { login, completeLogin } = useAuth();
   const [formData, setFormData]         = useState({ email: "", password: "" });
   const [errors, setErrors]             = useState({});
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
@@ -40,13 +40,21 @@ const LoginStep = ({ onOtpRequired, onError }) => {
 
     try {
       const data = await login({ email: formData.email, password: formData.password });
+
       if (data.requires_otp) {
         onOtpRequired({ email: formData.email, channel: data.channel });
+      } else {
+        // No OTP — fetch user profile and navigate by role
+        await completeLogin();
       }
-      // If no OTP needed, AuthContext handles routing
     } catch (err) {
-      const msg = err.response?.data?.detail
-        ?? err.response?.data?.non_field_errors?.[0]
+      const res = err.response?.data;
+      const msg =
+        res?.detail                          // DRF standard
+        ?? res?.non_field_errors?.[0]        // dj-rest-auth
+        ?? res?.email?.[0]                   // field error
+        ?? res?.password?.[0]               // field error
+        ?? (typeof res === "string" ? res : null)
         ?? "Invalid email or password. Please try again.";
       setApiError(msg);
     } finally {
@@ -117,21 +125,24 @@ const LoginStep = ({ onOtpRequired, onError }) => {
 ────────────────────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
   const { verifyOtp } = useAuth();
-  const [otp, setOtp]           = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [apiError, setApiError] = useState("");
-  const [resent, setResent]     = useState(false);
+  const [code, setCode]           = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [apiError, setApiError]   = useState("");
+  const [resent, setResent]       = useState(false);
   const [resending, setResending] = useState(false);
+
+  const isReady = code.trim().length === 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (otp.trim().length < 4) return;
+    if (!isReady) return;
     setApiError("");
     setLoading(true);
     try {
-      await verifyOtp({ email, otp: otp.trim() });
+      await verifyOtp({ email, code: code.trim() });
     } catch (err) {
-      const msg = err.response?.data?.detail ?? "Invalid or expired OTP. Please try again.";
+      const res = err.response?.data;
+      const msg = res?.detail ?? res?.code?.[0] ?? "Invalid or expired code. Please try again.";
       setApiError(msg);
     } finally {
       setLoading(false);
@@ -141,11 +152,12 @@ const OtpStep = ({ email, channel, onBack }) => {
   const handleResend = async () => {
     setResending(true);
     setResent(false);
+    setCode("");
     try {
       await authService.resendOtp({ email, purpose: "login" });
       setResent(true);
     } catch {
-      setApiError("Failed to resend OTP. Please try again.");
+      setApiError("Failed to resend code. Please try again.");
     } finally {
       setResending(false);
     }
@@ -162,31 +174,38 @@ const OtpStep = ({ email, channel, onBack }) => {
         </div>
         <h1 className="mt-4 text-2xl font-bold text-navy-700">Verify your identity</h1>
         <p className="mt-1 text-sm text-slate-400">
-          We sent a code via <span className="font-semibold text-slate-600">{channel}</span> to{" "}
+          We sent a 6-digit code via{" "}
+          <span className="font-semibold text-slate-600">{channel}</span> to{" "}
           <span className="font-semibold text-slate-600">{email}</span>
         </p>
       </div>
 
       <AlertBanner message={apiError} />
-      {resent && <AlertBanner message="A new OTP has been sent." variant="success" />}
+      {resent && <AlertBanner message="A new code has been sent." variant="success" />}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-700">OTP Code</label>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            6-Digit Code
+          </label>
           <input
             type="text"
             inputMode="numeric"
-            maxLength={8}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-            placeholder="Enter OTP code"
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xl font-bold tracking-[0.5em] text-slate-900 outline-none transition-all duration-200 focus:border-green focus:bg-white placeholder:tracking-normal placeholder:text-base placeholder:font-normal"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            placeholder="——————"
+            autoFocus
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-2xl font-bold tracking-[0.6em] text-slate-900 outline-none transition-all duration-200 focus:border-green focus:bg-white placeholder:tracking-normal placeholder:text-base placeholder:font-normal"
           />
+          <p className="mt-1.5 text-center text-xs text-slate-400">
+            {code.length}/6 digits entered
+          </p>
         </div>
 
         <button
           type="submit"
-          disabled={loading || otp.trim().length < 4}
+          disabled={loading || !isReady}
           className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading

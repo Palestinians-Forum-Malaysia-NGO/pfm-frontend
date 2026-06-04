@@ -8,10 +8,11 @@ const authService = {
     // Returns: { detail, channel, requires_otp, access, refresh }
   },
 
-  /** POST /auth/otp/verify/ */
-  verifyOtp: async ({ email, otp, purpose = "login" }) => {
-    const { data } = await api.post("/auth/otp/verify/", { email, otp, purpose });
+  /** POST /auth/otp/verify/ — field is "code", exactly 6 chars */
+  verifyOtp: async ({ email, code, purpose = "login" }) => {
+    const { data } = await api.post("/auth/otp/verify/", { email, code, purpose });
     return data;
+    // Returns: { detail, refresh, access }
   },
 
   /** POST /auth/otp/resend/ */
