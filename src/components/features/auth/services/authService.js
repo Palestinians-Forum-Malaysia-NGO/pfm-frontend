@@ -1,4 +1,4 @@
-import api from "services/api";
+import api from "services/app";
 
 const authService = {
   /** POST /auth/login/ */
