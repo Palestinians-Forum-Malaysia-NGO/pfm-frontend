@@ -95,42 +95,33 @@ const RegisterStep = ({ onOtpRequired }) => {
    Step 2 — OTP verification
 ────────────────────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
-  const { verifyOtp } = useAuth();
-  const [code, setCode]           = useState("");
-  const [loading, setLoading]     = useState(false);
-  const [apiError, setApiError]   = useState("");
-  const [resent, setResent]       = useState(false);
-  const [resending, setResending] = useState(false);
+  const { completeLogin }                                  = useAuth();
+  const { execute: verifyOtp, loading, error: otpError }  = useVerifyOtp();
+  const { execute: resendOtp, loading: resending }        = useResendOtp();
+  const [code, setCode]   = useState("");
+  const [resent, setResent] = useState(false);
 
   const isReady = code.trim().length === 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isReady) return;
-    setApiError("");
-    setLoading(true);
     try {
-      // Use "register" purpose for registration OTP
       await verifyOtp({ email, code: code.trim(), purpose: OTP_PURPOSE.REGISTER });
-    } catch (err) {
-      const res = err.response?.data;
-      setApiError(res?.detail ?? res?.code?.[0] ?? "Invalid or expired code. Please try again.");
-    } finally {
-      setLoading(false);
+      await completeLogin();
+    } catch {
+      // error handled by useVerifyOtp
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     setResent(false);
     setCode("");
     try {
-      await authService.resendOtp({ email, purpose: OTP_PURPOSE.REGISTER });
+      await resendOtp({ email, purpose: OTP_PURPOSE.REGISTER });
       setResent(true);
     } catch {
-      setApiError("Failed to resend code. Please try again.");
-    } finally {
-      setResending(false);
+      // error handled by useResendOtp
     }
   };
 
@@ -151,7 +142,7 @@ const OtpStep = ({ email, channel, onBack }) => {
         </p>
       </div>
 
-      <AlertBanner message={apiError} />
+      <AlertBanner message={otpError} />
       {resent && <AlertBanner message="A new code has been sent." variant="success" />}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
