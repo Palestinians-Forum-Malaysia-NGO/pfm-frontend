@@ -8,10 +8,10 @@ const CARDS = [
   { label: "Reports",   value: "—", icon: <MdBarChart  className="h-6 w-6" />, bg: "bg-amber-50",    color: "text-amber-500" },
 ];
 
-const ManagerDashboard = () => (
+const StaffDashboard = () => (
   <div className="flex flex-col gap-6">
     <div>
-      <h1 className="text-xl font-bold text-navy-700">Manager Dashboard</h1>
+      <h1 className="text-xl font-bold text-navy-700">Staff Dashboard</h1>
       <p className="mt-1 text-sm text-gray-400">Overview of your managed areas</p>
     </div>
 
@@ -31,4 +31,4 @@ const ManagerDashboard = () => (
   </div>
 );
 
-export default ManagerDashboard;
+export default StaffDashboard;

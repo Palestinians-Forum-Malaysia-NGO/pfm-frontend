@@ -4,7 +4,7 @@ import { AuthProvider }    from "components/features/auth/context/AuthContext";
 import { ToastProvider }  from "components/ui/toast/ToastContext";
 import ProtectedRoute      from "components/features/auth/components/ProtectedRoute";
 import AdminLayout         from "layouts/admin";
-import ManagerLayout       from "layouts/manager";
+import StaffLayout         from "layouts/staff";
 import MemberLayout        from "layouts/member";
 import BeneficiaryLayout   from "layouts/beneficiary";
 import AuthLayout          from "layouts/auth";
@@ -28,10 +28,10 @@ const App = () => (
         }
       />
       <Route
-        path="manager/*"
+        path="staff/*"
         element={
-          <ProtectedRoute role="manager">
-            <ManagerLayout />
+          <ProtectedRoute role="staff">
+            <StaffLayout />
           </ProtectedRoute>
         }
       />

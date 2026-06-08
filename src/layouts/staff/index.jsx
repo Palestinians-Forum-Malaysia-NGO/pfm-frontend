@@ -5,7 +5,7 @@ import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "routes.js";
 
-export default function ManagerLayout() {
+export default function StaffLayout() {
   const location = useLocation();
   const [open, setOpen]                 = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("Dashboard");
@@ -19,13 +19,13 @@ export default function ManagerLayout() {
 
   React.useEffect(() => {
     const path   = location.pathname;
-    const active = routes.find((r) => r.layout === "/manager" && path.includes(r.path));
+    const active = routes.find((r) => r.layout === "/staff" && path.includes(r.path));
     if (active) setCurrentRoute(active.name);
   }, [location.pathname]);
 
   const getRoutes = () =>
     routes.map((route, key) =>
-      route.layout === "/manager" ? (
+      route.layout === "/staff" ? (
         <Route path={`/${route.path}`} element={route.component} key={key} />
       ) : null
     );
@@ -34,10 +34,8 @@ export default function ManagerLayout() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* Sidebar */}
-      <Sidebar open={open} onClose={() => setOpen(false)} layout="/manager" />
+      <Sidebar open={open} onClose={() => setOpen(false)} layout="/staff" />
 
-      {/* Mobile overlay */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/30 xl:hidden"
@@ -45,14 +43,13 @@ export default function ManagerLayout() {
         />
       )}
 
-      {/* Main column */}
       <div className="flex flex-1 flex-col min-h-screen min-w-0 xl:ml-[280px]">
         <Navbar onOpenSidenav={() => setOpen(true)} brandText={currentRoute} />
 
         <main className="flex-1 p-4 md:p-6">
           <Routes>
             {getRoutes()}
-            <Route path="/" element={<Navigate to="/manager/default" replace />} />
+            <Route path="/" element={<Navigate to="/staff/default" replace />} />
           </Routes>
         </main>
 

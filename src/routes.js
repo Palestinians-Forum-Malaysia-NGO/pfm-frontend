@@ -11,7 +11,7 @@ import Register        from "views/auth/Register";
 import ForgotPassword  from "views/auth/ForgotPassword";
 import ResetPassword   from "views/auth/ResetPassword";
 import ChangePassword  from "views/auth/ChangePassword";
-import ManagerDashboard      from "views/manager/default";
+import StaffDashboard        from "views/staff/default";
 import MemberDashboard       from "views/member/default";
 import BeneficiaryDashboard  from "views/beneficiary/default";
 import BeneficiaryRequests   from "views/beneficiary/requests";
@@ -162,18 +162,18 @@ const routes = [
     hidden: true,
   },
 
-  // ── MANAGER ──────────────────────────────────────────────────────────────────
+  // ── STAFF ────────────────────────────────────────────────────────────────────
   {
     name: "Dashboard",
-    layout: "/manager",
+    layout: "/staff",
     path: "default",
     icon: <MdHome className="h-5 w-5" />,
-    component: <ManagerDashboard />,
+    component: <StaffDashboard />,
     section: "MAIN",
   },
   {
     name: "Members",
-    layout: "/manager",
+    layout: "/staff",
     path: "members",
     icon: <MdPeople className="h-5 w-5" />,
     component: <Placeholder pageName="Members" />,
@@ -182,7 +182,7 @@ const routes = [
   },
   {
     name: "Donations",
-    layout: "/manager",
+    layout: "/staff",
     path: "donations",
     icon: <MdFavorite className="h-5 w-5" />,
     component: <Placeholder pageName="Donations" />,
@@ -191,7 +191,7 @@ const routes = [
   },
   {
     name: "Events",
-    layout: "/manager",
+    layout: "/staff",
     path: "events",
     icon: <MdEvent className="h-5 w-5" />,
     component: <Placeholder pageName="Events" />,
@@ -200,7 +200,7 @@ const routes = [
   },
   {
     name: "Profile",
-    layout: "/manager",
+    layout: "/staff",
     path: "profile",
     icon: <MdPerson className="h-5 w-5" />,
     component: <Profile />,

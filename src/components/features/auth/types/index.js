@@ -4,17 +4,17 @@
 
 export const ROLES = {
   ADMIN:       "admin",
-  MANAGER:     "manager",
-  BENEFICIARY: "beneficiary",
+  STAFF:       "staff",
   MEMBER:      "member",
+  BENEFICIARY: "beneficiary",
 };
 
 /** Default dashboard route for each role */
 export const ROLE_HOME = {
   [ROLES.ADMIN]:       "/admin/default",
-  [ROLES.MANAGER]:     "/manager/default",
-  [ROLES.BENEFICIARY]: "/beneficiary/default",
+  [ROLES.STAFF]:       "/staff/default",
   [ROLES.MEMBER]:      "/member/default",
+  [ROLES.BENEFICIARY]: "/beneficiary/default",
 };
 
 /** OTP purposes */
