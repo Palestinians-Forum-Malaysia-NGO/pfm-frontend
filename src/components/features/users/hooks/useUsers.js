@@ -35,7 +35,9 @@ export const useUsers = () => {
       setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
       setDeleteUser(null);
     } catch (err) {
-      setError(extractError(err, "Failed to delete user."));
+      const msg = extractError(err, "Failed to delete user.");
+      setError(msg);
+      throw new Error(msg);
     } finally {
       setActionLoading(false);
     }

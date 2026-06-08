@@ -9,6 +9,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateUser } from "components/features/users/hooks";
 import { ROLE_OPTIONS } from "components/features/users/constants/roles";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
   full_name: [{ required: true, message: "Full name is required" }],
@@ -20,6 +21,7 @@ const RULES = {
 export default function UserCreate() {
   const navigate = useNavigate();
   const { execute: createUser, loading, error } = useCreateUser();
+  const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
     full_name: "", email: "", password: "", role: "", is_active: true,
@@ -40,9 +42,10 @@ export default function UserCreate() {
 
     try {
       const created = await createUser(formData);
+      success("User created", `${formData.full_name} has been added successfully.`);
       navigate(`/admin/users/${created.id}`);
-    } catch {
-      // error shown via useCreateUser
+    } catch (err) {
+      toastError("Failed to create user", err?.message);
     }
   };
 

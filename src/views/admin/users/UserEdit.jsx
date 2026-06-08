@@ -9,6 +9,7 @@ import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
 import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG, ROLE_OPTIONS } from "components/features/users/constants/roles";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -19,6 +20,7 @@ export default function UserEdit() {
 
   const { user, execute: fetchUser, loading, error: loadError } = useGetUser();
   const { execute: updateUser, loading: saving, error: saveError } = useUpdateUser();
+  const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
     full_name: "", email: "", password: "", role: "stuff", is_active: true,
@@ -54,9 +56,10 @@ export default function UserEdit() {
       };
       if (formData.password) payload.password = formData.password;
       await updateUser(id, payload);
+      success("User updated", `${formData.full_name} has been updated successfully.`);
       navigate(`/admin/users/${id}`);
-    } catch {
-      // error shown via saveError
+    } catch (err) {
+      toastError("Failed to update user", err?.message);
     }
   };
 

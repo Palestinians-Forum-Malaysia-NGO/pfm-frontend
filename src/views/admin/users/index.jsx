@@ -15,6 +15,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import { ROLE_LABELS, ROLE_BADGE, ROLE_AVATAR_BG as AVATAR_BG, ROLE_FILTER_OPTIONS as ROLE_OPTIONS } from "components/features/users/constants/roles";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -27,11 +28,22 @@ const STATUS_OPTIONS = [
 
 export default function UsersPage() {
   const navigate = useNavigate();
+  const { success, error: toastError } = useToast();
   const {
     users, loading, error,
     deleteUser, actionLoading,
-    openDelete, closeAll, handleDelete,
+    openDelete, closeAll, handleDelete: _handleDelete,
   } = useUsers();
+
+  const handleDelete = async () => {
+    const name = deleteUser?.full_name;
+    try {
+      await _handleDelete();
+      success("User deleted", `${name} has been removed.`);
+    } catch (err) {
+      toastError("Failed to delete user", err?.message);
+    }
+  };
 
   const [search, setSearch]             = useState("");
   const [roleFilter, setRoleFilter]     = useState("all");

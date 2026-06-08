@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider }    from "components/features/auth/context/AuthContext";
+import { ToastProvider }  from "components/ui/toast/ToastContext";
 import ProtectedRoute      from "components/features/auth/components/ProtectedRoute";
 import AdminLayout         from "layouts/admin";
 import ManagerLayout       from "layouts/manager";
@@ -10,6 +11,7 @@ import AuthLayout          from "layouts/auth";
 import PublicLayout        from "layouts/public";
 
 const App = () => (
+  <ToastProvider>
   <AuthProvider>
     <Routes>
       {/* Public — no auth required */}
@@ -51,6 +53,7 @@ const App = () => (
       />
     </Routes>
   </AuthProvider>
+  </ToastProvider>
 );
 
 export default App;

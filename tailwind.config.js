@@ -117,6 +117,15 @@ module.exports = {
       borderRadius: {
         primary: "20px",
       },
+      keyframes: {
+        "slide-in": {
+          "0%":   { opacity: "0", transform: "translateX(100%) scale(0.95)" },
+          "100%": { opacity: "1", transform: "translateX(0)   scale(1)" },
+        },
+      },
+      animation: {
+        "slide-in": "slide-in 0.25s ease-out forwards",
+      },
     },
     screens: {
       sm: "576px",

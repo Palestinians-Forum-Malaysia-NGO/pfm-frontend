@@ -15,6 +15,7 @@ import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading from "components/loading/Loading";
 import { useGetUser, useDeleteUser } from "components/features/users/hooks";
 import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -25,6 +26,7 @@ export default function UserDetail() {
 
   const { user, execute: fetchUser, loading, error } = useGetUser();
   const { execute: deleteUser, loading: deleteLoading, error: deleteError } = useDeleteUser();
+  const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => { fetchUser(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -32,9 +34,10 @@ export default function UserDetail() {
   const handleDelete = async () => {
     try {
       await deleteUser(id);
+      success("User deleted", `${user?.full_name} has been removed.`);
       navigate("/admin/users");
-    } catch {
-      // error shown via deleteError
+    } catch (err) {
+      toastError("Failed to delete user", err?.message);
     }
   };
 
