@@ -4,7 +4,7 @@ import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdPeople,
   MdEmail, MdPhone, MdCalendarToday, MdShield, MdVerified,
   MdPerson, MdFlag, MdLocationCity, MdHome, MdFlight,
-  MdAccountBalance, MdFamilyRestroom, MdBadge, MdUpdate,
+  MdAccountBalance, MdFamilyRestroom, MdBadge, MdUpdate, MdClose,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -14,9 +14,9 @@ import AlertBanner from "components/ui/AlertBanner";
 import MemberDeleteModal from "components/features/members/components/MemberDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading from "components/loading/Loading";
-import { useGetMember, useDeleteMember } from "components/features/members/hooks";
+import { useGetMember, useDeleteMember, useUpdateMember } from "components/features/members/hooks";
 import {
-  MEMBERSHIP_STATUS_BADGE, MEMBERSHIP_STATUS_LABELS,
+  MEMBERSHIP_STATUS_BADGE, MEMBERSHIP_STATUS_LABELS, MEMBERSHIP_STATUS_FORM_OPTIONS,
   GENDER_LABELS, MARITAL_STATUS_LABELS,
 } from "components/features/members/constants/membership";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -33,10 +33,29 @@ export default function MemberDetail() {
 
   const { member, execute: fetchMember, loading, error } = useGetMember();
   const { execute: deleteMember, loading: deleteLoading, error: deleteError } = useDeleteMember();
+  const { execute: updateMember, loading: statusSaving } = useUpdateMember();
   const { success, error: toastError } = useToast();
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteOpen,      setDeleteOpen]      = useState(false);
+  const [editingStatus,   setEditingStatus]   = useState(false);
+  const [selectedStatus,  setSelectedStatus]  = useState("");
 
   useEffect(() => { fetchMember(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStatusEdit = () => {
+    setSelectedStatus(member.membership_status ?? "");
+    setEditingStatus(true);
+  };
+
+  const handleStatusSave = async () => {
+    try {
+      await updateMember(id, { membership_status: selectedStatus });
+      success("Status updated", `Membership status changed to ${MEMBERSHIP_STATUS_LABELS[selectedStatus]}.`);
+      fetchMember(id);
+      setEditingStatus(false);
+    } catch (err) {
+      toastError("Failed to update status", err?.message);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -98,12 +117,50 @@ export default function MemberDetail() {
                 : getInitials(u.full_name)
               }
             </div>
-            {member.membership_status && (
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${MEMBERSHIP_STATUS_BADGE[member.membership_status] ?? "bg-slate-100 text-slate-500"}`}>
-                <MdVerified className="h-3.5 w-3.5" />
-                {MEMBERSHIP_STATUS_LABELS[member.membership_status] ?? member.membership_status}
-              </span>
-            )}
+            <div className="flex items-center gap-1.5">
+              {!editingStatus ? (
+                <>
+                  {member.membership_status && (
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${MEMBERSHIP_STATUS_BADGE[member.membership_status] ?? "bg-slate-100 text-slate-500"}`}>
+                      <MdVerified className="h-3.5 w-3.5" />
+                      {MEMBERSHIP_STATUS_LABELS[member.membership_status] ?? member.membership_status}
+                    </span>
+                  )}
+                  <button
+                    onClick={handleStatusEdit}
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-600"
+                    title="Change membership status"
+                  >
+                    <MdEdit className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm focus:border-green focus:outline-none focus:ring-1 focus:ring-green"
+                  >
+                    {MEMBERSHIP_STATUS_FORM_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleStatusSave}
+                    disabled={statusSaving}
+                    className="flex h-6 items-center rounded-full bg-green/10 px-2.5 text-xs font-semibold text-green transition-colors duration-150 hover:bg-green/20 disabled:opacity-50"
+                  >
+                    {statusSaving ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    onClick={() => setEditingStatus(false)}
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <MdClose className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900">{u.full_name}</h2>
           {member.full_name_arabic && (
@@ -170,25 +227,30 @@ export default function MemberDetail() {
       )}
 
       {/* ── Family Information ── */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label="Family in Malaysia" value={fi.family_in_malaysia ? "Yes" : "No"} />
-          <InfoRow icon={<MdPeople className="h-4 w-4" />}         label="No. of Children"   value={fi.number_of_children ?? "—"} />
-          {fi.spouse_name && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name"        value={fi.spouse_name} />}
-          {fi.spouse_job  && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label="Spouse Occupation"  value={fi.spouse_job} />}
+      {member.family_information && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label="Family in Malaysia"  value={fi.family_in_malaysia ? "Yes" : "No"} />
+            <InfoRow icon={<MdPeople className="h-4 w-4" />}         label="No. of Children"     value={fi.number_of_children ?? "—"} />
+            {fi.spouse_name        && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name"           value={fi.spouse_name} />}
+            {fi.spouse_name_arabic && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name (Arabic)"  value={fi.spouse_name_arabic} />}
+            {fi.spouse_job         && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label="Spouse Occupation"     value={fi.spouse_job} />}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Banking Information ── */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"          value={bi.bank_name || "—"} />
-          <InfoRow icon={<MdBadge className="h-4 w-4" />}          label="Account Number"     value={bi.account_number || "—"} />
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder"     value={bi.account_holder_name || "—"} />
+      {member.banking_information && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"          value={bi.bank_name || "—"} />
+            <InfoRow icon={<MdBadge className="h-4 w-4" />}          label="Account Number"     value={bi.account_number || "—"} />
+            <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder"     value={bi.account_holder_name || "—"} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Supporting Documents ── */}
       {member.supporting_documents?.length > 0 && (

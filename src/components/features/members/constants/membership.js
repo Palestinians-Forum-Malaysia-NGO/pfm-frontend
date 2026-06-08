@@ -27,6 +27,13 @@ export const MEMBERSHIP_STATUS_OPTIONS = [
   { value: "expired",   label: "Expired" },
 ];
 
+export const MEMBERSHIP_STATUS_FORM_OPTIONS = [
+  { value: "active",    label: "Active" },
+  { value: "pending",   label: "Pending" },
+  { value: "suspended", label: "Suspended" },
+  { value: "expired",   label: "Expired" },
+];
+
 export const GENDER_OPTIONS = [
   { value: "male",   label: "Male" },
   { value: "female", label: "Female" },

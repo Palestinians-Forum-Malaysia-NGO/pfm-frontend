@@ -78,15 +78,15 @@ export default function MemberCreate() {
         address:                    locationForm.address                    || undefined,
         family_information: {
           family_in_malaysia:  familyForm.family_in_malaysia,
-          spouse_name:         familyForm.spouse_name        || undefined,
-          spouse_name_arabic:  familyForm.spouse_name_arabic || undefined,
-          spouse_job:          familyForm.spouse_job         || undefined,
-          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : undefined,
+          spouse_name:         familyForm.spouse_name        || null,
+          spouse_name_arabic:  familyForm.spouse_name_arabic || null,
+          spouse_job:          familyForm.spouse_job         || null,
+          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
         },
         banking_information: {
-          bank_name:           bankingForm.bank_name           || undefined,
-          account_number:      bankingForm.account_number      || undefined,
-          account_holder_name: bankingForm.account_holder_name || undefined,
+          bank_name:           bankingForm.bank_name           || null,
+          account_number:      bankingForm.account_number      || null,
+          account_holder_name: bankingForm.account_holder_name || null,
         },
       };
 

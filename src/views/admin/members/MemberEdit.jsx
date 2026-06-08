@@ -11,7 +11,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetMember, useUpdateMember } from "components/features/members/hooks";
-import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/members/constants/membership";
+import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS, MEMBERSHIP_STATUS_FORM_OPTIONS } from "components/features/members/constants/membership";
 import { COUNTRY_OPTIONS } from "components/features/members/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -27,7 +27,7 @@ export default function MemberEdit() {
     full_name: "", email: "", password: "", phone_number: "", is_active: true,
   });
   const [personalForm, setPersonalForm] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "",
+    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "", membership_status: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
@@ -60,11 +60,12 @@ export default function MemberEdit() {
         is_active:    u.is_active    ?? true,
       });
       setPersonalForm({
-        full_name_arabic: data.full_name_arabic ?? "",
-        passport_number:  data.passport_number  ?? "",
-        date_of_birth:    data.date_of_birth    ? data.date_of_birth.slice(0, 10) : "",
-        gender:           data.gender           ?? "",
-        marital_status:   data.marital_status   ?? "",
+        full_name_arabic:  data.full_name_arabic  ?? "",
+        passport_number:   data.passport_number   ?? "",
+        date_of_birth:     data.date_of_birth     ? data.date_of_birth.slice(0, 10) : "",
+        gender:            data.gender            ?? "",
+        marital_status:    data.marital_status    ?? "",
+        membership_status: data.membership_status ?? "",
       });
       setLocationForm({
         country_of_origin:          data.country_of_origin              ?? "",
@@ -109,21 +110,22 @@ export default function MemberEdit() {
         date_of_birth:              personalForm.date_of_birth              || undefined,
         gender:                     personalForm.gender                     || undefined,
         marital_status:             personalForm.marital_status             || undefined,
+        membership_status:          personalForm.membership_status          || undefined,
         country_of_origin:          locationForm.country_of_origin          || undefined,
         date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia   || undefined,
         current_city:               locationForm.current_city               || undefined,
         address:                    locationForm.address                    || undefined,
         family_information: {
           family_in_malaysia:  familyForm.family_in_malaysia,
-          spouse_name:         familyForm.spouse_name        || undefined,
-          spouse_name_arabic:  familyForm.spouse_name_arabic || undefined,
-          spouse_job:          familyForm.spouse_job         || undefined,
-          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : undefined,
+          spouse_name:         familyForm.spouse_name        || null,
+          spouse_name_arabic:  familyForm.spouse_name_arabic || null,
+          spouse_job:          familyForm.spouse_job         || null,
+          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
         },
         banking_information: {
-          bank_name:           bankingForm.bank_name           || undefined,
-          account_number:      bankingForm.account_number      || undefined,
-          account_holder_name: bankingForm.account_holder_name || undefined,
+          bank_name:           bankingForm.bank_name           || null,
+          account_number:      bankingForm.account_number      || null,
+          account_holder_name: bankingForm.account_holder_name || null,
         },
       };
       if (userForm.password) payload.user.password = userForm.password;
@@ -180,7 +182,8 @@ export default function MemberEdit() {
             <InputField    label="Date of Birth"  field="date_of_birth"  type="date"                       formData={personalForm} errors={errors} updateFormData={setP} />
             <SelectField   label="Gender"         field="gender"         options={GENDER_OPTIONS}           formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
-          <SelectField     label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}   formData={personalForm} errors={errors} updateFormData={setP} />
+          <SelectField     label="Marital Status"    field="marital_status"    options={MARITAL_STATUS_OPTIONS}          formData={personalForm} errors={errors} updateFormData={setP} />
+          <SelectField     label="Membership Status" field="membership_status" options={MEMBERSHIP_STATUS_FORM_OPTIONS}   formData={personalForm} errors={errors} updateFormData={setP} />
         </div>
 
         {/* ── Location & Travel ── */}
