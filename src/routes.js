@@ -56,6 +56,7 @@ const routes = [
     icon: <MdFeed className="h-5 w-5" />,
     component: <Placeholder pageName="News & Updates" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "Events",
@@ -64,6 +65,7 @@ const routes = [
     icon: <MdEvent className="h-5 w-5" />,
     component: <Placeholder pageName="Events" />,
     section: "MAIN",
+    hidden: true,
     children: [
       { name: "All Events",      path: "events" },
       { name: "Create Event",    path: "events/create" },
@@ -91,6 +93,7 @@ const routes = [
     icon: <MdFavorite className="h-5 w-5" />,
     component: <Placeholder pageName="Donations" />,
     section: "COMMUNITY",
+    hidden: true,
     children: [
       { name: "All Donations",   path: "donations" },
       { name: "Pending",         path: "donations/pending" },
@@ -104,6 +107,7 @@ const routes = [
     icon: <MdCampaign className="h-5 w-5" />,
     component: <Placeholder pageName="Campaigns" />,
     section: "COMMUNITY",
+    hidden: true,
     children: [
       { name: "All Campaigns",   path: "campaigns" },
       { name: "Create Campaign", path: "campaigns/create" },
@@ -117,6 +121,7 @@ const routes = [
     icon: <MdBarChart className="h-5 w-5" />,
     component: <Placeholder pageName="Reports" />,
     section: "COMMUNITY",
+    hidden: true,
     children: [
       { name: "Financial Report", path: "reports/financial" },
       { name: "Member Report",    path: "reports/members" },
@@ -154,6 +159,7 @@ const routes = [
     icon: <MdSettings className="h-5 w-5" />,
     component: <Placeholder pageName="Settings" />,
     section: "ACCOUNT",
+    hidden: true,
   },
 
   // ── MANAGER ──────────────────────────────────────────────────────────────────
@@ -172,6 +178,7 @@ const routes = [
     icon: <MdPeople className="h-5 w-5" />,
     component: <Placeholder pageName="Members" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "Donations",
@@ -180,6 +187,7 @@ const routes = [
     icon: <MdFavorite className="h-5 w-5" />,
     component: <Placeholder pageName="Donations" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "Events",
@@ -188,6 +196,7 @@ const routes = [
     icon: <MdEvent className="h-5 w-5" />,
     component: <Placeholder pageName="Events" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "Profile",
@@ -214,6 +223,7 @@ const routes = [
     icon: <MdFeed className="h-5 w-5" />,
     component: <Placeholder pageName="News & Updates" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "Events",
@@ -222,6 +232,7 @@ const routes = [
     icon: <MdEvent className="h-5 w-5" />,
     component: <Placeholder pageName="Events" />,
     section: "MAIN",
+    hidden: true,
   },
   {
     name: "My Donations",
@@ -230,6 +241,7 @@ const routes = [
     icon: <MdFavorite className="h-5 w-5" />,
     component: <Placeholder pageName="My Donations" />,
     section: "COMMUNITY",
+    hidden: true,
   },
   {
     name: "Profile",
@@ -272,6 +284,7 @@ const routes = [
     icon: <MdSettings className="h-5 w-5" />,
     component: <BeneficiarySettings />,
     section: "ACCOUNT",
+    hidden: true,
   },
 
   // ── PUBLIC ───────────────────────────────────────────────────────────────────

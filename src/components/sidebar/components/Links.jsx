@@ -130,7 +130,7 @@ function NavItem({ route }) {
 export function SidebarLinks({ routes, layout = "/admin" }) {
   const grouped = SECTION_ORDER.reduce((acc, section) => {
     const items = routes.filter(
-      (r) => r.layout === layout && r.section === section
+      (r) => r.layout === layout && r.section === section && !r.hidden
     );
     if (items.length) acc[section] = items;
     return acc;

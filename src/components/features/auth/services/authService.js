@@ -40,6 +40,11 @@ const authService = {
     const { data } = await api.post("/auth/password-change", payload);
     return data;
   },
+
+  refreshToken: async (refresh) => {
+    const { data } = await api.post("/auth/token/refresh", { refresh });
+    return data;
+  },
 };
 
 export default authService;
