@@ -2,6 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdChevronRight } from "react-icons/md";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const SECTION_ORDER = ["MAIN", "COMMUNITY", "SYSTEM", "ACCOUNT"];
 
@@ -128,9 +129,16 @@ function NavItem({ route }) {
 
 // ── Main export ────────────────────────────────────────────────────────────────
 export function SidebarLinks({ routes, layout = "/admin" }) {
+  const { user } = useAuth();
+  const userRole = user?.role;
+
   const grouped = SECTION_ORDER.reduce((acc, section) => {
     const items = routes.filter(
-      (r) => r.layout === layout && r.section === section && !r.hidden
+      (r) =>
+        r.layout === layout &&
+        r.section === section &&
+        !r.hidden &&
+        (!r.roles || r.roles.includes(userRole))
     );
     if (items.length) acc[section] = items;
     return acc;

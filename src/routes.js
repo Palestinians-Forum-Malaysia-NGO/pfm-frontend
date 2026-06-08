@@ -137,6 +137,7 @@ const routes = [
     icon: <MdManageAccounts className="h-5 w-5" />,
     component: <UsersPage />,
     section: "SYSTEM",
+    roles: ["admin"],
     children: [
       { name: "All Users", path: "users" },
       { name: "Add User",  path: "users/create" },

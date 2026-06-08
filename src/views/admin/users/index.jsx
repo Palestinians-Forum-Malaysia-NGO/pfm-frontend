@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   MdAdd, MdPeople, MdCheckCircle, MdCancel, MdAdminPanelSettings,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdManageAccounts, MdClose,
-  MdPerson, MdShield,
+  MdPerson, MdShield, MdSupervisorAccount, MdGroup,
 } from "react-icons/md";
 import { FiSliders } from "react-icons/fi";
 import { useUsers } from "components/features/users/hooks/useUsers";
@@ -14,7 +14,7 @@ import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
-import { ROLE_LABELS, ROLE_BADGE, ROLE_AVATAR_BG as AVATAR_BG, ROLE_FILTER_OPTIONS as ROLE_OPTIONS } from "components/features/users/constants/roles";
+import { ROLE_LABELS, ROLE_BADGE, ROLE_AVATAR_BG, ROLE_FILTER_OPTIONS as ROLE_OPTIONS } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
@@ -71,13 +71,15 @@ export default function UsersPage() {
   }, [users, search, roleFilter, statusFilter]);
 
   const stats = useMemo(() => ({
-    total:    users.length,
-    active:   users.filter((u) => u.is_active).length,
+    total:   users.length,
+    active:  users.filter((u) => u.is_active).length,
     inactive: users.filter((u) => !u.is_active).length,
-    admins:   users.filter((u) => u.role === "admin").length,
+    admin:   users.filter((u) => u.role === "admin").length,
+    staff:   users.filter((u) => u.role === "staff").length,
+    member:  users.filter((u) => u.role === "member").length,
   }), [users]);
 
-  const statCards = [
+  const statusCards = [
     {
       key: "total", label: "Total Users", value: stats.total,
       icon: <MdPeople className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
@@ -96,11 +98,26 @@ export default function UsersPage() {
       active: statusFilter === "inactive",
       onClick: () => setStatusFilter((s) => s === "inactive" ? "all" : "inactive"),
     },
+  ];
+
+  const roleCards = [
     {
-      key: "admins", label: "Admins", value: stats.admins,
-      icon: <MdAdminPanelSettings className="h-5 w-5" />, color: "text-blue-600", bgColor: "bg-blue-50",
+      key: "admin", label: "Admin", value: stats.admin,
+      icon: <MdAdminPanelSettings className="h-5 w-5" />,
       active: roleFilter === "admin",
       onClick: () => setRoleFilter((r) => r === "admin" ? "all" : "admin"),
+    },
+    {
+      key: "staff", label: "Staff", value: stats.staff,
+      icon: <MdSupervisorAccount className="h-5 w-5" />,
+      active: roleFilter === "staff",
+      onClick: () => setRoleFilter((r) => r === "staff" ? "all" : "staff"),
+    },
+    {
+      key: "member", label: "Member", value: stats.member,
+      icon: <MdGroup className="h-5 w-5" />,
+      active: roleFilter === "member",
+      onClick: () => setRoleFilter((r) => r === "member" ? "all" : "member"),
     },
   ];
 
@@ -112,7 +129,7 @@ export default function UsersPage() {
       icon: <MdPerson className="h-3.5 w-3.5" />,
       render: (user) => (
         <div className="flex items-center gap-3">
-          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-xs font-bold ${AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
+          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-xs font-bold ${ROLE_AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
             {user.profile_picture
               ? <img src={user.profile_picture} alt={user.full_name} className="h-full w-full object-cover" />
               : getInitials(user.full_name)
@@ -189,9 +206,9 @@ export default function UsersPage() {
         }
       />
 
-      {/* ── Stat cards ── */}
-      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {statCards.map((card) => (
+      {/* ── Status cards ── */}
+      <div className="mb-3 grid grid-cols-3 gap-3">
+        {statusCards.map((card) => (
           <button
             key={card.key}
             onClick={card.onClick}
@@ -206,6 +223,29 @@ export default function UsersPage() {
             </div>
             <div className="min-w-0 flex-1">
               <p className={`text-xl font-bold leading-none ${card.active ? "text-green" : "text-slate-900"}`}>{card.value}</p>
+              <p className="mt-0.5 truncate text-xs text-slate-400">{card.label}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Role filter cards ── */}
+      <div className="mb-5 grid grid-cols-3 gap-3">
+        {roleCards.map((card) => (
+          <button
+            key={card.key}
+            onClick={card.onClick}
+            className={`group flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
+              card.active
+                ? "border-green/30 bg-green/5 shadow-sm"
+                : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+            }`}
+          >
+            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${ROLE_AVATAR_BG[card.key] ?? "bg-slate-100 text-slate-500"}`}>
+              {card.icon}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className={`text-lg font-bold leading-none ${card.active ? "text-green" : "text-slate-900"}`}>{card.value}</p>
               <p className="mt-0.5 truncate text-xs text-slate-400">{card.label}</p>
             </div>
           </button>
