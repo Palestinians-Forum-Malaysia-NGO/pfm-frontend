@@ -11,7 +11,7 @@ const UserDeleteModal = ({ open, user, onClose, onConfirm, loading }) => {
       message={
         <>
           Are you sure you want to delete{" "}
-          <span className="font-semibold text-slate-900">{user.name}</span>?{" "}
+          <span className="font-semibold text-slate-900">{user.full_name}</span>?{" "}
           This action cannot be undone.
         </>
       }

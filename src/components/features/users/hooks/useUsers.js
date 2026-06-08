@@ -1,22 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { userService } from "../services/userService";
+import { extractError } from "components/features/auth/utils";
 
 export const useUsers = () => {
-  const [users, setUsers]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState(null);
-
+  const [users, setUsers]         = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
   const [deleteUser, setDeleteUser]       = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const data = await userService.getAll();
       setUsers(data);
     } catch (err) {
-      setError(err.message ?? "Failed to load users");
+      setError(extractError(err, "Failed to load users."));
     } finally {
       setLoading(false);
     }
@@ -24,8 +24,8 @@ export const useUsers = () => {
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
-  const openDelete = (user) => setDeleteUser(user);
-  const closeAll   = ()     => setDeleteUser(null);
+  const openDelete  = (user) => setDeleteUser(user);
+  const closeAll    = ()     => setDeleteUser(null);
 
   const handleDelete = async () => {
     if (!deleteUser) return;
@@ -35,7 +35,7 @@ export const useUsers = () => {
       setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
       setDeleteUser(null);
     } catch (err) {
-      setError(err.message ?? "Failed to delete user");
+      setError(extractError(err, "Failed to delete user."));
     } finally {
       setActionLoading(false);
     }

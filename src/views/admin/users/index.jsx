@@ -74,8 +74,8 @@ export default function UsersPage() {
   const filtered = useMemo(() => {
     return users.filter((u) => {
       const matchSearch = search
-        ? u.name.toLowerCase().includes(search.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.toLowerCase())
+        ? (u.full_name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+          (u.email ?? "").toLowerCase().includes(search.toLowerCase())
         : true;
       const matchRole   = roleFilter   === "all" || u.role     === roleFilter;
       const matchStatus = statusFilter === "all" ||
@@ -301,10 +301,10 @@ export default function UsersPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${AVATAR_BG[user.role]}`}>
-                              {getInitials(user.name)}
+                              {getInitials(user.full_name)}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="truncate font-medium text-slate-900">{user.name}</p>
+                              <p className="truncate font-medium text-slate-900">{user.full_name}</p>
                               <p className="truncate text-xs text-slate-400">{user.email}</p>
                             </div>
                           </div>

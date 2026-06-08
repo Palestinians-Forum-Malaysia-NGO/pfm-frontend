@@ -1,32 +1,27 @@
 import api from "services/app";
 
 export const userService = {
-  /** GET /users/ */
   async getAll() {
-    const { data } = await api.get("/users/");
+    const { data } = await api.get("/account/manage/users");
     return data;
   },
 
-  /** GET /users/:id/ */
   async getById(id) {
-    const { data } = await api.get(`/users/${id}/`);
+    const { data } = await api.get(`/account/manage/users/${id}`);
     return data;
   },
 
-  /** POST /users/ */
   async create(payload) {
-    const { data } = await api.post("/users/", payload);
+    const { data } = await api.post("/account/manage/users", payload);
     return data;
   },
 
-  /** PATCH /users/:id/ */
   async update(id, payload) {
-    const { data } = await api.patch(`/users/${id}/`, payload);
+    const { data } = await api.patch(`/account/manage/users/${id}`, payload);
     return data;
   },
 
-  /** DELETE /users/:id/ */
   async remove(id) {
-    await api.delete(`/users/${id}/`);
+    await api.delete(`/account/manage/users/${id}`);
   },
 };

@@ -1,55 +1,43 @@
 import api from "services/app";
 
 const authService = {
-  /** POST /auth/login/ */
   login: async ({ email, password }) => {
-    const { data } = await api.post("/auth/login/", { email, password });
+    const { data } = await api.post("/auth/login", { email, password });
     return data;
-    // Returns: { detail, channel, requires_otp, access, refresh }
   },
 
-  /** POST /auth/otp/verify/ — field is "code", exactly 6 chars */
   verifyOtp: async ({ email, code, purpose = "login" }) => {
-    const { data } = await api.post("/auth/otp/verify/", { email, code, purpose });
+    const { data } = await api.post("/auth/otp/verify", { email, code, purpose });
     return data;
-    // Returns: { detail, refresh, access }
   },
 
-  /** POST /auth/otp/resend/ */
   resendOtp: async ({ email, purpose = "login" }) => {
-    const { data } = await api.post("/auth/otp/resend/", { email, purpose });
+    const { data } = await api.post("/auth/otp/resend", { email, purpose });
     return data;
-    // Returns: { detail, channel }
   },
 
-  /** GET /auth/me/ */
   getMe: async () => {
-    const { data } = await api.get("/auth/me/");
+    const { data } = await api.get("/auth/me");
     return data;
-    // Returns: { email, full_name, role }
   },
 
-  /** POST /auth/register/ */
   register: async (payload) => {
-    const { data } = await api.post("/auth/register/", payload);
+    const { data } = await api.post("/auth/register", payload);
     return data;
   },
 
-  /** POST /auth/password-forgot/ */
   forgotPassword: async ({ email }) => {
-    const { data } = await api.post("/auth/password-forgot/", { email });
+    const { data } = await api.post("/auth/password-forgot", { email });
     return data;
   },
 
-  /** POST /auth/password-reset/ */
   resetPassword: async (payload) => {
-    const { data } = await api.post("/auth/password-reset/", payload);
+    const { data } = await api.post("/auth/password-reset", payload);
     return data;
   },
 
-  /** POST /auth/password-change/ */
   changePassword: async (payload) => {
-    const { data } = await api.post("/auth/password-change/", payload);
+    const { data } = await api.post("/auth/password-change", payload);
     return data;
   },
 };
