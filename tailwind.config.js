@@ -126,10 +126,15 @@ module.exports = {
           "0%":   { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "logout-fade": {
+          "0%":   { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
-        "slide-in":   "slide-in 0.25s ease-out forwards",
-        "page-enter": "page-enter 0.25s ease-out both",
+        "slide-in":    "slide-in 0.25s ease-out forwards",
+        "page-enter":  "page-enter 0.25s ease-out both",
+        "logout-fade": "logout-fade 0.3s ease-out both",
       },
     },
     screens: {

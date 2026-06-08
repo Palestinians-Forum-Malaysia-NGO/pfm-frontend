@@ -7,7 +7,7 @@ import routes from "routes.js";
 import useAuth from "components/features/auth/hooks/useAuth";
 
 const Sidebar = ({ open, onClose, layout = "/admin" }) => {
-  const { logout, user } = useAuth();
+  const { handleLogout, user } = useAuth();
 
   return (
     <aside
@@ -58,7 +58,7 @@ const Sidebar = ({ open, onClose, layout = "/admin" }) => {
         </div>
 
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="group mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-150 hover:bg-red-50"
         >
           <MdLogout className="h-5 w-5 shrink-0 text-gray-400 transition-colors group-hover:text-red-500" />

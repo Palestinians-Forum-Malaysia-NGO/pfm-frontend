@@ -9,9 +9,10 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  const [user, setUser]       = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [user, setUser]           = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   /* ── Hydrate user on mount if tokens exist ── */
   useEffect(() => {
@@ -65,13 +66,27 @@ export const AuthProvider = ({ children }) => {
     navigate("/auth/sign-in");
   }, [navigate]);
 
+  /* ── Logout with transition overlay ── */
+  const handleLogout = useCallback(() => {
+    setLoggingOut(true);
+    setTimeout(() => {
+      clearTokens();
+      setUser(null);
+      setLoggingOut(false);
+      navigate("/auth/sign-in");
+    }, 350);
+  }, [navigate]);
+
   return (
     <AuthContext.Provider value={{
       user, loading, error,
-      login, completeLogin, verifyOtp, loginDirect, logout,
+      login, completeLogin, verifyOtp, loginDirect, logout, handleLogout,
       isAuthenticated: !!user,
     }}>
       {children}
+      {loggingOut && (
+        <div className="animate-logout-fade pointer-events-none fixed inset-0 z-[9999] bg-white" />
+      )}
     </AuthContext.Provider>
   );
 };
