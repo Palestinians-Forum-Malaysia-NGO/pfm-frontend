@@ -1,98 +1,143 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { MdArrowBack, MdEdit, MdVerified } from "react-icons/md";
-import { memberService } from "components/features/members/services/memberService";
-import { InputField, SelectField, ToggleInput } from "components/form";
-import Button from "components/ui/buttons/Button";
+import {
+  MdArrowBack, MdEdit, MdPerson, MdFlight,
+  MdFamilyRestroom, MdAccountBalance, MdBadge,
+} from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
+import { InputField, PasswordField, SelectField, ToggleInput } from "components/form";
+import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
-
-const TYPE_OPTIONS = [
-  { value: "regular",  label: "Regular" },
-  { value: "student",  label: "Student" },
-  { value: "honorary", label: "Honorary" },
-  { value: "lifetime", label: "Lifetime" },
-];
-
-const NATIONALITY_OPTIONS = [
-  { value: "Malaysian",   label: "Malaysian" },
-  { value: "Palestinian", label: "Palestinian" },
-  { value: "Other",       label: "Other" },
-];
-
-const TYPE_LABELS = { regular: "Regular", student: "Student", honorary: "Honorary", lifetime: "Lifetime" };
-const TYPE_BADGE  = {
-  regular:  "bg-blue-50 text-blue-600 border-blue-100",
-  student:  "bg-purple-50 text-purple-600 border-purple-100",
-  honorary: "bg-amber-50 text-amber-600 border-amber-100",
-  lifetime: "bg-green/10 text-green border-green/20",
-};
-const AVATAR_BG = {
-  regular:  "from-blue-100 to-blue-50 text-blue-600",
-  student:  "from-purple-100 to-purple-50 text-purple-600",
-  honorary: "from-amber-100 to-amber-50 text-amber-600",
-  lifetime: "from-green/20 to-green/10 text-green",
-};
-
-const getInitials = (name = "") =>
-  name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+import { useGetMember, useUpdateMember } from "components/features/members/hooks";
+import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/members/constants/membership";
+import { COUNTRY_OPTIONS } from "components/features/members/constants/countries";
+import { useToast } from "components/ui/toast/ToastContext";
 
 export default function MemberEdit() {
-  const { id } = useParams();
+  const { id }   = useParams();
   const navigate = useNavigate();
 
-  const [loading, setLoading]     = useState(true);
-  const [loadError, setLoadError] = useState(null);
+  const { member, execute: fetchMember, loading, error: loadError } = useGetMember();
+  const { execute: updateMember, loading: saving, error: saveError } = useUpdateMember();
+  const { success, error: toastError } = useToast();
 
-  const [formData, setFormData]   = useState({
-    name: "", email: "", phone: "", ic_number: "",
-    membership_type: "regular", nationality: "Malaysian", is_active: true,
+  const [userForm, setUserForm] = useState({
+    full_name: "", email: "", password: "", phone_number: "", is_active: true,
   });
-  const [errors, setErrors]       = useState({});
-  const [saving, setSaving]       = useState(false);
-  const [saveError, setSaveError] = useState(null);
+  const [personalForm, setPersonalForm] = useState({
+    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "",
+  });
+  const [locationForm, setLocationForm] = useState({
+    country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
+  });
+  const [familyForm, setFamilyForm] = useState({
+    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "",
+  });
+  const [bankingForm, setBankingForm] = useState({
+    bank_name: "", account_number: "", account_holder_name: "",
+  });
+  const [errors, setErrors] = useState({});
 
-  const updateFormData = (field, value) =>
-    setFormData((p) => ({ ...p, [field]: value }));
+  const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
+  const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
+  const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
+  const setFa = (f, v) => setFamilyForm((p)  => ({ ...p, [f]: v }));
+  const setB  = (f, v) => setBankingForm((p) => ({ ...p, [f]: v }));
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await memberService.getById(id);
-        if (!data) { setLoadError("Member not found"); return; }
-        setFormData({
-          name: data.name, email: data.email, phone: data.phone,
-          ic_number: data.ic_number, membership_type: data.membership_type,
-          nationality: data.nationality, is_active: data.is_active,
-        });
-      } catch (err) {
-        setLoadError(err.message ?? "Failed to load member");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
+    fetchMember(id).then((data) => {
+      if (!data) return;
+      const u  = data.user ?? {};
+      const fi = data.family_information ?? {};
+      const bi = data.banking_information ?? {};
+      setUserForm({
+        full_name:    u.full_name    ?? "",
+        email:        u.email        ?? "",
+        password:     "",
+        phone_number: u.phone_number ?? "",
+        is_active:    u.is_active    ?? true,
+      });
+      setPersonalForm({
+        full_name_arabic: data.full_name_arabic ?? "",
+        passport_number:  data.passport_number  ?? "",
+        date_of_birth:    data.date_of_birth    ? data.date_of_birth.slice(0, 10) : "",
+        gender:           data.gender           ?? "",
+        marital_status:   data.marital_status   ?? "",
+      });
+      setLocationForm({
+        country_of_origin:          data.country_of_origin              ?? "",
+        date_arrived_in_malaysia:   data.date_arrived_in_malaysia
+          ? data.date_arrived_in_malaysia.slice(0, 10) : "",
+        current_city:               data.current_city                   ?? "",
+        address:                    data.address                        ?? "",
+      });
+      setFamilyForm({
+        family_in_malaysia:  fi.family_in_malaysia  ?? false,
+        spouse_name:         fi.spouse_name         ?? "",
+        spouse_name_arabic:  fi.spouse_name_arabic  ?? "",
+        spouse_job:          fi.spouse_job          ?? "",
+        number_of_children:  fi.number_of_children  ?? "",
+      });
+      setBankingForm({
+        bank_name:           bi.bank_name           ?? "",
+        account_number:      bi.account_number      ?? "",
+        account_holder_name: bi.account_holder_name ?? "",
+      });
+    }).catch(() => {});
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+    const newErrors = {};
+    if (!userForm.full_name.trim()) newErrors.full_name = "Full name is required";
+    if (!userForm.email.trim())     newErrors.email     = "Email is required";
+    if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
+
     try {
-      setSaving(true);
-      setSaveError(null);
-      setErrors({});
-      await memberService.update(id, formData);
+      const payload = {
+        user: {
+          full_name:    userForm.full_name,
+          email:        userForm.email,
+          phone_number: userForm.phone_number || undefined,
+          is_active:    userForm.is_active,
+        },
+        full_name_arabic:           personalForm.full_name_arabic           || undefined,
+        passport_number:            personalForm.passport_number            || undefined,
+        date_of_birth:              personalForm.date_of_birth              || undefined,
+        gender:                     personalForm.gender                     || undefined,
+        marital_status:             personalForm.marital_status             || undefined,
+        country_of_origin:          locationForm.country_of_origin          || undefined,
+        date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia   || undefined,
+        current_city:               locationForm.current_city               || undefined,
+        address:                    locationForm.address                    || undefined,
+        family_information: {
+          family_in_malaysia:  familyForm.family_in_malaysia,
+          spouse_name:         familyForm.spouse_name        || undefined,
+          spouse_name_arabic:  familyForm.spouse_name_arabic || undefined,
+          spouse_job:          familyForm.spouse_job         || undefined,
+          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : undefined,
+        },
+        banking_information: {
+          bank_name:           bankingForm.bank_name           || undefined,
+          account_number:      bankingForm.account_number      || undefined,
+          account_holder_name: bankingForm.account_holder_name || undefined,
+        },
+      };
+      if (userForm.password) payload.user.password = userForm.password;
+
+      await updateMember(id, payload);
+      success("Member updated", `${userForm.full_name} has been updated successfully.`);
       navigate(`/admin/members/${id}`);
     } catch (err) {
-      setSaveError(err.message ?? "Failed to update member");
-    } finally {
-      setSaving(false);
+      toastError("Failed to update member", err?.message);
     }
   };
 
-  if (loading)   return <Loading text="Loading member..." />;
-  if (loadError) return <AlertBanner message={loadError} />;
+  if (loading)   return <Loading text="Loading member…" />;
+  if (loadError) return <p className="py-12 text-center text-sm text-red-500">{loadError}</p>;
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -100,80 +145,87 @@ export default function MemberEdit() {
       <PageHeader
         icon={<MdEdit className="h-5 w-5" />}
         title="Edit Member"
-        subtitle={formData.name || "Update member details"}
+        subtitle={userForm.full_name || "Update member details"}
         actions={
-          <Button
-            variant="ghost"
-            icon={<MdArrowBack className="h-4 w-4" />}
-            text="Back to Member"
-            onClick={() => navigate(`/admin/members/${id}`)}
-          />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Member" onClick={() => navigate(`/admin/members/${id}`)} />
         }
       />
 
-      {/* ── Profile preview ── */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div
-          className="h-28 w-full"
-          style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}
-        >
-          <div className="h-full w-full opacity-40"
-            style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+      <AlertBanner message={saveError} />
+
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+
+        {/* ── User Account ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="User Account" subtitle="Login credentials" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris"           formData={userForm} errors={errors} updateFormData={setU} />
+            <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <PasswordField label="New Password"  field="password"     placeholder="Leave blank to keep current" formData={userForm} errors={errors} updateFormData={setU} />
+            <InputField    label="Phone Number"  field="phone_number" placeholder="+60 12-345 6789"       formData={userForm} errors={errors} updateFormData={setU} />
+          </div>
+          <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
-        <div className="px-6 pb-5">
-          <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[formData.membership_type]}`}>
-              {getInitials(formData.name) || "?"}
-            </div>
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${TYPE_BADGE[formData.membership_type]}`}>
-              <MdVerified className="h-3.5 w-3.5" />
-              {TYPE_LABELS[formData.membership_type]}
-            </span>
+
+        {/* ── Personal Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField    label="Full Name (Arabic)"  field="full_name_arabic" placeholder="أحمد فارس"   formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField    label="Passport Number"     field="passport_number"  placeholder="A12345678"    formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">{formData.name || <span className="text-slate-300">Full Name</span>}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{formData.email || "email@example.com"}</p>
-          <div className="mt-3">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-              formData.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${formData.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-              {formData.is_active ? "Active" : "Inactive"}
-            </span>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField    label="Date of Birth"  field="date_of_birth"  type="date"                       formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField   label="Gender"         field="gender"         options={GENDER_OPTIONS}           formData={personalForm} errors={errors} updateFormData={setP} />
+          </div>
+          <SelectField     label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}   formData={personalForm} errors={errors} updateFormData={setP} />
+        </div>
+
+        {/* ── Location & Travel ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdFlight className="h-5 w-5" />} title="Location & Travel" subtitle="Country of origin and residence in Malaysia" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <SelectField label="Country of Origin"          field="country_of_origin"        options={COUNTRY_OPTIONS} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Date Arrived in Malaysia"   field="date_arrived_in_malaysia"  type="date"              formData={locationForm} errors={errors} updateFormData={setL} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField  label="Current City"  field="current_city" placeholder="Kuala Lumpur" formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Address"       field="address"      placeholder="No. 1, Jalan..."   formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
         </div>
-      </div>
 
-      {/* ── Edit form ── */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader title="Edit Details" subtitle="Update member information" />
-
-        <AlertBanner message={saveError} />
-
-        <form onSubmit={handleSubmit} noValidate>
+        {/* ── Family Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
+          <ToggleInput label="Family in Malaysia" field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Full Name"    field="name"  placeholder="Ahmad Faris" formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="Email"        field="email" type="email" placeholder="ahmad@email.com" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Spouse Name"         field="spouse_name"        placeholder="Fatimah binti Ali"   formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"    formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
-
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Phone"        field="phone" placeholder="+60123456789" formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="IC / Passport" field="ic_number" placeholder="900101-14-1234" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Spouse Occupation" field="spouse_job"          placeholder="Teacher"              formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="No. of Children"   field="number_of_children"  type="number" placeholder="0"     formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
+        </div>
 
+        {/* ── Banking Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField label="Membership Type" field="membership_type" options={TYPE_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SelectField label="Nationality"     field="nationality"     options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Bank Name"          field="bank_name"           placeholder="Maybank"          formData={bankingForm} errors={errors} updateFormData={setB} />
+            <InputField label="Account Number"     field="account_number"      placeholder="1234567890"       formData={bankingForm} errors={errors} updateFormData={setB} />
           </div>
+          <InputField   label="Account Holder Name" field="account_holder_name" placeholder="Ahmad Faris bin Abdullah" formData={bankingForm} errors={errors} updateFormData={setB} />
+        </div>
 
-          <ToggleInput label="Active Status" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
+        <div className="flex gap-3">
+          <Button variant="ghost"  text="Cancel"       onClick={() => navigate(`/admin/members/${id}`)} className="flex-1" />
+          <Button type="submit" variant="primary" text="Save Changes" loading={saving} className="flex-1" />
+        </div>
 
-          <div className="mt-4 flex gap-3">
-            <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/members/${id}`)} className="flex-1" />
-            <Button type="submit" variant="primary" text="Save Changes" loading={saving} className="flex-1" />
-          </div>
-        </form>
-      </div>
-
+      </form>
     </div>
   );
 }

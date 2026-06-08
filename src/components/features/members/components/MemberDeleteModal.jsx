@@ -11,7 +11,7 @@ const MemberDeleteModal = ({ open, member, onClose, onConfirm, loading }) => {
       message={
         <>
           Are you sure you want to delete{" "}
-          <span className="font-semibold text-slate-900">{member.name}</span>?{" "}
+          <span className="font-semibold text-slate-900">{member.user?.full_name}</span>?{" "}
           This action cannot be undone.
         </>
       }
