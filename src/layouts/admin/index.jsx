@@ -11,10 +11,14 @@ import UserEdit     from "views/admin/users/UserEdit";
 import MemberCreate from "views/admin/members/MemberCreate";
 import MemberDetail from "views/admin/members/MemberDetail";
 import MemberEdit   from "views/admin/members/MemberEdit";
+import StaffCreate  from "views/admin/staff/StaffCreate";
+import StaffDetail  from "views/admin/staff/StaffDetail";
+import StaffEdit    from "views/admin/staff/StaffEdit";
 
 const SUB_ROUTE_NAMES = {
-  "/users/create":  "New User",
-  "/members/create":"New Member",
+  "/users/create":   "New User",
+  "/members/create": "New Member",
+  "/staff/create":   "New Staff",
 };
 
 export default function Admin(props) {
@@ -37,9 +41,11 @@ export default function Admin(props) {
     // Edit pages
     if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRoute("Edit User");   return; }
     if (path.match(/\/members\/\d+\/edit$/)) { setCurrentRoute("Edit Member"); return; }
+    if (path.match(/\/staff\/\d+\/edit$/))   { setCurrentRoute("Edit Staff");   return; }
     // Detail pages
     if (path.match(/\/users\/\d+$/))         { setCurrentRoute("User Detail");   return; }
     if (path.match(/\/members\/\d+$/))       { setCurrentRoute("Member Detail"); return; }
+    if (path.match(/\/staff\/\d+$/))         { setCurrentRoute("Staff Detail");  return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
     if (active) setCurrentRoute(active.name);
@@ -81,6 +87,9 @@ export default function Admin(props) {
               <Route path="/members/create"   element={<MemberCreate />} />
               <Route path="/members/:id"      element={<MemberDetail />} />
               <Route path="/members/:id/edit" element={<MemberEdit />} />
+              <Route path="/staff/create"     element={<StaffCreate />} />
+              <Route path="/staff/:id"        element={<StaffDetail />} />
+              <Route path="/staff/:id/edit"   element={<StaffEdit />} />
               <Route path="/" element={<Navigate to="/admin/default" replace />} />
             </Routes>
           </PageTransition>

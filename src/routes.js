@@ -3,6 +3,7 @@ import React from "react";
 // Page Imports
 import MainDashboard from "views/admin/default";
 import UsersPage from "views/admin/users";
+import StaffPage from "views/admin/staff";
 import MembersPage from "views/admin/members";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -37,6 +38,7 @@ import {
   MdBarChart,
   MdManageAccounts,
   MdAssignment,
+  MdBadge,
 } from "react-icons/md";
 
 const routes = [
@@ -130,6 +132,19 @@ const routes = [
   },
 
   // ── SYSTEM ───────────────────────────────────────────────────────────────────
+  {
+    name: "Staff",
+    layout: "/admin",
+    path: "staff",
+    icon: <MdBadge className="h-5 w-5" />,
+    component: <StaffPage />,
+    section: "SYSTEM",
+    roles: ["admin"],
+    children: [
+      { name: "All Staff", path: "staff" },
+      { name: "Add Staff", path: "staff/create" },
+    ],
+  },
   {
     name: "Users",
     layout: "/admin",
