@@ -1,6 +1,6 @@
 export const ROLE_VALUES = {
   ADMIN:  "admin",
-  STUFF:  "stuff",
+  STAFF:  "stuff",
   MEMBER: "member",
 };
 

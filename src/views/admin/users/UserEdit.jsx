@@ -8,7 +8,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
-import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG, ROLE_OPTIONS } from "components/features/users/constants/roles";
+import { ROLE_VALUES, ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG, ROLE_OPTIONS } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
@@ -23,7 +23,7 @@ export default function UserEdit() {
   const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
-    full_name: "", email: "", password: "", role: "stuff", is_active: true,
+    full_name: "", email: "", password: "", role: ROLE_VALUES.STAFF, is_active: true,
   });
   const [errors, setErrors] = useState({});
 
@@ -37,7 +37,7 @@ export default function UserEdit() {
           full_name: data.full_name ?? "",
           email:     data.email ?? "",
           password:  "",
-          role:      data.role ?? "stuff",
+          role:      data.role ?? ROLE_VALUES.STAFF,
           is_active: data.is_active ?? true,
         });
       }
