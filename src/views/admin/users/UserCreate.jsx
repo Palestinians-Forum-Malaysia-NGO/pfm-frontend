@@ -8,11 +8,7 @@ import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateUser } from "components/features/users/hooks";
-
-const ROLE_OPTIONS = [
-  { value: "admin",           label: "Admin" },
-  { value: "account_manager", label: "Account Manager" },
-];
+import { ROLE_OPTIONS } from "components/features/users/constants/roles";
 
 const RULES = {
   full_name: [{ required: true, message: "Full name is required" }],

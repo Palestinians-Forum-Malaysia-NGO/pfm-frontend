@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline,
   MdEmail, MdCalendarToday, MdShield, MdVerified, MdPerson, MdPhone, MdSecurity,
+  MdUpdate, MdFingerprint,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -13,18 +14,7 @@ import UserDeleteModal from "components/features/users/components/UserDeleteModa
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading from "components/loading/Loading";
 import { useGetUser, useDeleteUser } from "components/features/users/hooks";
-
-const ROLE_LABELS = { admin: "Admin", manager: "Manager", account_manager: "Account Manager" };
-const ROLE_BADGE  = {
-  admin:           "bg-green/10 text-green border-green/20",
-  manager:         "bg-blue-50 text-blue-600 border-blue-100",
-  account_manager: "bg-blue-50 text-blue-600 border-blue-100",
-};
-const AVATAR_BG = {
-  admin:           "from-green/20 to-green/10 text-green",
-  manager:         "from-blue-100 to-blue-50 text-blue-600",
-  account_manager: "from-blue-100 to-blue-50 text-blue-600",
-};
+import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -132,8 +122,10 @@ export default function UserDetail() {
           <InfoRow icon={<MdShield className="h-4 w-4" />}        label="Role"   value={ROLE_LABELS[user.role] ?? user.role} />
           <InfoRow icon={<MdPhone className="h-4 w-4" />}         label="Phone"  value={user.phone_number || "—"} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Joined" value={new Date(user.created_at).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })} />
-          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label="Status" value={user.is_active ? "Active" : "Inactive"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label="2FA"    value={user.is_2fa_enabled ? (user.is_2fa_verified ? "Enabled & Verified" : "Enabled") : "Disabled"} />
+          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label="Status"   value={user.is_active ? "Active" : "Inactive"} />
+          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label="2FA"      value={user.is_2fa_enabled ? (user.is_2fa_verified ? "Enabled & Verified" : "Enabled") : "Disabled"} />
+          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Updated"  value={user.updated_at ? new Date(user.updated_at).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—"} />
+          <InfoRow icon={<MdFingerprint className="h-4 w-4" />}   label="User ID"  value={user.id} />
         </div>
       </div>
 

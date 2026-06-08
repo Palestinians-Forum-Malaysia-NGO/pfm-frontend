@@ -8,15 +8,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
-
-const ROLE_OPTIONS = [
-  { value: "admin",           label: "Admin" },
-  { value: "account_manager", label: "Account Manager" },
-];
-
-const ROLE_LABELS = { admin: "Admin", account_manager: "Account Manager" };
-const ROLE_BADGE  = { admin: "bg-green/10 text-green border-green/20", account_manager: "bg-blue-50 text-blue-600 border-blue-100" };
-const AVATAR_BG   = { admin: "from-green/20 to-green/10 text-green", account_manager: "from-blue-100 to-blue-50 text-blue-600" };
+import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG, ROLE_OPTIONS } from "components/features/users/constants/roles";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -29,7 +21,7 @@ export default function UserEdit() {
   const { execute: updateUser, loading: saving, error: saveError } = useUpdateUser();
 
   const [formData, setFormData] = useState({
-    full_name: "", email: "", password: "", role: "account_manager", is_active: true,
+    full_name: "", email: "", password: "", role: "stuff", is_active: true,
   });
   const [errors, setErrors] = useState({});
 
@@ -43,7 +35,7 @@ export default function UserEdit() {
           full_name: data.full_name ?? "",
           email:     data.email ?? "",
           password:  "",
-          role:      data.role ?? "account_manager",
+          role:      data.role ?? "stuff",
           is_active: data.is_active ?? true,
         });
       }
