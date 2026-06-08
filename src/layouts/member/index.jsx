@@ -4,6 +4,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "routes.js";
+import PageTransition from "components/ui/PageTransition";
 
 export default function MemberLayout() {
   const location = useLocation();
@@ -46,10 +47,12 @@ export default function MemberLayout() {
         <Navbar onOpenSidenav={() => setOpen(true)} brandText={currentRoute} />
 
         <main className="flex-1 p-4 md:p-6">
-          <Routes>
-            {getRoutes()}
-            <Route path="/" element={<Navigate to="/member/default" replace />} />
-          </Routes>
+          <PageTransition>
+            <Routes>
+              {getRoutes()}
+              <Route path="/" element={<Navigate to="/member/default" replace />} />
+            </Routes>
+          </PageTransition>
         </main>
 
         <Footer />

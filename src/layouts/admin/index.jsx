@@ -4,6 +4,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "routes.js";
+import PageTransition from "components/ui/PageTransition";
 import UserCreate   from "views/admin/users/UserCreate";
 import UserDetail   from "views/admin/users/UserDetail";
 import UserEdit     from "views/admin/users/UserEdit";
@@ -71,16 +72,18 @@ export default function Admin(props) {
         <Navbar onOpenSidenav={() => setOpen(true)} brandText={currentRoute} />
 
         <main className="flex-1 p-4 md:p-6">
-          <Routes>
-            {getRoutes()}
-            <Route path="/users/create"     element={<UserCreate />} />
-            <Route path="/users/:id"        element={<UserDetail />} />
-            <Route path="/users/:id/edit"   element={<UserEdit />} />
-            <Route path="/members/create"   element={<MemberCreate />} />
-            <Route path="/members/:id"      element={<MemberDetail />} />
-            <Route path="/members/:id/edit" element={<MemberEdit />} />
-            <Route path="/" element={<Navigate to="/admin/default" replace />} />
-          </Routes>
+          <PageTransition>
+            <Routes>
+              {getRoutes()}
+              <Route path="/users/create"     element={<UserCreate />} />
+              <Route path="/users/:id"        element={<UserDetail />} />
+              <Route path="/users/:id/edit"   element={<UserEdit />} />
+              <Route path="/members/create"   element={<MemberCreate />} />
+              <Route path="/members/:id"      element={<MemberDetail />} />
+              <Route path="/members/:id/edit" element={<MemberEdit />} />
+              <Route path="/" element={<Navigate to="/admin/default" replace />} />
+            </Routes>
+          </PageTransition>
         </main>
 
         <Footer />

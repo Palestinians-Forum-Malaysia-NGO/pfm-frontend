@@ -4,6 +4,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/Footer";
 import routes from "routes.js";
+import PageTransition from "components/ui/PageTransition";
 
 export default function StaffLayout() {
   const location = useLocation();
@@ -47,10 +48,12 @@ export default function StaffLayout() {
         <Navbar onOpenSidenav={() => setOpen(true)} brandText={currentRoute} />
 
         <main className="flex-1 p-4 md:p-6">
-          <Routes>
-            {getRoutes()}
-            <Route path="/" element={<Navigate to="/staff/default" replace />} />
-          </Routes>
+          <PageTransition>
+            <Routes>
+              {getRoutes()}
+              <Route path="/" element={<Navigate to="/staff/default" replace />} />
+            </Routes>
+          </PageTransition>
         </main>
 
         <Footer />
