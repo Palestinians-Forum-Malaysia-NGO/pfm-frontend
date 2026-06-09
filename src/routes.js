@@ -5,6 +5,7 @@ import MainDashboard from "views/admin/default";
 import UsersPage from "views/admin/users";
 import StaffPage from "views/admin/staff";
 import MembersPage from "views/admin/members";
+import CategoriesPage from "views/admin/categories";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn          from "views/auth/SignIn";
@@ -39,6 +40,7 @@ import {
   MdManageAccounts,
   MdAssignment,
   MdBadge,
+  MdCategory,
 } from "react-icons/md";
 
 const routes = [
@@ -132,6 +134,19 @@ const routes = [
   },
 
   // ── SYSTEM ───────────────────────────────────────────────────────────────────
+  {
+    name: "Categories",
+    layout: "/admin",
+    path: "categories",
+    icon: <MdCategory className="h-5 w-5" />,
+    component: <CategoriesPage />,
+    section: "SYSTEM",
+    roles: ["admin"],
+    children: [
+      { name: "All Categories", path: "categories" },
+      { name: "Add Category",   path: "categories/create" },
+    ],
+  },
   {
     name: "Staff",
     layout: "/admin",

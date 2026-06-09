@@ -11,14 +11,18 @@ import UserEdit     from "views/admin/users/UserEdit";
 import MemberCreate from "views/admin/members/MemberCreate";
 import MemberDetail from "views/admin/members/MemberDetail";
 import MemberEdit   from "views/admin/members/MemberEdit";
-import StaffCreate  from "views/admin/staff/StaffCreate";
-import StaffDetail  from "views/admin/staff/StaffDetail";
-import StaffEdit    from "views/admin/staff/StaffEdit";
+import StaffCreate      from "views/admin/staff/StaffCreate";
+import StaffDetail      from "views/admin/staff/StaffDetail";
+import StaffEdit        from "views/admin/staff/StaffEdit";
+import CategoryCreate   from "views/admin/categories/CategoryCreate";
+import CategoryDetail   from "views/admin/categories/CategoryDetail";
+import CategoryEdit     from "views/admin/categories/CategoryEdit";
 
 const SUB_ROUTE_NAMES = {
-  "/users/create":   "New User",
-  "/members/create": "New Member",
-  "/staff/create":   "New Staff",
+  "/users/create":      "New User",
+  "/members/create":    "New Member",
+  "/staff/create":      "New Staff",
+  "/categories/create": "New Category",
 };
 
 export default function Admin(props) {
@@ -41,11 +45,13 @@ export default function Admin(props) {
     // Edit pages
     if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRoute("Edit User");   return; }
     if (path.match(/\/members\/\d+\/edit$/)) { setCurrentRoute("Edit Member"); return; }
-    if (path.match(/\/staff\/\d+\/edit$/))   { setCurrentRoute("Edit Staff");   return; }
+    if (path.match(/\/staff\/\d+\/edit$/))         { setCurrentRoute("Edit Staff");      return; }
+    if (path.match(/\/categories\/[^/]+\/edit$/)) { setCurrentRoute("Edit Category");    return; }
     // Detail pages
-    if (path.match(/\/users\/\d+$/))         { setCurrentRoute("User Detail");   return; }
-    if (path.match(/\/members\/\d+$/))       { setCurrentRoute("Member Detail"); return; }
-    if (path.match(/\/staff\/\d+$/))         { setCurrentRoute("Staff Detail");  return; }
+    if (path.match(/\/users\/\d+$/))              { setCurrentRoute("User Detail");      return; }
+    if (path.match(/\/members\/\d+$/))            { setCurrentRoute("Member Detail");    return; }
+    if (path.match(/\/staff\/\d+$/))              { setCurrentRoute("Staff Detail");     return; }
+    if (path.match(/\/categories\/[^/]+$/))       { setCurrentRoute("Category Detail");  return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
     if (active) setCurrentRoute(active.name);
@@ -87,9 +93,12 @@ export default function Admin(props) {
               <Route path="/members/create"   element={<MemberCreate />} />
               <Route path="/members/:id"      element={<MemberDetail />} />
               <Route path="/members/:id/edit" element={<MemberEdit />} />
-              <Route path="/staff/create"     element={<StaffCreate />} />
-              <Route path="/staff/:id"        element={<StaffDetail />} />
-              <Route path="/staff/:id/edit"   element={<StaffEdit />} />
+              <Route path="/staff/create"          element={<StaffCreate />} />
+              <Route path="/staff/:id"             element={<StaffDetail />} />
+              <Route path="/staff/:id/edit"        element={<StaffEdit />} />
+              <Route path="/categories/create"     element={<CategoryCreate />} />
+              <Route path="/categories/:id"        element={<CategoryDetail />} />
+              <Route path="/categories/:id/edit"   element={<CategoryEdit />} />
               <Route path="/" element={<Navigate to="/admin/default" replace />} />
             </Routes>
           </PageTransition>
