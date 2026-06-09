@@ -1,0 +1,207 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
+  MdFamilyRestroom, MdAccountBalance, MdBadge, MdInfoOutline,
+} from "react-icons/md";
+import PageHeader from "components/ui/PageHeader";
+import { InputField, PasswordField, SelectField, ToggleInput, validate } from "components/form";
+import Button from "components/ui/buttons/Button";
+import FormHeader from "components/ui/form/FormHeader";
+import AlertBanner from "components/ui/AlertBanner";
+import { useCreateMember } from "components/features/members/hooks";
+import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/members/constants/membership";
+import { COUNTRY_OPTIONS } from "components/features/members/constants/countries";
+import { useToast } from "components/ui/toast/ToastContext";
+
+const USER_RULES = {
+  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
+  email:     [{ required: true, message: "Email is required" }, { email: true }],
+  password:  [{ required: true, message: "Password is required" }, { minLength: 8, message: "At least 8 characters" }],
+};
+
+export default function MemberCreateForm() {
+  const navigate = useNavigate();
+  const { execute: createMember, loading, error } = useCreateMember();
+  const { success, error: toastError } = useToast();
+
+  const [userForm, setUserForm] = useState({
+    full_name: "", email: "", password: "", phone_number: "", is_active: true,
+  });
+  const [personalForm, setPersonalForm] = useState({
+    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "",
+  });
+  const [locationForm, setLocationForm] = useState({
+    country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
+  });
+  const [familyForm, setFamilyForm] = useState({
+    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "",
+  });
+  const [bankingForm, setBankingForm] = useState({
+    bank_name: "", account_number: "", account_holder_name: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
+  const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
+  const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
+  const setFa = (f, v) => setFamilyForm((p)  => ({ ...p, [f]: v }));
+  const setB  = (f, v) => setBankingForm((p) => ({ ...p, [f]: v }));
+
+  const canSubmit = userForm.full_name.trim() && userForm.email.trim() && userForm.password;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    Object.entries(USER_RULES).forEach(([field, rules]) => {
+      const err = validate(userForm[field], rules);
+      if (err) newErrors[field] = err;
+    });
+    if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
+
+    try {
+      const payload = {
+        user: {
+          full_name:    userForm.full_name,
+          email:        userForm.email,
+          password:     userForm.password,
+          phone_number: userForm.phone_number || undefined,
+          role:         "member",
+          is_active:    userForm.is_active,
+        },
+        full_name_arabic:           personalForm.full_name_arabic           || undefined,
+        passport_number:            personalForm.passport_number            || undefined,
+        date_of_birth:              personalForm.date_of_birth              || undefined,
+        gender:                     personalForm.gender                     || undefined,
+        marital_status:             personalForm.marital_status             || undefined,
+        country_of_origin:          locationForm.country_of_origin          || undefined,
+        date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia   || undefined,
+        current_city:               locationForm.current_city               || undefined,
+        address:                    locationForm.address                    || undefined,
+        family_information: {
+          family_in_malaysia:  familyForm.family_in_malaysia,
+          spouse_name:         familyForm.spouse_name        || null,
+          spouse_name_arabic:  familyForm.spouse_name_arabic || null,
+          spouse_job:          familyForm.spouse_job         || null,
+          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
+        },
+        banking_information: {
+          bank_name:           bankingForm.bank_name           || null,
+          account_number:      bankingForm.account_number      || null,
+          account_holder_name: bankingForm.account_holder_name || null,
+        },
+      };
+
+      const created = await createMember(payload);
+      success("Member created", `${userForm.full_name} has been added successfully.`);
+      navigate(`/admin/members/${created.id}`);
+    } catch (err) {
+      toastError("Failed to create member", err?.message);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
+
+      <PageHeader
+        icon={<MdPersonAdd className="h-5 w-5" />}
+        title="Add Member"
+        subtitle="Register a new PFM community member"
+        actions={
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Members" onClick={() => navigate("/admin/members")} />
+        }
+      />
+
+      <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+        <MdInfoOutline className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+        <p className="text-xs text-blue-700">
+          Members can also self-register via the <span className="font-semibold">Register</span> page. Use this form to manually add a member as an administrator.
+        </p>
+      </div>
+
+      <AlertBanner message={error} />
+
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+
+        {/* ── User Account ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="User Account" subtitle="Login credentials for this member" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris bin Abdullah" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
+            <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <PasswordField label="Password"      field="password"     placeholder="Min. 8 characters"       formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.password} />
+            <InputField    label="Phone Number"  field="phone_number" placeholder="+60 12-345 6789"         formData={userForm} errors={errors} updateFormData={setU} />
+          </div>
+          <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
+        </div>
+
+        {/* ── Personal Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField  label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"   formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Passport Number"    field="passport_number"  placeholder="A12345678"    formData={personalForm} errors={errors} updateFormData={setP} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField  label="Date of Birth"  field="date_of_birth"  type="date"                        formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS}            formData={personalForm} errors={errors} updateFormData={setP} />
+          </div>
+          <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}    formData={personalForm} errors={errors} updateFormData={setP} />
+        </div>
+
+        {/* ── Location & Travel ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdFlight className="h-5 w-5" />} title="Location & Travel" subtitle="Country of origin and residence in Malaysia" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <SelectField label="Country of Origin"        field="country_of_origin"       options={COUNTRY_OPTIONS} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date"               formData={locationForm} errors={errors} updateFormData={setL} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"    formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"   formData={locationForm} errors={errors} updateFormData={setL} />
+          </div>
+        </div>
+
+        {/* ── Family Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
+          <ToggleInput label="Family in Malaysia" field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali"  formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"     formData={familyForm} errors={errors} updateFormData={setFa} />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"              formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0"     formData={familyForm} errors={errors} updateFormData={setFa} />
+          </div>
+        </div>
+
+        {/* ── Banking Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField label="Bank Name"      field="bank_name"      placeholder="Maybank"       formData={bankingForm} errors={errors} updateFormData={setB} />
+            <InputField label="Account Number" field="account_number" placeholder="1234567890"    formData={bankingForm} errors={errors} updateFormData={setB} />
+          </div>
+          <InputField label="Account Holder Name" field="account_holder_name" placeholder="Ahmad Faris bin Abdullah" formData={bankingForm} errors={errors} updateFormData={setB} />
+        </div>
+
+        <div className="flex gap-3">
+          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/members")} className="flex-1" />
+          <Button
+            type="submit"
+            variant="primary"
+            text="Add Member"
+            icon={<MdPersonAdd className="h-4 w-4" />}
+            loading={loading}
+            disabled={!canSubmit}
+            className="flex-1"
+          />
+        </div>
+
+      </form>
+    </div>
+  );
+}
