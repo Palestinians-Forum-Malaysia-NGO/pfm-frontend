@@ -102,7 +102,6 @@ export default function CategoryDetailView() {
           <InfoRow icon={<MdTextFields className="h-4 w-4" />}  label="Name"   value={category.name} />
           <InfoRow icon={<MdLink className="h-4 w-4" />}        label="Slug"   value={category.slug} />
           <InfoRow icon={<MdCheckCircle className="h-4 w-4" />} label="Status" value={category.is_active ? "Active" : "Inactive"} />
-          <InfoRow icon={<MdBadge className="h-4 w-4" />}       label="ID"     value={category.id} />
         </div>
         {category.description && (
           <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
