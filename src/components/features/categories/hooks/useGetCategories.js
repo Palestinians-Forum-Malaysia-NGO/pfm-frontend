@@ -12,7 +12,7 @@ export function useGetCategories() {
     setError(null);
     try {
       const data = await categoryService.getAll();
-      setCategories(data);
+      setCategories(data.results ?? []);
     } catch (err) {
       setError(extractError(err));
     } finally {
