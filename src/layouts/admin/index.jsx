@@ -17,12 +17,16 @@ import StaffEdit        from "views/admin/staff/StaffEdit";
 import CategoryCreate   from "views/admin/categories/CategoryCreate";
 import CategoryDetail   from "views/admin/categories/CategoryDetail";
 import CategoryEdit     from "views/admin/categories/CategoryEdit";
+import ProjectCreate    from "views/admin/projects/ProjectCreate";
+import ProjectDetail    from "views/admin/projects/ProjectDetail";
+import ProjectEdit      from "views/admin/projects/ProjectEdit";
 
 const SUB_ROUTE_NAMES = {
   "/users/create":      "New User",
   "/members/create":    "New Member",
   "/staff/create":      "New Staff",
   "/categories/create": "New Category",
+  "/projects/create":   "New Project",
 };
 
 export default function Admin(props) {
@@ -47,11 +51,13 @@ export default function Admin(props) {
     if (path.match(/\/members\/\d+\/edit$/)) { setCurrentRoute("Edit Member"); return; }
     if (path.match(/\/staff\/\d+\/edit$/))         { setCurrentRoute("Edit Staff");      return; }
     if (path.match(/\/categories\/[^/]+\/edit$/)) { setCurrentRoute("Edit Category");    return; }
+    if (path.match(/\/projects\/[^/]+\/edit$/))  { setCurrentRoute("Edit Project");     return; }
     // Detail pages
     if (path.match(/\/users\/\d+$/))              { setCurrentRoute("User Detail");      return; }
     if (path.match(/\/members\/\d+$/))            { setCurrentRoute("Member Detail");    return; }
     if (path.match(/\/staff\/\d+$/))              { setCurrentRoute("Staff Detail");     return; }
     if (path.match(/\/categories\/[^/]+$/))       { setCurrentRoute("Category Detail");  return; }
+    if (path.match(/\/projects\/[^/]+$/))         { setCurrentRoute("Project Detail");   return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
     if (active) setCurrentRoute(active.name);
@@ -99,6 +105,9 @@ export default function Admin(props) {
               <Route path="/categories/create"     element={<CategoryCreate />} />
               <Route path="/categories/:id"        element={<CategoryDetail />} />
               <Route path="/categories/:id/edit"   element={<CategoryEdit />} />
+              <Route path="/projects/create"       element={<ProjectCreate />} />
+              <Route path="/projects/:id"          element={<ProjectDetail />} />
+              <Route path="/projects/:id/edit"     element={<ProjectEdit />} />
               <Route path="/" element={<Navigate to="/admin/default" replace />} />
             </Routes>
           </PageTransition>

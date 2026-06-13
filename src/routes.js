@@ -6,6 +6,7 @@ import UsersPage from "views/admin/users";
 import StaffPage from "views/admin/staff";
 import MembersPage from "views/admin/members";
 import CategoriesPage from "views/admin/categories";
+import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn          from "views/auth/SignIn";
@@ -41,6 +42,7 @@ import {
   MdAssignment,
   MdBadge,
   MdCategory,
+  MdFolderSpecial,
 } from "react-icons/md";
 
 const routes = [
@@ -78,6 +80,18 @@ const routes = [
   },
 
   // ── COMMUNITY ────────────────────────────────────────────────────────────────
+  {
+    name: "Projects",
+    layout: "/admin",
+    path: "projects",
+    icon: <MdFolderSpecial className="h-5 w-5" />,
+    component: <ProjectsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Projects", path: "projects" },
+      { name: "New Project",  path: "projects/create" },
+    ],
+  },
   {
     name: "Members",
     layout: "/admin",
