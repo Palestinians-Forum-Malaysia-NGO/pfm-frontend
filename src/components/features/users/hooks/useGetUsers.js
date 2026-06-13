@@ -12,7 +12,7 @@ const useGetUsers = () => {
     setError(null);
     try {
       const data = await userService.getAll();
-      setUsers(data);
+      setUsers(data.results ?? []);
     } catch (err) {
       const msg = extractError(err, "Failed to load users.");
       setError(msg);

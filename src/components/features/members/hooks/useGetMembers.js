@@ -12,7 +12,7 @@ const useGetMembers = () => {
     setError(null);
     try {
       const data = await memberService.getAll();
-      setMembers(data);
+      setMembers(data.results ?? []);
     } catch (err) {
       setError(extractError(err, "Failed to load members."));
     } finally {

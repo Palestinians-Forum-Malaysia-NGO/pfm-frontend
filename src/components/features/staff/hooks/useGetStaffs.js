@@ -12,7 +12,7 @@ const useGetStaffs = () => {
     setError(null);
     try {
       const data = await staffService.getAll();
-      setStaffs(data);
+      setStaffs(data.results ?? []);
     } catch (err) {
       setError(extractError(err, "Failed to load staff."));
     } finally {
