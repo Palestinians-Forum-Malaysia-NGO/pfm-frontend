@@ -116,7 +116,6 @@ export default function UserDetailView() {
           <InfoRow icon={<MdVerified className="h-4 w-4" />}      label="Status"   value={user.is_active ? "Active" : "Inactive"} />
           <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label="2FA"      value={user.is_2fa_enabled ? (user.is_2fa_verified ? "Enabled & Verified" : "Enabled") : "Disabled"} />
           <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Updated"  value={fmtDate(user.updated_at)} />
-          <InfoRow icon={<MdFingerprint className="h-4 w-4" />}   label="User ID"  value={user.id} />
         </div>
       </div>
 
