@@ -114,7 +114,6 @@ export default function UserDetailView() {
           <InfoRow icon={<MdPhone className="h-4 w-4" />}         label="Phone"    value={user.phone_number || "—"} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Joined"   value={fmtDate(user.created_at)} />
           <InfoRow icon={<MdVerified className="h-4 w-4" />}      label="Status"   value={user.is_active ? "Active" : "Inactive"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label="2FA"      value={user.is_2fa_enabled ? (user.is_2fa_verified ? "Enabled & Verified" : "Enabled") : "Disabled"} />
           <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Updated"  value={fmtDate(user.updated_at)} />
         </div>
       </div>
