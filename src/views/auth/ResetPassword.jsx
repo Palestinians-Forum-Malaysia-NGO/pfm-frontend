@@ -1,56 +1,45 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { MdLockReset, MdArrowBack, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
 import { validate }  from "components/form/utils/validation";
-import { useResetPassword, useResendOtp } from "components/features/auth/hooks";
+import { useResetPassword } from "components/features/auth/hooks";
 
 const PASSWORD_RULES = [
   { required: true, message: "New password is required" },
-  { minLength: 8, message: "At least 8 characters" },
+  { minLength: 8,   message: "At least 8 characters" },
 ];
 
 export default function ResetPassword() {
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const prefilled = location.state?.email ?? "";
+  const navigate                                    = useNavigate();
+  const [searchParams]                              = useSearchParams();
+  const urlToken                                    = searchParams.get("token") ?? "";
 
-  const { execute: resetPassword, loading, error }    = useResetPassword();
-  const { execute: resendOtp, loading: resending }    = useResendOtp();
+  const { execute: resetPassword, loading, error }  = useResetPassword();
 
-  const [email, setEmail]       = useState(prefilled);
-  const [otp, setOtp]           = useState("");
-  const [formData, setFormData] = useState({ new_password: "" });
+  const [token, setToken]       = useState(urlToken);
+  const [formData, setFormData] = useState({ password: "" });
   const [errors, setErrors]     = useState({});
   const [done, setDone]         = useState(false);
-  const [resent, setResent]     = useState(false);
 
   const updateFormData = (field, value) =>
     setFormData((p) => ({ ...p, [field]: value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const pwErr = validate(formData.new_password, PASSWORD_RULES);
-    if (pwErr) { setErrors({ new_password: pwErr }); return; }
-    if (!otp.trim()) { setErrors({ otp: "OTP code is required" }); return; }
+    const newErrors = {};
+    if (!token.trim()) newErrors.token = "Reset token is required";
+    const pwErr = validate(formData.password, PASSWORD_RULES);
+    if (pwErr) newErrors.password = pwErr;
+    if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     setErrors({});
     try {
-      await resetPassword({ email, otp: otp.trim(), new_password: formData.new_password });
+      await resetPassword({ token: token.trim(), password: formData.password });
       setDone(true);
     } catch {
       // error handled by useResetPassword
-    }
-  };
-
-  const handleResend = async () => {
-    setResent(false);
-    try {
-      await resendOtp({ email, purpose: "password_reset" });
-      setResent(true);
-    } catch {
-      // error handled by useResendOtp
     }
   };
 
@@ -77,7 +66,6 @@ export default function ResetPassword() {
   return (
     <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
 
-      {/* Header */}
       <div className="mb-7">
         <Link
           to="/auth/forgot-password"
@@ -90,53 +78,35 @@ export default function ResetPassword() {
         </div>
         <h1 className="mt-4 text-2xl font-bold text-navy-700">Reset password</h1>
         <p className="mt-1 text-sm text-slate-400">
-          Enter the code sent to{" "}
-          <span className="font-semibold text-slate-700">{email || "your email"}</span>{" "}
-          and choose a new password.
+          Paste the reset token from your email and choose a new password.
         </p>
       </div>
 
       <AlertBanner message={error} />
-      {resent && <AlertBanner message="A new code has been sent." variant="success" />}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-        {/* Email (editable if not prefilled) */}
-        {!prefilled && (
+        {/* Token input — hidden if received via URL param */}
+        {!urlToken && (
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">Email</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700">Reset Token</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 focus:border-green focus:bg-white"
+              type="text"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Paste your reset token"
+              className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 ${
+                errors.token
+                  ? "border-red-300 bg-red-50"
+                  : "border-slate-200 bg-slate-50 focus:border-green focus:bg-white"
+              }`}
             />
+            {errors.token && <p className="mt-1 text-xs text-red-500">{errors.token}</p>}
           </div>
         )}
 
-        {/* OTP */}
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-700">Reset Code</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={8}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-            placeholder="Enter code"
-            className={`w-full rounded-xl border px-4 py-2.5 text-center text-xl font-bold tracking-[0.5em] outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-base placeholder:font-normal ${
-              errors.otp
-                ? "border-red-300 bg-red-50"
-                : "border-slate-200 bg-slate-50 focus:border-green focus:bg-white"
-            }`}
-          />
-          {errors.otp && <p className="mt-1 text-xs text-red-500">{errors.otp}</p>}
-        </div>
-
-        {/* New password */}
         <PasswordField
-          label="New Password" field="new_password"
+          label="New Password" field="password"
           placeholder="Min. 8 characters"
           formData={formData} errors={errors}
           updateFormData={updateFormData} rules={PASSWORD_RULES}
@@ -155,14 +125,10 @@ export default function ResetPassword() {
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-400">
-        Didn't receive a code?{" "}
-        <button
-          onClick={handleResend}
-          disabled={resending}
-          className="font-medium text-green transition-colors hover:text-[#006833] disabled:opacity-50"
-        >
-          {resending ? "Sending..." : "Resend"}
-        </button>
+        Didn't get the email?{" "}
+        <Link to="/auth/forgot-password" className="font-medium text-green transition-colors hover:text-[#006833]">
+          Try again
+        </Link>
       </p>
     </div>
   );

@@ -42,15 +42,15 @@ export default function ForgotPassword() {
         </div>
         <h1 className="mt-5 text-xl font-bold text-navy-700">Check your email</h1>
         <p className="mt-2 text-sm text-slate-400">
-          We sent a password reset code to{" "}
+          We sent a password reset link to{" "}
           <span className="font-semibold text-slate-700">{formData.email}</span>.
-          Use it to reset your password.
+          Click the link in the email to reset your password.
         </p>
         <button
-          onClick={() => navigate("/auth/reset-password", { state: { email: formData.email } })}
+          onClick={() => navigate("/auth/reset-password")}
           className="mt-7 flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98]"
         >
-          Enter Reset Code
+          Enter Reset Token
         </button>
         <button
           onClick={() => setSent(false)}
@@ -78,7 +78,7 @@ export default function ForgotPassword() {
         </div>
         <h1 className="mt-4 text-2xl font-bold text-navy-700">Forgot password?</h1>
         <p className="mt-1 text-sm text-slate-400">
-          Enter your email and we'll send you a reset code.
+          Enter your email and we'll send you a reset link.
         </p>
       </div>
 
@@ -100,7 +100,7 @@ export default function ForgotPassword() {
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : "Send Reset Code"
+            : "Send Reset Link"
           }
         </button>
       </form>
