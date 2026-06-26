@@ -1,9 +1,26 @@
-﻿import React from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
-import { MdNotificationsNone, MdPerson } from "react-icons/md";
+import { MdNotificationsNone } from "react-icons/md";
+import { AuthContext } from "components/features/auth/context/AuthContext";
+
+const ROLE_PROFILE = {
+  admin:       "/admin/profile",
+  staff:       "/staff/profile",
+  member:      "/member/profile",
+  beneficiary: "/beneficiary/profile",
+};
+
+const getInitials = (name = "") =>
+  name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase() || "?";
 
 const Navbar = ({ onOpenSidenav, brandText }) => {
+  const { user, handleLogout } = useContext(AuthContext);
+
+  const profilePath = ROLE_PROFILE[user?.role] ?? "/admin/profile";
+  const initials    = getInitials(user?.full_name);
+
   return (
     <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6">
       {/* Left — mobile toggle + page title */}
@@ -16,9 +33,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
         </button>
         <div className="min-w-0">
           <p className="hidden truncate text-xs text-gray-400 sm:block">Palestinian Forum Malaysia</p>
-          <h1 className="truncate text-base font-bold capitalize text-navy-700">
-            {brandText}
-          </h1>
+          <h1 className="truncate text-base font-bold capitalize text-navy-700">{brandText}</h1>
         </div>
       </div>
 
@@ -38,13 +53,11 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
             <div className="w-[min(20rem,calc(100vw-2rem))] rounded-2xl bg-white p-4 shadow-xl shadow-shadow-500">
               <div className="mb-3 flex items-center justify-between">
                 <p className="font-bold text-navy-700">Notifications</p>
-                <button className="text-xs font-medium text-brand-500 hover:underline">
-                  Mark all read
-                </button>
+                <button className="text-xs font-medium text-brand-500 hover:underline">Mark all read</button>
               </div>
               <div className="flex flex-col gap-3">
                 {[
-                  { title: "New member joined PFM", time: "2 min ago" },
+                  { title: "New member joined PFM",            time: "2 min ago" },
                   { title: "Upcoming event: Gaza Solidarity March", time: "1 hr ago" },
                   { title: "Donation goal reached — Thank you!", time: "Yesterday" },
                 ].map((n, i) => (
@@ -64,8 +77,11 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
         {/* Avatar */}
         <Dropdown
           button={
-            <button className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden ring-2 ring-brand-100 transition hover:ring-brand-400">
-              <MdPerson className="h-5 w-5 text-green" />
+            <button className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-green/10 ring-2 ring-green/20 transition hover:ring-green/50 text-sm font-bold text-green">
+              {user?.profile_photo
+                ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" />
+                : initials
+              }
             </button>
           }
           animation="origin-top-right transition-all duration-200 ease-in-out"
@@ -73,22 +89,31 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
           children={
             <div className="w-52 rounded-2xl bg-white shadow-xl shadow-shadow-500">
               <div className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green/10">
-                  <MdPerson className="h-5 w-5 text-green" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green/10 text-sm font-bold text-green">
+                  {user?.profile_photo
+                    ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full rounded-full object-cover" />
+                    : initials
+                  }
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-navy-700">Admin User</p>
-                  <p className="text-xs text-gray-400">PFM Administrator</p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-navy-700">{user?.full_name || "—"}</p>
+                  <p className="truncate text-xs text-gray-400">{user?.email || ""}</p>
                 </div>
               </div>
               <div className="h-px bg-gray-100" />
               <div className="flex flex-col p-3 gap-1">
-                <a href=" " className="rounded-lg px-3 py-2 text-sm text-navy-700 transition hover:bg-gray-50">
+                <Link
+                  to={profilePath}
+                  className="rounded-lg px-3 py-2 text-sm text-navy-700 transition hover:bg-gray-50"
+                >
                   Profile Settings
-                </a>
-                <a href=" " className="rounded-lg px-3 py-2 text-sm font-medium text-pfmRed-500 transition hover:bg-pfmRed-50">
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-lg px-3 py-2 text-left text-sm font-medium text-pfmRed-500 transition hover:bg-pfmRed-50"
+                >
                   Log Out
-                </a>
+                </button>
               </div>
             </div>
           }
