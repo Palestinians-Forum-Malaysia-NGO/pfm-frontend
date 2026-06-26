@@ -1,9 +1,13 @@
 ﻿import { MdCloudUpload, MdDeleteOutline, MdInsertDriveFile, MdErrorOutline } from "react-icons/md";
 import React, { useState } from "react";
-import { ALLOWED_FILE_TYPES } from "services/uploadService";
+const ALLOWED_FILE_TYPES = {
+  mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/jpg"],
+  extensions: [".pdf", ".png", ".jpg", ".jpeg"],
+  label: "PDF, JPG, PNG",
+};
 
 const FileUploadField = ({
-  label, field, documentTypeId, formData, updateFormData, errors,
+  label, field, documentTypeId, formData, errors,
   required = false, multiple = false,
   accept = ALLOWED_FILE_TYPES.extensions.join(","),
   uploadHandler, removeHandler,
