@@ -2,11 +2,20 @@ import React from "react";
 import {
   MdPeople, MdEvent, MdCalendarToday, MdHistory,
   MdFavorite, MdCampaign, MdVolunteerActivism, MdMail,
+  MdFolderSpecial, MdCheckCircle, MdFlag,
 } from "react-icons/md";
 
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
+  {
+    label: "Projects", to: "/projects",
+    children: [
+      { label: "All Projects",    to: "/projects", desc: "Browse every PFM community initiative",  icon: <MdFolderSpecial className="h-4 w-4" />, bg: "bg-green/10 text-green" },
+      { label: "Active Projects", to: "/projects", desc: "Initiatives currently underway",         icon: <MdCheckCircle className="h-4 w-4" />,   bg: "bg-blue-50 text-blue-500" },
+      { label: "Completed",       to: "/projects", desc: "Projects we have seen through",          icon: <MdFlag className="h-4 w-4" />,          bg: "bg-slate-100 text-slate-500" },
+    ],
+  },
   {
     label: "Events", to: "/events",
     children: [

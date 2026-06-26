@@ -114,13 +114,30 @@ export default function ProjectPublicList() {
 
   const clearFilters = () => { setSearch(""); setStatusFilter("all"); };
 
+  const activeCount = allProjects.filter((p) => p.status === "active").length;
+
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">Our Projects</h1>
-        <p className="mt-3 text-base text-slate-500">Community initiatives making a real difference across Malaysia and Palestine.</p>
+    <div>
+      {/* ── Hero banner ── */}
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #007A3D 0%, #005a2e 100%)" }}>
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, #ffffff22 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="max-w-2xl">
+            <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+              {activeCount} Active {activeCount === 1 ? "Project" : "Projects"}
+            </span>
+            <h1 className="mt-3 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl leading-tight">
+              Our Community Projects
+            </h1>
+            <p className="mt-4 text-base text-white/75 sm:text-lg leading-relaxed">
+              Real initiatives, real impact — supporting Palestinians and communities across Malaysia and beyond.
+            </p>
+          </div>
+        </div>
       </div>
+
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
 
       {/* Filters */}
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -181,5 +198,6 @@ export default function ProjectPublicList() {
         </div>
       )}
     </section>
+    </div>
   );
 }

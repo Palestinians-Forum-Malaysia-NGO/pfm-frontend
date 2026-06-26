@@ -50,8 +50,20 @@ export default function ProjectPublicDetail() {
         {project.cover_image ? (
           <div className="relative h-64 w-full overflow-hidden sm:h-80 lg:h-96">
             <img src={project.cover_image} alt={project.title} className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 sm:px-8">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+            {/* Breadcrumb — top of hero */}
+            <div className="absolute left-0 right-0 top-0 px-6 pt-5 sm:px-8">
+              <div className="mx-auto max-w-4xl">
+                <button
+                  onClick={() => navigate("/projects")}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-150 hover:bg-black/40"
+                >
+                  <MdArrowBack className="h-3.5 w-3.5" /> Projects
+                </button>
+              </div>
+            </div>
+            {/* Title — bottom of hero */}
+            <div className="absolute bottom-0 left-0 right-0 px-6 pb-7 sm:px-8">
               <div className="mx-auto max-w-4xl">
                 <div className="mb-2 flex flex-wrap gap-2">
                   <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${PROJECT_STATUS_BADGE[project.status] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
@@ -68,12 +80,24 @@ export default function ProjectPublicDetail() {
             </div>
           </div>
         ) : (
-          <div className="relative h-40 w-full overflow-hidden" style={{ background: "linear-gradient(135deg, #007A3D 0%, #005a2e 100%)" }}>
+          <div className="relative h-48 w-full overflow-hidden" style={{ background: "linear-gradient(135deg, #007A3D 0%, #005a2e 100%)" }}>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, #ffffff22 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+            {/* Breadcrumb — top */}
+            <div className="absolute left-0 right-0 top-0 px-6 pt-5 sm:px-8">
+              <div className="mx-auto max-w-4xl">
+                <button
+                  onClick={() => navigate("/projects")}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-150 hover:bg-white/25"
+                >
+                  <MdArrowBack className="h-3.5 w-3.5" /> Projects
+                </button>
+              </div>
+            </div>
+            {/* Title — bottom */}
             <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 sm:px-8">
               <div className="mx-auto max-w-4xl">
                 <div className="mb-2 flex flex-wrap gap-2">
-                  <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${PROJECT_STATUS_BADGE[project.status] ?? "bg-white/10 text-white border-white/20"}`}>
+                  <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-white/10 text-white border-white/20`}>
                     {PROJECT_STATUS_LABELS[project.status] ?? project.status}
                   </span>
                   {project.category?.name && (
@@ -87,16 +111,6 @@ export default function ProjectPublicDetail() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Back button */}
-      <div className="mx-auto max-w-4xl px-4 pt-5 sm:px-6 lg:px-8">
-        <button
-          onClick={() => navigate("/projects")}
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-green transition-colors duration-150"
-        >
-          <MdArrowBack className="h-4 w-4" /> All Projects
-        </button>
       </div>
 
       {/* ── Main content ── */}
