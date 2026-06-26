@@ -14,7 +14,7 @@ export const useUsers = () => {
     setError(null);
     try {
       const data = await userService.getAll();
-      setUsers(data);
+      setUsers(data.results ?? []);
     } catch (err) {
       setError(extractError(err, "Failed to load users."));
     } finally {

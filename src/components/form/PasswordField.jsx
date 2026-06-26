@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG, inputCls } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const PasswordField = ({
   label, field, required = true, placeholder = "",

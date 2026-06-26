@@ -2,12 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdExpandMore } from "react-icons/md";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const SearchableSelect = ({
   label, field, options = [], required = true,

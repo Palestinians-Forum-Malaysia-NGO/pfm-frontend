@@ -29,7 +29,8 @@ export default function UserEditForm() {
   const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
-    full_name: "", email: "", password: "", role: ROLE_VALUES.STAFF, is_active: true,
+    full_name: "", email: "", phone_number: "", password: "",
+    role: ROLE_VALUES.STAFF, is_active: true,
   });
   const [initial, setInitial] = useState(null);
   const [errors, setErrors]   = useState({});
@@ -37,22 +38,24 @@ export default function UserEditForm() {
   const updateFormData = (field, value) => setFormData((p) => ({ ...p, [field]: value }));
 
   const isDirty = !initial || (
-    formData.full_name !== initial.full_name ||
-    formData.email     !== initial.email     ||
-    formData.role      !== initial.role      ||
-    formData.is_active !== initial.is_active ||
-    formData.password  !== ""
+    formData.full_name    !== initial.full_name    ||
+    formData.email        !== initial.email        ||
+    formData.phone_number !== initial.phone_number ||
+    formData.role         !== initial.role         ||
+    formData.is_active    !== initial.is_active    ||
+    formData.password     !== ""
   );
 
   useEffect(() => {
     fetchUser(id).then((data) => {
       if (!data) return;
       const snapshot = {
-        full_name: data.full_name ?? "",
-        email:     data.email     ?? "",
-        password:  "",
-        role:      data.role      ?? ROLE_VALUES.STAFF,
-        is_active: data.is_active ?? true,
+        full_name:    data.full_name    ?? "",
+        email:        data.email        ?? "",
+        phone_number: data.phone_number ?? "",
+        password:     "",
+        role:         data.role         ?? ROLE_VALUES.STAFF,
+        is_active:    data.is_active    ?? true,
       };
       setFormData(snapshot);
       setInitial(snapshot);
@@ -154,14 +157,14 @@ export default function UserEditForm() {
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField
-              label="New Password"
-              field="password"
-              placeholder="Leave blank to keep current"
+            <InputField
+              label="Phone Number"
+              field="phone_number"
+              type="tel"
+              placeholder="+60 12-345 6789"
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              rules={RULES.password}
             />
             <SelectField
               label="Role"
@@ -171,6 +174,17 @@ export default function UserEditForm() {
               errors={errors}
               updateFormData={updateFormData}
               rules={[{ required: true, message: "Role is required" }]}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <PasswordField
+              label="New Password"
+              field="password"
+              placeholder="Leave blank to keep current"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              rules={RULES.password}
             />
           </div>
           <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />

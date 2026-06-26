@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const TextareaField = ({
   label, field, rows = 4, required = true,

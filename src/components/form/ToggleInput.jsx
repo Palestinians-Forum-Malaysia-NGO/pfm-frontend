@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { validate } from "../utils/validation";
-import { WRAPPER, LABEL, ERROR_MSG } from "../utils/fieldStyles";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
 const ToggleInput = ({
   label, field, formData, updateFormData,

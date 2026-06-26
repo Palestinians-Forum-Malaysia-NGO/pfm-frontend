@@ -112,8 +112,8 @@ export default function UserList() {
       render: (user) => (
         <div className="flex items-center gap-3">
           <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-xs font-bold ${ROLE_AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
-            {user.profile_picture
-              ? <img src={user.profile_picture} alt={user.full_name} className="h-full w-full object-cover" />
+            {user.profile_photo
+              ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" />
               : getInitials(user.full_name)
             }
           </div>

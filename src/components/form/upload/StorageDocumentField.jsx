@@ -1,0 +1,165 @@
+import React from "react";
+import {
+  MdCloudUpload, MdDeleteOutline, MdInsertDriveFile,
+  MdErrorOutline, MdOpenInNew,
+} from "react-icons/md";
+import { WRAPPER, LABEL, ERROR_MSG } from "../utils/fieldStyles";
+import useStorageUpload from "./useStorageUpload";
+
+/**
+ * Smart document / file upload field backed by DigitalOcean Spaces.
+ * Handles the full presigned-upload flow internally.
+ *
+ * Props:
+ *   label        – field label
+ *   fileType     – "document" | "pdf" | "file"  (default: "document")
+ *   folder       – Spaces folder, e.g. "cvs", "projects"
+ *   accept       – input accept string (default: ".pdf,.doc,.docx")
+ *   currentName  – display name for the existing file (e.g. "resume.pdf")
+ *   currentUrl   – public URL of the current file (for an "Open" link)
+ *   onUpload     – (fileKey: string | null) => void
+ *   onRemove     – () => void — called when existing file is removed
+ *   required     – show required asterisk
+ *   errors       – validation errors object
+ *   field        – key used to look up errors (default: "document")
+ */
+const StorageDocumentField = ({
+  label,
+  fileType = "document",
+  folder,
+  accept = ".pdf,.doc,.docx",
+  currentName,
+  currentUrl,
+  onUpload,
+  onRemove,
+  required = false,
+  errors,
+  field = "document",
+}) => {
+  const { file, isUploading, progress, error, handleFileChange, handleRemove } =
+    useStorageUpload({ fileType, folder, onUpload });
+
+  const handleChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    handleFileChange(selected);
+    e.target.value = "";
+  };
+
+  const hasExisting  = !file && (currentUrl || currentName);
+  const showDropzone = !file && !hasExisting;
+
+  return (
+    <div className={WRAPPER}>
+      {label && (
+        <label className={LABEL}>
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
+
+      {/* ── Dropzone ── */}
+      {showDropzone && (
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center transition-all hover:border-green/75 hover:bg-green/10">
+          <MdCloudUpload className="mb-2 h-8 w-8 text-slate-400" />
+          <p className="text-sm text-slate-500">
+            Drag & drop or <span className="font-semibold text-green">browse</span>
+          </p>
+          <p className="mt-1 text-xs text-slate-400">{accept}</p>
+          <input type="file" accept={accept} className="hidden" onChange={handleChange} />
+        </label>
+      )}
+
+      {/* ── Existing file ── */}
+      {hasExisting && (
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green/15 text-green">
+                <MdInsertDriveFile className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-slate-900">
+                  {currentName ?? "Uploaded file"}
+                </p>
+                {currentUrl && (
+                  <a
+                    href={currentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-green hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Open <MdOpenInNew className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <label className="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-100">
+                Replace
+                <input type="file" accept={accept} className="hidden" onChange={handleChange} />
+              </label>
+              <button
+                type="button"
+                onClick={onRemove}
+                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100"
+              >
+                <MdDeleteOutline className="h-3.5 w-3.5" /> Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── New file (uploading / done / failed) ── */}
+      {file && (
+        <div className={`rounded-xl border p-4 ${error ? "border-red-200 bg-red-50" : "border-slate-200 bg-white"}`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${error ? "bg-red-100 text-red-500" : "bg-green/15 text-green"}`}>
+                <MdInsertDriveFile className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className={`truncate text-sm font-medium ${error ? "text-red-600" : "text-slate-900"}`}>
+                  {file.name}
+                </p>
+                <p className={`text-xs ${error ? "text-red-400" : "text-slate-400"}`}>
+                  {isUploading ? `Uploading… ${progress}%` : error ? "Upload failed" : "Uploaded"}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemove}
+              disabled={isUploading}
+              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100 disabled:opacity-50"
+            >
+              <MdDeleteOutline className="h-3.5 w-3.5" /> Remove
+            </button>
+          </div>
+
+          {isUploading && (
+            <div className="mt-3 h-1 w-full rounded-full bg-green/15">
+              <div
+                className="h-full rounded-full bg-green transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Upload error banner ── */}
+      {error && (
+        <div className="mt-2 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5">
+          <MdErrorOutline className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+          <p className="text-xs text-red-600">{error}</p>
+        </div>
+      )}
+
+      {errors?.[field] && <p className={ERROR_MSG}>{errors[field]}</p>}
+    </div>
+  );
+};
+
+export default StorageDocumentField;

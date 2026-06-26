@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, LABEL_DARK, ERROR_MSG, inputCls } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const InputField = ({
   label, field, type = "text", required = true,

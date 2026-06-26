@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdArrowBack, MdPersonAdd, MdPerson } from "react-icons/md";
+import { MdArrowBack, MdPersonAdd, MdPerson, MdSecurity } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, PasswordField, SelectField, ToggleInput, validate } from "components/form";
+import { InputField, SelectField, ToggleInput, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -13,7 +13,6 @@ import { useToast } from "components/ui/toast/ToastContext";
 const RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ required: true, message: "Password is required" }, { minLength: 8, message: "At least 8 characters" }],
   role:      [{ required: true, message: "Role is required" }],
 };
 
@@ -23,13 +22,15 @@ export default function UserCreateForm() {
   const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
-    full_name: "", email: "", password: "", role: "", is_active: true,
+    full_name: "", email: "", phone_number: "",
+    role: "", is_active: true,
+    is_2fa_enabled: false, is_2fa_verified: false,
   });
   const [errors, setErrors] = useState({});
 
   const updateFormData = (field, value) => setFormData((p) => ({ ...p, [field]: value }));
 
-  const canSubmit = formData.full_name.trim() && formData.email.trim() && formData.password && formData.role;
+  const canSubmit = formData.full_name.trim() && formData.email.trim() && formData.role;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,6 +65,7 @@ export default function UserCreateForm() {
       <AlertBanner message={error} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials and role assignment" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
@@ -88,14 +90,14 @@ export default function UserCreateForm() {
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField
-              label="Password"
-              field="password"
-              placeholder="Min. 8 characters"
+            <InputField
+              label="Phone Number"
+              field="phone_number"
+              type="tel"
+              placeholder="+60 12-345 6789"
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              rules={RULES.password}
             />
             <SelectField
               label="Role"
@@ -108,6 +110,13 @@ export default function UserCreateForm() {
             />
           </div>
           <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
+        </div>
+
+        {/* ── Security ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdSecurity className="h-5 w-5" />} title="Two-Factor Authentication" subtitle="Configure 2FA settings for this account" />
+          <ToggleInput label="2FA Enabled"   field="is_2fa_enabled"  formData={formData} errors={errors} updateFormData={updateFormData} />
+          <ToggleInput label="2FA Verified"  field="is_2fa_verified" formData={formData} errors={errors} updateFormData={updateFormData} />
         </div>
 
         <div className="flex gap-3">

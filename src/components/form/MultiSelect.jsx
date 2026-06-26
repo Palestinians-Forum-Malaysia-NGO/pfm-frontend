@@ -1,15 +1,10 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdExpandMore } from "react-icons/md";
-import { validate } from "../utils/validation";
-import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "../utils/fieldStyles";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "./utils/fieldStyles";
+import { getNestedValue } from "./utils/getNestedValue";
 
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
-
-const SearchableDropdown = ({
+const MultiSelect = ({
   label, field, options = [], required = true,
   formData, errors, updateFormData,
   placeholder = "Select...", disabledOptions = [], rules = [],
@@ -19,9 +14,8 @@ const SearchableDropdown = ({
   const [search, setSearch] = useState("");
   const [localError, setLocalError] = useState(null);
 
-  const selectedValue = getNestedValue(formData, field) ?? "";
-  const selectedOption = options.find((opt) => opt.value === selectedValue);
-  const selectedLabel = selectedOption?.label ?? selectedValue ?? "";
+  const selectedValues = getNestedValue(formData, field) ?? [];
+  const selectedLabels = options.filter((opt) => selectedValues.includes(opt.value)).map((opt) => opt.label);
   const externalError = getNestedValue(errors, field);
   const displayError = localError || externalError;
 
@@ -33,21 +27,22 @@ const SearchableDropdown = ({
   useEffect(() => {
     const handler = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
-        if (isOpen) setLocalError(validate(selectedValue, rules));
+        if (isOpen) setLocalError(validate(selectedValues, rules));
         setIsOpen(false);
         setSearch("");
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [isOpen, selectedValue, rules]);
+  }, [isOpen, selectedValues, rules]);
 
   const handleSelect = (option) => {
     if (disabledOptions.includes(option.value)) return;
-    updateFormData(field, option.value);
-    setLocalError(validate(option.value, rules));
-    setIsOpen(false);
-    setSearch("");
+    const newValues = selectedValues.includes(option.value)
+      ? selectedValues.filter((v) => v !== option.value)
+      : [...selectedValues, option.value];
+    updateFormData(field, newValues);
+    setLocalError(validate(newValues, rules));
   };
 
   return (
@@ -58,12 +53,12 @@ const SearchableDropdown = ({
 
       <div
         onClick={() => setIsOpen((p) => !p)}
-        className={dropdownTriggerCls(isOpen, !!displayError)}
+        className={`${dropdownTriggerCls(isOpen, !!displayError)} min-h-12 h-auto py-2`}
       >
-        <span className={selectedLabel ? "text-slate-900" : "text-slate-400"}>
-          {selectedLabel || placeholder}
+        <span className={selectedLabels.length ? "text-slate-900" : "text-slate-400"}>
+          {selectedLabels.length ? selectedLabels.join(", ") : placeholder}
         </span>
-        <MdExpandMore className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <MdExpandMore className={`h-5 w-5 shrink-0 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </div>
 
       {isOpen && (
@@ -79,14 +74,16 @@ const SearchableDropdown = ({
           <ul className="max-h-48 overflow-y-auto">
             {filteredOptions.map((opt) => {
               const disabled = disabledOptions.includes(opt.value);
+              const checked = selectedValues.includes(opt.value);
               return (
                 <li
                   key={opt.value}
-                  onClick={() => handleSelect(opt)}
-                  className={`flex h-9 items-center rounded-lg px-3 text-sm transition-colors ${
+                  onClick={() => !disabled && handleSelect(opt)}
+                  className={`flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm transition-colors ${
                     disabled ? "cursor-not-allowed text-slate-300" : "cursor-pointer text-slate-900 hover:bg-green/10"
                   }`}
                 >
+                  <input type="checkbox" checked={checked} readOnly className="accent-green h-3.5 w-3.5 shrink-0" />
                   {opt.label}
                 </li>
               );
@@ -103,4 +100,4 @@ const SearchableDropdown = ({
   );
 };
 
-export default SearchableDropdown;
+export default MultiSelect;
