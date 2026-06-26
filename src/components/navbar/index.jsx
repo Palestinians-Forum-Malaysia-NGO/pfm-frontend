@@ -108,6 +108,13 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
                 >
                   Profile Settings
                 </Link>
+                <Link
+                  to="/auth/change-password"
+                  className="rounded-lg px-3 py-2 text-sm text-navy-700 transition hover:bg-gray-50"
+                >
+                  Change Password
+                </Link>
+                <div className="my-1 h-px bg-gray-100" />
                 <button
                   onClick={handleLogout}
                   className="rounded-lg px-3 py-2 text-left text-sm font-medium text-pfmRed-500 transition hover:bg-pfmRed-50"
