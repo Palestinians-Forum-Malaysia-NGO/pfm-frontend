@@ -6,9 +6,6 @@
 } from "react-icons/md";
 
 import StatCard from "./components/StatCard";
-import BalanceCard from "./components/BalanceCard";
-import RecentTransactions from "./components/RecentTransactions";
-import QuickDonate from "./components/QuickDonate";
 
 // ── Mock data ──────────────────────────────────────────────────────────────────
 
@@ -51,69 +48,6 @@ const STATS = [
   },
 ];
 
-const TRANSACTIONS = [
-  {
-    description: "Donation from Ahmad Razali",
-    date: "12 Nov, 2024",
-    amount: "RM 500.00",
-    type: "Donation",
-  },
-  {
-    description: "Aid sent to Gaza families",
-    date: "11 Nov, 2024",
-    amount: "RM 2,000.00",
-    type: "Aid Sent",
-  },
-  {
-    description: "Donation from Siti Nurhaliza",
-    date: "10 Nov, 2024",
-    amount: "RM 1,200.00",
-    type: "Donation",
-  },
-  {
-    description: "Medical supplies — Palestine",
-    date: "09 Nov, 2024",
-    amount: "RM 3,500.00",
-    type: "Aid Sent",
-  },
-  {
-    description: "Donation from Ali Hassan",
-    date: "08 Nov, 2024",
-    amount: "RM 800.00",
-    type: "Donation",
-  },
-  {
-    description: "Donation from Nurul Izzah",
-    date: "07 Nov, 2024",
-    amount: "RM 250.00",
-    type: "Donation",
-  },
-];
-
-const CAMPAIGNS = [
-  "Gaza Medical Aid",
-  "Food for Palestine",
-  "Education Fund",
-  "Orphan Support",
-  "Winter Relief 2024",
-];
-
-const BENEFICIARIES = [
-  "Al-Shifa Hospital",
-  "UNRWA Malaysia",
-  "Islamic Relief",
-  "Palestinian Red Crescent",
-  "Aman Palestine",
-];
-
-const AS_OF = new Date().toLocaleDateString("en-MY", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
 // ── Component ──────────────────────────────────────────────────────────────────
 
 const Dashboard = () => {
@@ -124,24 +58,6 @@ const Dashboard = () => {
         {STATS.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
-      </div>
-
-      {/* ── Main grid: left (2/3) + right (1/3) ── */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {/* Left column */}
-        <div className="flex flex-col gap-4 lg:col-span-2">
-          <BalanceCard
-            total="RM 125,000"
-            available="RM 48,200"
-            asOf={AS_OF}
-          />
-          <RecentTransactions transactions={TRANSACTIONS} asOf={AS_OF} />
-        </div>
-
-        {/* Right column */}
-        <div className="lg:col-span-1">
-          <QuickDonate campaigns={CAMPAIGNS} beneficiaries={BENEFICIARIES} />
-        </div>
       </div>
     </div>
   );
