@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdAssignment,
   MdCalendarToday, MdPublic, MdPublicOff, MdPerson,
-  MdCategory, MdInfoOutline, MdUpdate,
+  MdCategory, MdInfoOutline, MdUpdate, MdAttachMoney,
+  MdTrendingUp, MdPeople,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -23,6 +24,12 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
+
+const fmtMYR = (val) => {
+  const n = parseFloat(val);
+  if (isNaN(n)) return "—";
+  return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
 export default function ProjectDetailView() {
   const { id }   = useParams();
@@ -66,6 +73,9 @@ export default function ProjectDetailView() {
   if (error)   return <AlertBanner message={error} />;
   if (!project) return null;
 
+  const progressPct = parseFloat(project.progress_percentage) || 0;
+  const clampedPct  = Math.min(100, Math.max(0, progressPct));
+
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
 
@@ -95,10 +105,9 @@ export default function ProjectDetailView() {
 
       {/* ── Hero card ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        {project.cover_image && (
+        {project.cover_image ? (
           <img src={project.cover_image} alt={project.title} className="h-48 w-full object-cover" />
-        )}
-        {!project.cover_image && (
+        ) : (
           <div className="h-28 w-full" style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}>
             <div className="h-full w-full opacity-40" style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
           </div>
@@ -131,6 +140,35 @@ export default function ProjectDetailView() {
           />
         </div>
       </div>
+
+      {/* ── Funding Stats ── */}
+      {(project.target || project.amount_raised || project.total_beneficiaries_helped) && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Funding & Impact" subtitle="Progress towards target and beneficiaries reached" />
+          {project.target && (
+            <div className="mb-4">
+              <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
+                <span>Funding Progress</span>
+                <span className="font-semibold text-slate-700">{clampedPct.toFixed(1)}%</span>
+              </div>
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${clampedPct}%` }} />
+              </div>
+            </div>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {project.target && (
+              <InfoRow icon={<MdAttachMoney className="h-4 w-4" />} label="Target" value={fmtMYR(project.target)} />
+            )}
+            {project.amount_raised && (
+              <InfoRow icon={<MdTrendingUp className="h-4 w-4" />} label="Amount Raised" value={fmtMYR(project.amount_raised)} />
+            )}
+            {project.total_beneficiaries_helped && (
+              <InfoRow icon={<MdPeople className="h-4 w-4" />} label="Beneficiaries Helped" value={project.total_beneficiaries_helped} />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Project Info ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">

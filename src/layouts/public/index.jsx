@@ -4,6 +4,7 @@ import routes from "routes.js";
 
 import PublicNavbar from "components/navbar/PublicNavbar";
 import Footer from "components/footer/Footer";
+import ProjectDetail from "views/public/projects/ProjectDetail";
 
 export default function PublicLayout() {
   const getRoutes = () =>
@@ -19,6 +20,7 @@ export default function PublicLayout() {
       <main className="flex-1">
         <Routes>
           {getRoutes()}
+          <Route path="/projects/:slug" element={<ProjectDetail />} />
         </Routes>
       </main>
       <Footer />

@@ -25,6 +25,7 @@ import About from "views/public/about";
 import PublicEvents from "views/public/events";
 import Donate from "views/public/donate";
 import Contact from "views/public/contact";
+import PublicProjectsPage from "views/public/projects";
 
 // Icon Imports
 import {
@@ -333,11 +334,12 @@ const routes = [
   },
 
   // ── PUBLIC ───────────────────────────────────────────────────────────────────
-  { name: "Home",    layout: "/", path: "/",        component: <Home /> },
-  { name: "About",   layout: "/", path: "/about",   component: <About /> },
-  { name: "Events",  layout: "/", path: "/events",  component: <PublicEvents /> },
-  { name: "Donate",  layout: "/", path: "/donate",  component: <Donate /> },
-  { name: "Contact", layout: "/", path: "/contact", component: <Contact /> },
+  { name: "Home",     layout: "/", path: "/",         component: <Home /> },
+  { name: "About",    layout: "/", path: "/about",    component: <About /> },
+  { name: "Events",   layout: "/", path: "/events",   component: <PublicEvents /> },
+  { name: "Projects", layout: "/", path: "/projects", component: <PublicProjectsPage /> },
+  { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
+  { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
   { name: "Sign In",         layout: "/auth", path: "sign-in",         component: <SignIn /> },

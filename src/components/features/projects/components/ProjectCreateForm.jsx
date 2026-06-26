@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdArrowBack, MdAdd, MdAssignment } from "react-icons/md";
+import { MdArrowBack, MdAdd, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, TextareaField, SelectField, ToggleInput, validate } from "components/form";
+import { InputField, TextareaField, SelectField, ToggleInput, StorageImageField, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -25,8 +25,8 @@ export default function ProjectCreateForm() {
   const { success, error: toastError } = useToast();
 
   const [form, setForm]     = useState({
-    title: "", category_id: "", status: "active", summary: "",
-    description: "", beneficiary_info: "", start_date: "", end_date: "", is_published: false,
+    title: "", cover_image: null, category_id: "", status: "active", summary: "",
+    description: "", beneficiary_info: "", target: "", start_date: "", end_date: "", is_published: false,
   });
   const [errors, setErrors] = useState({});
 
@@ -50,15 +50,17 @@ export default function ProjectCreateForm() {
 
     try {
       const payload = {
-        title:           form.title,
-        category_id:     form.category_id  || undefined,
-        status:          form.status       || undefined,
-        summary:         form.summary      || undefined,
-        description:     form.description  || undefined,
+        title:            form.title,
+        cover_image:      form.cover_image      || undefined,
+        category_id:      form.category_id      || undefined,
+        status:           form.status           || undefined,
+        summary:          form.summary          || undefined,
+        description:      form.description      || undefined,
         beneficiary_info: form.beneficiary_info || undefined,
-        start_date:      form.start_date   || undefined,
-        end_date:        form.end_date     || undefined,
-        is_published:    form.is_published,
+        target:           form.target           ? Number(form.target) : undefined,
+        start_date:       form.start_date       || undefined,
+        end_date:         form.end_date         || undefined,
+        is_published:     form.is_published,
       };
       const created = await createProject(payload);
       success("Project created", `"${form.title}" has been added.`);
@@ -84,6 +86,20 @@ export default function ProjectCreateForm() {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
+        {/* ── Cover Image ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdImage className="h-5 w-5" />} title="Cover Image" subtitle="Shown on the public project page and listing" />
+          <StorageImageField
+            label="Cover Image"
+            field="cover_image"
+            fileType="image"
+            folder="projects"
+            onUpload={(key) => set("cover_image", key)}
+            onRemove={() => set("cover_image", null)}
+            errors={errors}
+          />
+        </div>
+
         {/* ── Overview ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Project Overview" subtitle="Title, category, and status" />
@@ -98,13 +114,14 @@ export default function ProjectCreateForm() {
         {/* ── Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Project Details" subtitle="Full description and beneficiary information" />
-          <TextareaField label="Description"        field="description"      rows={5} placeholder="Full project description…" formData={form} errors={errors} updateFormData={set} required={false} />
-          <TextareaField label="Beneficiary Info"   field="beneficiary_info" rows={3} placeholder="Who will benefit from this project?" formData={form} errors={errors} updateFormData={set} required={false} />
+          <TextareaField label="Description"      field="description"      rows={5} placeholder="Full project description…" formData={form} errors={errors} updateFormData={set} required={false} />
+          <TextareaField label="Beneficiary Info" field="beneficiary_info" rows={3} placeholder="Who will benefit from this project?" formData={form} errors={errors} updateFormData={set} required={false} />
         </div>
 
-        {/* ── Dates & Publishing ── */}
+        {/* ── Funding & Dates ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Dates & Publishing" subtitle="Project timeline and visibility" />
+          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Funding & Dates" subtitle="Funding target and project timeline" />
+          <InputField label="Funding Target (MYR)" field="target" type="number" placeholder="e.g. 50000" formData={form} errors={errors} updateFormData={set} required={false} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label="Start Date" field="start_date" type="date" formData={form} errors={errors} updateFormData={set} required={false} />
             <InputField label="End Date"   field="end_date"   type="date" formData={form} errors={errors} updateFormData={set} required={false} />
