@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdArrowBack, MdAdd, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, TextareaField, SelectField, ToggleInput, StorageImageField, validate } from "components/form";
+import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -89,10 +89,7 @@ export default function ProjectCreateForm() {
         {/* ── Cover Image ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdImage className="h-5 w-5" />} title="Cover Image" subtitle="Shown on the public project page and listing" />
-          <StorageImageField
-            label="Cover Image"
-            field="cover_image"
-            fileType="image"
+          <StorageCoverField
             folder="projects"
             onUpload={(key) => set("cover_image", key)}
             onRemove={() => set("cover_image", null)}

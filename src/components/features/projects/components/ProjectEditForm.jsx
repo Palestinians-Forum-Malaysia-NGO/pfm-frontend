@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdEdit, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, TextareaField, SelectField, ToggleInput, StorageImageField } from "components/form";
+import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -110,10 +110,7 @@ export default function ProjectEditForm() {
         {/* ── Cover Image ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdImage className="h-5 w-5" />} title="Cover Image" subtitle="Shown on the public project page and listing" />
-          <StorageImageField
-            label="Cover Image"
-            field="cover_image"
-            fileType="image"
+          <StorageCoverField
             folder="projects"
             currentUrl={currentCoverUrl}
             onUpload={(key) => { set("cover_image", key); setCurrentCoverUrl(null); }}

@@ -22,6 +22,7 @@ export { default as ImageUploadField    } from "./upload/ImageUploadField";
 export { default as FileUploadField     } from "./upload/FileUploadField";
 export { default as FileUploadToggleField } from "./upload/FileUploadToggleField";
 export { default as StorageImageField   } from "./upload/StorageImageField";
+export { default as StorageCoverField   } from "./upload/StorageCoverField";
 export { default as StorageDocumentField } from "./upload/StorageDocumentField";
 export { default as useStorageUpload    } from "./upload/useStorageUpload";
 
