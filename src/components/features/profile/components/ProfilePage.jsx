@@ -26,7 +26,7 @@ const ProfilePage = () => {
 
       <UserProfileCard user={profile} showId />
 
-      {profile.role === "member" && <MemberInfoSection profile={profile} />}
+      {profile.role === "beneficiary" && <MemberInfoSection profile={profile} />}
 
       <EditProfileSection profile={profile} onSaved={refetch} />
 

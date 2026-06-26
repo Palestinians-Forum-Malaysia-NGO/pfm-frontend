@@ -4,7 +4,7 @@ import React from "react";
 import MainDashboard from "views/admin/default";
 import UsersPage from "views/admin/users";
 import StaffPage from "views/admin/staff";
-import MembersPage from "views/admin/members";
+import BeneficiariesPage from "views/admin/beneficiaries";
 import CategoriesPage from "views/admin/categories";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
@@ -93,15 +93,15 @@ const routes = [
     ],
   },
   {
-    name: "Members",
+    name: "Beneficiaries",
     layout: "/admin",
-    path: "members",
+    path: "beneficiaries",
     icon: <MdPeople className="h-5 w-5" />,
-    component: <MembersPage />,
+    component: <BeneficiariesPage />,
     section: "COMMUNITY",
     children: [
-      { name: "All Members", path: "members" },
-      { name: "Add Member",  path: "members/create" },
+      { name: "All Beneficiaries", path: "beneficiaries" },
+      { name: "Add Beneficiary",   path: "beneficiaries/create" },
     ],
   },
   {
@@ -142,7 +142,7 @@ const routes = [
     hidden: true,
     children: [
       { name: "Financial Report", path: "reports/financial" },
-      { name: "Member Report",    path: "reports/members" },
+      { name: "Beneficiary Report", path: "reports/beneficiaries" },
       { name: "Campaign Report",  path: "reports/campaigns" },
     ],
   },
@@ -217,11 +217,11 @@ const routes = [
     section: "MAIN",
   },
   {
-    name: "Members",
+    name: "Beneficiaries",
     layout: "/staff",
-    path: "members",
+    path: "beneficiaries",
     icon: <MdPeople className="h-5 w-5" />,
-    component: <Placeholder pageName="Members" />,
+    component: <Placeholder pageName="Beneficiaries" />,
     section: "MAIN",
     hidden: true,
   },
