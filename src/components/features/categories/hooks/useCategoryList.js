@@ -8,25 +8,28 @@ export function useCategoryList() {
   const { execute: deleteCategory, loading: deleteLoading }    = useDeleteCategory();
   const { success, error: toastError }                         = useToast();
 
-  const [search, setSearch]           = useState("");
+  const [search,       setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [toDelete, setToDelete]       = useState(null);
+  const [moduleFilter, setModuleFilter] = useState("all");
+  const [toDelete,     setToDelete]     = useState(null);
 
   const categories = useMemo(() => {
     let list = allCategories;
     if (statusFilter === "active")   list = list.filter((c) => c.is_active);
     if (statusFilter === "inactive") list = list.filter((c) => !c.is_active);
+    if (moduleFilter !== "all")      list = list.filter((c) => c.module === moduleFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
         (c) =>
           c.name.toLowerCase().includes(q) ||
           (c.description ?? "").toLowerCase().includes(q) ||
-          (c.slug ?? "").toLowerCase().includes(q)
+          (c.slug ?? "").toLowerCase().includes(q) ||
+          (c.module ?? "").toLowerCase().includes(q)
       );
     }
     return list;
-  }, [allCategories, search, statusFilter]);
+  }, [allCategories, search, statusFilter, moduleFilter]);
 
   const stats = useMemo(() => ({
     total:    allCategories.length,
@@ -51,6 +54,7 @@ export function useCategoryList() {
     stats,
     search,       setSearch,
     statusFilter, setStatusFilter,
+    moduleFilter, setModuleFilter,
     toDelete,     setToDelete,
     deleteLoading,
     handleDeleteConfirm,

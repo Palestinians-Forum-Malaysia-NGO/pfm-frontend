@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import {
   MdAdd, MdCategory, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
+  MdApps,
 } from "react-icons/md";
 import { useCategoryList } from "components/features/categories/hooks";
 import CategoryDeleteModal from "./CategoryDeleteModal";
+import { MODULE_FILTER_OPTIONS, MODULE_LABELS } from "components/features/categories/constants/category";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
@@ -26,6 +28,7 @@ export default function CategoryList() {
     stats,
     search,       setSearch,
     statusFilter, setStatusFilter,
+    moduleFilter, setModuleFilter,
     toDelete,     setToDelete,
     deleteLoading,
     handleDeleteConfirm,
@@ -64,10 +67,18 @@ export default function CategoryList() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold text-slate-900">{c.name}</p>
-            <p className="truncate text-xs text-slate-400">{c.slug}</p>
+            <p className="truncate font-mono text-xs text-slate-400">{c.slug}</p>
           </div>
         </div>
       ),
+    },
+    {
+      key: "module",
+      label: "Module",
+      icon: <MdApps className="h-3.5 w-3.5" />,
+      render: (c) => c.module
+        ? <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 capitalize">{MODULE_LABELS[c.module] ?? c.module}</span>
+        : <span className="text-slate-300">—</span>,
     },
     {
       key: "description",
@@ -76,6 +87,13 @@ export default function CategoryList() {
         <span className="line-clamp-1 text-sm text-slate-600">
           {c.description || <span className="text-slate-300">—</span>}
         </span>
+      ),
+    },
+    {
+      key: "order",
+      label: "Order",
+      render: (c) => (
+        <span className="text-sm text-slate-500">{c.order ?? <span className="text-slate-300">—</span>}</span>
       ),
     },
     {
@@ -106,7 +124,7 @@ export default function CategoryList() {
     },
   ];
 
-  const hasFilters = search !== "" || statusFilter !== "all";
+  const hasFilters = search !== "" || statusFilter !== "all" || moduleFilter !== "all";
 
   return (
     <div className="mx-auto max-w-5xl bg-white p-6 rounded-2xl border border-slate-200">
@@ -114,27 +132,20 @@ export default function CategoryList() {
       <PageHeader
         icon={<MdCategory className="h-5 w-5" />}
         title="Categories"
-        subtitle="Manage PFM membership classification categories"
+        subtitle="Manage content categories across PFM modules"
         actions={
           <Button icon={<MdAdd className="h-4 w-4" />} text="Add Category" onClick={() => navigate("/admin/categories/create")} />
         }
       />
 
-      {/* ── Stat cards ── */}
       <div className="mb-5 grid grid-cols-3 gap-3">
         {statCards.map((card) => (
-          <button
-            key={card.key}
-            onClick={card.onClick}
+          <button key={card.key} onClick={card.onClick}
             className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
-              card.active
-                ? "border-green/30 bg-green/5 shadow-sm"
-                : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+              card.active ? "border-green/30 bg-green/5 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
             }`}
           >
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.bgColor} ${card.color}`}>
-              {card.icon}
-            </div>
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.bgColor} ${card.color}`}>{card.icon}</div>
             <div className="min-w-0 flex-1">
               <p className={`text-xl font-bold leading-none ${card.active ? "text-green" : "text-slate-900"}`}>{card.value}</p>
               <p className="mt-0.5 truncate text-xs text-slate-400">{card.label}</p>
@@ -143,31 +154,16 @@ export default function CategoryList() {
         ))}
       </div>
 
-      {/* ── Filters ── */}
       <div className="mb-4 flex items-center gap-2">
-        <SearchInput
-          value={search}
-          onChange={(v) => setSearch(v)}
-          placeholder="Search by name, slug, or description…"
-          className="flex-1"
-        />
-        <FilterSelect
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={STATUS_OPTIONS}
-          icon={<MdCheckCircle className="h-3.5 w-3.5" />}
-        />
+        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder="Search by name, slug, or description…" className="flex-1" />
+        <FilterSelect value={moduleFilter} onChange={setModuleFilter} options={MODULE_FILTER_OPTIONS} icon={<MdApps className="h-3.5 w-3.5" />} />
+        <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS}        icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         {hasFilters && (
-          <Button
-            variant="danger"
-            icon={<MdClose className="h-3.5 w-3.5" />}
-            text="Clear"
-            onClick={() => { setSearch(""); setStatusFilter("all"); }}
-          />
+          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text="Clear"
+            onClick={() => { setSearch(""); setStatusFilter("all"); setModuleFilter("all"); }} />
         )}
       </div>
 
-      {/* ── DataTable ── */}
       <DataTable
         columns={columns}
         data={categories}

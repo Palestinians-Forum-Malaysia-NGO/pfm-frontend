@@ -1,7 +1,7 @@
 import api from "services/app";
 
 export const categoryService = {
-  async getAll()              { const { data } = await api.get("/categories"); return data; },
+  async getAll(params = {})   { const { data } = await api.get("/categories", { params }); return data; },
   async getById(id)           { const { data } = await api.get(`/categories/${id}`); return data; },
   async create(payload)       { const { data } = await api.post("/categories", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/categories/${id}`, payload); return data; },

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { categoryService } from "../services/categoryService";
 import { extractError } from "components/features/auth/utils";
 
-export function useGetCategories() {
+export function useGetCategories(params = {}) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState(null);
@@ -11,7 +11,7 @@ export function useGetCategories() {
     setLoading(true);
     setError(null);
     try {
-      const data = await categoryService.getAll();
+      const data = await categoryService.getAll(params);
       setCategories(data.results ?? []);
     } catch (err) {
       setError(extractError(err));
