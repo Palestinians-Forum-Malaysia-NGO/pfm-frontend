@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { MdCampaign, MdAdd, MdDeleteOutline, MdPerson } from "react-icons/md";
+import {
+  MdCampaign, MdAdd, MdDeleteOutline, MdPerson, MdEdit, MdCheck, MdClose, MdImage,
+} from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import Button from "components/ui/buttons/Button";
 import RowIconButton from "components/ui/buttons/RowIconButton";
-import { useCreateProjectUpdate, useDeleteProjectUpdate } from "components/features/projects/hooks";
+import { StorageCoverField } from "components/form";
+import {
+  useCreateProjectUpdate, useUpdateProjectUpdate, useDeleteProjectUpdate,
+} from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const fmtDate = (d) =>
@@ -11,20 +16,36 @@ const fmtDate = (d) =>
 
 export default function UpdatesSection({ projectId, initialUpdates = [] }) {
   const [updates, setUpdates] = useState(initialUpdates);
-  const [addOpen, setAddOpen] = useState(false);
-  const [body,    setBody]    = useState("");
+
+  // Create state
+  const [addOpen,       setAddOpen]       = useState(false);
+  const [newBody,       setNewBody]       = useState("");
+  const [newPhotoKey,   setNewPhotoKey]   = useState(null);
+
+  // Edit state
+  const [editingId,         setEditingId]         = useState(null);
+  const [editBody,          setEditBody]          = useState("");
+  const [editPhotoKey,      setEditPhotoKey]      = useState(null);
+  const [editCurrentUrl,    setEditCurrentUrl]    = useState(null);
+  const [showPhotoInCreate, setShowPhotoInCreate] = useState(false);
 
   const { execute: createUpdate, loading: creating } = useCreateProjectUpdate();
+  const { execute: patchUpdate,  loading: saving   } = useUpdateProjectUpdate();
   const { execute: deleteUpdate, loading: deleting } = useDeleteProjectUpdate();
   const { success, error: toastError } = useToast();
 
+  /* ── Create ── */
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!body.trim()) return;
+    if (!newBody.trim()) return;
     try {
-      const created = await createUpdate(projectId, { body });
+      const payload = { body: newBody };
+      if (newPhotoKey) payload.photo = newPhotoKey;
+      const created = await createUpdate(projectId, payload);
       setUpdates((prev) => [created, ...prev]);
-      setBody("");
+      setNewBody("");
+      setNewPhotoKey(null);
+      setShowPhotoInCreate(false);
       setAddOpen(false);
       success("Update posted");
     } catch (err) {
@@ -32,6 +53,36 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
     }
   };
 
+  /* ── Edit ── */
+  const startEdit = (u) => {
+    setEditingId(u.id);
+    setEditBody(u.body);
+    setEditPhotoKey(null);
+    setEditCurrentUrl(u.photo || null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditBody("");
+    setEditPhotoKey(null);
+    setEditCurrentUrl(null);
+  };
+
+  const handleSave = async (updateId) => {
+    if (!editBody.trim()) return;
+    try {
+      const payload = { body: editBody };
+      if (editPhotoKey !== null) payload.photo = editPhotoKey || null;
+      const updated = await patchUpdate(projectId, updateId, payload);
+      setUpdates((prev) => prev.map((u) => (u.id === updateId ? updated : u)));
+      cancelEdit();
+      success("Update saved");
+    } catch (err) {
+      toastError("Failed to save update", err?.message);
+    }
+  };
+
+  /* ── Delete ── */
   const handleDelete = async (id) => {
     try {
       await deleteUpdate(projectId, id);
@@ -44,47 +95,104 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
-      <div className="flex items-start justify-between mb-4">
-        <FormHeader icon={<MdCampaign className="h-5 w-5" />} title="Project Updates" subtitle="Progress posts visible to community members" />
-        <Button variant="ghost" icon={<MdAdd className="h-4 w-4" />} text="Post" onClick={() => setAddOpen((o) => !o)} />
+      <div className="mb-4 flex items-start justify-between">
+        <FormHeader
+          icon={<MdCampaign className="h-5 w-5" />}
+          title="Project Updates"
+          subtitle="Progress posts visible to community members"
+        />
+        <Button
+          variant="ghost"
+          icon={<MdAdd className="h-4 w-4" />}
+          text="Post"
+          onClick={() => { setAddOpen((o) => !o); setShowPhotoInCreate(false); setNewPhotoKey(null); setNewBody(""); }}
+        />
       </div>
 
-      {/* Post form */}
+      {/* ── Create form ── */}
       {addOpen && (
         <form onSubmit={handleAdd} className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-4 flex flex-col gap-3">
           <textarea
-            value={body} onChange={(e) => setBody(e.target.value)}
-            placeholder="Write an update for this project…" rows={3} required
+            value={newBody}
+            onChange={(e) => setNewBody(e.target.value)}
+            placeholder="Write an update for this project…"
+            rows={3}
+            required
             className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
           />
+          {showPhotoInCreate ? (
+            <StorageCoverField
+              label="Photo"
+              folder="projects/updates"
+              onUpload={(key) => setNewPhotoKey(key)}
+              onRemove={() => setNewPhotoKey(null)}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowPhotoInCreate(true)}
+              className="flex w-fit items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            >
+              <MdImage className="h-3.5 w-3.5" /> Attach photo
+            </button>
+          )}
           <div className="flex gap-2">
-            <Button variant="ghost" text="Cancel" type="button" onClick={() => { setAddOpen(false); setBody(""); }} className="flex-1" />
-            <Button variant="primary" text="Post Update" type="submit" loading={creating} disabled={!body.trim()} className="flex-1" />
+            <Button variant="ghost" text="Cancel" type="button" onClick={() => { setAddOpen(false); setNewBody(""); setNewPhotoKey(null); setShowPhotoInCreate(false); }} className="flex-1" />
+            <Button variant="primary" text="Post Update" type="submit" loading={creating} disabled={!newBody.trim()} className="flex-1" />
           </div>
         </form>
       )}
 
-      {/* Updates list */}
+      {/* ── Updates list ── */}
       {updates.length === 0 ? (
         <p className="py-6 text-center text-sm text-slate-400">No updates posted yet.</p>
       ) : (
         <div className="flex flex-col divide-y divide-slate-100">
           {updates.map((u) => (
-            <div key={u.id} className="flex items-start gap-3 py-4">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green/10 text-green">
-                <MdPerson className="h-4 w-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  {u.posted_by && <span className="text-xs font-semibold text-slate-700">{u.posted_by}</span>}
-                  <span className="text-xs text-slate-400">{fmtDate(u.created_at)}</span>
+            <div key={u.id} className="py-4">
+              {editingId === u.id ? (
+                /* ── Inline edit form ── */
+                <div className="flex flex-col gap-3 rounded-xl border border-green/20 bg-green/5 p-4">
+                  <textarea
+                    value={editBody}
+                    onChange={(e) => setEditBody(e.target.value)}
+                    rows={3}
+                    className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-green focus:ring-1 focus:ring-green"
+                  />
+                  <StorageCoverField
+                    label="Photo"
+                    folder="projects/updates"
+                    currentUrl={editCurrentUrl}
+                    onUpload={(key) => { setEditPhotoKey(key); setEditCurrentUrl(null); }}
+                    onRemove={() => { setEditPhotoKey(""); setEditCurrentUrl(null); }}
+                  />
+                  <div className="flex gap-2">
+                    <Button variant="ghost" text="Cancel" type="button" onClick={cancelEdit} icon={<MdClose className="h-3.5 w-3.5" />} className="flex-1" />
+                    <Button variant="primary" text="Save" type="button" loading={saving} disabled={!editBody.trim()} onClick={() => handleSave(u.id)} icon={<MdCheck className="h-3.5 w-3.5" />} className="flex-1" />
+                  </div>
                 </div>
-                <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
-                {u.photo && (
-                  <img src={u.photo} alt="Update" className="mt-2 max-h-48 rounded-lg object-cover border border-slate-100" />
-                )}
-              </div>
-              <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title="Delete" onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
+              ) : (
+                /* ── Normal row ── */
+                <div className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green/10 text-green">
+                    <MdPerson className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      {u.posted_by && <span className="text-xs font-semibold text-slate-700">{u.posted_by}</span>}
+                      <span className="text-xs text-slate-400">{fmtDate(u.created_at)}</span>
+                    </div>
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
+                    {u.photo && (
+                      <img src={u.photo} alt="Update" className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
+                    )}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title="Edit"   onClick={() => startEdit(u)} />
+                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title="Delete" onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
