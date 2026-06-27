@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdPerson, MdFlight,
   MdFamilyRestroom, MdAccountBalance, MdBadge,
@@ -24,6 +25,7 @@ const USER_RULES = {
 export default function BeneficiaryEditForm() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { beneficiary, execute: fetchBeneficiary, loading, error: loadError } = useGetBeneficiary();
   const { execute: updateBeneficiary, loading: saving, error: saveError } = useUpdateBeneficiary();
@@ -159,7 +161,7 @@ export default function BeneficiaryEditForm() {
 
       await updateBeneficiary(id, payload);
       success("Beneficiary updated", `${userForm.full_name} has been updated successfully.`);
-      navigate(`/admin/beneficiaries/${id}`);
+      navigate(`${base}/beneficiaries/${id}`);
     } catch (err) {
       toastError("Failed to update beneficiary", err?.message);
     }
@@ -176,7 +178,7 @@ export default function BeneficiaryEditForm() {
         title="Edit Beneficiary"
         subtitle={userForm.full_name || "Update beneficiary details"}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Beneficiary" onClick={() => navigate(`/admin/beneficiaries/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Beneficiary" onClick={() => navigate(`${base}/beneficiaries/${id}`)} />
         }
       />
 
@@ -251,7 +253,7 @@ export default function BeneficiaryEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/beneficiaries/${id}`)} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/beneficiaries/${id}`)} className="flex-1" />
           <Button
             type="submit"
             variant="primary"

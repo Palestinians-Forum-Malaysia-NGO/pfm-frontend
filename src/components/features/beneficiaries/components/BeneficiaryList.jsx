@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
@@ -28,6 +29,7 @@ const STATUS_OPTIONS = [
 
 export default function BeneficiaryList() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const {
     beneficiaries, loading, error,
     stats,
@@ -136,8 +138,8 @@ export default function BeneficiaryList() {
       stopPropagation: true,
       render: (b) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`/admin/beneficiaries/${b.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`/admin/beneficiaries/${b.id}/edit`)} />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`${base}/beneficiaries/${b.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`${base}/beneficiaries/${b.id}/edit`)} />
           <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title="Delete" onClick={() => setToDelete(b)} variant="danger" />
         </div>
       ),
@@ -154,7 +156,7 @@ export default function BeneficiaryList() {
         title="Beneficiaries"
         subtitle="Manage PFM beneficiary profiles"
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Beneficiary" onClick={() => navigate("/admin/beneficiaries/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Beneficiary" onClick={() => navigate(`${base}/beneficiaries/create`)} />
         }
       />
 
@@ -189,13 +191,13 @@ export default function BeneficiaryList() {
         data={beneficiaries}
         loading={loading}
         error={error}
-        onRowClick={(b) => navigate(`/admin/beneficiaries/${b.id}`)}
+        onRowClick={(b) => navigate(`${base}/beneficiaries/${b.id}`)}
         selectable
         pageSize={8}
         emptyIcon={<MdPeople />}
         emptyTitle="No beneficiaries found"
         emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first PFM beneficiary."}
-        emptyAction={!hasFilters ? { label: "Add Beneficiary", onClick: () => navigate("/admin/beneficiaries/create") } : undefined}
+        emptyAction={!hasFilters ? { label: "Add Beneficiary", onClick: () => navigate(`${base}/beneficiaries/create`) } : undefined}
       />
 
       <BeneficiaryDeleteModal

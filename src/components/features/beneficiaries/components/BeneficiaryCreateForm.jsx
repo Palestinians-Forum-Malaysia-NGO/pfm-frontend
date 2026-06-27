@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
   MdFamilyRestroom, MdAccountBalance, MdBadge, MdInfoOutline,
@@ -22,6 +23,7 @@ const USER_RULES = {
 
 export default function BeneficiaryCreateForm() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
   const { success, error: toastError } = useToast();
 
@@ -94,7 +96,7 @@ export default function BeneficiaryCreateForm() {
 
       const created = await createBeneficiary(payload);
       success("Beneficiary created", `${userForm.full_name} has been added successfully.`);
-      navigate(`/admin/beneficiaries/${created.id}`);
+      navigate(`${base}/beneficiaries/${created.id}`);
     } catch (err) {
       toastError("Failed to create beneficiary", err?.message);
     }
@@ -108,7 +110,7 @@ export default function BeneficiaryCreateForm() {
         title="Add Beneficiary"
         subtitle="Register a new PFM beneficiary profile"
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Beneficiaries" onClick={() => navigate("/admin/beneficiaries")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Beneficiaries" onClick={() => navigate(`${base}/beneficiaries`)} />
         }
       />
 
@@ -189,7 +191,7 @@ export default function BeneficiaryCreateForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/beneficiaries")} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/beneficiaries`)} className="flex-1" />
           <Button
             type="submit"
             variant="primary"

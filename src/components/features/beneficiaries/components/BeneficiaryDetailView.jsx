@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdPeople,
   MdEmail, MdPhone, MdCalendarToday, MdShield, MdVerified,
@@ -30,6 +31,7 @@ const fmtDate = (d) =>
 export default function BeneficiaryDetailView() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { beneficiary, execute: fetchBeneficiary, loading, error } = useGetBeneficiary();
   const { execute: deleteBeneficiary, loading: deleteLoading, error: deleteError } = useDeleteBeneficiary();
@@ -61,7 +63,7 @@ export default function BeneficiaryDetailView() {
     try {
       await deleteBeneficiary(id);
       success("Beneficiary deleted", `${beneficiary?.user?.full_name} has been removed.`);
-      navigate("/admin/beneficiaries");
+      navigate(`${base}/beneficiaries`);
     } catch (err) {
       toastError("Failed to delete beneficiary", err?.message);
     }
@@ -85,11 +87,11 @@ export default function BeneficiaryDetailView() {
         subtitle="Beneficiary Details"
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Beneficiaries" onClick={() => navigate("/admin/beneficiaries")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Beneficiaries" onClick={() => navigate(`${base}/beneficiaries`)} />
             <DropdownButton
               label="Actions"
               items={[
-                { label: "Edit Beneficiary",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/beneficiaries/${id}/edit`) },
+                { label: "Edit Beneficiary",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/beneficiaries/${id}/edit`) },
                 { divider: true },
                 { label: "Delete Beneficiary", icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}

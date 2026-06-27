@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdCategory,
   MdBadge, MdLink, MdTextFields, MdCheckCircle,
@@ -20,6 +21,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 export default function CategoryDetailView() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { category, execute: fetchCategory, loading, error } = useGetCategory();
   const { execute: deleteCategory, loading: deleteLoading, error: deleteError } = useDeleteCategory();
@@ -32,7 +34,7 @@ export default function CategoryDetailView() {
     try {
       await deleteCategory(id);
       success("Category deleted", `"${category?.name}" has been removed.`);
-      navigate("/admin/categories");
+      navigate(`${base}/categories`);
     } catch (err) {
       toastError("Failed to delete category", err?.message);
     }
@@ -51,11 +53,11 @@ export default function CategoryDetailView() {
         subtitle="Category Details"
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Categories" onClick={() => navigate("/admin/categories")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Categories" onClick={() => navigate(`${base}/categories`)} />
             <DropdownButton
               label="Actions"
               items={[
-                { label: "Edit Category",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/categories/${id}/edit`) },
+                { label: "Edit Category",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/categories/${id}/edit`) },
                 { divider: true },
                 { label: "Delete Category", icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}
@@ -129,7 +131,7 @@ export default function CategoryDetailView() {
             {category.children.map((child) => (
               <button
                 key={child.id}
-                onClick={() => navigate(`/admin/categories/${child.id}`)}
+                onClick={() => navigate(`${base}/categories/${child.id}`)}
                 className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left transition-all duration-150 hover:border-green/30 hover:bg-green/5"
               >
                 <div className="flex items-center gap-3">

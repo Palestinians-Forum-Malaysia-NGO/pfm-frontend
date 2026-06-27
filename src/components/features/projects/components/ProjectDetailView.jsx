@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdAssignment,
   MdCalendarToday, MdPublic, MdPublicOff, MdPerson,
@@ -34,6 +35,7 @@ const fmtMYR = (val) => {
 export default function ProjectDetailView() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { project, execute: fetchProject, loading, error } = useGetProject();
   const { execute: deleteProject,   loading: deleteLoading  } = useDeleteProject();
@@ -48,7 +50,7 @@ export default function ProjectDetailView() {
     try {
       await deleteProject(id);
       success("Project deleted", `"${project?.title}" has been removed.`);
-      navigate("/admin/projects");
+      navigate(`${base}/projects`);
     } catch (err) {
       toastError("Failed to delete project", err?.message);
     }
@@ -85,11 +87,11 @@ export default function ProjectDetailView() {
         subtitle="Project Details"
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Projects" onClick={() => navigate("/admin/projects")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Projects" onClick={() => navigate(`${base}/projects`)} />
             <DropdownButton
               label="Actions"
               items={[
-                { label: "Edit Project",  icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/projects/${id}/edit`) },
+                { label: "Edit Project",  icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/projects/${id}/edit`) },
                 {
                   label: project.is_published ? "Unpublish" : "Publish",
                   icon: project.is_published ? <MdPublicOff className="h-4 w-4" /> : <MdPublic className="h-4 w-4" />,

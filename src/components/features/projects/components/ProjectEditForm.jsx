@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdEdit, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField } from "components/form";
@@ -15,6 +16,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 export default function ProjectEditForm() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { project, execute: fetchProject, loading, error: loadError } = useGetProject();
   const { execute: updateProject, loading: saving, error: saveError }  = useUpdateProject();
@@ -82,7 +84,7 @@ export default function ProjectEditForm() {
       };
       await updateProject(id, payload);
       success("Project updated", `"${form.title}" has been saved.`);
-      navigate(`/admin/projects/${id}`);
+      navigate(`${base}/projects/${id}`);
     } catch (err) {
       toastError("Failed to update project", err?.message);
     }
@@ -99,7 +101,7 @@ export default function ProjectEditForm() {
         title="Edit Project"
         subtitle={form.title || "Update project details"}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`/admin/projects/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`${base}/projects/${id}`)} />
         }
       />
 
@@ -155,7 +157,7 @@ export default function ProjectEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/projects/${id}`)} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/projects/${id}`)} className="flex-1" />
           <Button
             type="submit" variant="primary" text="Save Changes"
             loading={saving} disabled={!form.title.trim() || !isDirty}

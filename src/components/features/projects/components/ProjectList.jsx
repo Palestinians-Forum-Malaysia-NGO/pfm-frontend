@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdAssignment, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
@@ -27,6 +28,7 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numer
 
 export default function ProjectList() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const {
     projects, loading, error,
     stats,
@@ -119,8 +121,8 @@ export default function ProjectList() {
       stopPropagation: true,
       render: (p) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />} title="View"   onClick={() => navigate(`/admin/projects/${p.id}`)} variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}      title="Edit"   onClick={() => navigate(`/admin/projects/${p.id}/edit`)} />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />} title="View"   onClick={() => navigate(`${base}/projects/${p.id}`)} variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}      title="Edit"   onClick={() => navigate(`${base}/projects/${p.id}/edit`)} />
           <RowIconButton
             icon={p.is_published ? <MdPublicOff className="h-4 w-4" /> : <MdPublic className="h-4 w-4" />}
             title={p.is_published ? "Unpublish" : "Publish"}
@@ -143,7 +145,7 @@ export default function ProjectList() {
         title="Projects"
         subtitle="Manage PFM community projects"
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="New Project" onClick={() => navigate("/admin/projects/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text="New Project" onClick={() => navigate(`${base}/projects/create`)} />
         }
       />
 
@@ -178,13 +180,13 @@ export default function ProjectList() {
         data={projects}
         loading={loading}
         error={error}
-        onRowClick={(p) => navigate(`/admin/projects/${p.id}`)}
+        onRowClick={(p) => navigate(`${base}/projects/${p.id}`)}
         selectable
         pageSize={8}
         emptyIcon={<MdAssignment />}
         emptyTitle="No projects found"
         emptyDesc={hasFilters ? "Try adjusting your filters." : "Create the first PFM project."}
-        emptyAction={!hasFilters ? { label: "New Project", onClick: () => navigate("/admin/projects/create") } : undefined}
+        emptyAction={!hasFilters ? { label: "New Project", onClick: () => navigate(`${base}/projects/create`) } : undefined}
       />
 
       <ProjectDeleteModal

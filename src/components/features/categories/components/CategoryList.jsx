@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdCategory, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
@@ -23,6 +24,7 @@ const STATUS_OPTIONS = [
 
 export default function CategoryList() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const {
     categories, loading, error,
     stats,
@@ -116,8 +118,8 @@ export default function CategoryList() {
       stopPropagation: true,
       render: (c) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`/admin/categories/${c.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`/admin/categories/${c.id}/edit`)} />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`${base}/categories/${c.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`${base}/categories/${c.id}/edit`)} />
           <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title="Delete" onClick={() => setToDelete(c)} variant="danger" />
         </div>
       ),
@@ -134,7 +136,7 @@ export default function CategoryList() {
         title="Categories"
         subtitle="Manage content categories across PFM modules"
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Category" onClick={() => navigate("/admin/categories/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Category" onClick={() => navigate(`${base}/categories/create`)} />
         }
       />
 
@@ -169,13 +171,13 @@ export default function CategoryList() {
         data={categories}
         loading={loading}
         error={error}
-        onRowClick={(c) => navigate(`/admin/categories/${c.id}`)}
+        onRowClick={(c) => navigate(`${base}/categories/${c.id}`)}
         selectable
         pageSize={10}
         emptyIcon={<MdCategory />}
         emptyTitle="No categories found"
         emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first PFM category."}
-        emptyAction={!hasFilters ? { label: "Add Category", onClick: () => navigate("/admin/categories/create") } : undefined}
+        emptyAction={!hasFilters ? { label: "Add Category", onClick: () => navigate(`${base}/categories/create`) } : undefined}
       />
 
       <CategoryDeleteModal

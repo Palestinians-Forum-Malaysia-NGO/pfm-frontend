@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdAdd, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField, validate } from "components/form";
@@ -20,6 +21,7 @@ const RULES = {
 
 export default function ProjectCreateForm() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const { execute: createProject, loading, error } = useCreateProject();
   const { categories } = useGetCategories();
   const { success, error: toastError } = useToast();
@@ -64,7 +66,7 @@ export default function ProjectCreateForm() {
       };
       const created = await createProject(payload);
       success("Project created", `"${form.title}" has been added.`);
-      navigate(`/admin/projects/${created.id}`);
+      navigate(`${base}/projects/${created.id}`);
     } catch (err) {
       toastError("Failed to create project", err?.message);
     }
@@ -78,7 +80,7 @@ export default function ProjectCreateForm() {
         title="New Project"
         subtitle="Create a new PFM community project"
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Projects" onClick={() => navigate("/admin/projects")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Projects" onClick={() => navigate(`${base}/projects`)} />
         }
       />
 
@@ -127,7 +129,7 @@ export default function ProjectCreateForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/projects")} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/projects`)} className="flex-1" />
           <Button type="submit" variant="primary" text="Create Project" icon={<MdAdd className="h-4 w-4" />} loading={loading} disabled={!canSubmit} className="flex-1" />
         </div>
 

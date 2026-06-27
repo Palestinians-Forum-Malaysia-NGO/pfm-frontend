@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdEdit, MdCategory } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import { InputField, SelectField, ToggleInput, validate } from "components/form";
@@ -14,6 +15,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 export default function CategoryEditForm() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { category, execute: fetchCategory, loading, error: loadError } = useGetCategory();
   const { execute: updateCategory, loading: saving, error: saveError }  = useUpdateCategory();
@@ -63,7 +65,7 @@ export default function CategoryEditForm() {
         is_active:   form.is_active,
       });
       success("Category updated", `"${form.name}" has been updated.`);
-      navigate(`/admin/categories/${id}`);
+      navigate(`${base}/categories/${id}`);
     } catch (err) {
       toastError("Failed to update category", err?.message);
     }
@@ -80,7 +82,7 @@ export default function CategoryEditForm() {
         title="Edit Category"
         subtitle={form.name || "Update category details"}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`/admin/categories/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`${base}/categories/${id}`)} />
         }
       />
 
@@ -145,7 +147,7 @@ export default function CategoryEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/categories/${id}`)} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/categories/${id}`)} className="flex-1" />
           <Button type="submit" variant="primary" text="Save Changes" loading={saving} disabled={!form.name.trim() || !isDirty} className="flex-1" />
         </div>
       </form>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdAdd, MdCategory } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import { InputField, SelectField, ToggleInput, validate } from "components/form";
@@ -19,6 +20,7 @@ const RULES = {
 
 export default function CategoryCreateForm() {
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const { execute: createCategory, loading, error } = useCreateCategory();
   const { categories: allCategories } = useGetCategories();
   const { success, error: toastError } = useToast();
@@ -49,7 +51,7 @@ export default function CategoryCreateForm() {
         is_active:   form.is_active,
       });
       success("Category created", `"${form.name}" has been added.`);
-      navigate(`/admin/categories/${created.id}`);
+      navigate(`${base}/categories/${created.id}`);
     } catch (err) {
       toastError("Failed to create category", err?.message);
     }
@@ -63,7 +65,7 @@ export default function CategoryCreateForm() {
         title="Add Category"
         subtitle="Create a new PFM category"
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Categories" onClick={() => navigate("/admin/categories")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Categories" onClick={() => navigate(`${base}/categories`)} />
         }
       />
 
@@ -118,7 +120,7 @@ export default function CategoryCreateForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/categories")} className="flex-1" />
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/categories`)} className="flex-1" />
           <Button
             type="submit"
             variant="primary"
