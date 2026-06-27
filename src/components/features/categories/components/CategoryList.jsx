@@ -64,7 +64,14 @@ export default function CategoryList() {
       icon: <MdCategory className="h-3.5 w-3.5" />,
       render: (c) => (
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green/10 text-green">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={
+              c.hex_color
+                ? { background: c.hex_color, color: c.text_color || "#ffffff" }
+                : { background: "rgba(0,122,61,0.1)", color: "#007A3D" }
+            }
+          >
             <MdCategory className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">

@@ -10,7 +10,7 @@ const PARTNERS = ["Islamic Relief", "MERCY Malaysia", "AMAN Palestine", "UNRWA"]
 const STATS = [
   { value: "500+",   label: "Members",   icon: <MdPeople className="h-4 w-4" />,           color: "bg-green text-white",      delay: "0.5s" },
   { value: "RM 1M+", label: "Raised",   icon: <FaHandHoldingHeart className="h-4 w-4" />,  color: "bg-white text-slate-900",  delay: "0.65s" },
-  { value: "30+",    label: "Campaigns", icon: <MdCampaign className="h-4 w-4" />,          color: "bg-slate-900 text-white",   delay: "0.8s" },
+  { value: "30+",    label: "Campaigns", icon: <MdCampaign className="h-4 w-4" />,          color: "bg-red-500 text-white",     delay: "0.8s" },
 ];
 
 const HeroSection = () => (
@@ -71,10 +71,10 @@ const HeroSection = () => (
               <MdFavorite className="h-4 w-4" /> Donate Now
             </Link>
             <Link
-              to="/about"
+              to="/contact"
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98]"
             >
-              Learn More <MdArrowForward className="h-4 w-4" />
+              Join Us <MdArrowForward className="h-4 w-4" />
             </Link>
           </div>
 

@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdCategory,
-  MdBadge, MdLink, MdTextFields, MdCheckCircle,
+  MdLink, MdTextFields, MdCheckCircle,
   MdApps, MdAccountTree, MdSort, MdSubdirectoryArrowRight,
+  MdPalette,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -77,7 +78,14 @@ export default function CategoryDetailView() {
         </div>
         <div className="px-6 pb-6">
           <div className="-mt-8 mb-4 flex items-end justify-between">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-green/10 ring-4 ring-white shadow-md text-green">
+            <div
+              className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ring-4 ring-white shadow-md"
+              style={{
+                background: category.hex_color || undefined,
+                color: category.text_color || undefined,
+                ...(category.hex_color ? {} : { background: "rgba(0,122,61,0.1)", color: "#007A3D" }),
+              }}
+            >
               <MdCategory className="h-7 w-7" />
             </div>
             <div className="flex items-center gap-2">
@@ -113,6 +121,30 @@ export default function CategoryDetailView() {
           <InfoRow icon={<MdCheckCircle className="h-4 w-4" />} label="Status" value={category.is_active ? "Active" : "Inactive"} />
           {category.parent && (
             <InfoRow icon={<MdAccountTree className="h-4 w-4" />} label="Parent ID" value={<span className="font-mono text-xs">{category.parent}</span>} />
+          )}
+          {category.hex_color && (
+            <InfoRow
+              icon={<MdPalette className="h-4 w-4" />}
+              label="Background Color"
+              value={
+                <div className="flex items-center gap-2">
+                  <span className="h-5 w-5 rounded-md border border-slate-200 shadow-sm" style={{ background: category.hex_color }} />
+                  <span className="font-mono text-xs">{category.hex_color}</span>
+                </div>
+              }
+            />
+          )}
+          {category.text_color && (
+            <InfoRow
+              icon={<MdPalette className="h-4 w-4" />}
+              label="Text Color"
+              value={
+                <div className="flex items-center gap-2">
+                  <span className="h-5 w-5 rounded-md border border-slate-200 shadow-sm" style={{ background: category.text_color }} />
+                  <span className="font-mono text-xs">{category.text_color}</span>
+                </div>
+              }
+            />
           )}
         </div>
         {category.description && (

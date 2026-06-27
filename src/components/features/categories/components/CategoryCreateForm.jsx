@@ -25,7 +25,7 @@ export default function CategoryCreateForm() {
   const { categories: allCategories } = useGetCategories();
   const { success, error: toastError } = useToast();
 
-  const [form, setForm]     = useState({ name: "", module: "", description: "", parent: "", order: "", is_active: true });
+  const [form, setForm]     = useState({ name: "", module: "", description: "", parent: "", order: "", hex_color: "", text_color: "", is_active: true });
   const [errors, setErrors] = useState({});
 
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
@@ -48,6 +48,8 @@ export default function CategoryCreateForm() {
         description: form.description || undefined,
         parent:      form.parent      || undefined,
         order:       form.order !== "" ? Number(form.order) : undefined,
+        hex_color:   form.hex_color   || undefined,
+        text_color:  form.text_color  || undefined,
         is_active:   form.is_active,
       });
       success("Category created", `"${form.name}" has been added.`);
@@ -113,6 +115,46 @@ export default function CategoryCreateForm() {
               placeholder="0"
               formData={form} errors={errors} updateFormData={set}
             />
+          </div>
+
+          {/* Colors */}
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <div className="mb-4">
+              <label className="mb-1.5 block text-sm font-medium text-slate-900">Background Color</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={form.hex_color || "#ffffff"}
+                  onChange={(e) => set("hex_color", e.target.value)}
+                  className="h-12 w-12 flex-shrink-0 cursor-pointer rounded-xl border border-slate-200 bg-slate-50 p-1"
+                />
+                <input
+                  type="text"
+                  value={form.hex_color}
+                  onChange={(e) => set("hex_color", e.target.value)}
+                  placeholder="#007A3D"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-green focus:bg-slate-100/70"
+                />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="mb-1.5 block text-sm font-medium text-slate-900">Text Color</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={form.text_color || "#ffffff"}
+                  onChange={(e) => set("text_color", e.target.value)}
+                  className="h-12 w-12 flex-shrink-0 cursor-pointer rounded-xl border border-slate-200 bg-slate-50 p-1"
+                />
+                <input
+                  type="text"
+                  value={form.text_color}
+                  onChange={(e) => set("text_color", e.target.value)}
+                  placeholder="#ffffff"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-green focus:bg-slate-100/70"
+                />
+              </div>
+            </div>
           </div>
 
           <ToggleInput label="Active" field="is_active" formData={form} errors={errors} updateFormData={set} />

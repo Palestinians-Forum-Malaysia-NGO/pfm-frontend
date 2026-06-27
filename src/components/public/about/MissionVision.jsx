@@ -40,15 +40,14 @@ const MissionVision = () => {
         {/* Mission & Vision cards */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div
+            className="flex flex-col gap-4 rounded-3xl border border-green/20 bg-green/5 p-8"
             style={show(0)}
-            className="flex flex-col gap-4 rounded-3xl p-8 text-white"
-            style={{ background: "linear-gradient(135deg, #004d26 0%, #007A3D 100%)", ...show(0) }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/15 text-green">
               <FaHandHoldingHeart className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-black">Our Mission</h3>
-            <p className="leading-relaxed text-white/75">
+            <h3 className="text-2xl font-black text-slate-900">Our Mission</h3>
+            <p className="leading-relaxed text-slate-500">
               To unite Palestinians and supporters in Malaysia, advocate for Palestinian rights, deliver humanitarian aid, and raise awareness through community action.
             </p>
           </div>

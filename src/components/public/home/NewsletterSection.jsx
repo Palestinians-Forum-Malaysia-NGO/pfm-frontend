@@ -13,24 +13,20 @@ const NewsletterSection = () => {
   };
 
   return (
-    <section
-      ref={ref}
-      className="py-20"
-      style={{ background: "linear-gradient(135deg, #003d1f 0%, #007A3D 55%, #004d26 100%)" }}
-    >
+    <section ref={ref} className="bg-white py-20">
       <div
         className="mx-auto max-w-2xl px-6 text-center"
         style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(24px)", transition: "all 0.7s ease-in-out" }}
       >
         <div className="mb-5 flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green/10 text-green">
             <MdEmail className="h-7 w-7" />
           </div>
         </div>
 
-        <span className="text-xs font-bold uppercase tracking-widest text-white/60">Stay Informed</span>
-        <h2 className="mt-3 text-4xl font-extrabold text-white">Get Our Newsletter</h2>
-        <p className="mt-3 text-white/60">
+        <span className="text-xs font-bold uppercase tracking-widest text-green">Stay Informed</span>
+        <h2 className="mt-3 text-4xl font-extrabold text-slate-900">Get Our Newsletter</h2>
+        <p className="mt-3 text-slate-400">
           Receive updates on campaigns, events, and urgent appeals — straight to your inbox.
         </p>
 
@@ -38,31 +34,31 @@ const NewsletterSection = () => {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
-                <MdEmail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <MdEmail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="your@email.com"
-                  className="w-full rounded-full bg-white/10 py-3 pl-11 pr-4 text-sm text-white outline-none ring-1 ring-white/20 backdrop-blur-sm transition-all duration-200 focus:ring-white/40 placeholder:text-white/35"
+                  className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
                 />
               </div>
               <button
                 type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-                style={{ color: "#007A3D" }}
+                className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
+                style={{ background: "#007A3D", boxShadow: "0 4px 16px #007A3D25" }}
               >
                 Subscribe <MdArrowForward className="h-4 w-4" />
               </button>
             </form>
           ) : (
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm">
-              <MdCheckCircle className="h-5 w-5 text-green/80" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-green/20 bg-green/5 px-6 py-3 text-sm font-semibold text-green">
+              <MdCheckCircle className="h-5 w-5" />
               You're subscribed — thank you!
             </div>
           )}
-          <p className="mt-3 text-xs text-white/30">No spam. Unsubscribe anytime.</p>
+          <p className="mt-3 text-xs text-slate-400">No spam. Unsubscribe anytime.</p>
         </div>
       </div>
     </section>
