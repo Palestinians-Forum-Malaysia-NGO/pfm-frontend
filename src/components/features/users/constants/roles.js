@@ -7,7 +7,7 @@ export const ROLE_VALUES = {
 export const ROLE_LABELS = {
   admin:  "Admin",
   staff:  "Staff",
-  beneficiary: "Member",
+  beneficiary: "Beneficiary",
 };
 
 export const ROLE_BADGE = {
