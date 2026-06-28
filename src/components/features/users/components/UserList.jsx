@@ -75,7 +75,7 @@ export default function UserList() {
     inactive: users.filter((u) => !u.is_active).length,
     admin:    users.filter((u) => u.role === "admin").length,
     staff:    users.filter((u) => u.role === "staff").length,
-    member:   users.filter((u) => u.role === "member").length,
+    beneficiary: users.filter((u) => u.role === "beneficiary").length,
   }), [users]);
 
   const statusCards = [
@@ -102,7 +102,7 @@ export default function UserList() {
   const roleCards = [
     { key: "admin",  label: "Admin",  value: stats.admin,  icon: <MdAdminPanelSettings className="h-5 w-5" />, active: roleFilter === "admin",  onClick: () => setRoleFilter((r) => r === "admin"  ? "all" : "admin") },
     { key: "staff",  label: "Staff",  value: stats.staff,  icon: <MdSupervisorAccount  className="h-5 w-5" />, active: roleFilter === "staff",  onClick: () => setRoleFilter((r) => r === "staff"  ? "all" : "staff") },
-    { key: "member", label: "Member", value: stats.member, icon: <MdGroup              className="h-5 w-5" />, active: roleFilter === "member", onClick: () => setRoleFilter((r) => r === "member" ? "all" : "member") },
+    { key: "beneficiary", label: "Beneficiary", value: stats.beneficiary, icon: <MdGroup className="h-5 w-5" />, active: roleFilter === "beneficiary", onClick: () => setRoleFilter((r) => r === "beneficiary" ? "all" : "beneficiary") },
   ];
 
   const columns = [

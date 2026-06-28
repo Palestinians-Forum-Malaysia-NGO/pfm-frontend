@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdVerified, MdEdit, MdPerson } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, PasswordField, SelectField, ToggleInput } from "components/form";
+import { InputField, SelectField, ToggleInput } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -17,7 +17,6 @@ const getInitials = (name = "") =>
 const RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ minLength: 8, message: "At least 8 characters" }],
 };
 
 export default function UserEditForm() {
@@ -29,7 +28,7 @@ export default function UserEditForm() {
   const { success, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
-    full_name: "", email: "", phone_number: "", password: "",
+    full_name: "", email: "", phone_number: "",
     role: ROLE_VALUES.STAFF, is_active: true,
   });
   const [initial, setInitial] = useState(null);
@@ -42,8 +41,7 @@ export default function UserEditForm() {
     formData.email        !== initial.email        ||
     formData.phone_number !== initial.phone_number ||
     formData.role         !== initial.role         ||
-    formData.is_active    !== initial.is_active    ||
-    formData.password     !== ""
+    formData.is_active    !== initial.is_active
   );
 
   useEffect(() => {
@@ -53,7 +51,6 @@ export default function UserEditForm() {
         full_name:    data.full_name    ?? "",
         email:        data.email        ?? "",
         phone_number: data.phone_number ?? "",
-        password:     "",
         role:         data.role         ?? ROLE_VALUES.STAFF,
         is_active:    data.is_active    ?? true,
       };
@@ -67,12 +64,12 @@ export default function UserEditForm() {
     setErrors({});
     try {
       const payload = {
-        full_name: formData.full_name,
-        email:     formData.email,
-        role:      formData.role,
-        is_active: formData.is_active,
+        full_name:    formData.full_name,
+        email:        formData.email,
+        phone_number: formData.phone_number,
+        role:         formData.role,
+        is_active:    formData.is_active,
       };
-      if (formData.password) payload.password = formData.password;
       await updateUser(id, payload);
       success("User updated", `${formData.full_name} has been updated successfully.`);
       navigate(`/admin/users/${id}`);
@@ -174,17 +171,6 @@ export default function UserEditForm() {
               errors={errors}
               updateFormData={updateFormData}
               rules={[{ required: true, message: "Role is required" }]}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField
-              label="New Password"
-              field="password"
-              placeholder="Leave blank to keep current"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              rules={RULES.password}
             />
           </div>
           <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
