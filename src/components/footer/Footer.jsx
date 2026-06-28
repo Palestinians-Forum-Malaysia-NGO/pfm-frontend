@@ -5,6 +5,7 @@ import {
   FaFacebook, FaInstagram, FaYoutube, FaWhatsapp, FaTelegram,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import logo from "assets/brand/LOGO-wbg.png";
 
 const NAV_COLS = [
   {
@@ -50,51 +51,64 @@ const NAV_COLS = [
 ];
 
 const SOCIALS = [
-  { icon: <FaFacebook size={16} />,  label: "Facebook",    href: "https://facebook.com/pfmalaysia" },
-  { icon: <FaXTwitter size={15} />,  label: "X / Twitter", href: "https://x.com/pfmalaysia" },
-  { icon: <FaInstagram size={16} />, label: "Instagram",   href: "https://instagram.com/pfmalaysia" },
-  { icon: <FaYoutube size={16} />,   label: "YouTube",     href: "https://youtube.com/@pfmalaysia" },
-  { icon: <FaTelegram size={16} />,  label: "Telegram",    href: "https://t.me/pfmalaysia" },
-  { icon: <FaWhatsapp size={16} />,  label: "WhatsApp",    href: "https://wa.me/60123456789" },
+  { icon: <FaFacebook size={15} />,  label: "Facebook",    href: "https://facebook.com/pfmalaysia" },
+  { icon: <FaXTwitter size={14} />,  label: "X / Twitter", href: "https://x.com/pfmalaysia" },
+  { icon: <FaInstagram size={15} />, label: "Instagram",   href: "https://instagram.com/pfmalaysia" },
+  { icon: <FaYoutube size={15} />,   label: "YouTube",     href: "https://youtube.com/@pfmalaysia" },
+  { icon: <FaTelegram size={15} />,  label: "Telegram",    href: "https://t.me/pfmalaysia" },
+  { icon: <FaWhatsapp size={15} />,  label: "WhatsApp",    href: "https://wa.me/60123456789" },
 ];
 
 const Footer = () => (
-  <footer className="border-t border-slate-100 bg-white">
+  <footer className="relative overflow-hidden bg-green">
+
+    {/* Dot texture */}
+    <div className="pointer-events-none absolute inset-0 bg-dot-white bg-[size:32px_32px] opacity-[0.04]" />
+
+    {/* Glow blob */}
+    <div className="pointer-events-none absolute -top-40 -right-40 h-96 w-96 rounded-full bg-green-400/20 blur-3xl" />
+
+    {/* Palestinian flag strip */}
+    <div className="relative flex h-1 w-full">
+      <div className="flex-1 bg-black" />
+      <div className="flex-1 bg-white/80" />
+      <div className="flex-1 bg-white/20" />
+      <div className="flex-1 bg-pfmRed-500" />
+    </div>
 
     {/* ── Main grid ── */}
-    <div className="mx-auto max-w-7xl px-6 pt-14 pb-10">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.6fr_repeat(4,1fr)]">
+    <div className="relative mx-auto max-w-7xl px-6 pb-12 pt-14">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.9fr_repeat(4,1fr)]">
 
         {/* Brand column */}
-        <div className="flex flex-col gap-5">
-          {/* Logo + name */}
-          <div className="flex items-center gap-2.5">
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green text-xs font-black text-white"
-            >
-              PFM
+        <div className="flex flex-col gap-6">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-lg shadow-black/10">
+              <img src={logo} alt="PFM" className="h-full w-full object-contain" />
             </div>
-            <span className="text-sm font-extrabold leading-tight text-slate-900">
-              Palestinian Forum<br />Malaysia
-            </span>
+            <div>
+              <p className="text-sm font-extrabold leading-tight text-white">Palestinian Forum</p>
+              <p className="text-[11px] font-medium text-white/50 uppercase tracking-widest">Malaysia</p>
+            </div>
           </div>
 
-          <p className="text-sm leading-relaxed text-slate-400 max-w-[240px]">
+          <p className="max-w-[230px] text-sm leading-relaxed text-white/55">
             Uniting Palestinians and supporters across Malaysia through community, advocacy, and humanitarian action.
           </p>
 
           {/* Contact */}
-          <ul className="flex flex-col gap-2 text-xs text-slate-400">
-            <li className="flex items-start gap-2">
-              <MdLocationOn className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green" />
+          <ul className="flex flex-col gap-3 text-sm text-white/55">
+            <li className="flex items-start gap-2.5">
+              <MdLocationOn className="mt-0.5 h-4 w-4 shrink-0 text-white/40" />
               Kuala Lumpur, Malaysia
             </li>
-            <li className="flex items-center gap-2">
-              <MdEmail className="h-3.5 w-3.5 shrink-0 text-green" />
+            <li className="flex items-center gap-2.5">
+              <MdEmail className="h-4 w-4 shrink-0 text-white/40" />
               info@pfmalaysia.org
             </li>
-            <li className="flex items-center gap-2">
-              <MdPhone className="h-3.5 w-3.5 shrink-0 text-green" />
+            <li className="flex items-center gap-2.5">
+              <MdPhone className="h-4 w-4 shrink-0 text-white/40" />
               +60 12-345 6789
             </li>
           </ul>
@@ -108,7 +122,7 @@ const Footer = () => (
                 target="_blank"
                 rel="noreferrer"
                 aria-label={s.label}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition-all duration-150 ease-in-out hover:border-green/30 hover:bg-green/5 hover:text-green hover:-translate-y-px"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 text-white/50 transition-all duration-150 hover:-translate-y-px hover:border-white/40 hover:bg-white/10 hover:text-white"
               >
                 {s.icon}
               </a>
@@ -119,7 +133,7 @@ const Footer = () => (
         {/* Nav columns */}
         {NAV_COLS.map((col) => (
           <div key={col.heading}>
-            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">
+            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
               {col.heading}
             </p>
             <ul className="flex flex-col gap-2.5">
@@ -127,7 +141,7 @@ const Footer = () => (
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="group inline-flex items-center gap-1 text-sm text-slate-500 transition-colors duration-150 hover:text-green"
+                    className="group inline-flex items-center gap-1 text-sm text-white/55 transition-colors duration-150 hover:text-white"
                   >
                     <MdArrowForward className="-translate-x-1 h-3 w-3 opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100" />
                     {link.label}
@@ -142,12 +156,12 @@ const Footer = () => (
     </div>
 
     {/* ── Bottom bar ── */}
-    <div className="border-t border-slate-100">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-1.5 px-6 py-4 text-center sm:flex-row sm:justify-between sm:text-left">
-        <p className="text-xs text-slate-400">
+    <div className="relative border-t border-white/10">
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-1.5 px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
+        <p className="text-xs text-white/35">
           © {new Date().getFullYear()} Palestinian Forum Malaysia. All Rights Reserved.
         </p>
-        <p className="text-xs font-semibold text-green">
+        <p className="text-xs font-semibold text-white/60">
           Standing with Palestine 🇵🇸
         </p>
       </div>

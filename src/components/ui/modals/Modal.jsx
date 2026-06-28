@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import { MdClose } from "react-icons/md";
 
 const SIZES = {
@@ -51,7 +52,7 @@ const Modal = ({
 
   if (!visible) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300 ${
         shown ? "bg-black/40" : "bg-black/0"
@@ -100,7 +101,8 @@ const Modal = ({
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
