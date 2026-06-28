@@ -15,7 +15,6 @@ import ForgotPassword  from "views/auth/ForgotPassword";
 import ResetPassword   from "views/auth/ResetPassword";
 import ChangePassword  from "views/auth/ChangePassword";
 import StaffDashboard        from "views/staff/default";
-import MemberDashboard       from "views/member/default";
 import BeneficiaryDashboard  from "views/beneficiary/default";
 import BeneficiaryRequests   from "views/beneficiary/requests";
 import BeneficiaryProfile    from "views/beneficiary/profile";
@@ -37,7 +36,6 @@ import {
   MdCampaign,
   MdPerson,
   MdSettings,
-  MdLock,
   MdBarChart,
   MdManageAccounts,
   MdAssignment,
@@ -256,51 +254,6 @@ const routes = [
   {
     name: "Profile",
     layout: "/staff",
-    path: "profile",
-    icon: <MdPerson className="h-5 w-5" />,
-    component: <Profile />,
-    section: "ACCOUNT",
-  },
-
-  // ── MEMBER ───────────────────────────────────────────────────────────────────
-  {
-    name: "Home",
-    layout: "/member",
-    path: "default",
-    icon: <MdHome className="h-5 w-5" />,
-    component: <MemberDashboard />,
-    section: "MAIN",
-  },
-  {
-    name: "News & Updates",
-    layout: "/member",
-    path: "news",
-    icon: <MdFeed className="h-5 w-5" />,
-    component: <Placeholder pageName="News & Updates" />,
-    section: "MAIN",
-    hidden: true,
-  },
-  {
-    name: "Events",
-    layout: "/member",
-    path: "events",
-    icon: <MdEvent className="h-5 w-5" />,
-    component: <Placeholder pageName="Events" />,
-    section: "MAIN",
-    hidden: true,
-  },
-  {
-    name: "My Donations",
-    layout: "/member",
-    path: "donations",
-    icon: <MdFavorite className="h-5 w-5" />,
-    component: <Placeholder pageName="My Donations" />,
-    section: "COMMUNITY",
-    hidden: true,
-  },
-  {
-    name: "Profile",
-    layout: "/member",
     path: "profile",
     icon: <MdPerson className="h-5 w-5" />,
     component: <Profile />,
