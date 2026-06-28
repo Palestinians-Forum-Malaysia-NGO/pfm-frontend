@@ -25,6 +25,7 @@ import PublicEvents from "views/public/events";
 import Donate from "views/public/donate";
 import Contact from "views/public/contact";
 import PublicProjectsPage from "views/public/projects";
+import RegisterPage from "views/public/register";
 
 // Icon Imports
 import {
@@ -302,6 +303,7 @@ const routes = [
   { name: "Projects", layout: "/", path: "/projects", component: <PublicProjectsPage /> },
   { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
+  { name: "Register", layout: "/", path: "/register", component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
   { name: "Sign In",         layout: "/auth", path: "sign-in",         component: <SignIn /> },

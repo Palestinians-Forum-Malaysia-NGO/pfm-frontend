@@ -97,7 +97,7 @@ const LoginStep = ({ onOtpRequired }) => {
 
       <p className="mt-6 text-center text-sm text-slate-400">
         Don't have an account?{" "}
-        <Link to="/auth/register" className="font-medium text-green transition-colors duration-200 hover:text-[#006833]">
+        <Link to="/register" className="font-medium text-green transition-colors duration-200 hover:text-[#006833]">
           Create one
         </Link>
       </p>
