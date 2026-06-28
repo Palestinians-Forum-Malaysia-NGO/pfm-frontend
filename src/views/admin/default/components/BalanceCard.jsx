@@ -29,15 +29,15 @@ const StatCard = ({ icon: Icon, label, value, pct, iconBg, iconColor, badgeColor
           <Skel className="h-3 w-20" />
         </>
       : <>
-      <div className="flex items-end gap-3">
-        <span className="text-3xl font-bold leading-none tracking-tight text-navy-700">
+      <div className="flex items-end gap-2">
+        <span className="text-base font-bold leading-none tracking-tight text-navy-700">
           {value.toLocaleString()}
           </span>
-          <span className="pb-1 text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-slate-500">
             {label}
-            </span>
-            </div>
-            </>          
+          </span>
+        </div>
+      </>          
     }
   </div>
 );
