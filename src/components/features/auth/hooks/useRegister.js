@@ -12,11 +12,11 @@ const useRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
 
-  const execute = async ({ email, password }) => {
+  const execute = async (payload) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await authService.register({ email, password });
+      const data = await authService.register(payload);
       if (data.access) setTokens({ access: data.access, refresh: data.refresh });
       return data;
     } catch (err) {

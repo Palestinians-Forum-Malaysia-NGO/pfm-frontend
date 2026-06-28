@@ -3,14 +3,17 @@ import { useNavigate } from "react-router-dom";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
-  MdFamilyRestroom, MdAccountBalance, MdBadge, MdInfoOutline,
+  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield, MdDescription,
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, PasswordField, SelectField, ToggleInput, validate } from "components/form";
+import {
+  InputField, PasswordField, SelectField, TextareaField,
+  ToggleInput, StorageDocumentField, validate,
+} from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
-import { useCreateBeneficiary } from "components/features/beneficiaries/hooks";
+import { useCreateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -25,13 +28,16 @@ export default function BeneficiaryCreateForm() {
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
+  const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
 
   const [userForm, setUserForm] = useState({
     full_name: "", email: "", password: "", phone_number: "", is_active: true,
   });
+  const [classForm, setClassForm] = useState({ classification: "" });
   const [personalForm, setPersonalForm] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "",
+    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "",
+    marital_status: "", background: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
@@ -39,16 +45,19 @@ export default function BeneficiaryCreateForm() {
   const [familyForm, setFamilyForm] = useState({
     family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "",
   });
-  const [bankingForm, setBankingForm] = useState({
-    bank_name: "", account_number: "", account_holder_name: "",
-  });
+  const [idDoc, setIdDoc] = useState(null);
   const [errors, setErrors] = useState({});
 
   const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
+  const setC  = (f, v) => setClassForm((p)   => ({ ...p, [f]: v }));
   const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
   const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
   const setFa = (f, v) => setFamilyForm((p)  => ({ ...p, [f]: v }));
-  const setB  = (f, v) => setBankingForm((p) => ({ ...p, [f]: v }));
+
+  const CLASSIFICATION_OPTIONS = [
+    { value: "", label: "Select classification" },
+    ...classifications.map((c) => ({ value: c.id, label: c.name })),
+  ];
 
   const canSubmit = userForm.full_name.trim() && userForm.email.trim() && userForm.password;
 
@@ -71,26 +80,24 @@ export default function BeneficiaryCreateForm() {
           role:         "beneficiary",
           is_active:    userForm.is_active,
         },
-        full_name_arabic:           personalForm.full_name_arabic           || undefined,
-        passport_number:            personalForm.passport_number            || undefined,
-        date_of_birth:              personalForm.date_of_birth              || undefined,
-        gender:                     personalForm.gender                     || undefined,
-        marital_status:             personalForm.marital_status             || undefined,
-        country_of_origin:          locationForm.country_of_origin          || undefined,
-        date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia   || undefined,
-        current_city:               locationForm.current_city               || undefined,
-        address:                    locationForm.address                    || undefined,
+        classification:             classForm.classification             || undefined,
+        full_name_arabic:           personalForm.full_name_arabic        || undefined,
+        passport_number:            personalForm.passport_number         || undefined,
+        date_of_birth:              personalForm.date_of_birth           || undefined,
+        gender:                     personalForm.gender                  || undefined,
+        marital_status:             personalForm.marital_status          || undefined,
+        background:                 personalForm.background              || undefined,
+        id_document:                idDoc                                || undefined,
+        country_of_origin:          locationForm.country_of_origin       || undefined,
+        date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia || undefined,
+        current_city:               locationForm.current_city            || undefined,
+        address:                    locationForm.address                 || undefined,
         family_information: {
           family_in_malaysia:  familyForm.family_in_malaysia,
           spouse_name:         familyForm.spouse_name        || null,
           spouse_name_arabic:  familyForm.spouse_name_arabic || null,
           spouse_job:          familyForm.spouse_job         || null,
           number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
-        },
-        banking_information: {
-          bank_name:           bankingForm.bank_name           || null,
-          account_number:      bankingForm.account_number      || null,
-          account_holder_name: bankingForm.account_holder_name || null,
         },
       };
 
@@ -139,6 +146,12 @@ export default function BeneficiaryCreateForm() {
           <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
 
+        {/* ── Classification ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdShield className="h-5 w-5" />} title="Classification" subtitle="Assign a beneficiary category" />
+          <SelectField label="Classification" field="classification" options={CLASSIFICATION_OPTIONS} formData={classForm} errors={errors} updateFormData={setC} />
+        </div>
+
         {/* ── Personal Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
@@ -151,6 +164,16 @@ export default function BeneficiaryCreateForm() {
             <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS}            formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}    formData={personalForm} errors={errors} updateFormData={setP} />
+          <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" formData={personalForm} errors={errors} updateFormData={setP} />
+          <StorageDocumentField
+            label="ID Document"
+            folder="beneficiaries/documents"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onUpload={(key) => setIdDoc(key)}
+            onRemove={() => setIdDoc(null)}
+            errors={errors}
+            field="id_document"
+          />
         </div>
 
         {/* ── Location & Travel ── */}
@@ -178,16 +201,6 @@ export default function BeneficiaryCreateForm() {
             <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"              formData={familyForm} errors={errors} updateFormData={setFa} />
             <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0"     formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
-        </div>
-
-        {/* ── Banking Information ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Bank Name"      field="bank_name"      placeholder="Maybank"       formData={bankingForm} errors={errors} updateFormData={setB} />
-            <InputField label="Account Number" field="account_number" placeholder="1234567890"    formData={bankingForm} errors={errors} updateFormData={setB} />
-          </div>
-          <InputField label="Account Holder Name" field="account_holder_name" placeholder="Ahmad Faris bin Abdullah" formData={bankingForm} errors={errors} updateFormData={setB} />
         </div>
 
         <div className="flex gap-3">

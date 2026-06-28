@@ -2,21 +2,21 @@ export const ACCOUNT_STATUS_VALUES = {
   ACTIVE:    "active",
   PENDING:   "pending",
   SUSPENDED: "suspended",
-  EXPIRED:   "expired",
+  REJECTED:  "rejected",
 };
 
 export const ACCOUNT_STATUS_LABELS = {
   active:    "Active",
   pending:   "Pending",
   suspended: "Suspended",
-  expired:   "Expired",
+  rejected:  "Rejected",
 };
 
 export const ACCOUNT_STATUS_BADGE = {
   active:    "bg-green/10 text-green",
   pending:   "bg-amber-50 text-amber-600",
   suspended: "bg-red-50 text-red-500",
-  expired:   "bg-slate-100 text-slate-500",
+  rejected:  "bg-slate-100 text-slate-500",
 };
 
 export const ACCOUNT_STATUS_OPTIONS = [
@@ -24,14 +24,14 @@ export const ACCOUNT_STATUS_OPTIONS = [
   { value: "active",    label: "Active" },
   { value: "pending",   label: "Pending" },
   { value: "suspended", label: "Suspended" },
-  { value: "expired",   label: "Expired" },
+  { value: "rejected",  label: "Rejected" },
 ];
 
 export const ACCOUNT_STATUS_FORM_OPTIONS = [
   { value: "active",    label: "Active" },
   { value: "pending",   label: "Pending" },
   { value: "suspended", label: "Suspended" },
-  { value: "expired",   label: "Expired" },
+  { value: "rejected",  label: "Rejected" },
 ];
 
 export const GENDER_OPTIONS = [

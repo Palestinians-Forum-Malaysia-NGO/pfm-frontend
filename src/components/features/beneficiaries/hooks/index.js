@@ -5,3 +5,4 @@ export { default as useUpdateBeneficiary }     from "./useUpdateBeneficiary";
 export { default as useDeleteBeneficiary }     from "./useDeleteBeneficiary";
 export { default as useBeneficiaryList }       from "./useBeneficiaryList";
 export { default as useGetBeneficiaryStats }   from "./useGetBeneficiaryStats";
+export { default as useGetClassifications }    from "./useGetClassifications";

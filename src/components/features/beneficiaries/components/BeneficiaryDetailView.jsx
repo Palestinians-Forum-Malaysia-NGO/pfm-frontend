@@ -5,7 +5,7 @@ import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdPeople,
   MdEmail, MdPhone, MdCalendarToday, MdShield, MdVerified,
   MdPerson, MdFlag, MdLocationCity, MdHome, MdFlight,
-  MdAccountBalance, MdFamilyRestroom, MdBadge, MdUpdate, MdClose,
+  MdFamilyRestroom, MdBadge, MdUpdate, MdClose,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -75,7 +75,6 @@ export default function BeneficiaryDetailView() {
 
   const u  = beneficiary.user ?? {};
   const fi = beneficiary.family_information ?? {};
-  const bi = beneficiary.banking_information ?? {};
   const cd = beneficiary.classification_details ?? {};
 
   return (
@@ -190,6 +189,21 @@ export default function BeneficiaryDetailView() {
           <InfoRow icon={<MdPerson className="h-4 w-4" />}        label="Gender"         value={GENDER_LABELS[beneficiary.gender] ?? beneficiary.gender ?? "—"} />
           <InfoRow icon={<MdPeople className="h-4 w-4" />}        label="Marital Status" value={MARITAL_STATUS_LABELS[beneficiary.marital_status] ?? beneficiary.marital_status ?? "—"} />
         </div>
+        {beneficiary.background && (
+          <div className="mt-3">
+            <p className="mb-1 text-xs font-medium text-slate-400">Background</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{beneficiary.background}</p>
+          </div>
+        )}
+        {beneficiary.id_document && (
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
+            <MdBadge className="h-5 w-5 shrink-0 text-green" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-400">ID Document</p>
+              <p className="truncate text-sm text-slate-700">{beneficiary.id_document}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Location & Travel ── */}
@@ -226,18 +240,6 @@ export default function BeneficiaryDetailView() {
             {fi.spouse_name        && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name"          value={fi.spouse_name} />}
             {fi.spouse_name_arabic && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name (Arabic)" value={fi.spouse_name_arabic} />}
             {fi.spouse_job         && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label="Spouse Occupation"    value={fi.spouse_job} />}
-          </div>
-        </div>
-      )}
-
-      {/* ── Banking Information ── */}
-      {beneficiary.banking_information && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account for payments and donations" />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"      value={bi.bank_name || "—"} />
-            <InfoRow icon={<MdBadge className="h-4 w-4" />}          label="Account Number" value={bi.account_number || "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder" value={bi.account_holder_name || "—"} />
           </div>
         </div>
       )}
