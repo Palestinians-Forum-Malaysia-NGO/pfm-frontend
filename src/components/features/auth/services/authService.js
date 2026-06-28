@@ -22,7 +22,7 @@ const authService = {
   },
 
   register: async (payload) => {
-    const { data } = await api.post("/auth/register", payload);
+    const { data } = await api.post("/accounts/beneficiaries", payload);
     return data;
   },
 

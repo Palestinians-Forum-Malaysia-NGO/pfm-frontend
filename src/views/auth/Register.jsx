@@ -1,32 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail,
-  MdBadge, MdFlight, MdFamilyRestroom, MdCheck,
+  MdBadge, MdFlight, MdFamilyRestroom, MdCheck, MdAdd, MdClose,
 } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
 import SelectField   from "components/form/SelectField";
+import TextareaField from "components/form/TextareaField";
 import ToggleInput   from "components/form/ToggleInput";
 import AlertBanner   from "components/ui/AlertBanner";
 import { validate }  from "components/form/utils/validation";
 import { useAuth, useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { OTP_PURPOSE } from "components/features/auth/types";
+import { useGetClassifications } from "components/features/beneficiaries/hooks";
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
 /* ── Step indicator ─────────────────────────────── */
 const STEP_META = [
-  { label: "Account",          icon: MdPersonAdd },
-  { label: "Personal Info",    icon: MdBadge },
+  { label: "Account",           icon: MdPersonAdd },
+  { label: "Personal Info",     icon: MdBadge },
   { label: "Location & Family", icon: MdFlight },
 ];
 
 const StepIndicator = ({ current }) => (
   <div className="mb-6 flex items-center">
     {STEP_META.map(({ label }, i) => {
-      const n     = i + 1;
-      const done  = n < current;
+      const n      = i + 1;
+      const done   = n < current;
       const active = n === current;
       return (
         <React.Fragment key={n}>
@@ -98,7 +100,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
         />
         <InputField
           label="Phone Number" field="phone_number" placeholder="+60 12-345 6789"
-          formData={data} errors={errors} updateFormData={set}
+          formData={data} errors={{}} updateFormData={set}
         />
       </div>
 
@@ -160,6 +162,12 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
           label="Country of Origin" field="country_of_origin" options={COUNTRY_OPTIONS}
           formData={data} errors={{}} updateFormData={set}
         />
+        <TextareaField
+          label="Background" field="background"
+          placeholder="Brief background about your situation (optional)…"
+          formData={data} errors={{}} updateFormData={set}
+          rows={3}
+        />
       </div>
 
       <div className="mt-5 flex gap-3">
@@ -183,9 +191,19 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
 };
 
 /* ── Step 3 — Location & Family ─────────────────── */
+const EMPTY_CHILD = { child_name: "", child_name_arabic: "", child_date_of_birth: "" };
+
 const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack, onSubmit, loading, error }) => {
   const setL = (f, v) => onLocChange((p) => ({ ...p, [f]: v }));
   const setF = (f, v) => onFamChange((p) => ({ ...p, [f]: v }));
+
+  const addChild    = () => onFamChange((p) => ({ ...p, children: [...p.children, { ...EMPTY_CHILD }] }));
+  const removeChild = (i) => onFamChange((p) => ({ ...p, children: p.children.filter((_, idx) => idx !== i) }));
+  const updateChild = (i, field, value) =>
+    onFamChange((p) => ({
+      ...p,
+      children: p.children.map((c, idx) => (idx === i ? { ...c, [field]: value } : c)),
+    }));
 
   return (
     <>
@@ -235,10 +253,62 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
           label="Spouse Occupation" field="spouse_job" placeholder="Teacher"
           formData={famData} errors={{}} updateFormData={setF}
         />
-        <InputField
-          label="No. of Children" field="number_of_children" type="number" placeholder="0"
-          formData={famData} errors={{}} updateFormData={setF}
-        />
+
+        {/* ── Children ── */}
+        <div className="mt-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">
+              Children ({famData.children.length})
+            </span>
+            <button
+              type="button"
+              onClick={addChild}
+              className="inline-flex items-center gap-1 rounded-lg bg-green/10 px-2.5 py-1 text-xs font-semibold text-green transition-colors hover:bg-green/20"
+            >
+              <MdAdd className="h-3.5 w-3.5" /> Add Child
+            </button>
+          </div>
+
+          {famData.children.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-slate-200 py-3 text-center text-xs text-slate-400">
+              No children added yet.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {famData.children.map((child, i) => (
+                <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-500">Child {i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeChild(i)}
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                    >
+                      <MdClose className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <InputField
+                      label="Child Name" field="child_name" placeholder="Ahmad"
+                      formData={child} errors={{}}
+                      updateFormData={(f, v) => updateChild(i, f, v)}
+                    />
+                    <InputField
+                      label="Child Name (Arabic)" field="child_name_arabic" placeholder="أحمد"
+                      formData={child} errors={{}}
+                      updateFormData={(f, v) => updateChild(i, f, v)}
+                    />
+                    <InputField
+                      label="Date of Birth" field="child_date_of_birth" type="date"
+                      formData={child} errors={{}}
+                      updateFormData={(f, v) => updateChild(i, f, v)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mt-5 flex gap-3">
@@ -267,10 +337,10 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
 
 /* ── Step 4 — OTP ───────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
-  const { completeLogin }                                 = useAuth();
-  const { execute: verifyOtp, loading, error: otpError } = useVerifyOtp();
-  const { execute: resendOtp, loading: resending }       = useResendOtp();
-  const [code, setCode]   = useState("");
+  const { completeLogin }                                  = useAuth();
+  const { execute: verifyOtp, loading, error: otpError }  = useVerifyOtp();
+  const { execute: resendOtp, loading: resending }        = useResendOtp();
+  const [code, setCode]     = useState("");
   const [resent, setResent] = useState(false);
 
   const isReady = code.trim().length === 6;
@@ -360,38 +430,55 @@ const OtpStep = ({ email, channel, onBack }) => {
 
 /* ── Main ───────────────────────────────────────── */
 export default function Register() {
-  const [step, setStep] = useState(1);
+  const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
+  const { classifications } = useGetClassifications();
+  const defaultClassification = useMemo(() => classifications[0]?.id ?? "", [classifications]);
+
   const [account,  setAccount]  = useState({ full_name: "", email: "", password: "", phone_number: "" });
-  const [personal, setPersonal] = useState({ full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "", marital_status: "", country_of_origin: "" });
+  const [personal, setPersonal] = useState({
+    full_name_arabic: "", passport_number: "", date_of_birth: "",
+    gender: "", marital_status: "", country_of_origin: "", background: "",
+  });
   const [location, setLocation] = useState({ date_arrived_in_malaysia: "", current_city: "", address: "" });
-  const [family,   setFamily]   = useState({ family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "" });
+  const [family,   setFamily]   = useState({
+    family_in_malaysia: false,
+    spouse_name: "", spouse_name_arabic: "", spouse_job: "",
+    children: [],
+  });
 
   const { execute: register, loading, error } = useRegister();
 
   const handleSubmit = async () => {
     try {
       const payload = {
-        full_name:    account.full_name,
-        email:        account.email,
-        password:     account.password,
-        phone_number: account.phone_number              || undefined,
-        full_name_arabic:         personal.full_name_arabic        || undefined,
-        passport_number:          personal.passport_number         || undefined,
-        date_of_birth:            personal.date_of_birth           || undefined,
-        gender:                   personal.gender                  || undefined,
-        marital_status:           personal.marital_status          || undefined,
-        country_of_origin:        personal.country_of_origin       || undefined,
-        date_arrived_in_malaysia: location.date_arrived_in_malaysia || undefined,
-        current_city:             location.current_city            || undefined,
-        address:                  location.address                 || undefined,
+        classification:           defaultClassification                  || undefined,
+        full_name:                account.full_name,
+        email:                    account.email,
+        password:                 account.password,
+        phone_number:             account.phone_number                   || undefined,
+        full_name_arabic:         personal.full_name_arabic             || undefined,
+        passport_number:          personal.passport_number              || undefined,
+        date_of_birth:            personal.date_of_birth                || undefined,
+        gender:                   personal.gender                       || undefined,
+        marital_status:           personal.marital_status               || undefined,
+        country_of_origin:        personal.country_of_origin            || undefined,
+        background:               personal.background                   || undefined,
+        date_arrived_in_malaysia: location.date_arrived_in_malaysia     || undefined,
+        current_city:             location.current_city                 || undefined,
+        address:                  location.address                      || undefined,
         family_information: {
           family_in_malaysia:  family.family_in_malaysia,
           spouse_name:         family.spouse_name        || null,
           spouse_name_arabic:  family.spouse_name_arabic || null,
           spouse_job:          family.spouse_job         || null,
-          number_of_children:  family.number_of_children !== "" ? Number(family.number_of_children) : null,
+          number_of_children:  family.children.length,
+          children_information: family.children.map((c) => ({
+            child_name:          c.child_name          || "",
+            child_name_arabic:   c.child_name_arabic   || "",
+            child_date_of_birth: c.child_date_of_birth || undefined,
+          })),
         },
       };
       const data = await register(payload);
