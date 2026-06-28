@@ -6,4 +6,5 @@ export const beneficiaryService = {
   async create(payload)       { const { data } = await api.post("/accounts/beneficiaries", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/accounts/beneficiaries/${id}`, payload); return data; },
   async remove(id)            { await api.delete(`/accounts/beneficiaries/${id}`); },
+  async getStats()            { const { data } = await api.get("/accounts/beneficiaries/stats"); return data; },
 };
