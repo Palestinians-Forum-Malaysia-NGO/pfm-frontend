@@ -9,11 +9,13 @@ import CategoriesPage from "views/admin/categories";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
-import SignIn          from "views/auth/SignIn";
-import Register        from "views/auth/Register";
-import ForgotPassword  from "views/auth/ForgotPassword";
-import ResetPassword   from "views/auth/ResetPassword";
-import ChangePassword  from "views/auth/ChangePassword";
+import SignIn           from "views/auth/SignIn";
+import Register         from "views/auth/Register";
+import ForgotPassword   from "views/auth/ForgotPassword";
+import ResetPassword    from "views/auth/ResetPassword";
+import ChangePassword   from "views/auth/ChangePassword";
+import ActivateAccount  from "views/auth/ActivateAccount";
+import SetPassword      from "views/auth/SetPassword";
 import StaffDashboard        from "views/staff/default";
 import BeneficiaryDashboard  from "views/beneficiary/default";
 import BeneficiaryRequests   from "views/beneficiary/requests";
@@ -306,11 +308,13 @@ const routes = [
   { name: "Register", layout: "/", path: "/register", component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
-  { name: "Sign In",         layout: "/auth", path: "sign-in",         component: <SignIn /> },
-  { name: "Register",        layout: "/auth", path: "register",        component: <Register /> },
-  { name: "Forgot Password", layout: "/auth", path: "forgot-password", component: <ForgotPassword /> },
-  { name: "Reset Password",  layout: "/auth", path: "reset-password",  component: <ResetPassword /> },
-  { name: "Change Password", layout: "/auth", path: "change-password", component: <ChangePassword /> },
+  { name: "Sign In",          layout: "/auth", path: "sign-in",         component: <SignIn /> },
+  { name: "Register",         layout: "/auth", path: "register",        component: <Register /> },
+  { name: "Forgot Password",  layout: "/auth", path: "forgot-password", component: <ForgotPassword /> },
+  { name: "Reset Password",   layout: "/auth", path: "reset-password",  component: <ResetPassword /> },
+  { name: "Change Password",  layout: "/auth", path: "change-password", component: <ChangePassword /> },
+  { name: "Activate Account", layout: "/auth", path: "activate",        component: <ActivateAccount /> },
+  { name: "Set Password",     layout: "/auth", path: "set-password",    component: <SetPassword /> },
 ];
 
 export default routes;

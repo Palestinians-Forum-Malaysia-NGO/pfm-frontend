@@ -7,4 +7,5 @@ export { default as useRegister }       from "./useRegister";
 export { default as useForgotPassword } from "./useForgotPassword";
 export { default as useResetPassword }  from "./useResetPassword";
 export { default as usePasswordChange } from "./usePasswordChange";
+export { default as useSetPassword }   from "./useSetPassword";
 export { default as useRefreshToken }  from "./useRefreshToken";
