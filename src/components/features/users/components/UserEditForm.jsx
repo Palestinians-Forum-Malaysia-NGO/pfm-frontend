@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdVerified, MdEdit, MdPerson } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, SelectField, ToggleInput } from "components/form";
+import { InputField, SelectField, ToggleInput, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -61,6 +61,12 @@ export default function UserEditForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    Object.entries(RULES).forEach(([field, rules]) => {
+      const err = validate(formData[field], rules);
+      if (err) newErrors[field] = err;
+    });
+    if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
     setErrors({});
     try {
       const payload = {
@@ -157,6 +163,7 @@ export default function UserEditForm() {
               field="phone_number"
               type="tel"
               placeholder="+60 12-345 6789"
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -180,7 +187,7 @@ export default function UserEditForm() {
               variant="primary"
               text="Save Changes"
               loading={saving}
-              disabled={!formData.full_name.trim() || !formData.email.trim() || !isDirty}
+              disabled={!formData.full_name.trim() || !formData.email.trim() || !isDirty || saving}
               className="flex-1"
             />
           </div>

@@ -96,6 +96,7 @@ export default function UserCreateForm() {
               field="phone_number"
               type="tel"
               placeholder="+60 12-345 6789"
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -128,7 +129,7 @@ export default function UserCreateForm() {
             text="Create User"
             icon={<MdPersonAdd className="h-4 w-4" />}
             loading={loading}
-            disabled={!canSubmit}
+            disabled={!canSubmit || loading}
             className="flex-1"
           />
         </div>

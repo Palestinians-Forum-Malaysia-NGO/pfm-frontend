@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdVerified, MdEdit, MdBadge, MdPerson } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, ToggleInput } from "components/form";
+import { InputField, ToggleInput, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -10,6 +10,11 @@ import Loading     from "components/loading/Loading";
 import { useGetStaff, useUpdateStaff } from "components/features/staff/hooks";
 import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
+
+const RULES = {
+  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255 }],
+  email:     [{ required: true, message: "Email is required" }, { email: true }],
+};
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -67,11 +72,13 @@ export default function StaffEditForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});
     const newErrors = {};
-    if (!userForm.full_name.trim()) newErrors.full_name = "Full name is required";
-    if (!userForm.email.trim())     newErrors.email     = "Email is required";
+    Object.entries(RULES).forEach(([field, rules]) => {
+      const err = validate(userForm[field], rules);
+      if (err) newErrors[field] = err;
+    });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
+    setErrors({});
 
     try {
       const payload = {
@@ -154,10 +161,10 @@ export default function StaffEditForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Basic information for this staff member" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Full Name"     field="full_name"    placeholder="Fatima Ali"          formData={userForm} errors={errors} updateFormData={setU} />
-            <InputField label="Email Address" field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} />
+            <InputField label="Full Name"     field="full_name"    placeholder="Fatima Ali"          formData={userForm} errors={errors} updateFormData={setU} rules={RULES.full_name} />
+            <InputField label="Email Address" field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} rules={RULES.email} />
           </div>
-          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" formData={userForm} errors={errors} updateFormData={setU} />
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" required={false} formData={userForm} errors={errors} updateFormData={setU} />
           <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
 
@@ -165,12 +172,12 @@ export default function StaffEditForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Employment Details" subtitle="Organisational role and assignment" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Department"   field="department"   placeholder="Programs"        formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label="Position"     field="position"     placeholder="Program Manager"  formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Department"   field="department"   placeholder="Programs"        required={false} formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Position"     field="position"     placeholder="Program Manager"  required={false} formData={staffForm} errors={errors} updateFormData={setS} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ" formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label="Joining Date" field="joining_date" type="date"                   formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ" required={false} formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Joining Date" field="joining_date" type="date"                   required={false} formData={staffForm} errors={errors} updateFormData={setS} />
           </div>
         </div>
 
@@ -181,7 +188,7 @@ export default function StaffEditForm() {
             variant="primary"
             text="Save Changes"
             loading={saving}
-            disabled={!userForm.full_name.trim() || !userForm.email.trim() || !isDirty}
+            disabled={!userForm.full_name.trim() || !userForm.email.trim() || !isDirty || saving}
             className="flex-1"
           />
         </div>

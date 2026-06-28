@@ -8,7 +8,7 @@ import {
 import PageHeader from "components/ui/PageHeader";
 import {
   InputField, SelectField, TextareaField,
-  ToggleInput, StorageDocumentField,
+  ToggleInput, StorageDocumentField, validate,
 } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
@@ -21,7 +21,7 @@ import {
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
 
-const USER_RULES = {
+const RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
 };
@@ -131,11 +131,13 @@ export default function BeneficiaryEditForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});
     const newErrors = {};
-    if (!userForm.full_name.trim()) newErrors.full_name = "Full name is required";
-    if (!userForm.email.trim())     newErrors.email     = "Email is required";
+    Object.entries(RULES).forEach(([field, rules]) => {
+      const err = validate(userForm[field], rules);
+      if (err) newErrors[field] = err;
+    });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
+    setErrors({});
 
     try {
       const payload = {
@@ -197,35 +199,35 @@ export default function BeneficiaryEditForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title="User Account" subtitle="Login credentials" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris"           formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
-            <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
+            <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris"           formData={userForm} errors={errors} updateFormData={setU} rules={RULES.full_name} />
+            <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={RULES.email} />
           </div>
-          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" formData={userForm} errors={errors} updateFormData={setU} />
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" required={false} formData={userForm} errors={errors} updateFormData={setU} />
           <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
 
         {/* ── Classification ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdShield className="h-5 w-5" />} title="Classification" subtitle="Assign a beneficiary category" />
-          <SelectField label="Classification" field="classification" options={CLASSIFICATION_OPTIONS} formData={classForm} errors={errors} updateFormData={setC} />
+          <SelectField label="Classification" field="classification" options={CLASSIFICATION_OPTIONS} required={false} formData={classForm} errors={errors} updateFormData={setC} />
         </div>
 
         {/* ── Personal Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField    label="Full Name (Arabic)"  field="full_name_arabic" placeholder="أحمد فارس"   formData={personalForm} errors={errors} updateFormData={setP} />
-            <InputField    label="Passport Number"     field="passport_number"  placeholder="A12345678"    formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField    label="Full Name (Arabic)"  field="full_name_arabic" placeholder="أحمد فارس"   required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField    label="Passport Number"     field="passport_number"  placeholder="A12345678"    required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField    label="Date of Birth"  field="date_of_birth"  type="date"                       formData={personalForm} errors={errors} updateFormData={setP} />
-            <SelectField   label="Gender"         field="gender"         options={GENDER_OPTIONS}           formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField    label="Date of Birth"  field="date_of_birth"  type="date"       required={false}            formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField   label="Gender"         field="gender"         options={GENDER_OPTIONS}  required={false}    formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField   label="Marital Status"  field="marital_status"  options={MARITAL_STATUS_OPTIONS}      formData={personalForm} errors={errors} updateFormData={setP} />
-            <SelectField   label="Account Status"  field="account_status"  options={ACCOUNT_STATUS_FORM_OPTIONS} formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField   label="Marital Status"  field="marital_status"  options={MARITAL_STATUS_OPTIONS}      required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField   label="Account Status"  field="account_status"  options={ACCOUNT_STATUS_FORM_OPTIONS} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
-          <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" formData={personalForm} errors={errors} updateFormData={setP} />
+          <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           <StorageDocumentField
             label="ID Document"
             folder="beneficiaries/documents"
@@ -242,12 +244,12 @@ export default function BeneficiaryEditForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdFlight className="h-5 w-5" />} title="Location & Travel" subtitle="Country of origin and residence in Malaysia" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField label="Country of Origin"        field="country_of_origin"       options={COUNTRY_OPTIONS} formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date"              formData={locationForm} errors={errors} updateFormData={setL} />
+            <SelectField label="Country of Origin"        field="country_of_origin"       options={COUNTRY_OPTIONS} required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"    formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"   formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"    required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"   required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
         </div>
 
@@ -256,12 +258,12 @@ export default function BeneficiaryEditForm() {
           <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
           <ToggleInput label="Family in Malaysia" field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali"  formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"    formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali"  required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"  required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"             formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0"    formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"             required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0"    required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
         </div>
 
@@ -272,7 +274,7 @@ export default function BeneficiaryEditForm() {
             variant="primary"
             text="Save Changes"
             loading={saving}
-            disabled={!userForm.full_name.trim() || !userForm.email.trim() || !isDirty}
+            disabled={!userForm.full_name.trim() || !userForm.email.trim() || !isDirty || saving}
             className="flex-1"
           />
         </div>

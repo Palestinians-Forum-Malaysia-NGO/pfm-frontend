@@ -101,19 +101,19 @@ export default function StaffCreateForm() {
             <InputField label="Full Name"     field="full_name"    placeholder="Fatima Ali"           formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
             <InputField label="Email Address" field="email"        type="email" placeholder="fatima@pfm.org.my" formData={form} errors={errors} updateFormData={set} rules={RULES.email} />
           </div>
-          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" formData={form} errors={errors} updateFormData={set} />
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" required={false} formData={form} errors={errors} updateFormData={set} />
         </div>
 
         {/* ── Employment details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Employment Details" subtitle="Organisational role and assignment" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Department"  field="department"   placeholder="Programs"           formData={form} errors={errors} updateFormData={set} />
-            <InputField label="Position"    field="position"     placeholder="Program Manager"     formData={form} errors={errors} updateFormData={set} />
+            <InputField label="Department"  field="department"   placeholder="Programs"           required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label="Position"    field="position"     placeholder="Program Manager"     required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ"    formData={form} errors={errors} updateFormData={set} />
-            <InputField label="Joining Date" field="joining_date" type="date"                      formData={form} errors={errors} updateFormData={set} />
+            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ"    required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label="Joining Date" field="joining_date" type="date"                      required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
         </div>
 
@@ -125,7 +125,7 @@ export default function StaffCreateForm() {
             text="Add Staff Member"
             icon={<MdPersonAdd className="h-4 w-4" />}
             loading={loading}
-            disabled={!canSubmit}
+            disabled={!canSubmit || loading}
             className="flex-1"
           />
         </div>

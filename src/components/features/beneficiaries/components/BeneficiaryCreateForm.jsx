@@ -161,28 +161,28 @@ export default function BeneficiaryCreateForm() {
             <InputField label="Full Name"     field="full_name"    placeholder="Ahmad Faris" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.full_name} />
             <InputField label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.email} />
           </div>
-          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" formData={accountForm} errors={errors} updateFormData={setA} />
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" required={false} formData={accountForm} errors={errors} updateFormData={setA} />
         </div>
 
         {/* ── Classification ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdShield className="h-5 w-5" />} title="Classification" subtitle="Assign a beneficiary category" />
-          <SelectField label="Classification" field="classification" options={CLASSIFICATION_OPTIONS} formData={classForm} errors={errors} updateFormData={setC} />
+          <SelectField label="Classification" field="classification" options={CLASSIFICATION_OPTIONS} required={false} formData={classForm} errors={errors} updateFormData={setC} />
         </div>
 
         {/* ── Personal Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"  formData={personalForm} errors={errors} updateFormData={setP} />
-            <InputField  label="Passport Number"    field="passport_number"  placeholder="A12345678"   formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"  required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Passport Number"    field="passport_number"  placeholder="A12345678"   required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Date of Birth"  field="date_of_birth"  type="date"                       formData={personalForm} errors={errors} updateFormData={setP} />
-            <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS}           formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Date of Birth"  field="date_of_birth"  type="date"       required={false}            formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS} required={false}     formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
-          <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}   formData={personalForm} errors={errors} updateFormData={setP} />
-          <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" formData={personalForm} errors={errors} updateFormData={setP} />
+          <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+          <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           <StorageDocumentField
             label="ID Document"
             folder="beneficiaries/documents"
@@ -198,12 +198,12 @@ export default function BeneficiaryCreateForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdFlight className="h-5 w-5" />} title="Location & Travel" subtitle="Country of origin and residence in Malaysia" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField label="Country of Origin"        field="country_of_origin"       options={COUNTRY_OPTIONS} formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date"               formData={locationForm} errors={errors} updateFormData={setL} />
+            <SelectField label="Country of Origin"        field="country_of_origin"       options={COUNTRY_OPTIONS} required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"   formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"  formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"   required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"  required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
         </div>
 
@@ -212,12 +212,12 @@ export default function BeneficiaryCreateForm() {
           <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
           <ToggleInput label="Family in Malaysia" field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali" formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"    formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"  required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"          formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0" formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"          required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0" required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
 
           {/* ── Children ── */}
@@ -267,7 +267,7 @@ export default function BeneficiaryCreateForm() {
             text="Add Beneficiary"
             icon={<MdPersonAdd className="h-4 w-4" />}
             loading={loading}
-            disabled={!canSubmit}
+            disabled={!canSubmit || loading}
             className="flex-1"
           />
         </div>
