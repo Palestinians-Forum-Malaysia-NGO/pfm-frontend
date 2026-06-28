@@ -177,8 +177,7 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={sending}
-                      className="inline-flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                      className="bg-green"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {sending ? (
                         <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

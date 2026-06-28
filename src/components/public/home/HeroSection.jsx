@@ -59,8 +59,7 @@ const HeroSection = () => (
           >
             <Link
               to="/donate"
-              className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-              className="bg-pfmRed-500 shadow-glow-red"
+              className="inline-flex items-center gap-2 rounded-full bg-pfmRed-500 px-7 py-3 text-sm font-bold text-white shadow-glow-red transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
             >
               <MdFavorite className="h-4 w-4" /> Donate Now
             </Link>
