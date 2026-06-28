@@ -358,7 +358,7 @@ const OtpStep = ({ email, channel, onBack }) => {
     try {
       const data = await verifyOtp({ email, code: code.trim(), purpose: OTP_PURPOSE.REGISTER });
       if (data?.access) setTokens({ access: data.access, refresh: data.refresh });
-      navigate("/auth/set-password");
+      navigate(`/auth/set-password?email=${encodeURIComponent(email)}`);
     } catch { /* handled by hook */ }
   };
 

@@ -100,8 +100,8 @@ const OtpStep = ({ email, onBack }) => {
     if (!isReady) return;
     try {
       const data = await verifyOtp({ email, code: code.trim(), purpose: "register" });
-      if (data.access) setTokens({ access: data.access, refresh: data.refresh });
-      navigate("/auth/set-password");
+      if (data?.access) setTokens({ access: data.access, refresh: data.refresh });
+      navigate(`/auth/set-password?email=${encodeURIComponent(email)}`);
     } catch {
       // error handled by hook
     }
