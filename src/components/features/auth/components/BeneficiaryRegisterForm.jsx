@@ -2,26 +2,67 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail,
-  MdBadge, MdFlight, MdFamilyRestroom, MdCheck, MdAdd, MdClose,
+  MdBadge, MdFamilyRestroom, MdCheck, MdAdd, MdClose, MdPeople,
 } from "react-icons/md";
-import InputField    from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
-import SelectField   from "components/form/SelectField";
-import TextareaField from "components/form/TextareaField";
-import ToggleInput   from "components/form/ToggleInput";
-import AlertBanner   from "components/ui/AlertBanner";
-import { validate }  from "components/form/utils/validation";
+import InputField            from "components/form/InputField";
+import PasswordField         from "components/form/PasswordField";
+import SelectField           from "components/form/SelectField";
+import TextareaField         from "components/form/TextareaField";
+import ToggleInput           from "components/form/ToggleInput";
+import StorageDocumentField  from "components/form/upload/StorageDocumentField";
+import AlertBanner           from "components/ui/AlertBanner";
+import { validate }          from "components/form/utils/validation";
 import { useAuth, useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
-import { OTP_PURPOSE } from "components/features/auth/types";
+import { OTP_PURPOSE }       from "components/features/auth/types";
 import { useGetClassifications } from "components/features/beneficiaries/hooks";
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
-import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
+import { COUNTRY_OPTIONS }   from "components/features/beneficiaries/constants/countries";
+
+/* ── Hero ───────────────────────────────────────── */
+const HERO_STEPS = [
+  { n: "1", label: "Account" },
+  { n: "2", label: "Personal" },
+  { n: "3", label: "Family" },
+  { n: "✓", label: "Verify" },
+];
+
+const Hero = () => (
+  <div className="border-b border-slate-100 bg-white px-6 py-14 text-center">
+    <span className="inline-flex items-center gap-2 rounded-full bg-green/10 px-4 py-1.5 text-xs font-semibold text-green">
+      <MdPeople className="h-4 w-4" />
+      Beneficiary Registration
+    </span>
+    <h1 className="mx-auto mt-4 max-w-xl text-3xl font-extrabold leading-tight text-navy-700 sm:text-4xl">
+      Apply for Beneficiary Support
+    </h1>
+    <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-slate-400">
+      Join the PFM support network. Fill in the application below — your details are kept
+      confidential and used only to process your request.
+    </p>
+
+    <div className="mt-10 flex items-center justify-center gap-0">
+      {HERO_STEPS.map((s, i) => (
+        <React.Fragment key={s.n}>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green/10 text-sm font-bold text-green ring-1 ring-green/20">
+              {s.n}
+            </div>
+            <span className="text-[10px] font-semibold text-slate-400">{s.label}</span>
+          </div>
+          {i < HERO_STEPS.length - 1 && (
+            <div className="mb-4 mx-2 h-px w-10 bg-slate-200 sm:w-16" />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  </div>
+);
 
 /* ── Step indicator ─────────────────────────────── */
 const STEP_META = [
   { label: "Account" },
   { label: "Personal" },
-  { label: "Location" },
+  { label: "Family" },
 ];
 
 const StepIndicator = ({ current }) => (
@@ -72,8 +113,8 @@ const AccountStep = ({ data, onChange, onNext }) => {
     onNext();
   };
 
-  const set      = (f, v) => onChange((p) => ({ ...p, [f]: v }));
-  const canNext  = data.full_name.trim() && data.email.trim() && data.password;
+  const set     = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+  const canNext = data.full_name.trim() && data.email.trim() && data.password;
 
   return (
     <>
@@ -81,8 +122,8 @@ const AccountStep = ({ data, onChange, onNext }) => {
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green/10">
           <MdPersonAdd className="h-5 w-5 text-green" />
         </div>
-        <h1 className="mt-3 text-2xl font-bold text-navy-700">Create account</h1>
-        <p className="mt-1 text-sm text-slate-400">Join the PFM community portal.</p>
+        <h2 className="mt-3 text-2xl font-bold text-navy-700">Create account</h2>
+        <p className="mt-1 text-sm text-slate-400">Set up your login credentials.</p>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -97,7 +138,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
       </div>
 
       <button type="button" onClick={handleNext} disabled={!canNext}
-        className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
       >
         Next <MdArrowForward className="h-4 w-4" />
       </button>
@@ -113,7 +154,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
 };
 
 /* ── Step 2 — Personal Info ─────────────────────── */
-const PersonalStep = ({ data, onChange, onBack, onNext }) => {
+const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
 
   return (
@@ -122,7 +163,7 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green/10">
           <MdBadge className="h-5 w-5 text-green" />
         </div>
-        <h1 className="mt-3 text-2xl font-bold text-navy-700">Personal information</h1>
+        <h2 className="mt-3 text-2xl font-bold text-navy-700">Personal information</h2>
         <p className="mt-1 text-sm text-slate-400">Help us know you better. All fields are optional.</p>
       </div>
 
@@ -142,6 +183,14 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
         <TextareaField label="Background" field="background"
           placeholder="Brief background about your situation (optional)…"
           formData={data} errors={{}} updateFormData={set} rows={3} />
+        <StorageDocumentField
+          label="ID Document"
+          folder="beneficiaries/documents"
+          accept=".pdf,.jpg,.jpeg,.png"
+          onUpload={(key) => onIdDocChange(key)}
+          onRemove={() => onIdDocChange(null)}
+          currentName={idDoc ? "Uploaded document" : undefined}
+        />
       </div>
 
       <div className="mt-5 flex gap-3">
@@ -151,7 +200,7 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
           <MdArrowBack className="h-4 w-4" /> Back
         </button>
         <button type="button" onClick={onNext}
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98]"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-green-600 active:scale-[0.98]"
         >
           Next <MdArrowForward className="h-4 w-4" />
         </button>
@@ -161,7 +210,10 @@ const PersonalStep = ({ data, onChange, onBack, onNext }) => {
 };
 
 /* ── Step 3 — Location & Family ─────────────────── */
-const EMPTY_CHILD = { child_name: "", child_name_arabic: "", child_date_of_birth: "" };
+const EMPTY_CHILD = {
+  child_name: "", child_name_arabic: "", child_date_of_birth: "",
+  passport_copy: null, entrance_stump: null,
+};
 
 const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack, onSubmit, loading, error }) => {
   const setL = (f, v) => onLocChange((p) => ({ ...p, [f]: v }));
@@ -181,7 +233,7 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green/10">
           <MdFamilyRestroom className="h-5 w-5 text-green" />
         </div>
-        <h1 className="mt-3 text-2xl font-bold text-navy-700">Location & family</h1>
+        <h2 className="mt-3 text-2xl font-bold text-navy-700">Location & family</h2>
         <p className="mt-1 text-sm text-slate-400">Residence details and family information. All optional.</p>
       </div>
 
@@ -230,9 +282,9 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
           ) : (
             <div className="flex flex-col gap-3">
               {famData.children.map((child, i) => (
-                <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">Child {i + 1}</span>
+                <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-600">Child {i + 1}</span>
                     <button type="button" onClick={() => removeChild(i)}
                       className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
                     >
@@ -246,6 +298,25 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
                       formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
                     <InputField label="Date of Birth" field="child_date_of_birth" type="date"
                       formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
+
+                    <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <StorageDocumentField
+                        label="Passport Copy"
+                        folder="beneficiaries/documents"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onUpload={(key) => updateChild(i, "passport_copy", key)}
+                        onRemove={() => updateChild(i, "passport_copy", null)}
+                        currentName={child.passport_copy ? "Passport uploaded" : undefined}
+                      />
+                      <StorageDocumentField
+                        label="Entrance Stamp"
+                        folder="beneficiaries/documents"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onUpload={(key) => updateChild(i, "entrance_stump", key)}
+                        onRemove={() => updateChild(i, "entrance_stump", null)}
+                        currentName={child.entrance_stump ? "Stamp uploaded" : undefined}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -261,11 +332,11 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
           <MdArrowBack className="h-4 w-4" /> Back
         </button>
         <button type="button" onClick={onSubmit} disabled={loading}
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : <><MdPersonAdd className="h-4 w-4" /> Create Account</>
+            : <><MdPersonAdd className="h-4 w-4" /> Submit Application</>
           }
         </button>
       </div>
@@ -312,7 +383,7 @@ const OtpStep = ({ email, channel, onBack }) => {
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green/10">
           <MdEmail className="h-5 w-5 text-green" />
         </div>
-        <h1 className="mt-3 text-2xl font-bold text-navy-700">Verify your account</h1>
+        <h2 className="mt-3 text-2xl font-bold text-navy-700">Verify your account</h2>
         <p className="mt-1 text-sm text-slate-400">
           We sent a 6-digit code via{" "}
           <span className="font-semibold text-slate-600">{channel}</span> to{" "}
@@ -337,7 +408,7 @@ const OtpStep = ({ email, channel, onBack }) => {
         </div>
 
         <button type="submit" disabled={loading || !isReady}
-          className="flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -363,14 +434,15 @@ export default function BeneficiaryRegisterForm() {
   const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
-  const { classifications } = useGetClassifications();
-  const defaultClassification = useMemo(() => classifications[0]?.id ?? "", [classifications]);
+  const { classifications }       = useGetClassifications();
+  const defaultClassification     = useMemo(() => classifications[0]?.id ?? "", [classifications]);
 
   const [account,  setAccount]  = useState({ full_name: "", email: "", password: "", phone_number: "" });
   const [personal, setPersonal] = useState({
     full_name_arabic: "", passport_number: "", date_of_birth: "",
     gender: "", marital_status: "", country_of_origin: "", background: "",
   });
+  const [idDoc,    setIdDoc]    = useState(null);
   const [location, setLocation] = useState({ date_arrived_in_malaysia: "", current_city: "", address: "" });
   const [family,   setFamily]   = useState({
     family_in_malaysia: false,
@@ -383,21 +455,18 @@ export default function BeneficiaryRegisterForm() {
   const handleSubmit = async () => {
     try {
       const payload = {
-        classification:           defaultClassification                   || undefined,
-        full_name:                account.full_name,
-        email:                    account.email,
-        password:                 account.password,
-        phone_number:             account.phone_number                    || undefined,
-        full_name_arabic:         personal.full_name_arabic              || undefined,
-        passport_number:          personal.passport_number               || undefined,
-        date_of_birth:            personal.date_of_birth                 || undefined,
-        gender:                   personal.gender                        || undefined,
-        marital_status:           personal.marital_status                || undefined,
-        country_of_origin:        personal.country_of_origin             || undefined,
-        background:               personal.background                    || undefined,
-        date_arrived_in_malaysia: location.date_arrived_in_malaysia      || undefined,
-        current_city:             location.current_city                  || undefined,
-        address:                  location.address                       || undefined,
+        classification:           defaultClassification                  || undefined,
+        full_name_arabic:         personal.full_name_arabic             || undefined,
+        passport_number:          personal.passport_number              || undefined,
+        date_of_birth:            personal.date_of_birth                || undefined,
+        gender:                   personal.gender                       || undefined,
+        marital_status:           personal.marital_status               || undefined,
+        country_of_origin:        personal.country_of_origin            || undefined,
+        background:               personal.background                   || undefined,
+        id_document:              idDoc                                  || undefined,
+        date_arrived_in_malaysia: location.date_arrived_in_malaysia     || undefined,
+        current_city:             location.current_city                 || undefined,
+        address:                  location.address                      || undefined,
         family_information: {
           family_in_malaysia:  family.family_in_malaysia,
           spouse_name:         family.spouse_name        || null,
@@ -408,6 +477,8 @@ export default function BeneficiaryRegisterForm() {
             child_name:          c.child_name          || "",
             child_name_arabic:   c.child_name_arabic   || "",
             child_date_of_birth: c.child_date_of_birth || undefined,
+            passport_copy:       c.passport_copy       || undefined,
+            entrance_stump:      c.entrance_stump      || undefined,
           })),
         },
       };
@@ -418,30 +489,38 @@ export default function BeneficiaryRegisterForm() {
   };
 
   return (
-    <section className="bg-slate-50 px-4 py-12">
-      <div className="mx-auto max-w-[520px]">
-        <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
-          {step < 4 && <StepIndicator current={step} />}
+    <div>
+      <Hero />
 
-          {step === 1 && (
-            <AccountStep data={account} onChange={setAccount} onNext={() => setStep(2)} />
-          )}
-          {step === 2 && (
-            <PersonalStep data={personal} onChange={setPersonal} onBack={() => setStep(1)} onNext={() => setStep(3)} />
-          )}
-          {step === 3 && (
-            <LocationFamilyStep
-              locData={location} onLocChange={setLocation}
-              famData={family}   onFamChange={setFamily}
-              onBack={() => setStep(2)} onSubmit={handleSubmit}
-              loading={loading} error={error}
-            />
-          )}
-          {step === 4 && (
-            <OtpStep email={otpMeta.email} channel={otpMeta.channel} onBack={() => setStep(1)} />
-          )}
+      <section className="bg-slate-50 px-4 py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
+            {step < 4 && <StepIndicator current={step} />}
+
+            {step === 1 && (
+              <AccountStep data={account} onChange={setAccount} onNext={() => setStep(2)} />
+            )}
+            {step === 2 && (
+              <PersonalStep
+                data={personal} onChange={setPersonal}
+                idDoc={idDoc} onIdDocChange={setIdDoc}
+                onBack={() => setStep(1)} onNext={() => setStep(3)}
+              />
+            )}
+            {step === 3 && (
+              <LocationFamilyStep
+                locData={location} onLocChange={setLocation}
+                famData={family}   onFamChange={setFamily}
+                onBack={() => setStep(2)} onSubmit={handleSubmit}
+                loading={loading} error={error}
+              />
+            )}
+            {step === 4 && (
+              <OtpStep email={otpMeta.email} channel={otpMeta.channel} onBack={() => setStep(1)} />
+            )}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

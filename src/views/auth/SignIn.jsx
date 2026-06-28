@@ -86,7 +86,7 @@ const LoginStep = ({ onOtpRequired }) => {
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:bg-[#005629] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:bg-[#005629] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -182,7 +182,7 @@ const OtpStep = ({ email, channel, onBack }) => {
         <button
           type="submit"
           disabled={loading || !isReady}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

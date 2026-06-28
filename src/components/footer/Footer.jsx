@@ -71,7 +71,7 @@ const Footer = () => (
           <div className="flex items-center gap-2.5">
             <div
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
-              style={{ background: "#007A3D" }}
+              className="bg-green"
             >
               PFM
             </div>

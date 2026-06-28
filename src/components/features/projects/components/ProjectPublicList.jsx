@@ -31,7 +31,7 @@ function ProjectCard({ project, onClick }) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ background: "linear-gradient(135deg, #007A3D18 0%, #e2f5eb 100%)" }}>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-green/10 to-green-50">
             <MdAssignment className="h-12 w-12 text-green/30" />
           </div>
         )}
@@ -120,8 +120,8 @@ export default function ProjectPublicList() {
   return (
     <div>
       {/* ── Hero banner ── */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #007A3D 0%, #005a2e 100%)" }}>
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, #ffffff22 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="relative overflow-hidden bg-gradient-to-br from-green to-green-700">
+        <div className="absolute inset-0 bg-dot-white bg-[size:28px_28px] opacity-10" />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="max-w-2xl">
             <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur-sm">

@@ -51,22 +51,16 @@ const ComingSoon = () => {
       <section className="min-h-screen bg-white p-3 sm:p-5">
         <div
           className="relative flex min-h-[calc(100vh-40px)] flex-col overflow-hidden rounded-3xl bg-white"
-          style={{ border: "1px solid #007A3D1A", boxShadow: "0 4px 40px #007A3D08" }}
+          className="border border-green/10 shadow-ring-green"
         >
 
           {/* ── Background elements ── */}
           {/* Top glow */}
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2"
-            style={{ background: "radial-gradient(ellipse at top, #007A3D0E 0%, transparent 70%)" }} />
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 bg-glow-top-green" />
           {/* Bottom-left glow */}
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full"
-            style={{ background: "radial-gradient(circle, #007A3D08 0%, transparent 70%)" }} />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-glow-circle-green" />
           {/* Dot grid */}
-          <div className="pointer-events-none absolute inset-0 opacity-[0.18]"
-            style={{
-              backgroundImage: "radial-gradient(circle, #007A3D 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
-            }} />
+          <div className="pointer-events-none absolute inset-0 bg-dot-green-dark bg-[size:32px_32px] opacity-[0.18]" />
           {/* Watermark */}
           <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 select-none overflow-hidden"
             style={{ opacity: 0.03 }}>
@@ -80,15 +74,14 @@ const ComingSoon = () => {
               <img src={logo} alt="PFM" className="h-11 w-auto" />
               <div className="hidden sm:block">
                 <p className="text-sm font-bold text-slate-900 leading-tight">Palestinian Forum Malaysia</p>
-                <p className="text-[10px] font-medium tracking-wide" style={{ color: "#007A3D" }}>
+                <p className="text-[10px] font-medium tracking-wide text-green">
                   منتدى فلسطين ماليزيا
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full border px-3.5 py-1.5"
-              style={{ borderColor: "#007A3D30", background: "#007A3D08" }}>
-              <span className="pulse-dot h-1.5 w-1.5 rounded-full" style={{ background: "#007A3D" }} />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.15em]" style={{ color: "#007A3D" }}>
+            <div className="flex items-center gap-1.5 rounded-full border border-green/20 bg-green/[3%] px-3.5 py-1.5">
+              <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-green" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-green">
                 Coming Soon
               </span>
             </div>
@@ -99,11 +92,11 @@ const ComingSoon = () => {
 
             {/* Org label */}
             <div className="fade-up mb-6 flex items-center gap-3" style={{ animationDelay: "0.1s" }}>
-              <span className="h-px w-8 rounded" style={{ background: "#007A3D40" }} />
+              <span className="h-px w-8 rounded bg-green/25" />
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                 Official Member Portal
               </p>
-              <span className="h-px w-8 rounded" style={{ background: "#007A3D40" }} />
+              <span className="h-px w-8 rounded bg-green/25" />
             </div>
 
             {/* Heading */}
@@ -111,7 +104,7 @@ const ComingSoon = () => {
               style={{ animationDelay: "0.2s" }}>
               Serving Our Community,
               <br />
-              <span style={{ color: "#007A3D" }}>Together.</span>
+              <span className="text-green">Together.</span>
             </h1>
 
             {/* Mission */}
@@ -132,9 +125,8 @@ const ComingSoon = () => {
               {PILLARS.map((p) => (
                 <div key={p.title}
                   className="flex flex-col items-center gap-2 rounded-2xl border px-5 py-4 text-center"
-                  style={{ borderColor: "#007A3D18", background: "#007A3D05" }}>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl"
-                    style={{ background: "#007A3D12", color: "#007A3D" }}>
+                  className="border-green/10 bg-green/[2%]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/[7%] text-green">
                     {p.icon}
                   </div>
                   <p className="text-sm font-bold text-slate-800">{p.title}</p>

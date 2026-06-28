@@ -34,13 +34,7 @@ const ComingSoonPage = ({
       </div>
 
       {/* ── Dotted grid overlay ── */}
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-40"
-        style={{
-          backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dot-slate bg-[size:28px_28px] opacity-40" />
 
       {/* ── Icon ── */}
       <div className="relative mb-8">

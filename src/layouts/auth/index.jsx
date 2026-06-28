@@ -19,17 +19,10 @@ export default function Auth() {
         {/* Decorative layer — clipped separately so the panel curve isn't cut */}
         <div className="absolute inset-0 overflow-hidden rounded-br-[100px]">
           {/* Subtle grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+          <div className="absolute inset-0 bg-auth-grid bg-[size:40px_40px] opacity-[0.06]" />
           {/* Glow blobs */}
           <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-[80px]" />
-          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-[#005629]/40 blur-[80px]" />
+          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-green-700/40 blur-[80px]" />
         </div>
 
         {/* Top — flag labels */}

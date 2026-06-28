@@ -81,8 +81,8 @@ export default function ProjectPublicDetail() {
             </div>
           </div>
         ) : (
-          <div className="relative h-48 w-full overflow-hidden" style={{ background: "linear-gradient(135deg, #007A3D 0%, #005a2e 100%)" }}>
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, #ffffff22 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+          <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-green to-green-700">
+            <div className="absolute inset-0 bg-dot-white bg-[size:24px_24px] opacity-10" />
             {/* Breadcrumb — top */}
             <div className="absolute left-0 right-0 top-0 px-6 pt-5 sm:px-8">
               <div className="mx-auto max-w-4xl">

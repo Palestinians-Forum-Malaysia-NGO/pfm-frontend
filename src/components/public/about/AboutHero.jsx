@@ -15,7 +15,7 @@ const AboutHero = () => (
       <div className="flex-1 bg-black" />
       <div className="flex-1 bg-white/80" />
       <div className="flex-1 bg-white/20" />
-      <div className="flex-1" style={{ background: "#CE1126" }} />
+      <div className="flex-1 bg-pfmRed-500" />
     </div>
 
     <div className="relative z-10 px-6 text-center text-white">

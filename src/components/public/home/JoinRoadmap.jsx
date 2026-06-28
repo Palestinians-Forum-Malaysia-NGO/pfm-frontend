@@ -50,7 +50,7 @@ const JoinRoadmap = () => {
           <Link
             to="/contact"
             className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-            style={{ background: "#007A3D", boxShadow: "0 4px 20px #007A3D30" }}
+            className="bg-green shadow-glow-green"
           >
             Apply for Membership <MdArrowForward className="h-4 w-4" />
           </Link>

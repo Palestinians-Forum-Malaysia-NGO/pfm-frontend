@@ -47,7 +47,7 @@ const NewsletterSection = () => {
               <button
                 type="submit"
                 className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-                style={{ background: "#007A3D", boxShadow: "0 4px 16px #007A3D25" }}
+                className="bg-green shadow-glow-green-sm"
               >
                 Subscribe <MdArrowForward className="h-4 w-4" />
               </button>

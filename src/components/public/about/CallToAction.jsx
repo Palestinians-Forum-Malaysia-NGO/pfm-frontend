@@ -15,7 +15,7 @@ const CallToAction = () => {
         <span className="text-xs font-bold uppercase tracking-[0.25em] text-green">Take Action</span>
         <h2 className="mt-3 text-4xl font-black leading-tight text-slate-900">
           Be Part of Something<br />
-          <span style={{ color: "#007A3D" }}>That Matters.</span>
+          <span className="text-green">That Matters.</span>
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-slate-400">
           Whether you donate, volunteer, or simply spread the word — every action strengthens our community and amplifies the Palestinian cause.
@@ -25,14 +25,14 @@ const CallToAction = () => {
           <Link
             to="/contact"
             className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-            style={{ background: "#007A3D", boxShadow: "0 4px 20px #007A3D30" }}
+            className="bg-green shadow-glow-green"
           >
             <MdPeople className="h-4 w-4" /> Become a Member
           </Link>
           <Link
             to="/donate"
             className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-            style={{ background: "#CE1126", boxShadow: "0 4px 20px #CE112630" }}
+            className="bg-pfmRed-500 shadow-glow-red"
           >
             <MdFavorite className="h-4 w-4" /> Donate Now
           </Link>

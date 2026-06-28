@@ -71,20 +71,15 @@ export default function CategoryDetailView() {
 
       {/* ── Profile card ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="h-24 w-full"
-          style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}>
-          <div className="h-full w-full opacity-40"
-            style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        <div className="h-24 w-full bg-gradient-to-br from-green/10 via-green/5 to-green-50">
+          <div className="h-full w-full bg-dot-green bg-[size:20px_20px] opacity-40" />
         </div>
         <div className="px-6 pb-6">
           <div className="-mt-8 mb-4 flex items-end justify-between">
             <div
               className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ring-4 ring-white shadow-md"
-              style={{
-                background: category.hex_color || undefined,
-                color: category.text_color || undefined,
-                ...(category.hex_color ? {} : { background: "rgba(0,122,61,0.1)", color: "#007A3D" }),
-              }}
+              className={!category.hex_color ? "bg-green/10 text-green" : ""}
+              style={category.hex_color ? { background: category.hex_color, color: category.text_color || undefined } : undefined}
             >
               <MdCategory className="h-7 w-7" />
             </div>

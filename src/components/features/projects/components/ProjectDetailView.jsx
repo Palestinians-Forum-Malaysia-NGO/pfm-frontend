@@ -111,8 +111,8 @@ export default function ProjectDetailView() {
         {project.cover_image ? (
           <StorageImage fileKey={project.cover_image} alt={project.title} className="h-48 w-full object-cover" />
         ) : (
-          <div className="h-28 w-full" style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}>
-            <div className="h-full w-full opacity-40" style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+          <div className="h-28 w-full bg-gradient-to-br from-green/10 via-green/5 to-green-50">
+            <div className="h-full w-full bg-dot-green bg-[size:20px_20px] opacity-40" />
           </div>
         )}
         <div className="px-6 pb-6 pt-4 flex items-start justify-between gap-4">

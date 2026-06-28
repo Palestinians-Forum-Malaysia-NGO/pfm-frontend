@@ -14,18 +14,12 @@ const STATS = [
 ];
 
 const HeroSection = () => (
-  <section
-    className="relative flex min-h-screen items-center overflow-hidden pt-16"
-    style={{ background: "linear-gradient(160deg, #f0faf5 0%, #ffffff 60%)" }}
-  >
+  <section className="relative flex min-h-screen items-center overflow-hidden bg-gradient-to-br from-green-50 to-white pt-16">
     {/* Subtle dot grid */}
-    <div
-      className="pointer-events-none absolute inset-0 opacity-40"
-      style={{ backgroundImage: "radial-gradient(circle, #007A3D18 1px, transparent 1px)", backgroundSize: "32px 32px" }}
-    />
+    <div className="pointer-events-none absolute inset-0 bg-dot-green bg-[size:32px_32px] opacity-40" />
 
     {/* Green blob top-right */}
-    <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full opacity-20 blur-3xl" style={{ background: "#007A3D" }} />
+    <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-green opacity-20 blur-3xl" />
 
     <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16">
       <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
@@ -47,7 +41,7 @@ const HeroSection = () => (
             style={{ animation: "fadeUp 0.7s 0.1s ease both" }}
           >
             Serving Our<br />
-            <span style={{ color: "#007A3D" }}>Community.</span>
+            <span className="text-green">Community.</span>
           </h1>
 
           {/* Description */}
@@ -66,7 +60,7 @@ const HeroSection = () => (
             <Link
               to="/donate"
               className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-              style={{ background: "#CE1126", boxShadow: "0 4px 20px #CE112630" }}
+              className="bg-pfmRed-500 shadow-glow-red"
             >
               <MdFavorite className="h-4 w-4" /> Donate Now
             </Link>
@@ -137,7 +131,8 @@ const HeroSection = () => (
           {/* Decorative ring */}
           <div
             className="absolute"
-            style={{ bottom: "28%", left: "57%", width: "72px", height: "72px", borderRadius: "50%", border: "2px dashed #007A3D40", animation: "spin 20s linear infinite" }}
+            className="border-2 border-dashed border-green/25"
+            style={{ bottom: "28%", left: "57%", width: "72px", height: "72px", borderRadius: "50%", animation: "spin 20s linear infinite" }}
           />
 
         </div>

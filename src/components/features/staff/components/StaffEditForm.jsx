@@ -125,10 +125,8 @@ export default function StaffEditForm() {
 
       {/* ── Live preview ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="h-28 w-full"
-          style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}>
-          <div className="h-full w-full opacity-40"
-            style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        <div className="h-28 w-full bg-gradient-to-br from-green/10 via-green/5 to-green-50">
+          <div className="h-full w-full bg-dot-green bg-[size:20px_20px] opacity-40" />
         </div>
         <div className="px-6 pb-5">
           <div className="-mt-10 mb-4 flex items-end justify-between">

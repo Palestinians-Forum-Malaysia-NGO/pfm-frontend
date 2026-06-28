@@ -68,7 +68,7 @@ export default function Contact() {
           <div className="flex-1 bg-black" />
           <div className="flex-1 bg-white/80" />
           <div className="flex-1 bg-white/20" />
-          <div className="flex-1" style={{ background: "#CE1126" }} />
+          <div className="flex-1 bg-pfmRed-500" />
         </div>
 
         <div className="relative z-10 text-center text-white px-6">
@@ -178,7 +178,7 @@ export default function Contact() {
                       type="submit"
                       disabled={sending}
                       className="inline-flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                      style={{ background: "#007A3D" }}
+                      className="bg-green"
                     >
                       {sending ? (
                         <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
