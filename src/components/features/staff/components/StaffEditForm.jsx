@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdVerified, MdEdit, MdBadge, MdPerson } from "react-icons/md";
-import PageHeader from "components/ui/PageHeader";
-import { InputField, PasswordField, ToggleInput } from "components/form";
-import Button from "components/ui/buttons/Button";
-import FormHeader from "components/ui/form/FormHeader";
+import PageHeader  from "components/ui/PageHeader";
+import { InputField, ToggleInput } from "components/form";
+import Button      from "components/ui/buttons/Button";
+import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
-import Loading from "components/loading/Loading";
+import Loading     from "components/loading/Loading";
 import { useGetStaff, useUpdateStaff } from "components/features/staff/hooks";
 import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
-
-const USER_RULES = {
-  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
-  email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ minLength: 8, message: "At least 8 characters" }],
-};
 
 export default function StaffEditForm() {
   const { id }   = useParams();
@@ -28,8 +22,8 @@ export default function StaffEditForm() {
   const { execute: updateStaff, loading: saving, error: saveError } = useUpdateStaff();
   const { success, error: toastError } = useToast();
 
-  const [userForm, setUserForm]   = useState({ full_name: "", email: "", password: "", phone_number: "", is_active: true });
-  const [staffForm, setStaffForm] = useState({ employee_id: "", department: "", position: "", branch: "", joining_date: "" });
+  const [userForm, setUserForm]   = useState({ full_name: "", email: "", phone_number: "", is_active: true });
+  const [staffForm, setStaffForm] = useState({ department: "", position: "", branch: "", joining_date: "" });
   const [initialUser, setInitialUser]   = useState(null);
   const [initialStaff, setInitialStaff] = useState(null);
   const [errors, setErrors] = useState({});
@@ -42,8 +36,6 @@ export default function StaffEditForm() {
     userForm.email        !== initialUser.email        ||
     userForm.phone_number !== initialUser.phone_number ||
     userForm.is_active    !== initialUser.is_active    ||
-    userForm.password     !== ""                       ||
-    staffForm.employee_id  !== initialStaff.employee_id  ||
     staffForm.department   !== initialStaff.department   ||
     staffForm.position     !== initialStaff.position     ||
     staffForm.branch       !== initialStaff.branch       ||
@@ -57,12 +49,10 @@ export default function StaffEditForm() {
       const userSnap = {
         full_name:    u.full_name    ?? "",
         email:        u.email        ?? "",
-        password:     "",
         phone_number: u.phone_number ?? "",
         is_active:    u.is_active    ?? true,
       };
       const staffSnap = {
-        employee_id:  data.employee_id  ?? "",
         department:   data.department   ?? "",
         position:     data.position     ?? "",
         branch:       data.branch       ?? "",
@@ -88,16 +78,14 @@ export default function StaffEditForm() {
         user: {
           full_name:    userForm.full_name,
           email:        userForm.email,
-          phone_number: userForm.phone_number,
+          phone_number: userForm.phone_number || undefined,
           is_active:    userForm.is_active,
         },
-        employee_id:  staffForm.employee_id  || undefined,
         department:   staffForm.department   || undefined,
         position:     staffForm.position     || undefined,
         branch:       staffForm.branch       || undefined,
         joining_date: staffForm.joining_date || undefined,
       };
-      if (userForm.password) payload.user.password = userForm.password;
       await updateStaff(id, payload);
       success("Staff updated", `${userForm.full_name} has been updated successfully.`);
       navigate(`/admin/staff/${id}`);
@@ -119,7 +107,7 @@ export default function StaffEditForm() {
         title="Edit Staff"
         subtitle={userForm.full_name || "Update staff member details"}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Staff" onClick={() => navigate(`/admin/staff/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`/admin/staff/${id}`)} />
         }
       />
 
@@ -162,32 +150,28 @@ export default function StaffEditForm() {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-        {/* ── User Account ── */}
+        {/* ── Account details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="User Account" subtitle="Login credentials for this staff member" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Basic information for this staff member" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField    label="Full Name"     field="full_name"     placeholder="Ahmad Farid"                  formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
-            <InputField    label="Email Address" field="email"         type="email" placeholder="ahmad@example.com" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
+            <InputField label="Full Name"     field="full_name"    placeholder="Fatima Ali"          formData={userForm} errors={errors} updateFormData={setU} />
+            <InputField label="Email Address" field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField label="New Password"  field="password"      placeholder="Leave blank to keep current"  formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.password} />
-            <InputField    label="Phone Number"  field="phone_number"  placeholder="+60 12-345 6789"              formData={userForm} errors={errors} updateFormData={setU} />
-          </div>
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" formData={userForm} errors={errors} updateFormData={setU} />
           <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
 
-        {/* ── Staff Profile ── */}
+        {/* ── Employment details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Staff Profile" subtitle="Employment and organisational details" />
+          <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Employment Details" subtitle="Organisational role and assignment" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Employee ID" field="employee_id"  placeholder="EMP001"        formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label="Department"  field="department"   placeholder="Finance"        formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Department"   field="department"   placeholder="Programs"        formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Position"     field="position"     placeholder="Program Manager"  formData={staffForm} errors={errors} updateFormData={setS} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Position"    field="position"     placeholder="Accountant"     formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label="Branch"      field="branch"       placeholder="Kuala Lumpur"   formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ" formData={staffForm} errors={errors} updateFormData={setS} />
+            <InputField label="Joining Date" field="joining_date" type="date"                   formData={staffForm} errors={errors} updateFormData={setS} />
           </div>
-          <InputField label="Joining Date"  field="joining_date" type="date"                  formData={staffForm} errors={errors} updateFormData={setS} />
         </div>
 
         <div className="flex gap-3">
