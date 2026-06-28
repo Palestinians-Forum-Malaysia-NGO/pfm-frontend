@@ -3,25 +3,37 @@ import { useNavigate } from "react-router-dom";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
-  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield, MdDescription,
+  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield,
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import {
-  InputField, PasswordField, SelectField, TextareaField,
+  InputField, SelectField, TextareaField,
   ToggleInput, StorageDocumentField, validate,
 } from "components/form";
-import Button from "components/ui/buttons/Button";
-import FormHeader from "components/ui/form/FormHeader";
+import Button      from "components/ui/buttons/Button";
+import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
-import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
+import {
+  GENDER_OPTIONS, MARITAL_STATUS_OPTIONS,
+} from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
 
-const USER_RULES = {
-  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
-  email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ required: true, message: "Password is required" }, { minLength: 8, message: "At least 8 characters" }],
+const RULES = {
+  full_name: [
+    { required: true, message: "Full name is required" },
+    { maxLength: 255, message: "Name must be 255 characters or fewer" },
+  ],
+  email: [
+    { required: true, message: "Email is required" },
+    { email: true },
+  ],
+};
+
+const EMPTY_CHILD = {
+  child_name: "", child_name_arabic: "", child_date_of_birth: "",
+  passport_copy: null, entrance_stump: null,
 };
 
 export default function BeneficiaryCreateForm() {
@@ -31,78 +43,88 @@ export default function BeneficiaryCreateForm() {
   const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
 
-  const [userForm, setUserForm] = useState({
-    full_name: "", email: "", password: "", phone_number: "", is_active: true,
-  });
-  const [classForm, setClassForm] = useState({ classification: "" });
+  /* ── Form state ── */
+  const [accountForm, setAccountForm] = useState({ full_name: "", email: "", phone_number: "" });
+  const [classForm,    setClassForm]   = useState({ classification: "" });
   const [personalForm, setPersonalForm] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "",
-    marital_status: "", background: "",
+    full_name_arabic: "", passport_number: "", date_of_birth: "",
+    gender: "", marital_status: "", background: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
   });
   const [familyForm, setFamilyForm] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "",
+    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "",
+    spouse_job: "", number_of_children: "",
   });
-  const [idDoc, setIdDoc] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [children, setChildren] = useState([]);
+  const [idDoc,   setIdDoc]   = useState(null);
+  const [errors,  setErrors]  = useState({});
 
-  const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
-  const setC  = (f, v) => setClassForm((p)   => ({ ...p, [f]: v }));
+  const setA  = (f, v) => setAccountForm((p)  => ({ ...p, [f]: v }));
+  const setC  = (f, v) => setClassForm((p)    => ({ ...p, [f]: v }));
   const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
   const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
-  const setFa = (f, v) => setFamilyForm((p)  => ({ ...p, [f]: v }));
+  const setFa = (f, v) => setFamilyForm((p)   => ({ ...p, [f]: v }));
+
+  const setChild = (i, f, v) =>
+    setChildren((prev) => prev.map((c, idx) => idx === i ? { ...c, [f]: v } : c));
 
   const CLASSIFICATION_OPTIONS = [
     { value: "", label: "Select classification" },
     ...classifications.map((c) => ({ value: c.id, label: c.name })),
   ];
 
-  const canSubmit = userForm.full_name.trim() && userForm.email.trim() && userForm.password;
+  const canSubmit = accountForm.full_name.trim() && accountForm.email.trim();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    Object.entries(USER_RULES).forEach(([field, rules]) => {
-      const err = validate(userForm[field], rules);
+    Object.entries(RULES).forEach(([field, rules]) => {
+      const err = validate(accountForm[field], rules);
       if (err) newErrors[field] = err;
     });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     try {
       const payload = {
-        user: {
-          full_name:    userForm.full_name,
-          email:        userForm.email,
-          password:     userForm.password,
-          phone_number: userForm.phone_number || undefined,
-          role:         "beneficiary",
-          is_active:    userForm.is_active,
-        },
-        classification:             classForm.classification             || undefined,
-        full_name_arabic:           personalForm.full_name_arabic        || undefined,
-        passport_number:            personalForm.passport_number         || undefined,
-        date_of_birth:              personalForm.date_of_birth           || undefined,
-        gender:                     personalForm.gender                  || undefined,
-        marital_status:             personalForm.marital_status          || undefined,
-        background:                 personalForm.background              || undefined,
-        id_document:                idDoc                                || undefined,
-        country_of_origin:          locationForm.country_of_origin       || undefined,
-        date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia || undefined,
-        current_city:               locationForm.current_city            || undefined,
-        address:                    locationForm.address                 || undefined,
+        /* user-level fields (flat, no nested user object) */
+        full_name:    accountForm.full_name,
+        email:        accountForm.email,
+        phone_number: accountForm.phone_number || undefined,
+
+        /* beneficiary fields */
+        classification:           classForm.classification             || undefined,
+        full_name_arabic:         personalForm.full_name_arabic        || undefined,
+        passport_number:          personalForm.passport_number         || undefined,
+        date_of_birth:            personalForm.date_of_birth           || undefined,
+        gender:                   personalForm.gender                  || undefined,
+        marital_status:           personalForm.marital_status          || undefined,
+        background:               personalForm.background              || undefined,
+        id_document:              idDoc                                || undefined,
+        country_of_origin:        locationForm.country_of_origin       || undefined,
+        date_arrived_in_malaysia: locationForm.date_arrived_in_malaysia || undefined,
+        current_city:             locationForm.current_city            || undefined,
+        address:                  locationForm.address                 || undefined,
+
         family_information: {
           family_in_malaysia:  familyForm.family_in_malaysia,
           spouse_name:         familyForm.spouse_name        || null,
           spouse_name_arabic:  familyForm.spouse_name_arabic || null,
           spouse_job:          familyForm.spouse_job         || null,
           number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
+          children_information: children.map((c) => ({
+            child_name:         c.child_name         || undefined,
+            child_name_arabic:  c.child_name_arabic  || undefined,
+            child_date_of_birth: c.child_date_of_birth || undefined,
+            passport_copy:      c.passport_copy      || undefined,
+            entrance_stump:     c.entrance_stump     || undefined,
+          })),
         },
       };
 
       const created = await createBeneficiary(payload);
-      success("Beneficiary created", `${userForm.full_name} has been added successfully.`);
+      success("Beneficiary added", `${accountForm.full_name} has been registered successfully.`);
       navigate(`${base}/beneficiaries/${created.id}`);
     } catch (err) {
       toastError("Failed to create beneficiary", err?.message);
@@ -132,18 +154,14 @@ export default function BeneficiaryCreateForm() {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-        {/* ── User Account ── */}
+        {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="User Account" subtitle="Login credentials for this beneficiary" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Basic contact information for the beneficiary" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris bin Abdullah" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
-            <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
+            <InputField label="Full Name"     field="full_name"    placeholder="Ahmad Faris" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.full_name} />
+            <InputField label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.email} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField label="Password"      field="password"     placeholder="Min. 8 characters"       formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.password} />
-            <InputField    label="Phone Number"  field="phone_number" placeholder="+60 12-345 6789"         formData={userForm} errors={errors} updateFormData={setU} />
-          </div>
-          <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" formData={accountForm} errors={errors} updateFormData={setA} />
         </div>
 
         {/* ── Classification ── */}
@@ -156,14 +174,14 @@ export default function BeneficiaryCreateForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Personal Information" subtitle="Identity and personal details" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"   formData={personalForm} errors={errors} updateFormData={setP} />
-            <InputField  label="Passport Number"    field="passport_number"  placeholder="A12345678"    formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"  formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Passport Number"    field="passport_number"  placeholder="A12345678"   formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Date of Birth"  field="date_of_birth"  type="date"                        formData={personalForm} errors={errors} updateFormData={setP} />
-            <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS}            formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label="Date of Birth"  field="date_of_birth"  type="date"                       formData={personalForm} errors={errors} updateFormData={setP} />
+            <SelectField label="Gender"         field="gender"         options={GENDER_OPTIONS}           formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
-          <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}    formData={personalForm} errors={errors} updateFormData={setP} />
+          <SelectField   label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}   formData={personalForm} errors={errors} updateFormData={setP} />
           <TextareaField label="Background" field="background" rows={3} placeholder="Brief background about the beneficiary…" formData={personalForm} errors={errors} updateFormData={setP} />
           <StorageDocumentField
             label="ID Document"
@@ -184,8 +202,8 @@ export default function BeneficiaryCreateForm() {
             <InputField  label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date"               formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"    formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"   formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"   formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"  formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
         </div>
 
@@ -194,13 +212,51 @@ export default function BeneficiaryCreateForm() {
           <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title="Family Information" subtitle="Family details and dependants" />
           <ToggleInput label="Family in Malaysia" field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali"  formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"     formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali" formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"    formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"              formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0"     formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="Spouse Occupation" field="spouse_job"         placeholder="Teacher"          formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label="No. of Children"   field="number_of_children" type="number" placeholder="0" formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
+
+          {/* ── Children ── */}
+          {children.length > 0 && (
+            <div className="mt-5 flex flex-col gap-4">
+              {children.map((child, i) => (
+                <div key={i} className="rounded-xl border border-slate-200 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-xs font-semibold text-slate-500">Child {i + 1}</p>
+                    <button type="button" onClick={() => setChildren((p) => p.filter((_, idx) => idx !== i))}
+                      className="text-xs font-medium text-red-400 transition-colors hover:text-red-600">
+                      Remove
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    <InputField label="Child Name"         field="child_name"         placeholder="Ahmad Jr." formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                    <InputField label="Child Name (Arabic)" field="child_name_arabic"  placeholder="أحمد"      formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                  </div>
+                  <InputField label="Date of Birth" field="child_date_of_birth" type="date" formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                  <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    <StorageDocumentField label="Passport Copy"  folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                      onUpload={(key) => setChild(i, "passport_copy",  key)}
+                      onRemove={() => setChild(i, "passport_copy",  null)} field={`passport_copy_${i}`} errors={{}} />
+                    <StorageDocumentField label="Entrance Stamp" folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                      onUpload={(key) => setChild(i, "entrance_stump", key)}
+                      onRemove={() => setChild(i, "entrance_stump", null)} field={`entrance_stump_${i}`} errors={{}} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setChildren((p) => [...p, { ...EMPTY_CHILD }])}
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-green transition-colors hover:text-green-600"
+          >
+            + Add Child
+          </button>
         </div>
 
         <div className="flex gap-3">

@@ -7,7 +7,7 @@ import {
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import {
-  InputField, PasswordField, SelectField, TextareaField,
+  InputField, SelectField, TextareaField,
   ToggleInput, StorageDocumentField,
 } from "components/form";
 import Button from "components/ui/buttons/Button";
@@ -24,7 +24,6 @@ import { useToast } from "components/ui/toast/ToastContext";
 const USER_RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ minLength: 8, message: "At least 8 characters" }],
 };
 
 export default function BeneficiaryEditForm() {
@@ -38,7 +37,7 @@ export default function BeneficiaryEditForm() {
   const { success, error: toastError } = useToast();
 
   const [userForm, setUserForm] = useState({
-    full_name: "", email: "", password: "", phone_number: "", is_active: true,
+    full_name: "", email: "", phone_number: "", is_active: true,
   });
   const [classForm, setClassForm] = useState({ classification: "" });
   const [personalForm, setPersonalForm] = useState({
@@ -73,8 +72,7 @@ export default function BeneficiaryEditForm() {
   ];
 
   const isDirty = initialUser === null || initialClass === null || !initialPersonal || !initialLocation || !initialFamily || initialIdDoc === undefined || (
-    userForm.password !== "" ||
-    JSON.stringify({ ...userForm, password: "" }) !== JSON.stringify(initialUser) ||
+    JSON.stringify(userForm) !== JSON.stringify(initialUser) ||
     JSON.stringify(classForm)    !== JSON.stringify(initialClass)    ||
     JSON.stringify(personalForm) !== JSON.stringify(initialPersonal) ||
     JSON.stringify(locationForm) !== JSON.stringify(initialLocation) ||
@@ -115,7 +113,7 @@ export default function BeneficiaryEditForm() {
       };
       const docSnap = data.id_document ?? null;
 
-      setUserForm({ ...uSnap, password: "" });
+      setUserForm(uSnap);
       setClassForm(cSnap);
       setPersonalForm(pSnap);
       setLocationForm(lSnap);
@@ -168,8 +166,6 @@ export default function BeneficiaryEditForm() {
           number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
         },
       };
-      if (userForm.password) payload.user.password = userForm.password;
-
       await updateBeneficiary(id, payload);
       success("Beneficiary updated", `${userForm.full_name} has been updated successfully.`);
       navigate(`${base}/beneficiaries/${id}`);
@@ -204,10 +200,7 @@ export default function BeneficiaryEditForm() {
             <InputField    label="Full Name"     field="full_name"    placeholder="Ahmad Faris"           formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
             <InputField    label="Email Address" field="email"        type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <PasswordField label="New Password"  field="password"     placeholder="Leave blank to keep current" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.password} />
-            <InputField    label="Phone Number"  field="phone_number" placeholder="+60 12-345 6789"       formData={userForm} errors={errors} updateFormData={setU} />
-          </div>
+          <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789" formData={userForm} errors={errors} updateFormData={setU} />
           <ToggleInput label="Account Active" field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
         </div>
 
