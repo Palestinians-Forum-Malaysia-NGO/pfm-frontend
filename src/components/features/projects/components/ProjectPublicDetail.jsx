@@ -6,6 +6,7 @@ import {
   MdRadioButtonUnchecked, MdCheck, MdPerson, MdCampaign,
 } from "react-icons/md";
 import { useGetProject } from "components/features/projects/hooks";
+import StorageImage from "components/ui/StorageImage";
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Loading from "components/loading/Loading";
 
@@ -49,7 +50,7 @@ export default function ProjectPublicDetail() {
       <div className="relative">
         {project.cover_image ? (
           <div className="relative h-64 w-full overflow-hidden sm:h-80 lg:h-96">
-            <img src={project.cover_image} alt={project.title} className="h-full w-full object-cover" />
+            <StorageImage fileKey={project.cover_image} alt={project.title} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
             {/* Breadcrumb — top of hero */}
             <div className="absolute left-0 right-0 top-0 px-6 pt-5 sm:px-8">

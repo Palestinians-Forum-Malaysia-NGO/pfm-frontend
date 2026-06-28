@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdSearch, MdClose, MdAssignment, MdCalendarToday, MdCategory, MdTrendingUp } from "react-icons/md";
 import { useGetProjects } from "components/features/projects/hooks";
+import StorageImage from "components/ui/StorageImage";
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_BADGE, PROJECT_STATUS_OPTIONS } from "components/features/projects/constants/projects";
 
 const fmtDate = (d) =>
@@ -24,8 +25,8 @@ function ProjectCard({ project, onClick }) {
       {/* Cover */}
       <div className="relative h-44 w-full shrink-0 overflow-hidden bg-slate-100">
         {project.cover_image ? (
-          <img
-            src={project.cover_image}
+          <StorageImage
+            fileKey={project.cover_image}
             alt={project.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

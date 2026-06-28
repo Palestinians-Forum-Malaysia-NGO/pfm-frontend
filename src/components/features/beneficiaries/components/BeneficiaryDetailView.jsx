@@ -14,6 +14,8 @@ import InfoRow from "components/ui/InfoRow";
 import AlertBanner from "components/ui/AlertBanner";
 import BeneficiaryDeleteModal from "./BeneficiaryDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
+import StorageImage from "components/ui/StorageImage";
+import StorageFileLink from "components/ui/StorageFileLink";
 import Loading from "components/loading/Loading";
 import { useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary } from "components/features/beneficiaries/hooks";
 import {
@@ -112,7 +114,7 @@ export default function BeneficiaryDetailView() {
           <div className="-mt-10 mb-4 flex items-end justify-between">
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-green/10 text-2xl font-black ring-4 ring-white shadow-md text-green">
               {u.profile_photo
-                ? <img src={u.profile_photo} alt={u.full_name} className="h-full w-full object-cover" />
+                ? <StorageImage fileKey={u.profile_photo} alt={u.full_name} className="h-full w-full object-cover" fallback={getInitials(u.full_name)} />
                 : getInitials(u.full_name)
               }
             </div>
@@ -200,7 +202,9 @@ export default function BeneficiaryDetailView() {
             <MdBadge className="h-5 w-5 shrink-0 text-green" />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-slate-400">ID Document</p>
-              <p className="truncate text-sm text-slate-700">{beneficiary.id_document}</p>
+              <StorageFileLink fileKey={beneficiary.id_document} className="text-sm font-medium text-green hover:underline">
+                View Document
+              </StorageFileLink>
             </div>
           </div>
         )}
@@ -256,9 +260,9 @@ export default function BeneficiaryDetailView() {
                   <p className="text-xs text-slate-400">{doc.document_type}</p>
                 </div>
                 {doc.document_file && (
-                  <a href={doc.document_file} target="_blank" rel="noreferrer" className="text-xs font-medium text-green hover:underline">
+                  <StorageFileLink fileKey={doc.document_file} className="text-xs font-medium text-green hover:underline">
                     View
-                  </a>
+                  </StorageFileLink>
                 )}
               </div>
             ))}

@@ -6,6 +6,7 @@ import {
   MdPerson, MdShield, MdSupervisorAccount, MdGroup,
 } from "react-icons/md";
 import { FiSliders } from "react-icons/fi";
+import StorageImage from "components/ui/StorageImage";
 import { useUsers } from "components/features/users/hooks/useUsers";
 import UserDeleteModal from "./UserDeleteModal";
 import Button from "components/ui/buttons/Button";
@@ -113,7 +114,7 @@ export default function UserList() {
         <div className="flex items-center gap-3">
           <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-xs font-bold ${ROLE_AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
             {user.profile_photo
-              ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" />
+              ? <StorageImage fileKey={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" fallback={getInitials(user.full_name)} />
               : getInitials(user.full_name)
             }
           </div>

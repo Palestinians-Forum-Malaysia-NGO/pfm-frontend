@@ -6,6 +6,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import Button from "components/ui/buttons/Button";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import { StorageCoverField } from "components/form";
+import StorageImage from "components/ui/StorageImage";
 import {
   useCreateProjectUpdate, useUpdateProjectUpdate, useDeleteProjectUpdate,
 } from "components/features/projects/hooks";
@@ -184,7 +185,7 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                     </div>
                     <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
                     {u.photo && (
-                      <img src={u.photo} alt="Update" className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
+                      <StorageImage fileKey={u.photo} alt="Update" className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">

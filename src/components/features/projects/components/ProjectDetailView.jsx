@@ -14,6 +14,7 @@ import InfoRow from "components/ui/InfoRow";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import DropdownButton from "components/ui/buttons/DropdownButton";
+import StorageImage from "components/ui/StorageImage";
 import ProjectDeleteModal from "./ProjectDeleteModal";
 import MilestoneSection from "./MilestoneSection";
 import UpdatesSection from "./UpdatesSection";
@@ -108,7 +109,7 @@ export default function ProjectDetailView() {
       {/* ── Hero card ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {project.cover_image ? (
-          <img src={project.cover_image} alt={project.title} className="h-48 w-full object-cover" />
+          <StorageImage fileKey={project.cover_image} alt={project.title} className="h-48 w-full object-cover" />
         ) : (
           <div className="h-28 w-full" style={{ background: "linear-gradient(135deg, #007A3D18 0%, #007A3D08 50%, #e2f5eb 100%)" }}>
             <div className="h-full w-full opacity-40" style={{ backgroundImage: "radial-gradient(circle, #007A3D22 1px, transparent 1px)", backgroundSize: "20px 20px" }} />

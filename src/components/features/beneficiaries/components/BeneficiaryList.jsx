@@ -17,6 +17,7 @@ import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
+import StorageImage from "components/ui/StorageImage";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -77,7 +78,7 @@ export default function BeneficiaryList() {
         <div className="flex items-center gap-3">
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-green/10 text-xs font-bold text-green">
             {b.user?.profile_photo
-              ? <img src={b.user.profile_photo} alt={b.user?.full_name} className="h-full w-full object-cover" />
+              ? <StorageImage fileKey={b.user.profile_photo} alt={b.user?.full_name} className="h-full w-full object-cover" fallback={getInitials(b.user?.full_name)} />
               : getInitials(b.user?.full_name)
             }
           </div>

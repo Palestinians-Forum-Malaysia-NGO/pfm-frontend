@@ -9,6 +9,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetProject, useUpdateProject } from "components/features/projects/hooks";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { useGetCategories } from "components/features/categories/hooks";
 import { PROJECT_STATUS_OPTIONS } from "components/features/projects/constants/projects";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -29,7 +30,8 @@ export default function ProjectEditForm() {
   });
   const [initial, setInitial] = useState(null);
   const [errors, setErrors]   = useState({});
-  const [currentCoverUrl, setCurrentCoverUrl] = useState(null);
+  const [coverKey, setCoverKey] = useState(null);
+  const { url: currentCoverUrl } = useStorageUrl(coverKey);
 
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
@@ -56,7 +58,7 @@ export default function ProjectEditForm() {
         end_date:        data.end_date         ? data.end_date.slice(0, 10)   : "",
         is_published:    data.is_published     ?? false,
       };
-      setCurrentCoverUrl(data.cover_image ?? null);
+      setCoverKey(data.cover_image ?? null);
       setForm(snap);
       setInitial(snap);
     }).catch(() => {});
@@ -115,8 +117,8 @@ export default function ProjectEditForm() {
           <StorageCoverField
             folder="projects"
             currentUrl={currentCoverUrl}
-            onUpload={(key) => { set("cover_image", key); setCurrentCoverUrl(null); }}
-            onRemove={() => { set("cover_image", ""); setCurrentCoverUrl(null); }}
+            onUpload={(key) => { set("cover_image", key); setCoverKey(null); }}
+            onRemove={() => { set("cover_image", ""); setCoverKey(null); }}
             errors={errors}
           />
         </div>
