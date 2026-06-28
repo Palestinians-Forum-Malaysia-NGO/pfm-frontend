@@ -43,7 +43,7 @@ export default function UserCreateForm() {
 
     try {
       const created = await createUser(formData);
-      success("User created", `${formData.full_name} has been added successfully.`);
+      success("User created", `${formData.full_name} has been added. An activation email with OTP has been sent.`);
       navigate(`/admin/users/${created.id}`);
     } catch (err) {
       toastError("Failed to create user", err?.message);
@@ -68,6 +68,7 @@ export default function UserCreateForm() {
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials and role assignment" />
+          <AlertBanner variant="info" message="After the account is created, an activation email with a one-time password (OTP) will be sent to the user's email address." />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label="Full Name"
