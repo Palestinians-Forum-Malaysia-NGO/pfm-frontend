@@ -5,14 +5,15 @@ import {
   MdBadge, MdFamilyRestroom, MdCheck, MdAdd, MdClose, MdPeople,
 } from "react-icons/md";
 import InputField            from "components/form/InputField";
-import PasswordField         from "components/form/PasswordField";
 import SelectField           from "components/form/SelectField";
 import TextareaField         from "components/form/TextareaField";
 import ToggleInput           from "components/form/ToggleInput";
 import StorageDocumentField  from "components/form/upload/StorageDocumentField";
 import AlertBanner           from "components/ui/AlertBanner";
 import { validate }          from "components/form/utils/validation";
-import { useAuth, useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
+import { useNavigate } from "react-router-dom";
+import { useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
+import { setTokens } from "components/features/auth/utils";
 import { OTP_PURPOSE }       from "components/features/auth/types";
 import { useGetClassifications } from "components/features/beneficiaries/hooks";
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
@@ -96,7 +97,6 @@ const StepIndicator = ({ current }) => (
 const ACCOUNT_RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255 }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
-  password:  [{ required: true, message: "Password is required" }, { minLength: 8, message: "At least 8 characters" }],
 };
 
 const AccountStep = ({ data, onChange, onNext }) => {
@@ -114,7 +114,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
   };
 
   const set     = (f, v) => onChange((p) => ({ ...p, [f]: v }));
-  const canNext = data.full_name.trim() && data.email.trim() && data.password;
+  const canNext = data.full_name.trim() && data.email.trim();
 
   return (
     <>
@@ -123,7 +123,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
           <MdPersonAdd className="h-5 w-5 text-green" />
         </div>
         <h2 className="mt-3 text-2xl font-bold text-navy-700">Create account</h2>
-        <p className="mt-1 text-sm text-slate-400">Set up your login credentials.</p>
+        <p className="mt-1 text-sm text-slate-400">Enter your contact details to get started.</p>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -131,8 +131,6 @@ const AccountStep = ({ data, onChange, onNext }) => {
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
         <InputField label="Email Address" field="email" type="email" placeholder="you@example.com"
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.email} />
-        <PasswordField label="Password" field="password" placeholder="Min. 8 characters"
-          formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.password} />
         <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789"
           formData={data} errors={{}} updateFormData={set} />
       </div>
@@ -346,7 +344,7 @@ const LocationFamilyStep = ({ locData, onLocChange, famData, onFamChange, onBack
 
 /* ── Step 4 — OTP ───────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
-  const { completeLogin }                                 = useAuth();
+  const navigate = useNavigate();
   const { execute: verifyOtp, loading, error: otpError } = useVerifyOtp();
   const { execute: resendOtp, loading: resending }       = useResendOtp();
   const [code, setCode]     = useState("");
@@ -358,8 +356,9 @@ const OtpStep = ({ email, channel, onBack }) => {
     e.preventDefault();
     if (!isReady) return;
     try {
-      await verifyOtp({ email, code: code.trim(), purpose: OTP_PURPOSE.REGISTER });
-      await completeLogin();
+      const data = await verifyOtp({ email, code: code.trim(), purpose: OTP_PURPOSE.REGISTER });
+      if (data?.access) setTokens({ access: data.access, refresh: data.refresh });
+      navigate("/auth/set-password");
     } catch { /* handled by hook */ }
   };
 
@@ -437,7 +436,7 @@ export default function BeneficiaryRegisterForm() {
   const { classifications }       = useGetClassifications();
   const defaultClassification     = useMemo(() => classifications[0]?.id ?? "", [classifications]);
 
-  const [account,  setAccount]  = useState({ full_name: "", email: "", password: "", phone_number: "" });
+  const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "" });
   const [personal, setPersonal] = useState({
     full_name_arabic: "", passport_number: "", date_of_birth: "",
     gender: "", marital_status: "", country_of_origin: "", background: "",
@@ -455,6 +454,11 @@ export default function BeneficiaryRegisterForm() {
   const handleSubmit = async () => {
     try {
       const payload = {
+        /* user-level fields */
+        full_name:    account.full_name    || undefined,
+        email:        account.email        || undefined,
+        phone_number: account.phone_number || undefined,
+
         classification:           defaultClassification                  || undefined,
         full_name_arabic:         personal.full_name_arabic             || undefined,
         passport_number:          personal.passport_number              || undefined,
