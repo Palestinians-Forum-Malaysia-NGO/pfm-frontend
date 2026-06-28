@@ -4,164 +4,196 @@ import ReactApexChart from "react-apexcharts";
 import { MdPeople, MdArrowForward } from "react-icons/md";
 import { useGetBeneficiaryStats } from "components/features/beneficiaries/hooks";
 
-const Skeleton = ({ className }) => (
-  <div className={`animate-pulse rounded-xl bg-slate-100 ${className}`} />
-);
+/* ── Tailwind palette values (used only in ApexCharts configs) ── */
+const TW_GREEN      = "#007A3D"; // green DEFAULT
+const TW_GREEN_400  = "#33BB7C"; // green-400
+const TW_GREEN_300  = "#66CC9E"; // green-300
+const TW_GREEN_200  = "#99DCBC"; // green-200
+const TW_GREEN_100  = "#C2EAD7"; // green-100
+const TW_BLUE_500   = "#3b82f6"; // blue-500  (male)
+const TW_PINK_400   = "#f472b6"; // pink-400  (female)
+const TW_SLATE_400  = "#94a3b8"; // slate-400
 
-const STATUS_COLORS  = ["#007A3D", "#F59E0B", "#F97316", "#EF4444"];
-const STATUS_LABELS  = ["Active", "Pending", "Suspended", "Rejected"];
-const STATUS_KEYS    = ["active", "pending", "suspended", "rejected"];
+/* ── Data config ── */
+const STATUS = [
+  { key: "active",    label: "Active",    bar: "bg-green" },
+  { key: "pending",   label: "Pending",   bar: "bg-amber-400" },
+  { key: "suspended", label: "Suspended", bar: "bg-orange-500" },
+  { key: "rejected",  label: "Rejected",  bar: "bg-red-500" },
+];
 
-const GENDER_COLORS  = ["#3B82F6", "#EC4899", "#94A3B8"];
-const GENDER_LABELS  = ["Male", "Female", "Unspecified"];
-const GENDER_KEYS    = ["male", "female", "unspecified"];
+const GENDER = [
+  { key: "male",   label: "Male",   dot: "bg-blue-500",  hex: TW_BLUE_500 },
+  { key: "female", label: "Female", dot: "bg-pink-400",  hex: TW_PINK_400 },
+];
 
-const donutOpts = (labels, colors) => ({
-  chart:       { type: "donut", toolbar: { show: false }, sparkline: { enabled: false } },
-  labels,
-  colors,
+/* ── ApexCharts options ── */
+const genderDonutOpts = {
+  chart:       { type: "donut", toolbar: { show: false } },
+  labels:      GENDER.map((g) => g.label),
+  colors:      GENDER.map((g) => g.hex),
   legend:      { show: false },
   dataLabels:  { enabled: false },
   stroke:      { width: 0 },
   plotOptions: { pie: { donut: { size: "70%", labels: { show: false } }, expandOnClick: false } },
-  tooltip:     { theme: "dark", style: { fontSize: "12px" } },
-  states:      { hover: { filter: { type: "lighten", value: 0.05 } } },
-});
+  tooltip:     { theme: "dark" },
+};
 
-const barOpts = (categories) => ({
-  chart:      { type: "bar", toolbar: { show: false } },
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      borderRadius: 6,
-      barHeight: "55%",
-      distributed: true,
-    },
-  },
-  colors:      ["#007A3D", "#00a351", "#00c45f", "#34d578", "#6ee7a0"],
+const cityBarOpts = (categories) => ({
+  chart:       { type: "bar", toolbar: { show: false }, background: "transparent" },
+  plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: "52%", distributed: true } },
+  colors:      [TW_GREEN, TW_GREEN_400, TW_GREEN_300, TW_GREEN_200, TW_GREEN_100],
   dataLabels:  { enabled: false },
   legend:      { show: false },
   grid:        { show: false },
   xaxis: {
     categories,
-    labels: { style: { colors: "#94A3B8", fontSize: "11px" } },
+    labels:     { style: { colors: TW_SLATE_400, fontSize: "11px" } },
     axisBorder: { show: false },
     axisTicks:  { show: false },
   },
-  yaxis: {
-    labels: { style: { colors: "#64748B", fontSize: "12px", fontWeight: 500 } },
-  },
-  tooltip: { theme: "dark", style: { fontSize: "12px" } },
+  yaxis: { labels: { style: { colors: TW_SLATE_400, fontSize: "11px", fontWeight: 500 } } },
+  tooltip: { theme: "dark" },
 });
+
+/* ── Sub-components ── */
+const Skeleton = ({ className }) => (
+  <div className={`animate-pulse rounded-lg bg-white/5 ${className}`} />
+);
 
 export default function BeneficiaryStatsWidget() {
   const { stats, loading } = useGetBeneficiaryStats();
   const navigate = useNavigate();
 
-  const total     = stats?.total     ?? 0;
-  const byStatus  = stats?.by_status ?? {};
-  const byGender  = stats?.by_gender ?? {};
-  const byCity    = (stats?.by_city  ?? []).slice(0, 5);
+  const total      = stats?.total     ?? 0;
+  const byStatus   = stats?.by_status ?? {};
+  const byGender   = stats?.by_gender ?? {};
+  const byCity     = (stats?.by_city  ?? []).slice(0, 5);
 
-  const statusSeries = STATUS_KEYS.map((k) => byStatus[k] ?? 0);
-  const genderSeries = GENDER_KEYS.map((k) => byGender[k] ?? 0);
+  const genderSeries = GENDER.map((g) => byGender[g.key] ?? 0);
+  const genderTotal  = genderSeries.reduce((a, b) => a + b, 0);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="relative overflow-hidden rounded-2xl bg-navy-900 p-6">
 
-      {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green">
+      {/* Decorative circles */}
+      <div className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full bg-white/[0.025]" />
+      <div className="pointer-events-none absolute -bottom-14 -right-6  h-64 w-64 rounded-full bg-white/[0.025]" />
+
+      {/* ── Header ── */}
+      <div className="relative mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green/15 text-green">
             <MdPeople className="h-5 w-5" />
           </div>
-          <div>
-            <p className="text-sm font-bold text-slate-900">Beneficiary Overview</p>
-            {loading
-              ? <Skeleton className="mt-1 h-3 w-20" />
-              : <p className="text-xs text-slate-400">{total.toLocaleString()} total registered</p>
-            }
-          </div>
+          <p className="text-sm font-bold text-white">Beneficiary Overview</p>
         </div>
         <button
           onClick={() => navigate("/admin/beneficiaries")}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-green transition-colors hover:text-[#005a2c]"
+          className="flex items-center gap-1 text-xs font-semibold text-green transition-colors duration-150 hover:text-green-400"
         >
           View all <MdArrowForward className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-
-        {/* ── Status donut ── */}
-        <div className="flex flex-col items-center rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-3 self-start text-xs font-semibold text-slate-500">By Status</p>
-          {loading ? (
-            <Skeleton className="h-40 w-40 rounded-full" />
-          ) : (
-            <ReactApexChart
-              type="donut"
-              series={statusSeries}
-              options={donutOpts(STATUS_LABELS, STATUS_COLORS)}
-              height={160}
-            />
-          )}
-          <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 self-start w-full">
-            {STATUS_LABELS.map((label, i) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: STATUS_COLORS[i] }} />
-                <span className="text-[11px] text-slate-500">{label}</span>
-                <span className="ml-auto text-[11px] font-bold text-slate-700">{statusSeries[i]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Gender donut ── */}
-        <div className="flex flex-col items-center rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-3 self-start text-xs font-semibold text-slate-500">By Gender</p>
-          {loading ? (
-            <Skeleton className="h-40 w-40 rounded-full" />
-          ) : (
-            <ReactApexChart
-              type="donut"
-              series={genderSeries}
-              options={donutOpts(GENDER_LABELS, GENDER_COLORS)}
-              height={160}
-            />
-          )}
-          <div className="mt-3 flex flex-col gap-1.5 self-start w-full">
-            {GENDER_LABELS.map((label, i) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: GENDER_COLORS[i] }} />
-                <span className="text-[11px] text-slate-500">{label}</span>
-                <span className="ml-auto text-[11px] font-bold text-slate-700">{genderSeries[i]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Top cities bar ── */}
-        <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-1 text-xs font-semibold text-slate-500">Top Cities</p>
-          {loading ? (
-            <div className="flex flex-col gap-3 pt-2">
-              {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-5 w-full" />)}
-            </div>
-          ) : byCity.length === 0 ? (
-            <p className="pt-4 text-xs text-slate-400">No data yet.</p>
-          ) : (
-            <ReactApexChart
-              type="bar"
-              series={[{ name: "Beneficiaries", data: byCity.map((c) => c.count) }]}
-              options={barOpts(byCity.map((c) => c.city))}
-              height={byCity.length * 44 + 20}
-            />
-          )}
-        </div>
-
+      {/* ── Total ── */}
+      <div className="relative mb-5">
+        {loading
+          ? <Skeleton className="mt-3 h-12 w-28" />
+          : <p className="mt-3 text-5xl font-extrabold tracking-tight text-green/80">{total.toLocaleString()}</p>
+        }
+        <p className="mt-1 text-xs text-gray-500">Total beneficiaries registered</p>
       </div>
+
+      <div className="relative border-t border-white/10 pt-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* ── Gender donut ── */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+            <p className="mb-3 text-xs font-semibold text-gray-400">By Gender</p>
+            {loading ? (
+              <Skeleton className="mx-auto h-[100px] w-[100px] rounded-full" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <ReactApexChart
+                  type="donut"
+                  series={genderSeries}
+                  options={genderDonutOpts}
+                  height={100}
+                  width={100}
+                />
+                <div className="flex flex-col gap-2.5">
+                  {GENDER.map((g, i) => {
+                    const pct = genderTotal > 0
+                      ? Math.round((genderSeries[i] / genderTotal) * 100)
+                      : 0;
+                    return (
+                      <div key={g.key} className="flex items-center gap-1.5">
+                        <span className={`h-2 w-2 shrink-0 rounded-full ${g.dot}`} />
+                        <span className="text-[11px] text-gray-400">{g.label}</span>
+                        <span className="ml-auto text-[11px] font-bold text-white">{genderSeries[i]}</span>
+                        <span className="w-7 text-right text-[10px] text-gray-500">{pct}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Status bars ── */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+            <p className="mb-3 text-xs font-semibold text-gray-400">By Status</p>
+            {loading ? (
+              <div className="flex flex-col gap-3">
+                {STATUS.map((s) => <Skeleton key={s.key} className="h-5 w-full" />)}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {STATUS.map((s) => {
+                  const count = byStatus[s.key] ?? 0;
+                  const pct   = total > 0 ? (count / total) * 100 : 0;
+                  return (
+                    <div key={s.key}>
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-[11px] text-gray-400">{s.label}</span>
+                        <span className="text-[11px] font-bold text-white">{count}</span>
+                      </div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${s.bar}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── Top cities ── */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4 sm:col-span-2 lg:col-span-1">
+            <p className="mb-2 text-xs font-semibold text-gray-400">Top Cities</p>
+            {loading ? (
+              <div className="flex flex-col gap-3 pt-1">
+                {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-5 w-full" />)}
+              </div>
+            ) : byCity.length === 0 ? (
+              <p className="pt-4 text-xs text-gray-500">No data yet.</p>
+            ) : (
+              <ReactApexChart
+                type="bar"
+                series={[{ name: "Beneficiaries", data: byCity.map((c) => c.count) }]}
+                options={cityBarOpts(byCity.map((c) => c.city))}
+                height={byCity.length * 40 + 20}
+              />
+            )}
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 }

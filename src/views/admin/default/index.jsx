@@ -2,11 +2,9 @@ import {
   MdFavorite,
   MdCampaign,
   MdPeople,
-  MdVolunteerActivism,
   MdFolderSpecial,
 } from "react-icons/md";
 
-import StatCard               from "./components/StatCard";
 import BeneficiaryStatsWidget from "./components/BeneficiaryStatsWidget";
 
 const STATS = [
@@ -50,15 +48,10 @@ const STATS = [
 
 const Dashboard = () => (
   <div className="flex flex-col gap-4">
-    {/* ── Top stat cards ── */}
-    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-      {STATS.map((s) => (
-        <StatCard key={s.label} {...s} />
-      ))}
-    </div>
-
+    
     {/* ── Beneficiary stats (live) ── */}
     <BeneficiaryStatsWidget />
+
   </div>
 );
 
