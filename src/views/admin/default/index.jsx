@@ -5,6 +5,7 @@ import {
   MdFolderSpecial,
 } from "react-icons/md";
 
+import BalanceCard from "./components/BalanceCard";
 import BeneficiaryStatsWidget from "./components/BeneficiaryStatsWidget";
 
 const STATS = [
@@ -50,6 +51,8 @@ const Dashboard = () => (
   <div className="flex flex-col gap-4">
     
     {/* ── Beneficiary stats (live) ── */}
+
+    <BalanceCard />
     <BeneficiaryStatsWidget />
 
   </div>
