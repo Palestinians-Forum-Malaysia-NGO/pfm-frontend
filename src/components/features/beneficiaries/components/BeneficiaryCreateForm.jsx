@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
-  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield,
+  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield, MdCardTravel,
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import {
@@ -16,6 +16,7 @@ import AlertBanner from "components/ui/AlertBanner";
 import { useCreateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
 import {
   GENDER_OPTIONS, MARITAL_STATUS_OPTIONS,
+  HAS_VISA_OPTIONS, VISA_TYPE_OPTIONS, SITUATION_OPTIONS, PALESTINE_REGION_OPTIONS,
 } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -58,6 +59,9 @@ export default function BeneficiaryCreateForm() {
     spouse_job: "", number_of_children: "",
   });
   const [children, setChildren] = useState([]);
+  const [visaForm, setVisaForm] = useState({
+    has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
+  });
   const [idDoc,   setIdDoc]   = useState(null);
   const [errors,  setErrors]  = useState({});
 
@@ -66,6 +70,7 @@ export default function BeneficiaryCreateForm() {
   const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
   const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
   const setFa = (f, v) => setFamilyForm((p)   => ({ ...p, [f]: v }));
+  const setV  = (f, v) => setVisaForm((p)     => ({ ...p, [f]: v }));
 
   const setChild = (i, f, v) =>
     setChildren((prev) => prev.map((c, idx) => idx === i ? { ...c, [f]: v } : c));
@@ -102,6 +107,11 @@ export default function BeneficiaryCreateForm() {
         marital_status:           personalForm.marital_status          || undefined,
         background:               personalForm.background              || undefined,
         id_document:              idDoc                                || undefined,
+        has_visa:                 visaForm.has_visa === "true" ? true : visaForm.has_visa === "false" ? false : undefined,
+        visa_type:                visaForm.has_visa === "true"  ? (visaForm.visa_type         || undefined) : undefined,
+        situation:                visaForm.has_visa === "false" ? (visaForm.situation          || undefined) : undefined,
+        unhcr_number:             (visaForm.has_visa === "false" && visaForm.situation === "refugee") ? (visaForm.unhcr_number || undefined) : undefined,
+        palestine_region:         locationForm.country_of_origin === "PS" ? (visaForm.palestine_region || undefined) : undefined,
         country_of_origin:        locationForm.country_of_origin       || undefined,
         date_arrived_in_malaysia: locationForm.date_arrived_in_malaysia || undefined,
         current_city:             locationForm.current_city            || undefined,
@@ -205,6 +215,26 @@ export default function BeneficiaryCreateForm() {
             <InputField  label="Current City" field="current_city" placeholder="Kuala Lumpur"   required={false} formData={locationForm} errors={errors} updateFormData={setL} />
             <InputField  label="Address"      field="address"      placeholder="No. 1, Jalan…"  required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
+        </div>
+
+        {/* ── Visa & Status ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title="Visa & Status" subtitle="Immigration status and documentation" />
+          <SelectField label="Visa Status" field="has_visa" options={HAS_VISA_OPTIONS} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+          {visaForm.has_visa === "true" && (
+            <SelectField label="Visa Type" field="visa_type" options={VISA_TYPE_OPTIONS} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+          )}
+          {visaForm.has_visa === "false" && (
+            <>
+              <SelectField label="Situation" field="situation" options={SITUATION_OPTIONS} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+              {visaForm.situation === "refugee" && (
+                <InputField label="UNHCR Number" field="unhcr_number" placeholder="e.g. MYS/2023/12345" required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+              )}
+            </>
+          )}
+          {locationForm.country_of_origin === "PS" && (
+            <SelectField label="Palestine Region" field="palestine_region" options={PALESTINE_REGION_OPTIONS} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+          )}
         </div>
 
         {/* ── Family Information ── */}

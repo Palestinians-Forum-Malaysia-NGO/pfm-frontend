@@ -34,6 +34,38 @@ export const ACCOUNT_STATUS_FORM_OPTIONS = [
   { value: "rejected",  label: "Rejected" },
 ];
 
+export const HAS_VISA_OPTIONS = [
+  { value: "",      label: "Not specified" },
+  { value: "true",  label: "Has Visa" },
+  { value: "false", label: "No Visa / Undocumented" },
+];
+
+export const VISA_TYPE_OPTIONS = [
+  { value: "student",      label: "Student" },
+  { value: "work",         label: "Work" },
+  { value: "dependent",    label: "Dependent" },
+  { value: "social_visit", label: "Social Visit" },
+  { value: "refugee_pass", label: "Refugee Pass" },
+  { value: "other",        label: "Other" },
+];
+
+export const SITUATION_OPTIONS = [
+  { value: "refugee",       label: "Refugee" },
+  { value: "asylum_seeker", label: "Asylum Seeker" },
+  { value: "undocumented",  label: "Undocumented" },
+  { value: "overstayed",    label: "Overstayed" },
+];
+
+export const PALESTINE_REGION_OPTIONS = [
+  { value: "gaza",             label: "Gaza" },
+  { value: "west_bank",        label: "West Bank" },
+  { value: "refugee_outside",  label: "Refugee Outside Palestine" },
+];
+
+export const VISA_TYPE_LABELS     = { student: "Student", work: "Work", dependent: "Dependent", social_visit: "Social Visit", refugee_pass: "Refugee Pass", other: "Other" };
+export const SITUATION_LABELS     = { refugee: "Refugee", asylum_seeker: "Asylum Seeker", undocumented: "Undocumented", overstayed: "Overstayed" };
+export const PALESTINE_REGION_LABELS = { gaza: "Gaza", west_bank: "West Bank", refugee_outside: "Refugee Outside Palestine" };
+
 export const GENDER_OPTIONS = [
   { value: "male",   label: "Male" },
   { value: "female", label: "Female" },

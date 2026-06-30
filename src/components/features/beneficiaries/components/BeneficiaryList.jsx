@@ -16,7 +16,7 @@ import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
-import DataTable from "components/ui/DataTable";
+import SimpleDataTable from "components/ui/SimpleDataTable";
 import StorageImage from "components/ui/StorageImage";
 
 const getInitials = (name = "") =>
@@ -187,13 +187,12 @@ export default function BeneficiaryList() {
         )}
       </div>
 
-      <DataTable
+      <SimpleDataTable
         columns={columns}
         data={beneficiaries}
         loading={loading}
         error={error}
         onRowClick={(b) => navigate(`${base}/beneficiaries/${b.id}`)}
-        selectable
         pageSize={8}
         emptyIcon={<MdPeople />}
         emptyTitle="No beneficiaries found"

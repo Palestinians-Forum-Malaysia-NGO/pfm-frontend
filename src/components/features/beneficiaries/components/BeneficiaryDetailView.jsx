@@ -6,6 +6,7 @@ import {
   MdEmail, MdPhone, MdCalendarToday, MdShield, MdVerified,
   MdPerson, MdFlag, MdLocationCity, MdHome, MdFlight,
   MdFamilyRestroom, MdBadge, MdUpdate, MdClose,
+  MdCardTravel, MdAccountBalance, MdAttachMoney, MdFingerprint, MdWarning, MdChildCare,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -21,6 +22,7 @@ import { useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary } from "c
 import {
   ACCOUNT_STATUS_BADGE, ACCOUNT_STATUS_LABELS, ACCOUNT_STATUS_FORM_OPTIONS,
   GENDER_LABELS, MARITAL_STATUS_LABELS,
+  VISA_TYPE_LABELS, SITUATION_LABELS, PALESTINE_REGION_LABELS,
 } from "components/features/beneficiaries/constants/beneficiary";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -29,6 +31,11 @@ const getInitials = (name = "") =>
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
+
+const fmtFrequency = (f) => {
+  const map = { monthly: "Monthly", weekly: "Weekly", "bi-weekly": "Bi-Weekly", annually: "Annually" };
+  return map[f] ?? f ?? "—";
+};
 
 export default function BeneficiaryDetailView() {
   const { id }   = useParams();
@@ -75,9 +82,14 @@ export default function BeneficiaryDetailView() {
   if (error)   return <AlertBanner message={error} />;
   if (!beneficiary) return null;
 
-  const u  = beneficiary.user ?? {};
-  const fi = beneficiary.family_information ?? {};
-  const cd = beneficiary.classification_details ?? {};
+  const u   = beneficiary.user ?? {};
+  const fi  = beneficiary.family_information ?? {};
+  const cd  = beneficiary.classification_details ?? {};
+  const bi  = u.banking_information  ?? {};
+  const fin = u.financial_information ?? {};
+  const hasBanking   = bi.bank_name || bi.account_number || bi.account_holder_name;
+  const hasFinancial = fin.job_title || fin.salary || fin.payment_frequency;
+  const children     = fi.children_information ?? [];
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -157,13 +169,19 @@ export default function BeneficiaryDetailView() {
           )}
           <p className="mt-0.5 text-sm text-slate-400">{u.email}</p>
           {cd.name && <p className="mt-1 text-xs font-medium text-green">{cd.name}</p>}
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
               u.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
             }`}>
               <span className={`h-1.5 w-1.5 rounded-full ${u.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
               {u.is_active ? "Active" : "Inactive"}
             </span>
+            {u.password_reset_required && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
+                <MdWarning className="h-3.5 w-3.5" />
+                Password Reset Required
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -219,6 +237,31 @@ export default function BeneficiaryDetailView() {
         </div>
       </div>
 
+      {/* ── Visa & Status ── */}
+      {(beneficiary.has_visa != null || beneficiary.situation || beneficiary.palestine_region) && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title="Visa & Status" subtitle="Immigration status and documentation" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {beneficiary.has_visa != null && (
+              <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label="Visa Status"
+                value={beneficiary.has_visa ? "Has Visa" : "No Visa / Undocumented"} />
+            )}
+            {beneficiary.has_visa && beneficiary.visa_type && (
+              <InfoRow icon={<MdBadge className="h-4 w-4" />} label="Visa Type" value={VISA_TYPE_LABELS[beneficiary.visa_type] ?? beneficiary.visa_type} />
+            )}
+            {!beneficiary.has_visa && beneficiary.situation && (
+              <InfoRow icon={<MdShield className="h-4 w-4" />} label="Situation" value={SITUATION_LABELS[beneficiary.situation] ?? beneficiary.situation} />
+            )}
+            {beneficiary.unhcr_number && (
+              <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label="UNHCR Number" value={beneficiary.unhcr_number} />
+            )}
+            {beneficiary.palestine_region && (
+              <InfoRow icon={<MdFlag className="h-4 w-4" />} label="Palestine Region" value={PALESTINE_REGION_LABELS[beneficiary.palestine_region] ?? beneficiary.palestine_region} />
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Classification ── */}
       {cd.name && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -242,6 +285,49 @@ export default function BeneficiaryDetailView() {
             {fi.spouse_name        && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name"          value={fi.spouse_name} />}
             {fi.spouse_name_arabic && <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Spouse Name (Arabic)" value={fi.spouse_name_arabic} />}
             {fi.spouse_job         && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label="Spouse Occupation"    value={fi.spouse_job} />}
+          </div>
+        </div>
+      )}
+
+      {/* ── Children ── */}
+      {children.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdChildCare className="h-5 w-5" />} title="Children" subtitle={`${children.length} child${children.length !== 1 ? "ren" : ""} registered`} />
+          <div className="flex flex-col gap-3">
+            {children.map((child, i) => (
+              <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="mb-2 text-xs font-semibold text-slate-400">Child {i + 1}</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {child.child_name        && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label="Name"         value={child.child_name} />}
+                  {child.child_name_arabic && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label="Name (Arabic)" value={child.child_name_arabic} />}
+                  {child.child_date_of_birth && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Date of Birth" value={fmtDate(child.child_date_of_birth)} />}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Banking Information ── */}
+      {hasBanking && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {bi.bank_name           && <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"      value={bi.bank_name} />}
+            {bi.account_holder_name && <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder" value={bi.account_holder_name} />}
+            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label="Account No."    value={bi.account_number} />}
+          </div>
+        </div>
+      )}
+
+      {/* ── Financial Information ── */}
+      {hasFinancial && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {fin.job_title         && <InfoRow icon={<MdBadge className="h-4 w-4" />}          label="Job Title"     value={fin.job_title} />}
+            {fin.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}    label="Salary"        value={`MYR ${fin.salary}`} />}
+            {fin.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label="Pay Frequency" value={fmtFrequency(fin.payment_frequency)} />}
           </div>
         </div>
       )}
