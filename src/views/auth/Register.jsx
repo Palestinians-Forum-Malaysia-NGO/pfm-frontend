@@ -1,2 +1,2 @@
 import { Navigate } from "react-router-dom";
-export default function Register() { return <Navigate to="/register" replace />; }
+export default function Register() { return <Navigate to="/apply" replace />; }

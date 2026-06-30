@@ -25,6 +25,9 @@ const App = () => (
       <Route path="reset-password"  element={<RedirectToAuth to="/auth/reset-password" />} />
       <Route path="set-password"    element={<RedirectToAuth to="/auth/reset-password" />} />
 
+      {/* Old register URL → new /apply */}
+      <Route path="register" element={<Navigate to="/apply" replace />} />
+
       <Route path="/*" element={<PublicLayout />} />
 
       {/* Protected by role */}

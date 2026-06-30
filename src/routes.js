@@ -320,7 +320,7 @@ const routes = [
   { name: "Projects", layout: "/", path: "/projects", component: <PublicProjectsPage /> },
   { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
-  { name: "Register", layout: "/", path: "/register", component: <RegisterPage /> },
+  { name: "Apply",    layout: "/", path: "/apply",    component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
   { name: "Sign In",          layout: "/auth", path: "sign-in",         component: <SignIn /> },
