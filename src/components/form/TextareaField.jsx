@@ -10,6 +10,7 @@ const TextareaField = ({
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
 
+  const inputId = field.replace(/[.[\]]/g, "-");
   const value = getNestedValue(formData, field) ?? "";
   const externalError = getNestedValue(errors, field);
   const displayError = localError || externalError;
@@ -26,11 +27,12 @@ const TextareaField = ({
 
   return (
     <div className={WRAPPER}>
-      <label className={LABEL}>
+      <label htmlFor={inputId} className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <textarea
+        id={inputId}
         rows={rows}
         value={value}
         onChange={handleChange}

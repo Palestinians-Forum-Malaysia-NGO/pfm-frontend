@@ -70,5 +70,11 @@ Desktop.ini
 .tmp/
 *.tmp
 
+# ── Playwright e2e ────────────────────────────────────────
+test-results/
+playwright-report/
+e2e/.auth/
+/playwright/.cache/
+
 # ── Sensitive project content ─────────────────────────────
 /src/assets/content

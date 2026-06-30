@@ -29,7 +29,7 @@ const Button = ({
         rounded-full border px-5 py-2.5 text-sm font-medium
         transition-all duration-200 ease-in-out
         enabled:hover:-translate-y-px enabled:active:translate-y-0 enabled:active:scale-[0.98]
-        disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none
+        disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none truncate
         ${variants[variant]} ${className}
       `}
     >

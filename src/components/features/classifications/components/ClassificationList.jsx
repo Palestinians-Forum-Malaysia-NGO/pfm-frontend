@@ -9,7 +9,7 @@ import Button        from "components/ui/buttons/Button";
 import PageHeader    from "components/ui/PageHeader";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput   from "components/form/SearchInput";
-import DataTable     from "components/ui/DataTable";
+import SimpleDataTable from "components/ui/SimpleDataTable";
 
 export default function ClassificationList() {
   const navigate = useNavigate();
@@ -109,13 +109,12 @@ export default function ClassificationList() {
         )}
       </div>
 
-      <DataTable
+      <SimpleDataTable
         columns={columns}
         data={classifications}
         loading={loading}
         error={error}
         onRowClick={(c) => navigate(`/admin/classifications/${c.id}`)}
-        selectable
         pageSize={10}
         emptyIcon={<MdGroups />}
         emptyTitle="No classifications found"
