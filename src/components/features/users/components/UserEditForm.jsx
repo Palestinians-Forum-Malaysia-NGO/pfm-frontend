@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { MdArrowBack, MdVerified, MdEdit, MdPerson } from "react-icons/md";
-import PageHeader from "components/ui/PageHeader";
+import {
+  MdArrowBack, MdVerified, MdEdit, MdPerson,
+  MdBusiness, MdAccountBalance, MdAttachMoney,
+} from "react-icons/md";
+import PageHeader  from "components/ui/PageHeader";
 import { InputField, SelectField, ToggleInput, validate } from "components/form";
-import Button from "components/ui/buttons/Button";
-import FormHeader from "components/ui/form/FormHeader";
+import Button      from "components/ui/buttons/Button";
+import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
-import Loading from "components/loading/Loading";
+import Loading     from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
-import { ROLE_VALUES, ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG, ROLE_OPTIONS } from "components/features/users/constants/roles";
+import {
+  ROLE_VALUES, ROLE_LABELS,
+  ROLE_BADGE_BORDER as ROLE_BADGE,
+  ROLE_AVATAR_GRADIENT as AVATAR_BG,
+  ROLE_OPTIONS,
+} from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
+
+const PAYMENT_FREQUENCY_OPTIONS = [
+  { value: "monthly",   label: "Monthly" },
+  { value: "weekly",    label: "Weekly" },
+  { value: "bi-weekly", label: "Bi-Weekly" },
+  { value: "annually",  label: "Annually" },
+];
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -19,29 +34,51 @@ const RULES = {
   email:     [{ required: true, message: "Email is required" }, { email: true }],
 };
 
+const EMPTY = {
+  full_name: "", email: "", phone_number: "",
+  role: ROLE_VALUES.STAFF, is_active: true,
+  department: "", job_title: "", branch: "", joining_date: "",
+  banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
+  financial_information: { job_title: "", salary: "", payment_frequency: "" },
+};
+
 export default function UserEditForm() {
   const { id }   = useParams();
   const navigate = useNavigate();
 
-  const { user, execute: fetchUser, loading, error: loadError } = useGetUser();
+  const { execute: fetchUser, loading, error: loadError } = useGetUser();
   const { execute: updateUser, loading: saving, error: saveError } = useUpdateUser();
   const { success, error: toastError } = useToast();
 
-  const [formData, setFormData] = useState({
-    full_name: "", email: "", phone_number: "",
-    role: ROLE_VALUES.STAFF, is_active: true,
-  });
-  const [initial, setInitial] = useState(null);
-  const [errors, setErrors]   = useState({});
+  const [formData, setFormData] = useState(EMPTY);
+  const [initial, setInitial]   = useState(null);
+  const [errors, setErrors]     = useState({});
 
-  const updateFormData = (field, value) => setFormData((p) => ({ ...p, [field]: value }));
+  const updateFormData = (field, value) => {
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setFormData((p) => ({ ...p, [parent]: { ...p[parent], [child]: value } }));
+    } else {
+      setFormData((p) => ({ ...p, [field]: value }));
+    }
+  };
 
   const isDirty = !initial || (
     formData.full_name    !== initial.full_name    ||
     formData.email        !== initial.email        ||
     formData.phone_number !== initial.phone_number ||
     formData.role         !== initial.role         ||
-    formData.is_active    !== initial.is_active
+    formData.is_active    !== initial.is_active    ||
+    formData.department   !== initial.department   ||
+    formData.job_title    !== initial.job_title    ||
+    formData.branch       !== initial.branch       ||
+    formData.joining_date !== initial.joining_date ||
+    formData.banking_information.bank_name           !== initial.banking_information.bank_name           ||
+    formData.banking_information.account_number      !== initial.banking_information.account_number      ||
+    formData.banking_information.account_holder_name !== initial.banking_information.account_holder_name ||
+    formData.financial_information.job_title         !== initial.financial_information.job_title         ||
+    formData.financial_information.salary            !== initial.financial_information.salary            ||
+    formData.financial_information.payment_frequency !== initial.financial_information.payment_frequency
   );
 
   useEffect(() => {
@@ -53,6 +90,20 @@ export default function UserEditForm() {
         phone_number: data.phone_number ?? "",
         role:         data.role         ?? ROLE_VALUES.STAFF,
         is_active:    data.is_active    ?? true,
+        department:   data.department   ?? "",
+        job_title:    data.job_title    ?? "",
+        branch:       data.branch       ?? "",
+        joining_date: data.joining_date ?? "",
+        banking_information: {
+          bank_name:           data.banking_information?.bank_name           ?? "",
+          account_number:      data.banking_information?.account_number      ?? "",
+          account_holder_name: data.banking_information?.account_holder_name ?? "",
+        },
+        financial_information: {
+          job_title:         data.financial_information?.job_title         ?? "",
+          salary:            data.financial_information?.salary            ?? "",
+          payment_frequency: data.financial_information?.payment_frequency ?? "",
+        },
       };
       setFormData(snapshot);
       setInitial(snapshot);
@@ -68,14 +119,33 @@ export default function UserEditForm() {
     });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
     setErrors({});
+
+    const bi = formData.banking_information;
+    const fi = formData.financial_information;
+
+    const payload = {
+      full_name:    formData.full_name,
+      email:        formData.email,
+      phone_number: formData.phone_number  || undefined,
+      role:         formData.role,
+      is_active:    formData.is_active,
+      department:   formData.department    || undefined,
+      job_title:    formData.job_title     || undefined,
+      branch:       formData.branch        || undefined,
+      joining_date: formData.joining_date  || undefined,
+      banking_information: {
+        bank_name:           bi.bank_name           || undefined,
+        account_number:      bi.account_number      || undefined,
+        account_holder_name: bi.account_holder_name || undefined,
+      },
+      financial_information: {
+        job_title:         fi.job_title         || undefined,
+        salary:            fi.salary            || undefined,
+        payment_frequency: fi.payment_frequency || undefined,
+      },
+    };
+
     try {
-      const payload = {
-        full_name:    formData.full_name,
-        email:        formData.email,
-        phone_number: formData.phone_number,
-        role:         formData.role,
-        is_active:    formData.is_active,
-      };
       await updateUser(id, payload);
       success("User updated", `${formData.full_name} has been updated successfully.`);
       navigate(`/admin/users/${id}`);
@@ -129,70 +199,122 @@ export default function UserEditForm() {
         </div>
       </div>
 
-      {/* ── Edit form ── */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Edit Details" subtitle="Update account information and permissions" />
+      <AlertBanner message={saveError} />
 
-        <AlertBanner message={saveError} />
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-        <form onSubmit={handleSubmit} noValidate>
+        {/* ── Account Details ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials and role assignment" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Full Name"
-              field="full_name"
-              placeholder="John Doe"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              rules={RULES.full_name}
+              label="Full Name" field="full_name" placeholder="John Doe"
+              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
             />
             <InputField
-              label="Email Address"
-              field="email"
-              type="email"
-              placeholder="john@example.com"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              rules={RULES.email}
+              label="Email Address" field="email" type="email" placeholder="john@example.com"
+              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Phone Number"
-              field="phone_number"
-              type="tel"
-              placeholder="+60 12-345 6789"
+              label="Phone Number" field="phone_number" type="tel" placeholder="+60 12-345 6789"
               required={false}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
+              formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <SelectField
-              label="Role"
-              field="role"
-              options={ROLE_OPTIONS}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
+              label="Role" field="role" options={ROLE_OPTIONS}
+              formData={formData} errors={errors} updateFormData={updateFormData}
               rules={[{ required: true, message: "Role is required" }]}
             />
           </div>
           <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
+        </div>
 
-          <div className="mt-4 flex gap-3">
-            <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/users/${id}`)} className="flex-1" />
-            <Button
-              type="submit"
-              variant="primary"
-              text="Save Changes"
-              loading={saving}
-              disabled={!formData.full_name.trim() || !formData.email.trim() || !isDirty || saving}
-              className="flex-1"
+        {/* ── Employment Details ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title="Employment Details" subtitle="Department, branch, and position info (optional)" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label="Department" field="department" placeholder="e.g. Operations"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+            <InputField
+              label="Job Title" field="job_title" placeholder="e.g. Project Manager"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
-        </form>
-      </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label="Branch" field="branch" placeholder="e.g. Kuala Lumpur"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+            <InputField
+              label="Joining Date" field="joining_date" type="date"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+          </div>
+        </div>
+
+        {/* ── Banking Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details for payments (optional)" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label="Bank Name" field="banking_information.bank_name" placeholder="e.g. Maybank"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+            <InputField
+              label="Account Holder Name" field="banking_information.account_holder_name" placeholder="As per bank records"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+          </div>
+          <InputField
+            label="Account Number" field="banking_information.account_number" placeholder="e.g. 1234567890"
+            required={false}
+            formData={formData} errors={errors} updateFormData={updateFormData}
+          />
+        </div>
+
+        {/* ── Financial Information ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details (optional)" />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label="Job Title" field="financial_information.job_title" placeholder="e.g. Senior Officer"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+            <InputField
+              label="Salary" field="financial_information.salary" placeholder="e.g. 3500.00"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+          </div>
+          <SelectField
+            label="Payment Frequency" field="financial_information.payment_frequency"
+            options={PAYMENT_FREQUENCY_OPTIONS}
+            required={false}
+            formData={formData} errors={errors} updateFormData={updateFormData}
+          />
+        </div>
+
+        <div className="flex gap-3">
+          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/users/${id}`)} className="flex-1" />
+          <Button
+            type="submit" variant="primary" text="Save Changes"
+            loading={saving}
+            disabled={!formData.full_name.trim() || !formData.email.trim() || !isDirty || saving}
+            className="flex-1"
+          />
+        </div>
+      </form>
     </div>
   );
 }
