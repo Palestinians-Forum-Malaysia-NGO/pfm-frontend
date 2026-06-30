@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider }    from "components/features/auth/context/AuthContext";
 import { ToastProvider }  from "components/ui/toast/ToastContext";
 import ProtectedRoute      from "components/features/auth/components/ProtectedRoute";
@@ -9,13 +9,23 @@ import BeneficiaryLayout   from "layouts/beneficiary";
 import AuthLayout          from "layouts/auth";
 import PublicLayout        from "layouts/public";
 
+const RedirectToAuth = ({ to }) => {
+  const { search } = useLocation();
+  return <Navigate to={`${to}${search}`} replace />;
+};
+
 const App = () => (
   <ToastProvider>
   <AuthProvider>
     <Routes>
       {/* Public — no auth required */}
       <Route path="auth/*" element={<AuthLayout />} />
-      <Route path="/*"     element={<PublicLayout />} />
+
+      {/* Deep-link redirects from API emails → auth pages */}
+      <Route path="reset-password"  element={<RedirectToAuth to="/auth/reset-password" />} />
+      <Route path="set-password"    element={<RedirectToAuth to="/auth/reset-password" />} />
+
+      <Route path="/*" element={<PublicLayout />} />
 
       {/* Protected by role */}
       <Route
