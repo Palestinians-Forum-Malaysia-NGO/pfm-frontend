@@ -15,7 +15,6 @@ import {
   ROLE_VALUES, ROLE_LABELS,
   ROLE_BADGE_BORDER as ROLE_BADGE,
   ROLE_AVATAR_GRADIENT as AVATAR_BG,
-  ROLE_OPTIONS,
 } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -36,7 +35,7 @@ const RULES = {
 
 const EMPTY = {
   full_name: "", email: "", phone_number: "",
-  role: ROLE_VALUES.STAFF, is_active: true,
+  role: ROLE_VALUES.ADMIN, is_active: true,
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
@@ -67,7 +66,6 @@ export default function UserEditForm() {
     formData.full_name    !== initial.full_name    ||
     formData.email        !== initial.email        ||
     formData.phone_number !== initial.phone_number ||
-    formData.role         !== initial.role         ||
     formData.is_active    !== initial.is_active    ||
     formData.department   !== initial.department   ||
     formData.job_title    !== initial.job_title    ||
@@ -88,7 +86,7 @@ export default function UserEditForm() {
         full_name:    data.full_name    ?? "",
         email:        data.email        ?? "",
         phone_number: data.phone_number ?? "",
-        role:         data.role         ?? ROLE_VALUES.STAFF,
+        role:         ROLE_VALUES.ADMIN,
         is_active:    data.is_active    ?? true,
         department:   data.department   ?? "",
         job_title:    data.job_title    ?? "",
@@ -162,8 +160,8 @@ export default function UserEditForm() {
 
       <PageHeader
         icon={<MdEdit className="h-5 w-5" />}
-        title="Edit User"
-        subtitle={formData.full_name || "Update account details"}
+        title="Edit Admin"
+        subtitle={formData.full_name || "Update admin account details"}
         actions={
           <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to User" onClick={() => navigate(`/admin/users/${id}`)} />
         }
@@ -205,7 +203,7 @@ export default function UserEditForm() {
 
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials and role assignment" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials for this admin account" />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label="Full Name" field="full_name" placeholder="John Doe"
@@ -222,13 +220,8 @@ export default function UserEditForm() {
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
-            <SelectField
-              label="Role" field="role" options={ROLE_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateFormData}
-              rules={[{ required: true, message: "Role is required" }]}
-            />
+            <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
-          <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
         </div>
 
         {/* ── Employment Details ── */}

@@ -11,7 +11,7 @@ const useGetUsers = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await userService.getAll();
+      const data = await userService.getAll({ role: "admin" });
       setUsers(data.results ?? []);
     } catch (err) {
       const msg = extractError(err, "Failed to load users.");

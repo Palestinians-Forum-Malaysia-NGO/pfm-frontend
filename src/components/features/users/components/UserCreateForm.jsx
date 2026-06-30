@@ -10,7 +10,6 @@ import Button       from "components/ui/buttons/Button";
 import FormHeader   from "components/ui/form/FormHeader";
 import AlertBanner  from "components/ui/AlertBanner";
 import { useCreateUser } from "components/features/users/hooks";
-import { ROLE_OPTIONS } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const PAYMENT_FREQUENCY_OPTIONS = [
@@ -23,11 +22,10 @@ const PAYMENT_FREQUENCY_OPTIONS = [
 const RULES = {
   full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
   email:     [{ required: true, message: "Email is required" }, { email: true }],
-  role:      [{ required: true, message: "Role is required" }],
 };
 
 const EMPTY = {
-  full_name: "", email: "", phone_number: "", role: "",
+  full_name: "", email: "", phone_number: "", role: "admin",
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
@@ -50,7 +48,7 @@ export default function UserCreateForm() {
     }
   };
 
-  const canSubmit = formData.full_name.trim() && formData.email.trim() && formData.role;
+  const canSubmit = formData.full_name.trim() && formData.email.trim();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,8 +101,8 @@ export default function UserCreateForm() {
 
       <PageHeader
         icon={<MdPersonAdd className="h-5 w-5" />}
-        title="Add User"
-        subtitle="Create a new portal account"
+        title="Add Admin"
+        subtitle="Create a new admin account"
         actions={
           <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Users" onClick={() => navigate("/admin/users")} />
         }
@@ -116,7 +114,7 @@ export default function UserCreateForm() {
 
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials and role assignment" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials for the new admin account" />
           <AlertBanner variant="info" message="After the account is created, an activation email with a one-time password (OTP) will be sent to the user's email address." />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
@@ -128,17 +126,11 @@ export default function UserCreateForm() {
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
             />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField
-              label="Phone Number" field="phone_number" type="tel" placeholder="+60 12-345 6789"
-              required={false}
-              formData={formData} errors={errors} updateFormData={updateFormData}
-            />
-            <SelectField
-              label="Role" field="role" options={ROLE_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.role}
-            />
-          </div>
+          <InputField
+            label="Phone Number" field="phone_number" type="tel" placeholder="+60 12-345 6789"
+            required={false}
+            formData={formData} errors={errors} updateFormData={updateFormData}
+          />
         </div>
 
         {/* ── Employment Details ── */}
@@ -225,6 +217,7 @@ export default function UserCreateForm() {
             className="flex-1"
           />
         </div>
+
       </form>
     </div>
   );
