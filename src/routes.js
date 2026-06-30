@@ -5,7 +5,8 @@ import MainDashboard from "views/admin/default";
 import UsersPage from "views/admin/users";
 import StaffPage from "views/admin/staff";
 import BeneficiariesPage from "views/admin/beneficiaries";
-import CategoriesPage from "views/admin/categories";
+import CategoriesPage        from "views/admin/categories";
+import ClassificationsPage   from "views/admin/classifications";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -45,6 +46,7 @@ import {
   MdBadge,
   MdCategory,
   MdFolderSpecial,
+  MdGroups,
 } from "react-icons/md";
 
 const routes = [
@@ -150,6 +152,19 @@ const routes = [
   },
 
   // ── SYSTEM ───────────────────────────────────────────────────────────────────
+  {
+    name: "Classifications",
+    layout: "/admin",
+    path: "classifications",
+    icon: <MdGroups className="h-5 w-5" />,
+    component: <ClassificationsPage />,
+    section: "SYSTEM",
+    roles: ["admin"],
+    children: [
+      { name: "All Classifications", path: "classifications" },
+      { name: "Add Classification",  path: "classifications/create" },
+    ],
+  },
   {
     name: "Categories",
     layout: "/admin",
