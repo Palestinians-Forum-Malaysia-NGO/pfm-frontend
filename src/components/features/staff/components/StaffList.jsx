@@ -12,7 +12,7 @@ import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
-import DataTable from "components/ui/DataTable";
+import SimpleDataTable from "components/ui/SimpleDataTable";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -151,19 +151,19 @@ export default function StaffList() {
         )}
       </div>
 
-      <DataTable
+      <SimpleDataTable
         columns={columns}
         data={staffs}
         loading={loading}
         error={error}
         onRowClick={(s) => navigate(`/admin/staff/${s.id}`)}
-        selectable
         pageSize={8}
         emptyIcon={<MdBadge />}
         emptyTitle="No staff members found"
         emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first staff member to get started."}
         emptyAction={!hasFilters ? { label: "Add Staff", onClick: () => navigate("/admin/staff/create") } : undefined}
       />
+
 
       <StaffDeleteModal
         open={!!toDelete}

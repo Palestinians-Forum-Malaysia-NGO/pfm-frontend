@@ -4,15 +4,16 @@ import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdBadge,
   MdEmail, MdPhone, MdShield, MdVerified, MdCalendarToday,
   MdWork, MdDomain, MdAccountBox, MdLocationCity, MdUpdate,
+  MdAccountBalance, MdAttachMoney, MdPerson, MdFingerprint, MdWarning,
 } from "react-icons/md";
-import Button from "components/ui/buttons/Button";
-import PageHeader from "components/ui/PageHeader";
-import FormHeader from "components/ui/form/FormHeader";
-import InfoRow from "components/ui/InfoRow";
-import AlertBanner from "components/ui/AlertBanner";
+import Button        from "components/ui/buttons/Button";
+import PageHeader    from "components/ui/PageHeader";
+import FormHeader    from "components/ui/form/FormHeader";
+import InfoRow       from "components/ui/InfoRow";
+import AlertBanner   from "components/ui/AlertBanner";
 import StaffDeleteModal from "./StaffDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
-import Loading from "components/loading/Loading";
+import Loading       from "components/loading/Loading";
 import { useGetStaff, useDeleteStaff } from "components/features/staff/hooks";
 import { ROLE_LABELS, ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -22,6 +23,11 @@ const getInitials = (name = "") =>
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
+
+const fmtFrequency = (f) => {
+  const map = { monthly: "Monthly", weekly: "Weekly", "bi-weekly": "Bi-Weekly", annually: "Annually" };
+  return map[f] ?? f ?? "—";
+};
 
 export default function StaffDetailView() {
   const { id }   = useParams();
@@ -48,7 +54,11 @@ export default function StaffDetailView() {
   if (error)   return <AlertBanner message={error} />;
   if (!staff)  return null;
 
-  const u = staff.user ?? {};
+  const u  = staff.user ?? {};
+  const bi = u.banking_information  ?? {};
+  const fi = u.financial_information ?? {};
+  const hasBanking  = bi.bank_name || bi.account_number || bi.account_holder_name;
+  const hasFinancial = fi.job_title || fi.salary || fi.payment_frequency;
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -82,25 +92,36 @@ export default function StaffDetailView() {
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
             <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[u.role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
-              {getInitials(u.full_name)}
+              {u.profile_photo
+                ? <img src={u.profile_photo} alt={u.full_name} className="h-full w-full rounded-2xl object-cover" />
+                : getInitials(u.full_name)
+              }
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ROLE_BADGE[u.role] ?? "bg-blue-50 text-blue-600 border-blue-100"}`}>
               <MdVerified className="h-3.5 w-3.5" />
-              {ROLE_LABELS[u.role] ?? u.role}
+              {ROLE_LABELS[u.role] ?? "Staff"}
             </span>
           </div>
           <h2 className="text-xl font-bold text-slate-900">{u.full_name}</h2>
           <p className="mt-0.5 text-sm text-slate-400">{u.email}</p>
           {staff.position && (
-            <p className="mt-0.5 text-sm font-medium text-slate-600">{staff.position}{staff.department ? ` · ${staff.department}` : ""}</p>
+            <p className="mt-0.5 text-sm font-medium text-slate-600">
+              {staff.position}{staff.department ? ` · ${staff.department}` : ""}
+            </p>
           )}
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
               u.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
             }`}>
               <span className={`h-1.5 w-1.5 rounded-full ${u.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
               {u.is_active ? "Active" : "Inactive"}
             </span>
+            {u.password_reset_required && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
+                <MdWarning className="h-3.5 w-3.5" />
+                Password Reset Required
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -111,8 +132,9 @@ export default function StaffDetailView() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdEmail className="h-4 w-4" />}         label="Email"           value={u.email} />
           <InfoRow icon={<MdPhone className="h-4 w-4" />}         label="Phone"           value={u.phone_number || "—"} />
-          <InfoRow icon={<MdShield className="h-4 w-4" />}        label="Role"            value={ROLE_LABELS[u.role] ?? u.role} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Account created" value={fmtDate(u.created_at)} />
+          <InfoRow icon={<MdShield className="h-4 w-4" />}        label="Role"            value={ROLE_LABELS[u.role] ?? "Staff"} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Account Created" value={fmtDate(u.created_at)} />
+          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Last Updated"    value={fmtDate(u.updated_at)} />
         </div>
       </div>
 
@@ -125,9 +147,32 @@ export default function StaffDetailView() {
           <InfoRow icon={<MdWork className="h-4 w-4" />}          label="Position"     value={staff.position || "—"} />
           <InfoRow icon={<MdLocationCity className="h-4 w-4" />}  label="Branch"       value={staff.branch || "—"} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Joining Date" value={fmtDate(staff.joining_date)} />
-          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Last Updated" value={fmtDate(staff.updated_at)} />
         </div>
       </div>
+
+      {/* ── Banking Information ── */}
+      {hasBanking && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {bi.bank_name           && <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"      value={bi.bank_name} />}
+            {bi.account_holder_name && <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder" value={bi.account_holder_name} />}
+            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label="Account No."    value={bi.account_number} />}
+          </div>
+        </div>
+      )}
+
+      {/* ── Financial Information ── */}
+      {hasFinancial && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {fi.job_title         && <InfoRow icon={<MdWork className="h-4 w-4" />}          label="Job Title"      value={fi.job_title} />}
+            {fi.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}   label="Salary"         value={`MYR ${fi.salary}`} />}
+            {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Pay Frequency"  value={fmtFrequency(fi.payment_frequency)} />}
+          </div>
+        </div>
+      )}
 
       <StaffDeleteModal
         open={deleteOpen}
