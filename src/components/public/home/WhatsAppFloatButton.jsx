@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaWhatsapp } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 
 const WhatsAppFloatButton = ({ phone = "60123456789", message = "Hi PFM, I'd like to know more about your work!" }) => {
+  const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
@@ -16,8 +18,8 @@ const WhatsAppFloatButton = ({ phone = "60123456789", message = "Hi PFM, I'd lik
             <FaWhatsapp size={18} />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-bold text-slate-900">Chat with PFM</p>
-            <p className="text-[11px] text-slate-400">Typically replies within an hour</p>
+            <p className="text-xs font-bold text-slate-900">{t("home.chat_with_pfm")}</p>
+            <p className="text-[11px] text-slate-400">{t("home.whatsapp_reply")}</p>
           </div>
           <button
             onClick={() => setShowTooltip(false)}

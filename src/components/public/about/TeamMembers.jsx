@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MdLinkedIn, MdEmail } from "react-icons/md";
 import useInView from "hooks/useInView";
 
@@ -12,6 +13,7 @@ const TEAM = [
 ];
 
 const TeamMembers = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -22,8 +24,8 @@ const TeamMembers = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">The People Behind PFM</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">Our Leadership Team</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.team_label")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("about.team_title")}</h2>
         </div>
 
         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">

@@ -1,15 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MdEvent, MdLocationOn, MdArrowForward } from "react-icons/md";
+import { useTranslation } from "react-i18next";
+import { MdLocationOn, MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 
 const EVENTS = [
-  { date: { day: "15", month: "Jul" }, title: "Palestine Solidarity March KL", location: "Dataran Merdeka, KL", type: "March", color: "bg-red-50 text-red-500 border-red-100" },
-  { date: { day: "22", month: "Jul" }, title: "Fundraising Gala Dinner 2025",  location: "Grand Ballroom, KL", type: "Fundraiser", color: "bg-green/10 text-green border-green/20" },
-  { date: { day: "05", month: "Aug" }, title: "Youth Leadership Workshop",     location: "PFM Community Centre",type: "Workshop", color: "bg-blue-50 text-blue-600 border-blue-100" },
+  { date: { day: "15", month: "Jul" }, title: "Palestine Solidarity March KL", location: "Dataran Merdeka, KL",    type: "March",      color: "bg-red-50 text-red-500 border-red-100" },
+  { date: { day: "22", month: "Jul" }, title: "Fundraising Gala Dinner 2025",  location: "Grand Ballroom, KL",    type: "Fundraiser", color: "bg-green/10 text-green border-green/20" },
+  { date: { day: "05", month: "Aug" }, title: "Youth Leadership Workshop",     location: "PFM Community Centre",  type: "Workshop",   color: "bg-blue-50 text-blue-600 border-blue-100" },
 ];
 
 const UpcomingEvents = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -20,11 +22,11 @@ const UpcomingEvents = () => {
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-green">Calendar</span>
-            <h2 className="mt-2 text-4xl font-extrabold text-slate-900">Upcoming Events</h2>
+            <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.calendar")}</span>
+            <h2 className="mt-2 text-4xl font-extrabold text-slate-900">{t("home.upcoming_events")}</h2>
           </div>
           <Link to="/events" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green transition-colors hover:text-[#005a2c]">
-            All events <MdArrowForward className="h-4 w-4" />
+            {t("home.all_events")} <MdArrowForward className="h-4 w-4" />
           </Link>
         </div>
 

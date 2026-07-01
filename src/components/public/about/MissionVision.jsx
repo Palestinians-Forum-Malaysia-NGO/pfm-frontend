@@ -1,10 +1,12 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import useInView from "hooks/useInView";
 import storyImg from "assets/img/layout/ngo-bg-2.jpg";
 
 const MissionVision = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
   const show = (delay = 0) => ({
     opacity: inView ? 1 : 0,
@@ -24,16 +26,12 @@ const MissionVision = () => {
             </div>
           </div>
           <div style={show(150)}>
-            <span className="text-xs font-bold uppercase tracking-widest text-green">Our Story</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.our_story")}</span>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight text-slate-900">
-              Born from Solidarity,<br />Driven by Purpose
+              {t("about.story_title")}<br />{t("about.story_title2")}
             </h2>
-            <p className="mt-5 text-base leading-relaxed text-slate-500">
-              Palestinian Forum Malaysia was founded by Palestinians and Malaysian supporters who needed an organized, credible voice for Palestine in Malaysia.
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-slate-500">
-              What started as informal gatherings has grown into a structured organization running campaigns, hosting events, and channelling aid directly to Palestinians in need.
-            </p>
+            <p className="mt-5 text-base leading-relaxed text-slate-500">{t("about.story_body1")}</p>
+            <p className="mt-4 text-base leading-relaxed text-slate-500">{t("about.story_body2")}</p>
           </div>
         </div>
 
@@ -46,10 +44,8 @@ const MissionVision = () => {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/15 text-green">
               <FaHandHoldingHeart className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Our Mission</h3>
-            <p className="leading-relaxed text-slate-500">
-              To unite Palestinians and supporters in Malaysia, advocate for Palestinian rights, deliver humanitarian aid, and raise awareness through community action.
-            </p>
+            <h3 className="text-2xl font-black text-slate-900">{t("about.mission_label")}</h3>
+            <p className="leading-relaxed text-slate-500">{t("about.mission_body")}</p>
           </div>
           <div
             className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-8"
@@ -58,10 +54,8 @@ const MissionVision = () => {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10 text-green">
               <MdArrowForward className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Our Vision</h3>
-            <p className="leading-relaxed text-slate-500">
-              A free, just Palestine — and a Malaysian community that stands proudly with the Palestinian people, informed, organized, and ready to act with compassion and strength.
-            </p>
+            <h3 className="text-2xl font-black text-slate-900">{t("about.vision_label")}</h3>
+            <p className="leading-relaxed text-slate-500">{t("about.vision_body")}</p>
           </div>
         </div>
 

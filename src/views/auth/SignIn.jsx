@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdEmail, MdArrowBack } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
@@ -15,7 +16,8 @@ const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password m
    Step 1 — Email + Password
 ────────────────────────────────────────────── */
 const LoginStep = ({ onOtpRequired }) => {
-  const { completeLogin }                        = useAuth();
+  const { t }                                         = useTranslation();
+  const { completeLogin }                             = useAuth();
   const { execute: login, loading, error: loginError } = useLogin();
   const [formData, setFormData]         = useState({ email: "", password: "" });
   const [errors, setErrors]             = useState({});
@@ -51,23 +53,23 @@ const LoginStep = ({ onOtpRequired }) => {
     <>
       <div className="mb-7">
         <span className="inline-block rounded-full bg-green/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-green">
-          Portal Access
+          {t("auth.portal_access")}
         </span>
-        <h1 className="mt-3 text-2xl font-bold text-navy-700">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-400">Sign in to your PFM account to continue.</p>
+        <h1 className="mt-3 text-2xl font-bold text-navy-700">{t("auth.welcome_back")}</h1>
+        <p className="mt-1 text-sm text-slate-400">{t("auth.sign_in_subtitle")}</p>
       </div>
 
       <AlertBanner message={loginError} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
         <InputField
-          label="Email address" field="email" type="email"
+          label={t("auth.email_address")} field="email" type="email"
           placeholder="you@example.com"
           formData={formData} errors={errors}
           updateFormData={updateFormData} rules={EMAIL_RULES}
         />
         <PasswordField
-          label="Password" field="password"
+          label={t("auth.password")} field="password"
           placeholder="Enter your password"
           formData={formData} errors={errors}
           updateFormData={updateFormData} rules={PASSWORD_RULES}
@@ -76,10 +78,10 @@ const LoginStep = ({ onOtpRequired }) => {
         <div className="mb-5 flex items-center justify-between">
           <label className="flex cursor-pointer items-center gap-2">
             <Checkbox color="green" checked={keepLoggedIn} onChange={(e) => setKeepLoggedIn(e.target.checked)} extra="cursor-pointer" />
-            <span className="text-sm text-slate-600">Remember me</span>
+            <span className="text-sm text-slate-600">{t("auth.remember_me")}</span>
           </label>
           <a href="/auth/forgot-password" className="text-sm font-medium text-green transition-colors duration-200 hover:text-[#006833]">
-            Forgot password?
+            {t("auth.forgot_password")}
           </a>
         </div>
 
@@ -90,18 +92,18 @@ const LoginStep = ({ onOtpRequired }) => {
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : "Sign In"
+            : t("auth.sign_in")
           }
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">
-        Don't have an account?{" "}
+        {t("auth.no_account")}{" "}
         <Link to="/register" className="font-medium text-green transition-colors duration-200 hover:text-green-600">
-          Create one
+          {t("auth.create_one")}
         </Link>
       </p>
-      
+
     </>
   );
 };
@@ -110,7 +112,8 @@ const LoginStep = ({ onOtpRequired }) => {
    Step 2 — OTP Verification
 ────────────────────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
-  const { completeLogin }                                    = useAuth();
+  const { t }                                               = useTranslation();
+  const { completeLogin }                                   = useAuth();
   const { execute: verifyOtp, loading, error: otpError }    = useVerifyOtp();
   const { execute: resendOtp, loading: resending }          = useResendOtp();
   const [code, setCode]   = useState("");
@@ -144,26 +147,27 @@ const OtpStep = ({ email, channel, onBack }) => {
     <>
       <div className="mb-7">
         <button onClick={onBack} className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700">
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("auth.back")}
         </button>
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10">
           <MdEmail className="h-6 w-6 text-green" />
         </div>
-        <h1 className="mt-4 text-2xl font-bold text-navy-700">Verify your identity</h1>
+        <h1 className="mt-4 text-2xl font-bold text-navy-700">{t("auth.verify_identity")}</h1>
         <p className="mt-1 text-sm text-slate-400">
-          We sent a 6-digit code via{" "}
-          <span className="font-semibold text-slate-600">{channel}</span> to{" "}
+          {t("auth.otp_sent_via")}{" "}
+          <span className="font-semibold text-slate-600">{channel}</span>{" "}
+          {t("auth.otp_sent_to")}{" "}
           <span className="font-semibold text-slate-600">{email}</span>
         </p>
       </div>
 
       <AlertBanner message={otpError} />
-      {resent && <AlertBanner message="A new code has been sent." variant="success" />}
+      {resent && <AlertBanner message={t("auth.new_link_sent")} variant="success" />}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-slate-700">
-            6-Digit Code
+            {t("auth.six_digit_code")}
           </label>
           <input
             type="text"
@@ -176,7 +180,7 @@ const OtpStep = ({ email, channel, onBack }) => {
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-2xl font-bold tracking-[0.6em] text-slate-900 outline-none transition-all duration-200 focus:border-green focus:bg-white placeholder:tracking-normal placeholder:text-base placeholder:font-normal"
           />
           <p className="mt-1.5 text-center text-xs text-slate-400">
-            {code.length}/6 digits entered
+            {code.length}/6 {t("auth.digits_entered")}
           </p>
         </div>
 
@@ -187,19 +191,19 @@ const OtpStep = ({ email, channel, onBack }) => {
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : "Verify & Sign In"
+            : t("auth.verify_sign_in")
           }
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">
-        Didn't receive it?{" "}
+        {t("auth.didnt_receive")}{" "}
         <button
           onClick={handleResend}
           disabled={resending}
           className="font-medium text-green transition-colors hover:text-[#006833] disabled:opacity-50"
         >
-          {resending ? "Sending..." : "Resend OTP"}
+          {resending ? t("auth.sending") : t("auth.resend_otp")}
         </button>
       </p>
     </>

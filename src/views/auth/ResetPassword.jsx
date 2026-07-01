@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdLockReset, MdArrowBack, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
@@ -12,6 +13,7 @@ const PASSWORD_RULES = [
 ];
 
 export default function ResetPassword() {
+  const { t }                                       = useTranslation();
   const navigate                                    = useNavigate();
   const [searchParams]                              = useSearchParams();
   const urlToken                                    = searchParams.get("token") ?? "";
@@ -49,15 +51,13 @@ export default function ResetPassword() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green/10">
           <MdCheckCircle className="h-8 w-8 text-green" />
         </div>
-        <h1 className="mt-5 text-xl font-bold text-navy-700">Password reset!</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Your password has been updated. You can now sign in with your new password.
-        </p>
+        <h1 className="mt-5 text-xl font-bold text-navy-700">{t("auth.reset_done_title")}</h1>
+        <p className="mt-2 text-sm text-slate-400">{t("auth.reset_done_body")}</p>
         <Link
           to="/auth/sign-in"
           className="mt-7 flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98]"
         >
-          Sign In
+          {t("auth.sign_in")}
         </Link>
       </div>
     );
@@ -71,15 +71,13 @@ export default function ResetPassword() {
           to="/auth/forgot-password"
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700"
         >
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("auth.back")}
         </Link>
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-green/10">
           <MdLockReset className="h-6 w-6 text-green" />
         </div>
-        <h1 className="mt-4 text-2xl font-bold text-navy-700">Reset password</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Paste the reset token from your email and choose a new password.
-        </p>
+        <h1 className="mt-4 text-2xl font-bold text-navy-700">{t("auth.reset_title")}</h1>
+        <p className="mt-1 text-sm text-slate-400">{t("auth.reset_subtitle")}</p>
       </div>
 
       <AlertBanner message={error} />
@@ -89,12 +87,12 @@ export default function ResetPassword() {
         {/* Token input — hidden if received via URL param */}
         {!urlToken && (
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">Reset Token</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("auth.reset_token")}</label>
             <input
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="Paste your reset token"
+              placeholder={t("auth.reset_token_placeholder")}
               className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 ${
                 errors.token
                   ? "border-red-300 bg-red-50"
@@ -106,8 +104,8 @@ export default function ResetPassword() {
         )}
 
         <PasswordField
-          label="New Password" field="password"
-          placeholder="Min. 8 characters"
+          label={t("auth.new_password")} field="password"
+          placeholder={t("auth.min_chars")}
           formData={formData} errors={errors}
           updateFormData={updateFormData} rules={PASSWORD_RULES}
         />
@@ -119,15 +117,15 @@ export default function ResetPassword() {
         >
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : "Reset Password"
+            : t("auth.reset_btn")
           }
         </button>
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-400">
-        Didn't get the email?{" "}
+        {t("auth.no_email")}{" "}
         <Link to="/auth/forgot-password" className="font-medium text-green transition-colors hover:text-[#006833]">
-          Try again
+          {t("auth.try_again")}
         </Link>
       </p>
     </div>

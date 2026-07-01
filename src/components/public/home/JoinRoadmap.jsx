@@ -1,16 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdHowToReg, MdVerified, MdGroups, MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const STEPS = [
-  { step: "01", icon: <MdHowToReg className="h-6 w-6" />,  title: "Register Online",   desc: "Fill in the simple membership form with your details. Takes less than 5 minutes." },
-  { step: "02", icon: <MdVerified className="h-6 w-6" />,  title: "Get Verified",      desc: "Our team reviews your application and approves your membership within 48 hours." },
-  { step: "03", icon: <MdGroups className="h-6 w-6" />,    title: "Join the Community",desc: "Access events, campaigns, and connect with the PFM community across Malaysia." },
-];
-
 const JoinRoadmap = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const STEPS = [
+    { step: "01", icon: <MdHowToReg className="h-6 w-6" />, title: t("home.step1_title"), desc: t("home.step1_desc") },
+    { step: "02", icon: <MdVerified className="h-6 w-6" />, title: t("home.step2_title"), desc: t("home.step2_desc") },
+    { step: "03", icon: <MdGroups className="h-6 w-6" />,   title: t("home.step3_title"), desc: t("home.step3_desc") },
+  ];
 
   return (
     <section ref={ref} className="bg-slate-50 py-20">
@@ -19,9 +21,9 @@ const JoinRoadmap = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">Get Started</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">How to Join PFM</h2>
-          <p className="mx-auto mt-3 max-w-md text-slate-400">Becoming a member is simple. Here's how to get started.</p>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.get_started")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("home.how_to_join")}</h2>
+          <p className="mx-auto mt-3 max-w-md text-slate-400">{t("home.join_subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -51,7 +53,7 @@ const JoinRoadmap = () => {
             to="/contact"
             className="inline-flex items-center gap-2 rounded-full bg-green px-8 py-3.5 text-sm font-bold text-white shadow-glow-green transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
           >
-            Apply for Membership <MdArrowForward className="h-4 w-4" />
+            {t("home.apply_membership")} <MdArrowForward className="h-4 w-4" />
           </Link>
         </div>
       </div>

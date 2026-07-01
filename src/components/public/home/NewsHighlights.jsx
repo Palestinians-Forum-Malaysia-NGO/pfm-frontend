@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 import img1 from "assets/img/layout/ngo-bg-7.jpg";
@@ -13,6 +14,7 @@ const NEWS = [
 ];
 
 const NewsHighlights = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -23,11 +25,11 @@ const NewsHighlights = () => {
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-green">Latest</span>
-            <h2 className="mt-2 text-4xl font-extrabold text-slate-900">News & Updates</h2>
+            <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.latest")}</span>
+            <h2 className="mt-2 text-4xl font-extrabold text-slate-900">{t("home.news_updates")}</h2>
           </div>
           <Link to="/news" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green transition-colors hover:text-[#005a2c]">
-            All news <MdArrowForward className="h-4 w-4" />
+            {t("home.all_news")} <MdArrowForward className="h-4 w-4" />
           </Link>
         </div>
 
@@ -48,7 +50,7 @@ const NewsHighlights = () => {
                 <p className="text-[11px] font-semibold text-slate-400">{n.date}</p>
                 <h3 className="text-sm font-bold leading-snug text-slate-900 group-hover:text-green transition-colors duration-200">{n.title}</h3>
                 <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-green">
-                  Read more <MdArrowForward className="h-3.5 w-3.5" />
+                  {t("home.read_more")} <MdArrowForward className="h-3.5 w-3.5" />
                 </span>
               </div>
             </article>

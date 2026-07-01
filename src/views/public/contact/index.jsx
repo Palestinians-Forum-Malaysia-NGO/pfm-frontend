@@ -1,35 +1,9 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MdEmail, MdPhone, MdLocationOn, MdSend, MdCheckCircle } from "react-icons/md";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
 
 import heroBg from "assets/img/layout/ngo-bg-2.jpg";
-
-const CONTACT_INFO = [
-  {
-    icon: <MdLocationOn className="h-5 w-5" />,
-    label: "Address",
-    value: "Kuala Lumpur, Malaysia",
-    sub: "Wilayah Persekutuan",
-  },
-  {
-    icon: <MdEmail className="h-5 w-5" />,
-    label: "Email",
-    value: "info@pfm.org.my",
-    href: "mailto:info@pfm.org.my",
-  },
-  {
-    icon: <MdPhone className="h-5 w-5" />,
-    label: "Phone",
-    value: "+60 12-345 6789",
-    href: "tel:+60123456789",
-  },
-  {
-    icon: <FaWhatsapp className="h-5 w-5" />,
-    label: "WhatsApp",
-    value: "+60 12-345 6789",
-    href: "https://wa.me/60123456789",
-  },
-];
 
 const SOCIALS = [
   { icon: <FaFacebook size={18} />,  href: "https://facebook.com/pfm",   label: "Facebook" },
@@ -39,9 +13,17 @@ const SOCIALS = [
 ];
 
 export default function Contact() {
-  const [form, setForm]         = useState({ name: "", email: "", subject: "", message: "" });
+  const { t } = useTranslation();
+  const [form, setForm]           = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending]   = useState(false);
+  const [sending, setSending]     = useState(false);
+
+  const CONTACT_INFO = [
+    { icon: <MdLocationOn className="h-5 w-5" />, label: t("contact.address"), value: "Kuala Lumpur, Malaysia", sub: "Wilayah Persekutuan" },
+    { icon: <MdEmail className="h-5 w-5" />,      label: t("contact.email"),   value: "info@pfm.org.my",        href: "mailto:info@pfm.org.my" },
+    { icon: <MdPhone className="h-5 w-5" />,      label: t("contact.phone"),   value: "+60 12-345 6789",        href: "tel:+60123456789" },
+    { icon: <FaWhatsapp className="h-5 w-5" />,   label: t("contact.whatsapp"),value: "+60 12-345 6789",        href: "https://wa.me/60123456789" },
+  ];
 
   const set = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
 
@@ -72,9 +54,9 @@ export default function Contact() {
         </div>
 
         <div className="relative z-10 text-center text-white px-6">
-          <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60">Get In Touch</span>
-          <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">Contact Us</h1>
-          <p className="mt-4 text-white/60 text-base">We'd love to hear from you — reach out anytime.</p>
+          <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60">{t("contact.how_to_reach")}</span>
+          <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">{t("contact.title")}</h1>
+          <p className="mt-4 text-white/60 text-base">{t("contact.subtitle")}</p>
         </div>
       </section>
 
@@ -85,11 +67,9 @@ export default function Contact() {
 
             {/* ── Left: Contact info ── */}
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-green">Contact Information</span>
-              <h2 className="mt-3 text-3xl font-extrabold text-slate-900">How to Reach Us</h2>
-              <p className="mt-4 text-slate-500 leading-relaxed">
-                Have a question, want to volunteer, or need help with a donation? Our team is here for you. Reach out through any of the channels below.
-              </p>
+              <span className="text-xs font-bold uppercase tracking-widest text-green">{t("contact.how_to_reach")}</span>
+              <h2 className="mt-3 text-3xl font-extrabold text-slate-900">{t("contact.how_to_reach")}</h2>
+              <p className="mt-4 text-slate-500 leading-relaxed">{t("contact.description")}</p>
 
               <div className="mt-8 flex flex-col gap-4">
                 {CONTACT_INFO.map((c) => (
@@ -115,7 +95,7 @@ export default function Contact() {
 
               {/* Socials */}
               <div className="mt-8">
-                <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Follow Us</p>
+                <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">{t("contact.follow_us")}</p>
                 <div className="flex items-center gap-2">
                   {SOCIALS.map(({ icon, href, label }) => (
                     <a key={label} href={href}
@@ -136,42 +116,40 @@ export default function Contact() {
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
                     <MdCheckCircle className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900">Message Sent!</h3>
-                  <p className="max-w-xs text-sm text-slate-400">
-                    Thank you for reaching out. Our team will get back to you within 24–48 hours.
-                  </p>
+                  <h3 className="text-xl font-bold text-slate-900">{t("contact.success_title")}</h3>
+                  <p className="max-w-xs text-sm text-slate-400">{t("contact.success_body")}</p>
                   <button
                     onClick={() => { setSubmitted(false); setForm({ name: "", email: "", subject: "", message: "" }); }}
                     className="mt-2 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
                   >
-                    Send another
+                    {t("contact.send_another")}
                   </button>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-xl font-bold text-slate-900">Send a Message</h3>
-                  <p className="mt-1 text-sm text-slate-400">We'll respond within 24–48 hours.</p>
+                  <h3 className="text-xl font-bold text-slate-900">{t("contact.send_message")}</h3>
+                  <p className="mt-1 text-sm text-slate-400">{t("contact.response_time")}</p>
 
                   <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">Full Name</label>
-                        <input value={form.name} onChange={set("name")} required placeholder="Ahmad Faris" className={inputCls} />
+                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.full_name")}</label>
+                        <input value={form.name} onChange={set("name")} required placeholder={t("contact.name_placeholder")} className={inputCls} />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">Email Address</label>
+                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.email_address")}</label>
                         <input value={form.email} onChange={set("email")} type="email" required placeholder="ahmad@email.com" className={inputCls} />
                       </div>
                     </div>
 
                     <div>
-                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">Subject</label>
-                      <input value={form.subject} onChange={set("subject")} required placeholder="How can we help?" className={inputCls} />
+                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.subject")}</label>
+                      <input value={form.subject} onChange={set("subject")} required placeholder={t("contact.subject_placeholder")} className={inputCls} />
                     </div>
 
                     <div>
-                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">Message</label>
-                      <textarea value={form.message} onChange={set("message")} required rows={5} placeholder="Write your message here..." className={`${inputCls} resize-none`} />
+                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.message")}</label>
+                      <textarea value={form.message} onChange={set("message")} required rows={5} placeholder={t("contact.message_placeholder")} className={`${inputCls} resize-none`} />
                     </div>
 
                     <button
@@ -184,7 +162,7 @@ export default function Contact() {
                       ) : (
                         <MdSend className="h-4 w-4" />
                       )}
-                      {sending ? "Sending..." : "Send Message"}
+                      {sending ? t("contact.sending") : t("contact.send")}
                     </button>
                   </form>
                 </>

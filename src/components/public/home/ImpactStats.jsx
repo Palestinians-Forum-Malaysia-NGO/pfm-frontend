@@ -1,16 +1,19 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MdFavorite, MdPeople, MdCampaign, MdEvent } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const STATS = [
-  { icon: <MdPeople className="h-6 w-6" />,   value: "500+",   label: "Community Members" },
-  { icon: <MdFavorite className="h-6 w-6" />, value: "RM 1M+", label: "Total Donations" },
-  { icon: <MdCampaign className="h-6 w-6" />, value: "30+",    label: "Campaigns Run" },
-  { icon: <MdEvent className="h-6 w-6" />,    value: "120+",   label: "Events Held" },
-];
-
 const ImpactStats = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const STATS = [
+    { icon: <MdPeople className="h-6 w-6" />,   value: "500+",   label: t("home.stat_members") },
+    { icon: <MdFavorite className="h-6 w-6" />, value: "RM 1M+", label: t("home.stat_donations") },
+    { icon: <MdCampaign className="h-6 w-6" />, value: "30+",    label: t("home.stat_campaigns") },
+    { icon: <MdEvent className="h-6 w-6" />,    value: "120+",   label: t("home.stat_events") },
+  ];
+
   return (
     <section ref={ref} className="bg-white py-14">
       <div className="mx-auto max-w-5xl px-6">

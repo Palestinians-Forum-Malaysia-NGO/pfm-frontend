@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useInView from "hooks/useInView";
 
 const TESTIMONIALS = [
@@ -26,6 +27,7 @@ const TESTIMONIALS = [
 ];
 
 const Testimonials = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -35,27 +37,27 @@ const Testimonials = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">Community Voices</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">What Our Members Say</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.community_voices")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("home.what_members_say")}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
+          {TESTIMONIALS.map((item, i) => (
             <div
-              key={t.name}
+              key={item.name}
               className="flex flex-col gap-5 rounded-3xl bg-white p-7 shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md"
               style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(28px)", transition: "all 0.7s ease-in-out", transitionDelay: `${i * 100}ms` }}
             >
               {/* Quote mark */}
               <span className="text-5xl font-black leading-none text-green/15">"</span>
-              <p className="text-sm leading-relaxed text-slate-600 -mt-6">{t.quote}</p>
+              <p className="text-sm leading-relaxed text-slate-600 -mt-6">{item.quote}</p>
               <div className="mt-auto flex items-center gap-3 border-t border-slate-100 pt-4">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${t.color}`}>
-                  {t.initials}
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${item.color}`}>
+                  {item.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900">{t.name}</p>
-                  <p className="text-[11px] text-slate-400">{t.role}</p>
+                  <p className="text-sm font-bold text-slate-900">{item.name}</p>
+                  <p className="text-[11px] text-slate-400">{item.role}</p>
                 </div>
               </div>
             </div>

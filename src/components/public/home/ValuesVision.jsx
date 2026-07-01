@@ -1,16 +1,18 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import { MdPeople, MdCampaign } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const PILLARS = [
-  { icon: <MdPeople className="h-7 w-7" />,          title: "Community",       desc: "Connecting Palestinians and supporters across Malaysia through shared values and solidarity." },
-  { icon: <MdCampaign className="h-7 w-7" />,        title: "Advocacy",        desc: "Raising awareness, championing justice, and amplifying the Palestinian voice in Malaysia." },
-  { icon: <FaHandHoldingHeart className="h-7 w-7" />,title: "Humanitarian Aid",desc: "Coordinating donations, relief efforts, and on-ground support for those who need it most." },
-];
-
 const ValuesVision = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const PILLARS = [
+    { icon: <MdPeople className="h-7 w-7" />,          title: t("home.pillar_community"),   desc: t("home.pillar_community_desc") },
+    { icon: <MdCampaign className="h-7 w-7" />,        title: t("home.pillar_advocacy"),    desc: t("home.pillar_advocacy_desc") },
+    { icon: <FaHandHoldingHeart className="h-7 w-7" />,title: t("home.pillar_humanitarian"),desc: t("home.pillar_humanitarian_desc") },
+  ];
 
   return (
     <section ref={ref} className="bg-white py-20">
@@ -19,10 +21,10 @@ const ValuesVision = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">Our Mission</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">What We Stand For</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.our_mission")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("home.what_we_stand_for")}</h2>
           <p className="mx-auto mt-4 max-w-lg text-base text-slate-400">
-            Everything we do is guided by our commitment to justice, community, and sustained action.
+            {t("home.values_subtitle")}
           </p>
         </div>
 

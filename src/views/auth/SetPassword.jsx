@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdMarkEmailRead, MdArrowForward } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import { useForgotPassword } from "components/features/auth/hooks";
 
 export default function SetPassword() {
+  const { t }            = useTranslation();
   const [searchParams]   = useSearchParams();
   const email            = searchParams.get("email") ?? "";
 
@@ -35,19 +37,21 @@ export default function SetPassword() {
         <MdMarkEmailRead className="h-8 w-8 text-green" />
       </div>
 
-      <h1 className="mt-5 text-xl font-bold text-navy-700">Check your email</h1>
+      <h1 className="mt-5 text-xl font-bold text-navy-700">{t("auth.set_title")}</h1>
 
       <p className="mt-2 text-sm text-slate-400">
-        We've sent a <span className="font-semibold text-slate-600">password setup link</span> to{" "}
-        <span className="font-semibold text-slate-700">{email || "your email address"}</span>.
-        Open the link to create your password and complete your account setup.
+        {t("auth.set_body1")}{" "}
+        <span className="font-semibold text-slate-600">{t("auth.set_body_link")}</span>{" "}
+        {t("auth.set_body2")}{" "}
+        <span className="font-semibold text-slate-700">{email || "your email address"}</span>.{" "}
+        {t("auth.set_body3")}
       </p>
 
       <AlertBanner message={error} />
 
       {resent && (
         <div className="mt-3 rounded-xl border border-green/20 bg-green/5 px-4 py-2.5 text-sm font-medium text-green">
-          A new link has been sent.
+          {t("auth.new_link_sent")}
         </div>
       )}
 
@@ -60,7 +64,7 @@ export default function SetPassword() {
           {loading ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
           ) : (
-            "Resend link"
+            t("auth.resend_link")
           )}
         </button>
 
@@ -68,12 +72,12 @@ export default function SetPassword() {
           to="/auth/sign-in"
           className="inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-green transition-colors hover:text-green-600"
         >
-          Back to sign in <MdArrowForward className="h-4 w-4" />
+          {t("auth.back_to_sign_in")} <MdArrowForward className="h-4 w-4" />
         </Link>
       </div>
 
       <p className="mt-6 text-xs text-slate-400">
-        Once you've set your password, sign in with your email and new password.
+        {t("auth.set_footer")}
       </p>
     </div>
   );
