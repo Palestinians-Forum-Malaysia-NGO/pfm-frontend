@@ -3,13 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdMenu, MdClose } from "react-icons/md";
 import logo          from "assets/brand/LOGO-wbg.png";
-import navLinks      from "./navLinks";
+import getNavLinks   from "./navLinks";
 import NavItem       from "./NavItem";
 import MobileNavItem from "./MobileNavItem";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const PublicNavbar = ({ links = navLinks }) => {
+const PublicNavbar = () => {
   const { t } = useTranslation();
+  const links = getNavLinks(t);
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
