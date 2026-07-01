@@ -34,14 +34,14 @@ const NewsletterSection = () => {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
-                <MdEmail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <MdEmail className="pointer-events-none absolute ltr:left-4 rtl:right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="your@email.com"
-                  className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
+                  className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 text-sm text-start text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
                 />
               </div>
               <button

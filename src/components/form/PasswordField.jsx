@@ -39,12 +39,12 @@ const PasswordField = ({
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`${inputCls(!!displayError)} pr-10`}
+          className={`${inputCls(!!displayError)} ltr:pr-10 rtl:pl-10`}
         />
         <button
           type="button"
           onClick={() => setShow((p) => !p)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+          className="absolute ltr:right-3 rtl:left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
           aria-label={show ? "Hide password" : "Show password"}
         >
           {show ? <MdVisibilityOff className="h-4 w-4" /> : <MdVisibility className="h-4 w-4" />}

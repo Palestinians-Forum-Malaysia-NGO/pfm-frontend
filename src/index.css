@@ -16,6 +16,20 @@
 		font-family: 'Cairo', sans-serif !important;
 		letter-spacing: 0;
 	}
+
+	html[dir="rtl"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+	html[dir="rtl"] textarea,
+	html[dir="rtl"] select {
+		text-align: right;
+		direction: rtl;
+	}
+
+	html[dir="ltr"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+	html[dir="ltr"] textarea,
+	html[dir="ltr"] select {
+		text-align: left;
+		direction: ltr;
+	}
 }
 
 /* ── Reduced motion accessibility ── */

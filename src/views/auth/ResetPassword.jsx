@@ -93,7 +93,7 @@ export default function ResetPassword() {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder={t("auth.reset_token_placeholder")}
-              className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 ${
+              className={`w-full rounded-xl border px-4 py-2.5 text-sm text-start text-slate-800 outline-none transition-all duration-200 ${
                 errors.token
                   ? "border-red-300 bg-red-50"
                   : "border-slate-200 bg-slate-50 focus:border-green focus:bg-white"
