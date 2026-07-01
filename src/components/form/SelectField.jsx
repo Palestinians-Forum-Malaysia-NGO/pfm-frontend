@@ -34,7 +34,7 @@ const SelectField = ({
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
-        className={`h-12 w-full cursor-pointer rounded-xl border px-3 text-sm text-slate-900 outline-none transition-all focus:outline-none ${
+        className={`h-12 w-full cursor-pointer rounded-xl border px-3 text-sm text-start text-slate-900 outline-none transition-all focus:outline-none ${
           displayError
             ? "border-red-400 bg-red-50 focus:border-red-400"
             : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70"

@@ -38,7 +38,7 @@ const TextareaField = ({
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`w-full resize-none rounded-xl border px-3 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 ${
+        className={`w-full resize-none rounded-xl border px-3 py-3 text-sm text-start text-slate-900 outline-none transition-all placeholder:text-slate-400 ${
           displayError
             ? "border-red-400 bg-red-50 focus:border-red-400"
             : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70"
