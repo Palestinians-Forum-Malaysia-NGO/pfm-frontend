@@ -37,7 +37,10 @@
     "donate_now": "تبرع الآن",
     "join_us": "انضم إلينا",
     "supported_by": "بدعم من",
-    "scroll": "مرر"
+    "scroll": "مرر",
+    "members": "عضو",
+    "raised": "تم جمعه",
+    "campaigns": "حملة"
   },
   "about_pfm": {
     "label": "من نحن",

@@ -37,7 +37,10 @@
     "donate_now": "Donate Now",
     "join_us": "Join Us",
     "supported_by": "Supported by",
-    "scroll": "Scroll"
+    "scroll": "Scroll",
+    "members": "Members",
+    "raised": "Raised",
+    "campaigns": "Campaigns"
   },
   "about_pfm": {
     "label": "Who We Are",

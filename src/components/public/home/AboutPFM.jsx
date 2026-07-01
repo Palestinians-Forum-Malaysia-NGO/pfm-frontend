@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 import aboutImg from "assets/img/layout/ngo-bg-3.jpg";
 
 const AboutPFM = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
   const show = { opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(28px)", transition: "all 0.7s ease-in-out" };
 
@@ -14,21 +16,21 @@ const AboutPFM = () => {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
 
           <div style={{ ...show, transitionDelay: "0ms" }}>
-            <span className="text-xs font-bold uppercase tracking-widest text-green">Who We Are</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about_pfm.label")}</span>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight text-slate-900">
-              A Voice for Palestine<br />in Malaysia
+              {t("about_pfm.title")}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-500">
-              Palestinian Forum Malaysia (PFM) was established to unite the Palestinian community and their supporters across Malaysia. We work tirelessly to build community bonds, advocate for justice, and deliver humanitarian aid.
+              {t("about_pfm.body1")}
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-500">
-              Through events, campaigns, and grassroots organizing, we ensure the Palestinian cause is heard, felt, and acted upon — right here in Malaysia.
+              {t("about_pfm.body2")}
             </p>
             <Link
               to="/about"
               className="mt-7 inline-flex items-center gap-2 rounded-full border border-green bg-white px-6 py-2.5 text-sm font-semibold text-green transition-all duration-200 ease-in-out hover:-translate-y-px hover:bg-green/5 active:scale-[0.98]"
             >
-              Our Story <MdArrowForward className="h-4 w-4" />
+              {t("about_pfm.cta")} <MdArrowForward className="h-4 w-4" />
             </Link>
           </div>
 

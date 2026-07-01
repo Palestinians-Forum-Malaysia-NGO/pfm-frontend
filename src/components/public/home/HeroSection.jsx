@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdFavorite, MdArrowForward, MdPeople, MdCampaign } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import img1 from "assets/img/layout/ngo-bg-4.jpg";
@@ -7,13 +8,16 @@ import img2 from "assets/img/layout/ngo-bg-5.jpg";
 
 const PARTNERS = ["Islamic Relief", "MERCY Malaysia", "AMAN Palestine", "UNRWA"];
 
-const STATS = [
-  { value: "500+",   label: "Members",   icon: <MdPeople className="h-4 w-4" />,           color: "bg-green text-white",      delay: "0.5s" },
-  { value: "RM 1M+", label: "Raised",   icon: <FaHandHoldingHeart className="h-4 w-4" />,  color: "bg-white text-slate-900",  delay: "0.65s" },
-  { value: "30+",    label: "Campaigns", icon: <MdCampaign className="h-4 w-4" />,          color: "bg-red-500 text-white",     delay: "0.8s" },
-];
+const HeroSection = () => {
+  const { t } = useTranslation();
 
-const HeroSection = () => (
+  const STATS = [
+    { value: "500+",   label: t("hero.members"),   icon: <MdPeople className="h-4 w-4" />,           color: "bg-green text-white",     delay: "0.5s" },
+    { value: "RM 1M+", label: t("hero.raised"),    icon: <FaHandHoldingHeart className="h-4 w-4" />, color: "bg-white text-slate-900", delay: "0.65s" },
+    { value: "30+",    label: t("hero.campaigns"),  icon: <MdCampaign className="h-4 w-4" />,         color: "bg-red-500 text-white",   delay: "0.8s" },
+  ];
+
+  return (
   <section className="relative flex min-h-screen items-center overflow-hidden bg-gradient-to-br from-green-50 to-white pt-16">
     {/* Subtle dot grid */}
     <div className="pointer-events-none absolute inset-0 bg-dot-green bg-[size:32px_32px] opacity-40" />
@@ -32,7 +36,7 @@ const HeroSection = () => (
             style={{ animation: "fadeUp 0.7s ease both" }}
           >
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green" />
-            Palestinian Forum Malaysia
+            {t("hero.badge")}
           </span>
 
           {/* Headline */}
@@ -40,8 +44,7 @@ const HeroSection = () => (
             className="mt-5 text-5xl font-black leading-[1.05] tracking-tight text-slate-900 sm:text-6xl lg:text-[4.25rem]"
             style={{ animation: "fadeUp 0.7s 0.1s ease both" }}
           >
-            Serving Our<br />
-            <span className="text-green">Community.</span>
+            {t("hero.title")}
           </h1>
 
           {/* Description */}
@@ -49,7 +52,7 @@ const HeroSection = () => (
             className="mt-5 max-w-md text-base leading-relaxed text-slate-500"
             style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
           >
-            Uniting Palestinians and supporters across Malaysia through community, advocacy, and humanitarian action.
+            {t("hero.subtitle")}
           </p>
 
           {/* CTAs */}
@@ -61,13 +64,13 @@ const HeroSection = () => (
               to="/donate"
               className="inline-flex items-center gap-2 rounded-full bg-pfmRed-500 px-7 py-3 text-sm font-bold text-white shadow-glow-red transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
             >
-              <MdFavorite className="h-4 w-4" /> Donate Now
+              <MdFavorite className="h-4 w-4" /> {t("hero.donate_now")}
             </Link>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98]"
             >
-              Join Us <MdArrowForward className="h-4 w-4" />
+              {t("hero.join_us")} <MdArrowForward className="h-4 w-4" />
             </Link>
           </div>
 
@@ -76,7 +79,7 @@ const HeroSection = () => (
             className="mt-10 border-t border-slate-100 pt-7"
             style={{ animation: "fadeUp 0.7s 0.4s ease both" }}
           >
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">Supported by</p>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">{t("hero.supported_by")}</p>
             <div className="flex flex-wrap items-center gap-4">
               {PARTNERS.map((p) => (
                 <span key={p} className="text-xs font-semibold text-slate-400 transition-colors hover:text-slate-600">{p}</span>
@@ -129,8 +132,7 @@ const HeroSection = () => (
 
           {/* Decorative ring */}
           <div
-            className="absolute"
-            className="border-2 border-dashed border-green/25"
+            className="absolute border-2 border-dashed border-green/25"
             style={{ bottom: "28%", left: "57%", width: "72px", height: "72px", borderRadius: "50%", animation: "spin 20s linear infinite" }}
           />
 
@@ -140,10 +142,11 @@ const HeroSection = () => (
 
     {/* Scroll hint */}
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-slate-300" style={{ animation: "fadeUp 1s 0.8s ease both" }}>
-      <span className="text-[10px] uppercase tracking-widest">Scroll</span>
+      <span className="text-[10px] uppercase tracking-widest">{t("hero.scroll")}</span>
       <span className="h-5 w-px bg-slate-200" />
     </div>
   </section>
-);
+  );
+};
 
 export default HeroSection;
