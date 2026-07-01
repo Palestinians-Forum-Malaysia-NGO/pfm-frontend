@@ -16,20 +16,33 @@
 		font-family: 'Cairo', sans-serif !important;
 		letter-spacing: 0;
 	}
+}
 
-	html[dir="rtl"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-	html[dir="rtl"] textarea,
-	html[dir="rtl"] select {
-		text-align: right;
-		direction: rtl;
-	}
+/* ── RTL/LTR input alignment — unlayered so it wins over @layer utilities ── */
+html[dir="rtl"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+	text-align: right !important;
+	direction: rtl !important;
+}
 
-	html[dir="ltr"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-	html[dir="ltr"] textarea,
-	html[dir="ltr"] select {
-		text-align: left;
-		direction: ltr;
-	}
+html[dir="rtl"] input::placeholder,
+html[dir="rtl"] textarea::placeholder {
+	text-align: right !important;
+	direction: rtl !important;
+}
+
+html[dir="ltr"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[dir="ltr"] textarea,
+html[dir="ltr"] select {
+	text-align: left !important;
+	direction: ltr !important;
+}
+
+html[dir="ltr"] input::placeholder,
+html[dir="ltr"] textarea::placeholder {
+	text-align: left !important;
+	direction: ltr !important;
 }
 
 /* ── Reduced motion accessibility ── */
