@@ -42,9 +42,12 @@ api.interceptors.response.use(
           clearTokens();
           window.location.href = "/auth/sign-in";
         }
-      } else {
+      } else if (original.headers?.Authorization) {
+        // Had an access token but no refresh token — session is broken, redirect
+        clearTokens();
         window.location.href = "/auth/sign-in";
       }
+      // No tokens at all → unauthenticated request on a public page, just reject
     }
 
     return Promise.reject(error);
