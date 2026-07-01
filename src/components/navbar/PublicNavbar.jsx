@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdMenu, MdClose } from "react-icons/md";
-import logo       from "assets/brand/LOGO-wbg.png";
-import navLinks   from "./navLinks";
-import NavItem    from "./NavItem";
+import logo          from "assets/brand/LOGO-wbg.png";
+import navLinks      from "./navLinks";
+import NavItem       from "./NavItem";
 import MobileNavItem from "./MobileNavItem";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const PublicNavbar = ({ links = navLinks }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -69,17 +72,18 @@ const PublicNavbar = ({ links = navLinks }) => {
 
           {/* Desktop CTA */}
           <div className="hidden shrink-0 items-center gap-2 md:flex">
+            <LanguageSwitcher />
             <Link
               to="/auth/sign-in"
               className="px-4 py-2 text-sm font-medium text-slate-500 transition-colors duration-200 hover:text-slate-900"
             >
-              Sign In
+              {t("nav.sign_in")}
             </Link>
             <Link
               to="/donate"
               className="rounded-full bg-pfmRed-500 px-5 py-2 text-sm font-bold text-white shadow-sm shadow-pfmRed-500/30 transition-all duration-200 ease-in-out hover:-translate-y-px hover:bg-pfmRed-600 active:scale-[0.98]"
             >
-              Donate Now
+              {t("nav.donate_now")}
             </Link>
           </div>
 
@@ -122,19 +126,22 @@ const PublicNavbar = ({ links = navLinks }) => {
               ))}
             </nav>
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
+              <div className="px-1 py-1">
+                <LanguageSwitcher />
+              </div>
               <Link
                 to="/auth/sign-in"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
               >
-                Sign In
+                {t("nav.sign_in")}
               </Link>
               <Link
                 to="/donate"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-xl bg-pfmRed-500 px-3 py-2.5 text-center text-sm font-bold text-white hover:bg-pfmRed-600"
               >
-                Donate Now
+                {t("nav.donate_now")}
               </Link>
             </div>
           </div>

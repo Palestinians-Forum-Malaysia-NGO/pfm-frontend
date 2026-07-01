@@ -11,6 +11,11 @@
 		-webkit-font-smoothing: antialiased;
 		letter-spacing: -0.5px;
 	}
+
+	html[dir="rtl"] {
+		font-family: 'Cairo', sans-serif !important;
+		letter-spacing: 0;
+	}
 }
 
 /* ── Reduced motion accessibility ── */
