@@ -8,7 +8,6 @@ import PageTransition from "components/ui/PageTransition";
 import UserCreate   from "views/admin/users/UserCreate";
 import UserDetail   from "views/admin/users/UserDetail";
 import UserEdit     from "views/admin/users/UserEdit";
-import BeneficiaryCreate from "views/admin/beneficiaries/BeneficiaryCreate";
 import BeneficiaryDetail from "views/admin/beneficiaries/BeneficiaryDetail";
 import BeneficiaryEdit   from "views/admin/beneficiaries/BeneficiaryEdit";
 import StaffCreate      from "views/admin/staff/StaffCreate";
@@ -26,7 +25,6 @@ import ProjectEdit      from "views/admin/projects/ProjectEdit";
 
 const SUB_ROUTE_NAMES = {
   "/users/create":      "New User",
-  "/beneficiaries/create":    "New Beneficiary",
   "/staff/create":      "New Staff",
   "/categories/create":      "New Category",
   "/classifications/create": "New Classification",
@@ -102,7 +100,6 @@ export default function Admin(props) {
               <Route path="/users/create"     element={<UserCreate />} />
               <Route path="/users/:id"        element={<UserDetail />} />
               <Route path="/users/:id/edit"   element={<UserEdit />} />
-              <Route path="/beneficiaries/create"   element={<BeneficiaryCreate />} />
               <Route path="/beneficiaries/:id"      element={<BeneficiaryDetail />} />
               <Route path="/beneficiaries/:id/edit" element={<BeneficiaryEdit />} />
               <Route path="/staff/create"          element={<StaffCreate />} />

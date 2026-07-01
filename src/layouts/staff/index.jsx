@@ -5,7 +5,6 @@ import Sidebar from "components/sidebar";
 import Footer from "components/footer/FooterAuthDefault";
 import routes from "routes.js";
 import PageTransition from "components/ui/PageTransition";
-import BeneficiaryCreate from "views/admin/beneficiaries/BeneficiaryCreate";
 import BeneficiaryDetail from "views/admin/beneficiaries/BeneficiaryDetail";
 import BeneficiaryEdit   from "views/admin/beneficiaries/BeneficiaryEdit";
 import CategoryCreate    from "views/admin/categories/CategoryCreate";
@@ -16,7 +15,6 @@ import ProjectDetail     from "views/admin/projects/ProjectDetail";
 import ProjectEdit       from "views/admin/projects/ProjectEdit";
 
 const SUB_ROUTE_NAMES = {
-  "/beneficiaries/create": "New Beneficiary",
   "/categories/create":    "New Category",
   "/projects/create":      "New Project",
 };
@@ -74,7 +72,6 @@ export default function StaffLayout() {
           <PageTransition>
             <Routes>
               {getRoutes()}
-              <Route path="/beneficiaries/create"   element={<BeneficiaryCreate />} />
               <Route path="/beneficiaries/:id"      element={<BeneficiaryDetail />} />
               <Route path="/beneficiaries/:id/edit" element={<BeneficiaryEdit />} />
               <Route path="/categories/create"      element={<CategoryCreate />} />

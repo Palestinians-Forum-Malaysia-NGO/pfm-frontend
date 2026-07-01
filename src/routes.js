@@ -103,10 +103,6 @@ const routes = [
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
     section: "COMMUNITY",
-    children: [
-      { name: "All Beneficiaries", path: "beneficiaries" },
-      { name: "Add Beneficiary",   path: "beneficiaries/create" },
-    ],
   },
   {
     name: "Donations",
@@ -252,10 +248,6 @@ const routes = [
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
     section: "COMMUNITY",
-    children: [
-      { name: "All Beneficiaries", path: "beneficiaries" },
-      { name: "Add Beneficiary",   path: "beneficiaries/create" },
-    ],
   },
   {
     name: "Categories",

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
-  MdAdd, MdPeople, MdCheckCircle, MdCancel,
+  MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
-  MdGroups, MdHourglassEmpty, MdFlag,
+  MdGroups, MdHourglassEmpty, MdFlag, MdLink, MdCheck,
 } from "react-icons/md";
 import { useBeneficiaryList } from "components/features/beneficiaries/hooks";
 import BeneficiaryDeleteModal from "./BeneficiaryDeleteModal";
@@ -28,9 +28,19 @@ const STATUS_OPTIONS = [
   { value: "inactive", label: "Inactive" },
 ];
 
+const APPLY_URL = `${window.location.origin}/apply`;
+
 export default function BeneficiaryList() {
   const navigate = useNavigate();
   const base = useLayoutBase();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(APPLY_URL).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   const {
     beneficiaries, loading, error,
     stats,
@@ -157,7 +167,13 @@ export default function BeneficiaryList() {
         title="Beneficiaries"
         subtitle="Manage PFM beneficiary profiles"
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Beneficiary" onClick={() => navigate(`${base}/beneficiaries/create`)} />
+          <button onClick={handleCopyLink}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition-all duration-200 hover:border-green/40 hover:bg-green/5 hover:text-green active:scale-[0.98]">
+            {copied
+              ? <><MdCheck className="h-4 w-4 text-green" /> Copied!</>
+              : <><MdLink className="h-4 w-4" /> Copy Apply Link</>
+            }
+          </button>
         }
       />
 
