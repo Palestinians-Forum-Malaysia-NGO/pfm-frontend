@@ -316,5 +316,15 @@
     "vision_body": "A free, just Palestine — and a Malaysian community that stands proudly with the Palestinian people, informed, organized, and ready to act with compassion and strength.",
     "team_label": "The People Behind PFM",
     "team_title": "Our Leadership Team"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Enter a valid email address",
+    "minLength": "Minimum {{count}} characters",
+    "maxLength": "Maximum {{count}} characters",
+    "pattern": "Invalid format",
+    "min": "Minimum value is {{count}}",
+    "max": "Maximum value is {{count}}",
+    "minItems": "Select at least {{count}} item"
   }
 }
