@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdBusiness,
   MdAccountBalance, MdAttachMoney,
@@ -12,16 +13,9 @@ import AlertBanner  from "components/ui/AlertBanner";
 import { useCreateUser } from "components/features/users/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
-const PAYMENT_FREQUENCY_OPTIONS = [
-  { value: "monthly",   label: "Monthly" },
-  { value: "weekly",    label: "Weekly" },
-  { value: "bi-weekly", label: "Bi-Weekly" },
-  { value: "annually",  label: "Annually" },
-];
-
 const RULES = {
-  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
-  email:     [{ required: true, message: "Email is required" }, { email: true }],
+  full_name: [{ required: true }, { maxLength: 255 }],
+  email:     [{ required: true }, { email: true }],
 };
 
 const EMPTY = {
@@ -32,6 +26,7 @@ const EMPTY = {
 };
 
 export default function UserCreateForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { execute: createUser, loading, error } = useCreateUser();
   const { success, error: toastError } = useToast();
@@ -47,6 +42,13 @@ export default function UserCreateForm() {
       setFormData((p) => ({ ...p, [field]: value }));
     }
   };
+
+  const PAYMENT_FREQUENCY_OPTIONS = [
+    { value: "monthly",   label: t("users.freq_monthly") },
+    { value: "weekly",    label: t("users.freq_weekly") },
+    { value: "bi-weekly", label: t("users.freq_biweekly") },
+    { value: "annually",  label: t("users.freq_annually") },
+  ];
 
   const canSubmit = formData.full_name.trim() && formData.email.trim();
 
@@ -89,10 +91,10 @@ export default function UserCreateForm() {
 
     try {
       const created = await createUser(payload);
-      success("User created", `${formData.full_name} has been added. An activation email will be sent.`);
+      success(t("users.toast_created"), `${formData.full_name} ${t("users.toast_created_sub")}`);
       navigate(`/admin/users/${created.id}`);
     } catch (err) {
-      toastError("Failed to create user", err?.message);
+      toastError(t("users.toast_create_failed"), err?.message);
     }
   };
 
@@ -101,10 +103,10 @@ export default function UserCreateForm() {
 
       <PageHeader
         icon={<MdPersonAdd className="h-5 w-5" />}
-        title="Add Admin"
-        subtitle="Create a new admin account"
+        title={t("users.add_admin_title")}
+        subtitle={t("users.create_subtitle")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Users" onClick={() => navigate("/admin/users")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_users")} onClick={() => navigate("/admin/users")} />
         }
       />
 
@@ -114,20 +116,20 @@ export default function UserCreateForm() {
 
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials for the new admin account" />
-          <AlertBanner variant="info" message="After the account is created, an activation email with a one-time password (OTP) will be sent to the user's email address." />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("users.account_details")} subtitle={t("users.account_details_sub_create")} />
+          <AlertBanner variant="info" message={t("users.activation_info")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Full Name" field="full_name" placeholder="John Doe"
+              label={t("users.full_name")} field="full_name" placeholder="John Doe"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
             />
             <InputField
-              label="Email Address" field="email" type="email" placeholder="john@example.com"
+              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
             />
           </div>
           <InputField
-            label="Phone Number" field="phone_number" type="tel" placeholder="+60 12-345 6789"
+            label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
             required={false}
             formData={formData} errors={errors} updateFormData={updateFormData}
           />
@@ -135,27 +137,27 @@ export default function UserCreateForm() {
 
         {/* ── Employment Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title="Employment Details" subtitle="Department, branch, and position info (optional)" />
+          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.employment_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Department" field="department" placeholder="e.g. Operations"
+              label={t("users.department")} field="department" placeholder="e.g. Operations"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Job Title" field="job_title" placeholder="e.g. Project Manager"
+              label={t("users.job_title")} field="job_title" placeholder="e.g. Project Manager"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Branch" field="branch" placeholder="e.g. Kuala Lumpur"
+              label={t("users.branch")} field="branch" placeholder="e.g. Kuala Lumpur"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Joining Date" field="joining_date" type="date"
+              label={t("users.joining_date")} field="joining_date" type="date"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
@@ -164,21 +166,21 @@ export default function UserCreateForm() {
 
         {/* ── Banking Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details for payments (optional)" />
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("users.banking_info")} subtitle={t("users.banking_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Bank Name" field="banking_information.bank_name" placeholder="e.g. Maybank"
+              label={t("users.bank_name")} field="banking_information.bank_name" placeholder="e.g. Maybank"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Account Holder Name" field="banking_information.account_holder_name" placeholder="As per bank records"
+              label={t("users.account_holder")} field="banking_information.account_holder_name" placeholder="As per bank records"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <InputField
-            label="Account Number" field="banking_information.account_number" placeholder="e.g. 1234567890"
+            label={t("users.account_number")} field="banking_information.account_number" placeholder="e.g. 1234567890"
             required={false}
             formData={formData} errors={errors} updateFormData={updateFormData}
           />
@@ -186,21 +188,21 @@ export default function UserCreateForm() {
 
         {/* ── Financial Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details (optional)" />
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("users.financial_info")} subtitle={t("users.financial_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Job Title" field="financial_information.job_title" placeholder="e.g. Senior Officer"
+              label={t("users.job_title")} field="financial_information.job_title" placeholder="e.g. Senior Officer"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Salary" field="financial_information.salary" placeholder="e.g. 3500.00"
+              label={t("users.salary")} field="financial_information.salary" placeholder="e.g. 3500.00"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <SelectField
-            label="Payment Frequency" field="financial_information.payment_frequency"
+            label={t("users.payment_frequency")} field="financial_information.payment_frequency"
             options={PAYMENT_FREQUENCY_OPTIONS}
             required={false}
             formData={formData} errors={errors} updateFormData={updateFormData}
@@ -208,9 +210,9 @@ export default function UserCreateForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/users")} className="flex-1" />
+          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate("/admin/users")} className="flex-1" />
           <Button
-            type="submit" variant="primary" text="Create User"
+            type="submit" variant="primary" text={t("users.create_user")}
             icon={<MdPersonAdd className="h-4 w-4" />}
             loading={loading}
             disabled={!canSubmit || loading}

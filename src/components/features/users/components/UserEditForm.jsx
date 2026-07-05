@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdVerified, MdEdit, MdPerson,
   MdBusiness, MdAccountBalance, MdAttachMoney,
@@ -18,19 +19,12 @@ import {
 } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
-const PAYMENT_FREQUENCY_OPTIONS = [
-  { value: "monthly",   label: "Monthly" },
-  { value: "weekly",    label: "Weekly" },
-  { value: "bi-weekly", label: "Bi-Weekly" },
-  { value: "annually",  label: "Annually" },
-];
-
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
 const RULES = {
-  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255, message: "Name must be 255 characters or fewer" }],
-  email:     [{ required: true, message: "Email is required" }, { email: true }],
+  full_name: [{ required: true }, { maxLength: 255 }],
+  email:     [{ required: true }, { email: true }],
 };
 
 const EMPTY = {
@@ -42,6 +36,7 @@ const EMPTY = {
 };
 
 export default function UserEditForm() {
+  const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
 
@@ -52,6 +47,13 @@ export default function UserEditForm() {
   const [formData, setFormData] = useState(EMPTY);
   const [initial, setInitial]   = useState(null);
   const [errors, setErrors]     = useState({});
+
+  const PAYMENT_FREQUENCY_OPTIONS = [
+    { value: "monthly",   label: t("users.freq_monthly") },
+    { value: "weekly",    label: t("users.freq_weekly") },
+    { value: "bi-weekly", label: t("users.freq_biweekly") },
+    { value: "annually",  label: t("users.freq_annually") },
+  ];
 
   const updateFormData = (field, value) => {
     if (field.includes(".")) {
@@ -145,10 +147,10 @@ export default function UserEditForm() {
 
     try {
       await updateUser(id, payload);
-      success("User updated", `${formData.full_name} has been updated successfully.`);
+      success(t("users.toast_updated"), `${formData.full_name} ${t("users.toast_updated_sub")}`);
       navigate(`/admin/users/${id}`);
     } catch (err) {
-      toastError("Failed to update user", err?.message);
+      toastError(t("users.toast_update_failed"), err?.message);
     }
   };
 
@@ -160,10 +162,10 @@ export default function UserEditForm() {
 
       <PageHeader
         icon={<MdEdit className="h-5 w-5" />}
-        title="Edit Admin"
-        subtitle={formData.full_name || "Update admin account details"}
+        title={t("users.edit_admin_title")}
+        subtitle={formData.full_name || t("users.user_details")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to User" onClick={() => navigate(`/admin/users/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_user")} onClick={() => navigate(`/admin/users/${id}`)} />
         }
       />
 
@@ -191,7 +193,7 @@ export default function UserEditForm() {
               formData.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
             }`}>
               <span className={`h-1.5 w-1.5 rounded-full ${formData.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-              {formData.is_active ? "Active" : "Inactive"}
+              {formData.is_active ? t("users.status_active") : t("users.status_inactive")}
             </span>
           </div>
         </div>
@@ -203,50 +205,50 @@ export default function UserEditForm() {
 
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Login credentials for this admin account" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("users.account_details")} subtitle={t("users.account_details_sub_edit")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Full Name" field="full_name" placeholder="John Doe"
+              label={t("users.full_name")} field="full_name" placeholder="John Doe"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
             />
             <InputField
-              label="Email Address" field="email" type="email" placeholder="john@example.com"
+              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Phone Number" field="phone_number" type="tel" placeholder="+60 12-345 6789"
+              label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
-            <ToggleInput label="Account Active" field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <ToggleInput label={t("users.account_active")} field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
         </div>
 
         {/* ── Employment Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title="Employment Details" subtitle="Department, branch, and position info (optional)" />
+          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.employment_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Department" field="department" placeholder="e.g. Operations"
+              label={t("users.department")} field="department" placeholder="e.g. Operations"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Job Title" field="job_title" placeholder="e.g. Project Manager"
+              label={t("users.job_title")} field="job_title" placeholder="e.g. Project Manager"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Branch" field="branch" placeholder="e.g. Kuala Lumpur"
+              label={t("users.branch")} field="branch" placeholder="e.g. Kuala Lumpur"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Joining Date" field="joining_date" type="date"
+              label={t("users.joining_date")} field="joining_date" type="date"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
@@ -255,21 +257,21 @@ export default function UserEditForm() {
 
         {/* ── Banking Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details for payments (optional)" />
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("users.banking_info")} subtitle={t("users.banking_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Bank Name" field="banking_information.bank_name" placeholder="e.g. Maybank"
+              label={t("users.bank_name")} field="banking_information.bank_name" placeholder="e.g. Maybank"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Account Holder Name" field="banking_information.account_holder_name" placeholder="As per bank records"
+              label={t("users.account_holder")} field="banking_information.account_holder_name" placeholder="As per bank records"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <InputField
-            label="Account Number" field="banking_information.account_number" placeholder="e.g. 1234567890"
+            label={t("users.account_number")} field="banking_information.account_number" placeholder="e.g. 1234567890"
             required={false}
             formData={formData} errors={errors} updateFormData={updateFormData}
           />
@@ -277,21 +279,21 @@ export default function UserEditForm() {
 
         {/* ── Financial Information ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details (optional)" />
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("users.financial_info")} subtitle={t("users.financial_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Job Title" field="financial_information.job_title" placeholder="e.g. Senior Officer"
+              label={t("users.job_title")} field="financial_information.job_title" placeholder="e.g. Senior Officer"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
             <InputField
-              label="Salary" field="financial_information.salary" placeholder="e.g. 3500.00"
+              label={t("users.salary")} field="financial_information.salary" placeholder="e.g. 3500.00"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <SelectField
-            label="Payment Frequency" field="financial_information.payment_frequency"
+            label={t("users.payment_frequency")} field="financial_information.payment_frequency"
             options={PAYMENT_FREQUENCY_OPTIONS}
             required={false}
             formData={formData} errors={errors} updateFormData={updateFormData}
@@ -299,9 +301,9 @@ export default function UserEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/users/${id}`)} className="flex-1" />
+          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate(`/admin/users/${id}`)} className="flex-1" />
           <Button
-            type="submit" variant="primary" text="Save Changes"
+            type="submit" variant="primary" text={t("users.save_changes")}
             loading={saving}
             disabled={!formData.full_name.trim() || !formData.email.trim() || !isDirty || saving}
             className="flex-1"

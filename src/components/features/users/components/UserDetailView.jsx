@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdEdit, MdDeleteOutline, MdPerson } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -12,6 +13,7 @@ import { useGetUser, useDeleteUser } from "components/features/users/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 export default function UserDetailView() {
+  const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
 
@@ -25,10 +27,10 @@ export default function UserDetailView() {
   const handleDelete = async () => {
     try {
       await deleteUser(id);
-      success("User deleted", `${user?.full_name} has been removed.`);
+      success(t("users.toast_deleted"), `${user?.full_name} ${t("users.toast_has_been_removed")}`);
       navigate("/admin/users");
     } catch (err) {
-      toastError("Failed to delete user", err?.message);
+      toastError(t("users.toast_delete_failed"), err?.message);
     }
   };
 
@@ -42,16 +44,16 @@ export default function UserDetailView() {
       <PageHeader
         icon={<MdPerson className="h-5 w-5" />}
         title={user.full_name}
-        subtitle="User Details"
+        subtitle={t("users.user_details")}
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Users" onClick={() => navigate("/admin/users")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.title")} onClick={() => navigate("/admin/users")} />
             <DropdownButton
-              label="Actions"
+              label={t("users.actions")}
               items={[
-                { label: "Edit User",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/users/${id}/edit`) },
+                { label: t("users.edit_user"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/users/${id}/edit`) },
                 { divider: true },
-                { label: "Delete User", icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                { label: t("users.delete_user"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}
             />
           </>

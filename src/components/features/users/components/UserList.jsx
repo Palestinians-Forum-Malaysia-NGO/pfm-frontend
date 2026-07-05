@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdAdd, MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdManageAccounts, MdClose,
@@ -20,13 +21,8 @@ import { useToast }  from "components/ui/toast/ToastContext";
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-const STATUS_OPTIONS = [
-  { value: "all",      label: "All Status" },
-  { value: "active",   label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export default function UserList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
   const {
@@ -39,14 +35,20 @@ export default function UserList() {
     const name = deleteUser?.full_name;
     try {
       await _handleDelete();
-      success("Admin deleted", `${name} has been removed.`);
+      success(t("users.toast_deleted"), `${name} ${t("users.toast_has_been_removed")}`);
     } catch (err) {
-      toastError("Failed to delete", err?.message);
+      toastError(t("users.toast_delete_failed"), err?.message);
     }
   };
 
   const [search, setSearch]             = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const STATUS_OPTIONS = [
+    { value: "all",      label: t("users.status_all") },
+    { value: "active",   label: t("users.status_active") },
+    { value: "inactive", label: t("users.status_inactive") },
+  ];
 
   const hasFilters = search !== "" || statusFilter !== "all";
 
@@ -70,19 +72,19 @@ export default function UserList() {
 
   const statCards = [
     {
-      key: "total", label: "Total Admins", value: stats.total,
+      key: "total", label: t("users.total_admins"), value: stats.total,
       icon: <MdPeople className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
       active: statusFilter === "all",
       onClick: () => setStatusFilter("all"),
     },
     {
-      key: "active", label: "Active", value: stats.active,
+      key: "active", label: t("users.status_active"), value: stats.active,
       icon: <MdCheckCircle className="h-5 w-5" />, color: "text-green", bgColor: "bg-green/10",
       active: statusFilter === "active",
       onClick: () => setStatusFilter((s) => s === "active" ? "all" : "active"),
     },
     {
-      key: "inactive", label: "Inactive", value: stats.inactive,
+      key: "inactive", label: t("users.status_inactive"), value: stats.inactive,
       icon: <MdCancel className="h-5 w-5" />, color: "text-slate-400", bgColor: "bg-slate-100",
       active: statusFilter === "inactive",
       onClick: () => setStatusFilter((s) => s === "inactive" ? "all" : "inactive"),
@@ -92,7 +94,7 @@ export default function UserList() {
   const columns = [
     {
       key: "user",
-      label: "Admin",
+      label: t("users.col_admin"),
       icon: <MdPerson className="h-3.5 w-3.5" />,
       render: (user) => (
         <div className="flex items-center gap-3">
@@ -111,20 +113,20 @@ export default function UserList() {
     },
     {
       key: "status",
-      label: "Status",
+      label: t("users.col_status"),
       icon: <MdCheckCircle className="h-3.5 w-3.5" />,
       render: (user) => (
         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
           user.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
         }`}>
           <span className={`h-1.5 w-1.5 rounded-full ${user.is_active ? "bg-green" : "bg-slate-400"}`} />
-          {user.is_active ? "Active" : "Inactive"}
+          {user.is_active ? t("users.status_active") : t("users.status_inactive")}
         </span>
       ),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t("users.col_actions"),
       align: "right",
       stopPropagation: true,
       render: (user) => (
@@ -142,10 +144,10 @@ export default function UserList() {
 
       <PageHeader
         icon={<MdManageAccounts className="h-5 w-5" />}
-        title="Users"
-        subtitle="Manage admin accounts"
+        title={t("users.title")}
+        subtitle={t("users.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Admin" onClick={() => navigate("/admin/users/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text={t("users.add_admin")} onClick={() => navigate("/admin/users/create")} />
         }
       />
 
@@ -168,10 +170,10 @@ export default function UserList() {
 
       {/* ── Filters ── */}
       <div className="mb-4 flex items-center gap-2">
-        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder="Search by name or email..." className="flex-1" />
+        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("users.search_placeholder")} className="flex-1" />
         <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         {hasFilters && (
-          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text="Clear" onClick={clearFilters} />
+          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("users.clear")} onClick={clearFilters} />
         )}
       </div>
 
@@ -184,9 +186,9 @@ export default function UserList() {
         onRowClick={(user) => navigate(`/admin/users/${user.id}`)}
         pageSize={8}
         emptyIcon={<MdPeople />}
-        emptyTitle="No admins found"
-        emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first admin user to get started."}
-        emptyAction={!hasFilters ? { label: "Add Admin", onClick: () => navigate("/admin/users/create") } : undefined}
+        emptyTitle={t("users.no_admins")}
+        emptyDesc={hasFilters ? t("users.adjust_filters") : t("users.add_first_admin")}
+        emptyAction={!hasFilters ? { label: t("users.add_admin"), onClick: () => navigate("/admin/users/create") } : undefined}
       />
 
       <UserDeleteModal
