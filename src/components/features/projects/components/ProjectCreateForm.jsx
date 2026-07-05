@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdAdd, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
@@ -9,37 +10,49 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateProject } from "components/features/projects/hooks";
 import { useGetCategories } from "components/features/categories/hooks";
-import { PROJECT_STATUS_OPTIONS } from "components/features/projects/constants/projects";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  title: [
-    { required: true,  message: "Title is required" },
-    { maxLength: 255,  message: "Title must be 255 characters or fewer" },
-  ],
+  title: [{ required: true }, { maxLength: 255 }],
 };
 
 export default function ProjectCreateForm() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createProject, loading, error } = useCreateProject();
   const { categories } = useGetCategories();
   const { success, error: toastError } = useToast();
 
-  const [form, setForm]     = useState({
-    title: "", cover_image: null, category_id: "", status: "active", summary: "",
-    description: "", beneficiary_info: "", target: "", start_date: "", end_date: "", is_published: false,
+  const [form, setForm] = useState({
+    title: "", title_ar: "",
+    cover_image: null,
+    category_id: "",
+    status: "active",
+    summary: "", summary_ar: "",
+    description: "", description_ar: "",
+    beneficiary_info: "", beneficiary_info_ar: "",
+    target: "", start_date: "", end_date: "", is_published: false,
   });
   const [errors, setErrors] = useState({});
 
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
-  const CATEGORY_OPTIONS = [
-    { value: "", label: "Select category" },
-    ...categories.map((c) => ({ value: c.id, label: c.name })),
+  const STATUS_OPTIONS = [
+    { value: "",          label: t("projects.status_select") },
+    { value: "active",    label: t("projects.status_active") },
+    { value: "completed", label: t("projects.status_completed") },
+    { value: "on_hold",   label: t("projects.status_on_hold") },
+    { value: "cancelled", label: t("projects.status_cancelled") },
   ];
 
-  const canSubmit = form.title.trim();
+  const CATEGORY_OPTIONS = [
+    { value: "", label: t("projects.category_select") },
+    ...categories.map((c) => ({
+      value: c.id,
+      label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
+    })),
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,26 +62,30 @@ export default function ProjectCreateForm() {
       if (err) newErrors[field] = err;
     });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
+    setErrors({});
 
     try {
-      const payload = {
-        title:            form.title,
-        cover_image:      form.cover_image      || undefined,
-        category_id:      form.category_id      || undefined,
-        status:           form.status           || undefined,
-        summary:          form.summary          || undefined,
-        description:      form.description      || undefined,
-        beneficiary_info: form.beneficiary_info || undefined,
-        target:           form.target           ? Number(form.target) : undefined,
-        start_date:       form.start_date       || undefined,
-        end_date:         form.end_date         || undefined,
-        is_published:     form.is_published,
-      };
-      const created = await createProject(payload);
-      success("Project created", `"${form.title}" has been added.`);
+      const created = await createProject({
+        title:              form.title,
+        title_ar:           form.title_ar           || undefined,
+        cover_image:        form.cover_image         || undefined,
+        category_id:        form.category_id         || undefined,
+        status:             form.status              || undefined,
+        summary:            form.summary             || undefined,
+        summary_ar:         form.summary_ar          || undefined,
+        description:        form.description         || undefined,
+        description_ar:     form.description_ar      || undefined,
+        beneficiary_info:   form.beneficiary_info    || undefined,
+        beneficiary_info_ar: form.beneficiary_info_ar || undefined,
+        target:             form.target ? Number(form.target) : undefined,
+        start_date:         form.start_date          || undefined,
+        end_date:           form.end_date            || undefined,
+        is_published:       form.is_published,
+      });
+      success(t("projects.toast_created"), `"${form.title}" ${t("projects.toast_created_sub")}`);
       navigate(`${base}/projects/${created.id}`);
     } catch (err) {
-      toastError("Failed to create project", err?.message);
+      toastError(t("projects.toast_create_failed"), err?.message);
     }
   };
 
@@ -77,10 +94,10 @@ export default function ProjectCreateForm() {
 
       <PageHeader
         icon={<MdAdd className="h-5 w-5" />}
-        title="New Project"
-        subtitle="Create a new PFM community project"
+        title={t("projects.add_title")}
+        subtitle={t("projects.add_subtitle")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Projects" onClick={() => navigate(`${base}/projects`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("projects.back")} onClick={() => navigate(`${base}/projects`)} />
         }
       />
 
@@ -90,7 +107,7 @@ export default function ProjectCreateForm() {
 
         {/* ── Cover Image ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdImage className="h-5 w-5" />} title="Cover Image" subtitle="Shown on the public project page and listing" />
+          <FormHeader icon={<MdImage className="h-5 w-5" />} title={t("projects.cover_section")} subtitle={t("projects.cover_subtitle")} />
           <StorageCoverField
             folder="projects"
             onUpload={(key) => set("cover_image", key)}
@@ -101,36 +118,78 @@ export default function ProjectCreateForm() {
 
         {/* ── Overview ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Project Overview" subtitle="Title, category, and status" />
-          <InputField label="Title" field="title" placeholder="e.g. Community Aid Programme 2026" formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
+          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title={t("projects.overview_section")} subtitle={t("projects.overview_subtitle")} />
+
+          {/* Title EN / AR */}
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField label="Category" field="category_id" options={CATEGORY_OPTIONS} formData={form} errors={errors} updateFormData={set} required={false} />
-            <SelectField label="Status"   field="status"      options={PROJECT_STATUS_OPTIONS} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("projects.title_en")} field="title" placeholder="e.g. Community Aid Programme 2026"
+              formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
+            <InputField label={t("projects.title_ar_label")} field="title_ar" placeholder={t("projects.title_ar_placeholder")}
+              required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
-          <TextareaField label="Summary" field="summary" rows={2} placeholder="A short one-paragraph summary visible in the project list…" formData={form} errors={errors} updateFormData={set} required={false} />
+
+          {/* Category / Status */}
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <SelectField label={t("projects.category_label")} field="category_id" options={CATEGORY_OPTIONS}
+              formData={form} errors={errors} updateFormData={set} required={false} />
+            <SelectField label={t("projects.status_label")} field="status" options={STATUS_OPTIONS}
+              formData={form} errors={errors} updateFormData={set} />
+          </div>
+
+          {/* Summary EN / AR */}
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <TextareaField label={t("projects.summary_en")} field="summary" rows={2}
+              placeholder="A short one-paragraph summary visible in the project list…"
+              required={false} formData={form} errors={errors} updateFormData={set} />
+            <TextareaField label={t("projects.summary_ar_label")} field="summary_ar" rows={2}
+              placeholder={t("projects.summary_ar_placeholder")}
+              required={false} formData={form} errors={errors} updateFormData={set} />
+          </div>
         </div>
 
         {/* ── Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Project Details" subtitle="Full description and beneficiary information" />
-          <TextareaField label="Description"      field="description"      rows={5} placeholder="Full project description…" formData={form} errors={errors} updateFormData={set} required={false} />
-          <TextareaField label="Beneficiary Info" field="beneficiary_info" rows={3} placeholder="Who will benefit from this project?" formData={form} errors={errors} updateFormData={set} required={false} />
+          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title={t("projects.details_section")} subtitle={t("projects.details_subtitle")} />
+
+          {/* Description EN / AR */}
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <TextareaField label={t("projects.desc_en")} field="description" rows={5}
+              placeholder="Full project description…"
+              required={false} formData={form} errors={errors} updateFormData={set} />
+            <TextareaField label={t("projects.desc_ar_label")} field="description_ar" rows={5}
+              placeholder={t("projects.desc_ar_placeholder")}
+              required={false} formData={form} errors={errors} updateFormData={set} />
+          </div>
+
+          {/* Beneficiary EN / AR */}
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <TextareaField label={t("projects.beneficiary_en")} field="beneficiary_info" rows={3}
+              placeholder="Who will benefit from this project?"
+              required={false} formData={form} errors={errors} updateFormData={set} />
+            <TextareaField label={t("projects.beneficiary_ar_label")} field="beneficiary_info_ar" rows={3}
+              placeholder={t("projects.beneficiary_ar_placeholder")}
+              required={false} formData={form} errors={errors} updateFormData={set} />
+          </div>
         </div>
 
         {/* ── Funding & Dates ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title="Funding & Dates" subtitle="Funding target and project timeline" />
-          <InputField label="Funding Target (MYR)" field="target" type="number" placeholder="e.g. 50000" formData={form} errors={errors} updateFormData={set} required={false} />
+          <FormHeader icon={<MdAssignment className="h-5 w-5" />} title={t("projects.funding_section")} subtitle={t("projects.funding_subtitle")} />
+          <InputField label={t("projects.target_label")} field="target" type="number" placeholder="e.g. 50000"
+            required={false} formData={form} errors={errors} updateFormData={set} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Start Date" field="start_date" type="date" formData={form} errors={errors} updateFormData={set} required={false} />
-            <InputField label="End Date"   field="end_date"   type="date" formData={form} errors={errors} updateFormData={set} required={false} />
+            <InputField label={t("projects.start_date")} field="start_date" type="date"
+              required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("projects.end_date")} field="end_date" type="date"
+              required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
-          <ToggleInput label="Publish immediately (make visible to public)" field="is_published" formData={form} errors={errors} updateFormData={set} />
+          <ToggleInput label={t("projects.publish_toggle")} field="is_published" formData={form} errors={errors} updateFormData={set} />
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`${base}/projects`)} className="flex-1" />
-          <Button type="submit" variant="primary" text="Create Project" icon={<MdAdd className="h-4 w-4" />} loading={loading} disabled={!canSubmit} className="flex-1" />
+          <Button variant="ghost" text={t("projects.cancel")} onClick={() => navigate(`${base}/projects`)} className="flex-1" />
+          <Button type="submit" variant="primary" text={t("projects.create_btn")} icon={<MdAdd className="h-4 w-4" />}
+            loading={loading} disabled={!form.title.trim() || loading} className="flex-1" />
         </div>
 
       </form>
