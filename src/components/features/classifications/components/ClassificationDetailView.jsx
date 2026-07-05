@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdGroups,
   MdTextFields, MdPerson, MdCalendarToday,
@@ -21,8 +23,10 @@ const formatDate = (iso) => {
 };
 
 export default function ClassificationDetailView() {
+  const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { classification, execute: fetchClassification, loading, error } = useGetClassification();
   const { execute: deleteClassification, loading: deleteLoading, error: deleteError } = useDeleteClassification();
@@ -34,16 +38,16 @@ export default function ClassificationDetailView() {
   const handleDelete = async () => {
     try {
       await deleteClassification(id);
-      success("Classification deleted", `"${classification?.name}" has been removed.`);
-      navigate("/admin/classifications");
+      success(t("classifications.toast_deleted"), `"${classification?.name}" ${t("classifications.toast_deleted_sub")}`);
+      navigate(`${base}/classifications`);
     } catch (err) {
-      toastError("Failed to delete classification", err?.message);
+      toastError(t("classifications.toast_delete_failed"), err?.message);
     }
   };
 
-  if (loading)          return <Loading text="Loading classification…" />;
-  if (error)            return <AlertBanner message={error} />;
-  if (!classification)  return null;
+  if (loading)         return <Loading text="Loading classification…" />;
+  if (error)           return <AlertBanner message={error} />;
+  if (!classification) return null;
 
   const assignedBy = classification.assigned_by;
 
@@ -53,16 +57,16 @@ export default function ClassificationDetailView() {
       <PageHeader
         icon={<MdGroups className="h-5 w-5" />}
         title={classification.name}
-        subtitle="Classification Details"
+        subtitle={t("classifications.detail_subtitle")}
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Classifications" onClick={() => navigate("/admin/classifications")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("classifications.back")} onClick={() => navigate(`${base}/classifications`)} />
             <DropdownButton
-              label="Actions"
+              label={t("classifications.actions")}
               items={[
-                { label: "Edit Classification",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/classifications/${id}/edit`) },
+                { label: t("classifications.edit_classification"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/classifications/${id}/edit`) },
                 { divider: true },
-                { label: "Delete Classification", icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                { label: t("classifications.delete_classification"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}
             />
           </>
@@ -94,34 +98,37 @@ export default function ClassificationDetailView() {
 
       {/* ── Details ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdGroups className="h-5 w-5" />} title="Classification Information" subtitle="Full details for this classification" />
+        <FormHeader icon={<MdGroups className="h-5 w-5" />} title={t("classifications.section_info_title")} subtitle={t("classifications.section_info_subtitle")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdTextFields className="h-4 w-4" />}     label="Name (English)"  value={classification.name} />
-          <InfoRow icon={<MdTextFields className="h-4 w-4" />}     label="Name (Arabic)"   value={classification.name_ar || <span className="text-slate-300">—</span>} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label="Created At"      value={formatDate(classification.assigned_at)} />
+          <InfoRow icon={<MdTextFields className="h-4 w-4" />}    label={t("classifications.name_info")}       value={classification.name} />
+          <InfoRow icon={<MdTextFields className="h-4 w-4" />}    label={t("classifications.name_ar_info")}    value={classification.name_ar ? <span dir="rtl">{classification.name_ar}</span> : <span className="text-slate-300">—</span>} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("classifications.created_at_info")} value={formatDate(classification.assigned_at)} />
           {assignedBy && (
-            <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Created By" value={
+            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("classifications.created_by_info")} value={
               <span>
                 {assignedBy.full_name}
-                {assignedBy.email && <span className="ml-1.5 text-xs text-slate-400">({assignedBy.email})</span>}
+                {assignedBy.email && <span className="ms-1.5 text-xs text-slate-400">({assignedBy.email})</span>}
               </span>
             } />
           )}
         </div>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {classification.description && (
-            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-              <p className="mb-1 text-xs font-medium text-slate-400">Description (English)</p>
-              <p className="text-sm text-slate-700">{classification.description}</p>
-            </div>
-          )}
-          {classification.description_ar && (
-            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3" dir="rtl">
-              <p className="mb-1 text-xs font-medium text-slate-400">Description (Arabic)</p>
-              <p className="text-sm text-slate-700">{classification.description_ar}</p>
-            </div>
-          )}
-        </div>
+
+        {(classification.description || classification.description_ar) && (
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {classification.description && (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <p className="mb-1 text-xs font-medium text-slate-400">{t("classifications.description_info")}</p>
+                <p className="text-sm text-slate-700">{classification.description}</p>
+              </div>
+            )}
+            {classification.description_ar && (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3" dir="rtl">
+                <p className="mb-1 text-xs font-medium text-slate-400">{t("classifications.description_ar_info")}</p>
+                <p className="text-sm text-slate-700">{classification.description_ar}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <ClassificationDeleteModal

@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdEdit, MdGroups } from "react-icons/md";
-import PageHeader   from "components/ui/PageHeader";
+import PageHeader  from "components/ui/PageHeader";
 import { InputField, TextareaField, validate } from "components/form";
-import Button       from "components/ui/buttons/Button";
-import FormHeader   from "components/ui/form/FormHeader";
-import AlertBanner  from "components/ui/AlertBanner";
-import Loading      from "components/loading/Loading";
+import Button      from "components/ui/buttons/Button";
+import FormHeader  from "components/ui/form/FormHeader";
+import AlertBanner from "components/ui/AlertBanner";
+import Loading     from "components/loading/Loading";
 import { useGetClassification, useUpdateClassification } from "components/features/classifications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  name: [
-    { required: true, message: "Name is required" },
-    { maxLength: 255, message: "Name must be 255 characters or fewer" },
-  ],
+  name: [{ required: true }, { maxLength: 255 }],
 };
 
 export default function ClassificationEditForm() {
+  const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { execute: fetchClassification, loading, error: loadError } = useGetClassification();
   const { execute: updateClassification, loading: saving, error: saveError } = useUpdateClassification();
@@ -31,21 +32,16 @@ export default function ClassificationEditForm() {
 
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
-  const isDirty = !initial || (
-    form.name           !== initial.name           ||
-    form.name_ar        !== initial.name_ar        ||
-    form.description    !== initial.description    ||
-    form.description_ar !== initial.description_ar
-  );
+  const isDirty = !initial || JSON.stringify(form) !== JSON.stringify(initial);
 
   useEffect(() => {
     fetchClassification(id).then((data) => {
       if (!data) return;
       const snapshot = {
-        name:            data.name            ?? "",
-        name_ar:         data.name_ar         ?? "",
-        description:     data.description     ?? "",
-        description_ar:  data.description_ar  ?? "",
+        name:           data.name           ?? "",
+        name_ar:        data.name_ar        ?? "",
+        description:    data.description    ?? "",
+        description_ar: data.description_ar ?? "",
       };
       setForm(snapshot);
       setInitial(snapshot);
@@ -64,15 +60,15 @@ export default function ClassificationEditForm() {
 
     try {
       await updateClassification(id, {
-        name:            form.name,
-        name_ar:         form.name_ar         || undefined,
-        description:     form.description     || undefined,
-        description_ar:  form.description_ar  || undefined,
+        name:           form.name,
+        name_ar:        form.name_ar        || undefined,
+        description:    form.description    || undefined,
+        description_ar: form.description_ar || undefined,
       });
-      success("Classification updated", `"${form.name}" has been updated successfully.`);
-      navigate(`/admin/classifications/${id}`);
+      success(t("classifications.toast_updated"), `"${form.name}" ${t("classifications.toast_updated_sub")}`);
+      navigate(`${base}/classifications/${id}`);
     } catch (err) {
-      toastError("Failed to update classification", err?.message);
+      toastError(t("classifications.toast_update_failed"), err?.message);
     }
   };
 
@@ -84,10 +80,10 @@ export default function ClassificationEditForm() {
 
       <PageHeader
         icon={<MdEdit className="h-5 w-5" />}
-        title="Edit Classification"
-        subtitle={form.name || "Update classification details"}
+        title={t("classifications.edit_title")}
+        subtitle={form.name || t("classifications.detail_subtitle")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back" onClick={() => navigate(`/admin/classifications/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("classifications.back_to_classification")} onClick={() => navigate(`${base}/classifications/${id}`)} />
         }
       />
 
@@ -95,26 +91,26 @@ export default function ClassificationEditForm() {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdGroups className="h-5 w-5" />} title="Classification Details" subtitle="Update name and description" />
+          <FormHeader icon={<MdGroups className="h-5 w-5" />} title={t("classifications.section_title")} subtitle={t("classifications.section_subtitle_edit")} />
 
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Name (English)"
+              label={t("classifications.name_en")}
               field="name"
               placeholder="e.g. Refugee, Displaced, Asylum Seeker"
               formData={form} errors={errors} updateFormData={set} rules={RULES.name}
             />
             <InputField
-              label="Name (Arabic)"
+              label={t("classifications.name_ar_label")}
               field="name_ar"
-              placeholder="مثال: لاجئ، نازح، طالب لجوء"
+              placeholder={t("classifications.name_ar_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <TextareaField
-              label="Description (English)"
+              label={t("classifications.desc_en")}
               field="description"
               rows={3}
               placeholder="Brief description of this classification…"
@@ -122,10 +118,10 @@ export default function ClassificationEditForm() {
               formData={form} errors={errors} updateFormData={set}
             />
             <TextareaField
-              label="Description (Arabic)"
+              label={t("classifications.desc_ar_label")}
               field="description_ar"
               rows={3}
-              placeholder="وصف مختصر لهذا التصنيف…"
+              placeholder={t("classifications.desc_ar_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />
@@ -133,11 +129,11 @@ export default function ClassificationEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate(`/admin/classifications/${id}`)} className="flex-1" />
+          <Button variant="ghost" text={t("classifications.cancel")} onClick={() => navigate(`${base}/classifications/${id}`)} className="flex-1" />
           <Button
             type="submit"
             variant="primary"
-            text="Save Changes"
+            text={t("classifications.save_btn")}
             loading={saving}
             disabled={!form.name.trim() || !isDirty || saving}
             className="flex-1"
