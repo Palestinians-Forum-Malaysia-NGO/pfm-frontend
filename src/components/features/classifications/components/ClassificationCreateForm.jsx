@@ -21,7 +21,7 @@ export default function ClassificationCreateForm() {
   const { execute: createClassification, loading, error } = useCreateClassification();
   const { success, error: toastError } = useToast();
 
-  const [form, setForm]     = useState({ name: "", description: "" });
+  const [form, setForm]     = useState({ name: "", name_ar: "", description: "", description_ar: "" });
   const [errors, setErrors] = useState({});
 
   const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
@@ -37,8 +37,10 @@ export default function ClassificationCreateForm() {
 
     try {
       const created = await createClassification({
-        name:        form.name,
-        description: form.description || undefined,
+        name:            form.name,
+        name_ar:         form.name_ar         || undefined,
+        description:     form.description     || undefined,
+        description_ar:  form.description_ar  || undefined,
       });
       success("Classification created", `"${form.name}" has been added.`);
       navigate(`/admin/classifications/${created.id}`);
@@ -65,20 +67,39 @@ export default function ClassificationCreateForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdGroups className="h-5 w-5" />} title="Classification Details" subtitle="Name and description for this classification" />
 
-          <InputField
-            label="Name"
-            field="name"
-            placeholder="e.g. Refugee, Displaced, Asylum Seeker"
-            formData={form} errors={errors} updateFormData={set} rules={RULES.name}
-          />
-          <TextareaField
-            label="Description"
-            field="description"
-            rows={3}
-            placeholder="Brief description of this classification…"
-            required={false}
-            formData={form} errors={errors} updateFormData={set}
-          />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label="Name (English)"
+              field="name"
+              placeholder="e.g. Refugee, Displaced, Asylum Seeker"
+              formData={form} errors={errors} updateFormData={set} rules={RULES.name}
+            />
+            <InputField
+              label="Name (Arabic)"
+              field="name_ar"
+              placeholder="مثال: لاجئ، نازح، طالب لجوء"
+              required={false}
+              formData={form} errors={errors} updateFormData={set}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <TextareaField
+              label="Description (English)"
+              field="description"
+              rows={3}
+              placeholder="Brief description of this classification…"
+              required={false}
+              formData={form} errors={errors} updateFormData={set}
+            />
+            <TextareaField
+              label="Description (Arabic)"
+              field="description_ar"
+              rows={3}
+              placeholder="وصف مختصر لهذا التصنيف…"
+              required={false}
+              formData={form} errors={errors} updateFormData={set}
+            />
+          </div>
         </div>
 
         <div className="flex gap-3">

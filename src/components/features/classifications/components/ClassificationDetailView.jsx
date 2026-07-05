@@ -83,6 +83,9 @@ export default function ClassificationDetailView() {
             </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900">{classification.name}</h2>
+          {classification.name_ar && (
+            <p className="mt-0.5 text-base font-medium text-slate-500" dir="rtl">{classification.name_ar}</p>
+          )}
           {classification.description && (
             <p className="mt-1 text-sm text-slate-500">{classification.description}</p>
           )}
@@ -93,8 +96,9 @@ export default function ClassificationDetailView() {
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader icon={<MdGroups className="h-5 w-5" />} title="Classification Information" subtitle="Full details for this classification" />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdTextFields className="h-4 w-4" />}     label="Name"        value={classification.name} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label="Created At"  value={formatDate(classification.assigned_at)} />
+          <InfoRow icon={<MdTextFields className="h-4 w-4" />}     label="Name (English)"  value={classification.name} />
+          <InfoRow icon={<MdTextFields className="h-4 w-4" />}     label="Name (Arabic)"   value={classification.name_ar || <span className="text-slate-300">—</span>} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label="Created At"      value={formatDate(classification.assigned_at)} />
           {assignedBy && (
             <InfoRow icon={<MdPerson className="h-4 w-4" />} label="Created By" value={
               <span>
@@ -104,12 +108,20 @@ export default function ClassificationDetailView() {
             } />
           )}
         </div>
-        {classification.description && (
-          <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-            <p className="mb-1 text-xs font-medium text-slate-400">Description</p>
-            <p className="text-sm text-slate-700">{classification.description}</p>
-          </div>
-        )}
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {classification.description && (
+            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+              <p className="mb-1 text-xs font-medium text-slate-400">Description (English)</p>
+              <p className="text-sm text-slate-700">{classification.description}</p>
+            </div>
+          )}
+          {classification.description_ar && (
+            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3" dir="rtl">
+              <p className="mb-1 text-xs font-medium text-slate-400">Description (Arabic)</p>
+              <p className="text-sm text-slate-700">{classification.description_ar}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <ClassificationDeleteModal
