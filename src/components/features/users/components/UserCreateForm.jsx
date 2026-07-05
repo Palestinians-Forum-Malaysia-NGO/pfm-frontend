@@ -5,6 +5,7 @@ import {
   MdArrowBack, MdPersonAdd, MdPerson, MdBusiness,
   MdAccountBalance, MdAttachMoney,
 } from "react-icons/md";
+import useLayoutBase from "hooks/useLayoutBase";
 import PageHeader   from "components/ui/PageHeader";
 import { InputField, SelectField, validate } from "components/form";
 import Button       from "components/ui/buttons/Button";
@@ -28,6 +29,7 @@ const EMPTY = {
 export default function UserCreateForm() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const { execute: createUser, loading, error } = useCreateUser();
   const { success, error: toastError } = useToast();
 
@@ -42,6 +44,12 @@ export default function UserCreateForm() {
       setFormData((p) => ({ ...p, [field]: value }));
     }
   };
+
+  const ROLE_OPTIONS = [
+    { value: "admin",       label: t("users.role_admin") },
+    { value: "staff",       label: t("users.role_staff") },
+    { value: "beneficiary", label: t("users.role_beneficiary") },
+  ];
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",   label: t("users.freq_monthly") },
@@ -92,7 +100,7 @@ export default function UserCreateForm() {
     try {
       const created = await createUser(payload);
       success(t("users.toast_created"), `${formData.full_name} ${t("users.toast_created_sub")}`);
-      navigate(`/admin/users/${created.id}`);
+      navigate(`${base}/users/${created.id}`);
     } catch (err) {
       toastError(t("users.toast_create_failed"), err?.message);
     }
@@ -106,7 +114,7 @@ export default function UserCreateForm() {
         title={t("users.add_admin_title")}
         subtitle={t("users.create_subtitle")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_users")} onClick={() => navigate("/admin/users")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_users")} onClick={() => navigate(`${base}/users`)} />
         }
       />
 
@@ -128,11 +136,18 @@ export default function UserCreateForm() {
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
             />
           </div>
-          <InputField
-            label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
-            required={false}
-            formData={formData} errors={errors} updateFormData={updateFormData}
-          />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+            <SelectField
+              label={t("users.role")} field="role"
+              options={ROLE_OPTIONS}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
+          </div>
         </div>
 
         {/* ── Employment Details ── */}
@@ -210,7 +225,7 @@ export default function UserCreateForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate("/admin/users")} className="flex-1" />
+          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate(`${base}/users`)} className="flex-1" />
           <Button
             type="submit" variant="primary" text={t("users.create_user")}
             icon={<MdPersonAdd className="h-4 w-4" />}

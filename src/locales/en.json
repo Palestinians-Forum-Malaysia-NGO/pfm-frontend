@@ -395,7 +395,22 @@
     "toast_updated": "User updated",
     "toast_updated_sub": "has been updated successfully.",
     "toast_update_failed": "Failed to update user",
-    "toast_has_been_removed": "has been removed."
+    "toast_has_been_removed": "has been removed.",
+    "col_user": "User",
+    "col_role": "Role",
+    "total_users": "Total Users",
+    "no_users": "No users found",
+    "add_first": "Add the first user to get started.",
+    "add_user": "Add User",
+    "role": "Role",
+    "role_all": "All Roles",
+    "role_admin": "Admin",
+    "role_staff": "Staff",
+    "role_beneficiary": "Beneficiary",
+    "full_name_ar": "Full Name (Arabic)",
+    "view_user": "View",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "categories": {
     "title": "Categories",

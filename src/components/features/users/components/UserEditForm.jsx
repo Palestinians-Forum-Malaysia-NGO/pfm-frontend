@@ -5,6 +5,7 @@ import {
   MdArrowBack, MdVerified, MdEdit, MdPerson,
   MdBusiness, MdAccountBalance, MdAttachMoney,
 } from "react-icons/md";
+import useLayoutBase from "hooks/useLayoutBase";
 import PageHeader  from "components/ui/PageHeader";
 import { InputField, SelectField, ToggleInput, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
@@ -13,7 +14,6 @@ import AlertBanner from "components/ui/AlertBanner";
 import Loading     from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
 import {
-  ROLE_VALUES, ROLE_LABELS,
   ROLE_BADGE_BORDER as ROLE_BADGE,
   ROLE_AVATAR_GRADIENT as AVATAR_BG,
 } from "components/features/users/constants/roles";
@@ -29,7 +29,7 @@ const RULES = {
 
 const EMPTY = {
   full_name: "", email: "", phone_number: "",
-  role: ROLE_VALUES.ADMIN, is_active: true,
+  role: "admin", is_active: true,
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
@@ -39,6 +39,7 @@ export default function UserEditForm() {
   const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { execute: fetchUser, loading, error: loadError } = useGetUser();
   const { execute: updateUser, loading: saving, error: saveError } = useUpdateUser();
@@ -47,6 +48,12 @@ export default function UserEditForm() {
   const [formData, setFormData] = useState(EMPTY);
   const [initial, setInitial]   = useState(null);
   const [errors, setErrors]     = useState({});
+
+  const ROLE_OPTIONS = [
+    { value: "admin",       label: t("users.role_admin") },
+    { value: "staff",       label: t("users.role_staff") },
+    { value: "beneficiary", label: t("users.role_beneficiary") },
+  ];
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",   label: t("users.freq_monthly") },
@@ -64,22 +71,7 @@ export default function UserEditForm() {
     }
   };
 
-  const isDirty = !initial || (
-    formData.full_name    !== initial.full_name    ||
-    formData.email        !== initial.email        ||
-    formData.phone_number !== initial.phone_number ||
-    formData.is_active    !== initial.is_active    ||
-    formData.department   !== initial.department   ||
-    formData.job_title    !== initial.job_title    ||
-    formData.branch       !== initial.branch       ||
-    formData.joining_date !== initial.joining_date ||
-    formData.banking_information.bank_name           !== initial.banking_information.bank_name           ||
-    formData.banking_information.account_number      !== initial.banking_information.account_number      ||
-    formData.banking_information.account_holder_name !== initial.banking_information.account_holder_name ||
-    formData.financial_information.job_title         !== initial.financial_information.job_title         ||
-    formData.financial_information.salary            !== initial.financial_information.salary            ||
-    formData.financial_information.payment_frequency !== initial.financial_information.payment_frequency
-  );
+  const isDirty = !initial || JSON.stringify(formData) !== JSON.stringify(initial);
 
   useEffect(() => {
     fetchUser(id).then((data) => {
@@ -88,7 +80,7 @@ export default function UserEditForm() {
         full_name:    data.full_name    ?? "",
         email:        data.email        ?? "",
         phone_number: data.phone_number ?? "",
-        role:         ROLE_VALUES.ADMIN,
+        role:         data.role         ?? "admin",
         is_active:    data.is_active    ?? true,
         department:   data.department   ?? "",
         job_title:    data.job_title    ?? "",
@@ -148,7 +140,7 @@ export default function UserEditForm() {
     try {
       await updateUser(id, payload);
       success(t("users.toast_updated"), `${formData.full_name} ${t("users.toast_updated_sub")}`);
-      navigate(`/admin/users/${id}`);
+      navigate(`${base}/users/${id}`);
     } catch (err) {
       toastError(t("users.toast_update_failed"), err?.message);
     }
@@ -165,7 +157,7 @@ export default function UserEditForm() {
         title={t("users.edit_admin_title")}
         subtitle={formData.full_name || t("users.user_details")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_user")} onClick={() => navigate(`/admin/users/${id}`)} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.back_to_user")} onClick={() => navigate(`${base}/users/${id}`)} />
         }
       />
 
@@ -181,7 +173,7 @@ export default function UserEditForm() {
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ROLE_BADGE[formData.role] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
               <MdVerified className="h-3.5 w-3.5" />
-              {ROLE_LABELS[formData.role] ?? formData.role}
+              {t(`users.role_${formData.role}`, { defaultValue: formData.role })}
             </span>
           </div>
           <h2 className="text-xl font-bold text-slate-900">
@@ -222,8 +214,13 @@ export default function UserEditForm() {
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
-            <ToggleInput label={t("users.account_active")} field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <SelectField
+              label={t("users.role")} field="role"
+              options={ROLE_OPTIONS}
+              formData={formData} errors={errors} updateFormData={updateFormData}
+            />
           </div>
+          <ToggleInput label={t("users.account_active")} field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
         </div>
 
         {/* ── Employment Details ── */}
@@ -301,7 +298,7 @@ export default function UserEditForm() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate(`/admin/users/${id}`)} className="flex-1" />
+          <Button variant="ghost" text={t("users.cancel")} onClick={() => navigate(`${base}/users/${id}`)} className="flex-1" />
           <Button
             type="submit" variant="primary" text={t("users.save_changes")}
             loading={saving}

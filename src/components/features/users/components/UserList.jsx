@@ -4,26 +4,28 @@ import { useTranslation } from "react-i18next";
 import {
   MdAdd, MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdManageAccounts, MdClose,
-  MdPerson,
+  MdPerson, MdVerified,
 } from "react-icons/md";
-import StorageImage  from "components/ui/StorageImage";
+import useLayoutBase from "hooks/useLayoutBase";
+import StorageImage from "components/ui/StorageImage";
 import { useUsers } from "components/features/users/hooks/useUsers";
 import UserDeleteModal from "./UserDeleteModal";
-import Button        from "components/ui/buttons/Button";
-import PageHeader    from "components/ui/PageHeader";
-import FilterSelect  from "components/ui/FilterSelect";
+import Button from "components/ui/buttons/Button";
+import PageHeader from "components/ui/PageHeader";
+import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
-import SearchInput   from "components/form/SearchInput";
-import SimpleDataTable from "components/ui/SimpleDataTable";
-import { ROLE_AVATAR_BG } from "components/features/users/constants/roles";
-import { useToast }  from "components/ui/toast/ToastContext";
+import SearchInput from "components/form/SearchInput";
+import DataTable from "components/ui/DataTable";
+import { ROLE_AVATAR_BG, ROLE_BADGE } from "components/features/users/constants/roles";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
 export default function UserList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const base = useLayoutBase();
   const { success, error: toastError } = useToast();
   const {
     users, loading, error,
@@ -41,8 +43,9 @@ export default function UserList() {
     }
   };
 
-  const [search, setSearch]             = useState("");
+  const [search, setSearch]         = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [roleFilter, setRoleFilter]   = useState("all");
 
   const STATUS_OPTIONS = [
     { value: "all",      label: t("users.status_all") },
@@ -50,19 +53,28 @@ export default function UserList() {
     { value: "inactive", label: t("users.status_inactive") },
   ];
 
-  const hasFilters = search !== "" || statusFilter !== "all";
+  const ROLE_OPTIONS = [
+    { value: "all",         label: t("users.role_all") },
+    { value: "admin",       label: t("users.role_admin") },
+    { value: "staff",       label: t("users.role_staff") },
+    { value: "beneficiary", label: t("users.role_beneficiary") },
+  ];
 
-  const clearFilters = () => { setSearch(""); setStatusFilter("all"); };
+  const hasFilters = search !== "" || statusFilter !== "all" || roleFilter !== "all";
+
+  const clearFilters = () => { setSearch(""); setStatusFilter("all"); setRoleFilter("all"); };
 
   const filtered = useMemo(() => users.filter((u) => {
-    const matchSearch = search
-      ? (u.full_name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-        (u.email ?? "").toLowerCase().includes(search.toLowerCase())
-      : true;
-    const matchStatus = statusFilter === "all" ||
-      (statusFilter === "active" ? u.is_active : !u.is_active);
-    return matchSearch && matchStatus;
-  }), [users, search, statusFilter]);
+    const q = search.toLowerCase();
+    const matchSearch = !q
+      || (u.full_name ?? "").toLowerCase().includes(q)
+      || (u.full_name_ar ?? "").toLowerCase().includes(q)
+      || (u.email ?? "").toLowerCase().includes(q);
+    const matchStatus = statusFilter === "all"
+      || (statusFilter === "active" ? u.is_active : !u.is_active);
+    const matchRole = roleFilter === "all" || u.role === roleFilter;
+    return matchSearch && matchStatus && matchRole;
+  }), [users, search, statusFilter, roleFilter]);
 
   const stats = useMemo(() => ({
     total:    users.length,
@@ -72,10 +84,10 @@ export default function UserList() {
 
   const statCards = [
     {
-      key: "total", label: t("users.total_admins"), value: stats.total,
+      key: "total", label: t("users.total_users"), value: stats.total,
       icon: <MdPeople className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
-      active: statusFilter === "all",
-      onClick: () => setStatusFilter("all"),
+      active: statusFilter === "all" && roleFilter === "all",
+      onClick: () => { setStatusFilter("all"); setRoleFilter("all"); },
     },
     {
       key: "active", label: t("users.status_active"), value: stats.active,
@@ -94,7 +106,7 @@ export default function UserList() {
   const columns = [
     {
       key: "user",
-      label: t("users.col_admin"),
+      label: t("users.col_user"),
       icon: <MdPerson className="h-3.5 w-3.5" />,
       render: (user) => (
         <div className="flex items-center gap-3">
@@ -104,11 +116,24 @@ export default function UserList() {
               : getInitials(user.full_name)
             }
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 max-w-[220px] flex-1">
             <p className="truncate font-semibold text-slate-900">{user.full_name}</p>
+            {user.full_name_ar && (
+              <p className="truncate text-xs text-slate-400" dir="rtl">{user.full_name_ar}</p>
+            )}
             <p className="truncate text-xs text-slate-400">{user.email}</p>
           </div>
         </div>
+      ),
+    },
+    {
+      key: "role",
+      label: t("users.col_role"),
+      icon: <MdVerified className="h-3.5 w-3.5" />,
+      render: (user) => (
+        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_BADGE[user.role] ?? "bg-slate-100 text-slate-500"}`}>
+          {t(`users.role_${user.role}`, { defaultValue: user.role ?? "—" })}
+        </span>
       ),
     },
     {
@@ -119,7 +144,7 @@ export default function UserList() {
         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
           user.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
         }`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${user.is_active ? "bg-green" : "bg-slate-400"}`} />
+          <span className={`h-1.5 w-1.5 rounded-full ${user.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
           {user.is_active ? t("users.status_active") : t("users.status_inactive")}
         </span>
       ),
@@ -131,23 +156,23 @@ export default function UserList() {
       stopPropagation: true,
       render: (user) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`/admin/users/${user.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`/admin/users/${user.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title="Delete" onClick={() => openDelete(user)} variant="danger" />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("users.view_user")} onClick={() => navigate(`${base}/users/${user.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("users.edit")}      onClick={() => navigate(`${base}/users/${user.id}/edit`)} />
+          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("users.delete")}   onClick={() => openDelete(user)} variant="danger" />
         </div>
       ),
     },
   ];
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl border border-slate-200">
+    <div className="mx-auto max-w-5xl bg-white p-6 rounded-2xl border border-slate-200">
 
       <PageHeader
         icon={<MdManageAccounts className="h-5 w-5" />}
         title={t("users.title")}
         subtitle={t("users.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text={t("users.add_admin")} onClick={() => navigate("/admin/users/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text={t("users.add_user")} onClick={() => navigate(`${base}/users/create`)} />
         }
       />
 
@@ -155,7 +180,7 @@ export default function UserList() {
       <div className="mb-5 grid grid-cols-3 gap-3">
         {statCards.map((card) => (
           <button key={card.key} onClick={card.onClick}
-            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
+            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-start transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
               card.active ? "border-green/30 bg-green/5 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
             }`}
           >
@@ -172,23 +197,24 @@ export default function UserList() {
       <div className="mb-4 flex items-center gap-2">
         <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("users.search_placeholder")} className="flex-1" />
         <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
+        <FilterSelect value={roleFilter}   onChange={setRoleFilter}   options={ROLE_OPTIONS}   icon={<MdVerified className="h-3.5 w-3.5" />} />
         {hasFilters && (
           <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("users.clear")} onClick={clearFilters} />
         )}
       </div>
 
       {/* ── Table ── */}
-      <SimpleDataTable
+      <DataTable
         columns={columns}
         data={filtered}
         loading={loading}
         error={error}
-        onRowClick={(user) => navigate(`/admin/users/${user.id}`)}
+        onRowClick={(user) => navigate(`${base}/users/${user.id}`)}
         pageSize={8}
         emptyIcon={<MdPeople />}
-        emptyTitle={t("users.no_admins")}
-        emptyDesc={hasFilters ? t("users.adjust_filters") : t("users.add_first_admin")}
-        emptyAction={!hasFilters ? { label: t("users.add_admin"), onClick: () => navigate("/admin/users/create") } : undefined}
+        emptyTitle={t("users.no_users")}
+        emptyDesc={hasFilters ? t("users.adjust_filters") : t("users.add_first")}
+        emptyAction={!hasFilters ? { label: t("users.add_user"), onClick: () => navigate(`${base}/users/create`) } : undefined}
       />
 
       <UserDeleteModal

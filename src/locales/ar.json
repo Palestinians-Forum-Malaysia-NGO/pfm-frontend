@@ -395,7 +395,22 @@
     "toast_updated": "تم تحديث المستخدم",
     "toast_updated_sub": "تم تحديثه بنجاح.",
     "toast_update_failed": "فشل تحديث المستخدم",
-    "toast_has_been_removed": "تمت إزالته."
+    "toast_has_been_removed": "تمت إزالته.",
+    "col_user": "المستخدم",
+    "col_role": "الدور",
+    "total_users": "إجمالي المستخدمين",
+    "no_users": "لا يوجد مستخدمون",
+    "add_first": "أضف أول مستخدم للبدء.",
+    "add_user": "إضافة مستخدم",
+    "role": "الدور",
+    "role_all": "كل الأدوار",
+    "role_admin": "مدير",
+    "role_staff": "موظف",
+    "role_beneficiary": "مستفيد",
+    "full_name_ar": "الاسم الكامل (عربي)",
+    "view_user": "عرض",
+    "edit": "تعديل",
+    "delete": "حذف"
   },
   "categories": {
     "title": "الفئات",

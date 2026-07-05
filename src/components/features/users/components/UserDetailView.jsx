@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdEdit, MdDeleteOutline, MdPerson } from "react-icons/md";
+import useLayoutBase from "hooks/useLayoutBase";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -16,6 +17,7 @@ export default function UserDetailView() {
   const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
+  const base = useLayoutBase();
 
   const { user, execute: fetchUser, loading, error } = useGetUser();
   const { execute: deleteUser, loading: deleteLoading, error: deleteError } = useDeleteUser();
@@ -28,7 +30,7 @@ export default function UserDetailView() {
     try {
       await deleteUser(id);
       success(t("users.toast_deleted"), `${user?.full_name} ${t("users.toast_has_been_removed")}`);
-      navigate("/admin/users");
+      navigate(`${base}/users`);
     } catch (err) {
       toastError(t("users.toast_delete_failed"), err?.message);
     }
@@ -47,11 +49,11 @@ export default function UserDetailView() {
         subtitle={t("users.user_details")}
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.title")} onClick={() => navigate("/admin/users")} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("users.title")} onClick={() => navigate(`${base}/users`)} />
             <DropdownButton
               label={t("users.actions")}
               items={[
-                { label: t("users.edit_user"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`/admin/users/${id}/edit`) },
+                { label: t("users.edit_user"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/users/${id}/edit`) },
                 { divider: true },
                 { label: t("users.delete_user"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}
