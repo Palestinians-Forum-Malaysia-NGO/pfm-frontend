@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useGetCategories } from "./useGetCategories";
 import { useDeleteCategory } from "./useDeleteCategory";
 import { useToast } from "components/ui/toast/ToastContext";
 
 export function useCategoryList() {
+  const { t } = useTranslation();
   const { categories: allCategories, loading, error, refetch } = useGetCategories();
   const { execute: deleteCategory, loading: deleteLoading }    = useDeleteCategory();
   const { success, error: toastError }                         = useToast();
@@ -23,7 +25,9 @@ export function useCategoryList() {
       list = list.filter(
         (c) =>
           c.name.toLowerCase().includes(q) ||
+          (c.name_ar ?? "").toLowerCase().includes(q) ||
           (c.description ?? "").toLowerCase().includes(q) ||
+          (c.description_ar ?? "").toLowerCase().includes(q) ||
           (c.slug ?? "").toLowerCase().includes(q) ||
           (c.module ?? "").toLowerCase().includes(q)
       );
@@ -41,11 +45,11 @@ export function useCategoryList() {
     if (!toDelete) return;
     try {
       await deleteCategory(toDelete.id);
-      success("Category deleted", `"${toDelete.name}" has been removed.`);
+      success(t("categories.toast_deleted"), `"${toDelete.name}" ${t("categories.toast_deleted_sub")}`);
       setToDelete(null);
       refetch();
     } catch (err) {
-      toastError("Failed to delete category", err?.message);
+      toastError(t("categories.toast_delete_failed"), err?.message);
     }
   };
 

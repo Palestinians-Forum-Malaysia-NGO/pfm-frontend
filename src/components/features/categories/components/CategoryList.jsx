@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdCategory, MdCheckCircle, MdCancel,
@@ -16,13 +17,8 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 
-const STATUS_OPTIONS = [
-  { value: "all",      label: "All Status" },
-  { value: "active",   label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export default function CategoryList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
   const {
@@ -36,21 +32,27 @@ export default function CategoryList() {
     handleDeleteConfirm,
   } = useCategoryList();
 
+  const STATUS_OPTIONS = [
+    { value: "all",      label: t("categories.status_all") },
+    { value: "active",   label: t("categories.status_active") },
+    { value: "inactive", label: t("categories.status_inactive") },
+  ];
+
   const statCards = [
     {
-      key: "total", label: "Total Categories", value: stats.total,
+      key: "total", label: t("categories.total"), value: stats.total,
       icon: <MdCategory className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
       active: statusFilter === "all",
       onClick: () => setStatusFilter("all"),
     },
     {
-      key: "active", label: "Active", value: stats.active,
+      key: "active", label: t("categories.status_active"), value: stats.active,
       icon: <MdCheckCircle className="h-5 w-5" />, color: "text-green", bgColor: "bg-green/10",
       active: statusFilter === "active",
       onClick: () => setStatusFilter((s) => s === "active" ? "all" : "active"),
     },
     {
-      key: "inactive", label: "Inactive", value: stats.inactive,
+      key: "inactive", label: t("categories.status_inactive"), value: stats.inactive,
       icon: <MdCancel className="h-5 w-5" />, color: "text-slate-400", bgColor: "bg-slate-100",
       active: statusFilter === "inactive",
       onClick: () => setStatusFilter((s) => s === "inactive" ? "all" : "inactive"),
@@ -60,7 +62,7 @@ export default function CategoryList() {
   const columns = [
     {
       key: "name",
-      label: "Category",
+      label: t("categories.col_category"),
       icon: <MdCategory className="h-3.5 w-3.5" />,
       render: (c) => (
         <div className="flex items-center gap-3">
@@ -76,6 +78,7 @@ export default function CategoryList() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold text-slate-900">{c.name}</p>
+            {c.name_ar && <p className="truncate text-xs text-slate-400" dir="rtl">{c.name_ar}</p>}
             <p className="truncate font-mono text-xs text-slate-400">{c.slug}</p>
           </div>
         </div>
@@ -83,7 +86,7 @@ export default function CategoryList() {
     },
     {
       key: "module",
-      label: "Module",
+      label: t("categories.col_module"),
       icon: <MdApps className="h-3.5 w-3.5" />,
       render: (c) => c.module
         ? <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 capitalize">{MODULE_LABELS[c.module] ?? c.module}</span>
@@ -91,7 +94,7 @@ export default function CategoryList() {
     },
     {
       key: "description",
-      label: "Description",
+      label: t("categories.col_description"),
       render: (c) => (
         <span className="line-clamp-1 text-sm text-slate-600">
           {c.description || <span className="text-slate-300">—</span>}
@@ -100,34 +103,34 @@ export default function CategoryList() {
     },
     {
       key: "order",
-      label: "Order",
+      label: t("categories.col_order"),
       render: (c) => (
         <span className="text-sm text-slate-500">{c.order ?? <span className="text-slate-300">—</span>}</span>
       ),
     },
     {
       key: "status",
-      label: "Status",
+      label: t("categories.col_status"),
       icon: <MdCheckCircle className="h-3.5 w-3.5" />,
       render: (c) => (
         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
           c.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
         }`}>
           <span className={`h-1.5 w-1.5 rounded-full ${c.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-          {c.is_active ? "Active" : "Inactive"}
+          {c.is_active ? t("categories.status_active") : t("categories.status_inactive")}
         </span>
       ),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t("categories.col_actions"),
       align: "right",
       stopPropagation: true,
       render: (c) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`${base}/categories/${c.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`${base}/categories/${c.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title="Delete" onClick={() => setToDelete(c)} variant="danger" />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("categories.actions")} onClick={() => navigate(`${base}/categories/${c.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("categories.edit_category")}   onClick={() => navigate(`${base}/categories/${c.id}/edit`)} />
+          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("categories.delete_category")} onClick={() => setToDelete(c)} variant="danger" />
         </div>
       ),
     },
@@ -140,17 +143,17 @@ export default function CategoryList() {
 
       <PageHeader
         icon={<MdCategory className="h-5 w-5" />}
-        title="Categories"
-        subtitle="Manage content categories across PFM modules"
+        title={t("categories.title")}
+        subtitle={t("categories.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Category" onClick={() => navigate(`${base}/categories/create`)} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text={t("categories.add_category")} onClick={() => navigate(`${base}/categories/create`)} />
         }
       />
 
       <div className="mb-5 grid grid-cols-3 gap-3">
         {statCards.map((card) => (
           <button key={card.key} onClick={card.onClick}
-            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
+            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-start transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
               card.active ? "border-green/30 bg-green/5 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
             }`}
           >
@@ -164,11 +167,11 @@ export default function CategoryList() {
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder="Search by name, slug, or description…" className="flex-1" />
+        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("categories.search_placeholder")} className="flex-1" />
         <FilterSelect value={moduleFilter} onChange={setModuleFilter} options={MODULE_FILTER_OPTIONS} icon={<MdApps className="h-3.5 w-3.5" />} />
         <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS}        icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         {hasFilters && (
-          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text="Clear"
+          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("categories.clear")}
             onClick={() => { setSearch(""); setStatusFilter("all"); setModuleFilter("all"); }} />
         )}
       </div>
@@ -182,9 +185,9 @@ export default function CategoryList() {
         selectable
         pageSize={10}
         emptyIcon={<MdCategory />}
-        emptyTitle="No categories found"
-        emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first PFM category."}
-        emptyAction={!hasFilters ? { label: "Add Category", onClick: () => navigate(`${base}/categories/create`) } : undefined}
+        emptyTitle={t("categories.no_categories")}
+        emptyDesc={hasFilters ? t("categories.adjust_filters") : t("categories.add_first")}
+        emptyAction={!hasFilters ? { label: t("categories.add_category"), onClick: () => navigate(`${base}/categories/create`) } : undefined}
       />
 
       <CategoryDeleteModal

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdCategory,
@@ -20,6 +21,7 @@ import { MODULE_LABELS } from "components/features/categories/constants/category
 import { useToast } from "components/ui/toast/ToastContext";
 
 export default function CategoryDetailView() {
+  const { t } = useTranslation();
   const { id }   = useParams();
   const navigate = useNavigate();
   const base = useLayoutBase();
@@ -34,10 +36,10 @@ export default function CategoryDetailView() {
   const handleDelete = async () => {
     try {
       await deleteCategory(id);
-      success("Category deleted", `"${category?.name}" has been removed.`);
+      success(t("categories.toast_deleted"), `"${category?.name}" ${t("categories.toast_deleted_sub")}`);
       navigate(`${base}/categories`);
     } catch (err) {
-      toastError("Failed to delete category", err?.message);
+      toastError(t("categories.toast_delete_failed"), err?.message);
     }
   };
 
@@ -51,16 +53,16 @@ export default function CategoryDetailView() {
       <PageHeader
         icon={<MdCategory className="h-5 w-5" />}
         title={category.name}
-        subtitle="Category Details"
+        subtitle={t("categories.detail_subtitle")}
         actions={
           <>
-            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Categories" onClick={() => navigate(`${base}/categories`)} />
+            <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("categories.back")} onClick={() => navigate(`${base}/categories`)} />
             <DropdownButton
-              label="Actions"
+              label={t("categories.actions")}
               items={[
-                { label: "Edit Category",   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/categories/${id}/edit`) },
+                { label: t("categories.edit_category"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/categories/${id}/edit`) },
                 { divider: true },
-                { label: "Delete Category", icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                { label: t("categories.delete_category"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
               ]}
             />
           </>
@@ -77,8 +79,7 @@ export default function CategoryDetailView() {
         <div className="px-6 pb-6">
           <div className="-mt-8 mb-4 flex items-end justify-between">
             <div
-              className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ring-4 ring-white shadow-md"
-              className={!category.hex_color ? "bg-green/10 text-green" : ""}
+              className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ring-4 ring-white shadow-md ${!category.hex_color ? "bg-green/10 text-green" : ""}`}
               style={category.hex_color ? { background: category.hex_color, color: category.text_color || undefined } : undefined}
             >
               <MdCategory className="h-7 w-7" />
@@ -93,11 +94,14 @@ export default function CategoryDetailView() {
                 category.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
               }`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${category.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-                {category.is_active ? "Active" : "Inactive"}
+                {category.is_active ? t("categories.status_active") : t("categories.status_inactive")}
               </span>
             </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900">{category.name}</h2>
+          {category.name_ar && (
+            <p className="mt-0.5 text-base font-semibold text-slate-500" dir="rtl">{category.name_ar}</p>
+          )}
           <p className="mt-1 font-mono text-xs text-slate-400">{category.slug}</p>
           {category.description && (
             <p className="mt-2 text-sm text-slate-500">{category.description}</p>
@@ -107,20 +111,23 @@ export default function CategoryDetailView() {
 
       {/* ── Category Information ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdCategory className="h-5 w-5" />} title="Category Information" subtitle="Full details for this category" />
+        <FormHeader icon={<MdCategory className="h-5 w-5" />} title={t("categories.section_title")} subtitle={t("categories.detail_subtitle")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdTextFields className="h-4 w-4" />}  label="Name"   value={category.name} />
-          <InfoRow icon={<MdLink className="h-4 w-4" />}        label="Slug"   value={<span className="font-mono text-xs">{category.slug}</span>} />
-          <InfoRow icon={<MdApps className="h-4 w-4" />}        label="Module" value={MODULE_LABELS[category.module] ?? category.module ?? "—"} />
-          <InfoRow icon={<MdSort className="h-4 w-4" />}        label="Order"  value={category.order ?? "—"} />
-          <InfoRow icon={<MdCheckCircle className="h-4 w-4" />} label="Status" value={category.is_active ? "Active" : "Inactive"} />
+          <InfoRow icon={<MdTextFields className="h-4 w-4" />}  label={t("categories.name_info")}   value={category.name} />
+          {category.name_ar && (
+            <InfoRow icon={<MdTextFields className="h-4 w-4" />} label={t("categories.name_ar_info")} value={<span dir="rtl">{category.name_ar}</span>} />
+          )}
+          <InfoRow icon={<MdLink className="h-4 w-4" />}        label={t("categories.slug_info")}   value={<span className="font-mono text-xs">{category.slug}</span>} />
+          <InfoRow icon={<MdApps className="h-4 w-4" />}        label={t("categories.module_info")} value={MODULE_LABELS[category.module] ?? category.module ?? "—"} />
+          <InfoRow icon={<MdSort className="h-4 w-4" />}        label={t("categories.order_info")}  value={category.order ?? "—"} />
+          <InfoRow icon={<MdCheckCircle className="h-4 w-4" />} label={t("categories.status_info")} value={category.is_active ? t("categories.status_active") : t("categories.status_inactive")} />
           {category.parent && (
-            <InfoRow icon={<MdAccountTree className="h-4 w-4" />} label="Parent ID" value={<span className="font-mono text-xs">{category.parent}</span>} />
+            <InfoRow icon={<MdAccountTree className="h-4 w-4" />} label={t("categories.parent_info")} value={<span className="font-mono text-xs">{category.parent}</span>} />
           )}
           {category.hex_color && (
             <InfoRow
               icon={<MdPalette className="h-4 w-4" />}
-              label="Background Color"
+              label={t("categories.bg_color_info")}
               value={
                 <div className="flex items-center gap-2">
                   <span className="h-5 w-5 rounded-md border border-slate-200 shadow-sm" style={{ background: category.hex_color }} />
@@ -132,7 +139,7 @@ export default function CategoryDetailView() {
           {category.text_color && (
             <InfoRow
               icon={<MdPalette className="h-4 w-4" />}
-              label="Text Color"
+              label={t("categories.text_color_info")}
               value={
                 <div className="flex items-center gap-2">
                   <span className="h-5 w-5 rounded-md border border-slate-200 shadow-sm" style={{ background: category.text_color }} />
@@ -142,10 +149,22 @@ export default function CategoryDetailView() {
             />
           )}
         </div>
-        {category.description && (
-          <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-            <p className="mb-1 text-xs font-medium text-slate-400">Description</p>
-            <p className="text-sm text-slate-700">{category.description}</p>
+
+        {/* Description bilingual */}
+        {(category.description || category.description_ar) && (
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {category.description && (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <p className="mb-1 text-xs font-medium text-slate-400">{t("categories.description_info")}</p>
+                <p className="text-sm text-slate-700">{category.description}</p>
+              </div>
+            )}
+            {category.description_ar && (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3" dir="rtl">
+                <p className="mb-1 text-xs font-medium text-slate-400">{t("categories.description_ar_info")}</p>
+                <p className="text-sm text-slate-700">{category.description_ar}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -153,18 +172,19 @@ export default function CategoryDetailView() {
       {/* ── Children ── */}
       {category.children?.length > 0 && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdSubdirectoryArrowRight className="h-5 w-5" />} title="Sub-Categories" subtitle="Child categories nested under this one" />
+          <FormHeader icon={<MdSubdirectoryArrowRight className="h-5 w-5" />} title={t("categories.sub_categories")} subtitle={t("categories.sub_categories_sub")} />
           <div className="flex flex-col gap-2">
             {category.children.map((child) => (
               <button
                 key={child.id}
                 onClick={() => navigate(`${base}/categories/${child.id}`)}
-                className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left transition-all duration-150 hover:border-green/30 hover:bg-green/5"
+                className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-start transition-all duration-150 hover:border-green/30 hover:bg-green/5"
               >
                 <div className="flex items-center gap-3">
                   <MdCategory className="h-4 w-4 shrink-0 text-green" />
                   <div>
                     <p className="text-sm font-medium text-slate-900">{child.name}</p>
+                    {child.name_ar && <p className="text-xs text-slate-400" dir="rtl">{child.name_ar}</p>}
                     <p className="font-mono text-xs text-slate-400">{child.slug}</p>
                   </div>
                 </div>
@@ -178,7 +198,7 @@ export default function CategoryDetailView() {
                     child.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-400"
                   }`}>
                     <span className={`h-1 w-1 rounded-full ${child.is_active ? "bg-green" : "bg-slate-400"}`} />
-                    {child.is_active ? "Active" : "Inactive"}
+                    {child.is_active ? t("categories.status_active") : t("categories.status_inactive")}
                   </span>
                 </div>
               </button>
