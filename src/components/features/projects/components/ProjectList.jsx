@@ -85,7 +85,7 @@ export default function ProjectList() {
       render: (p) => {
         const catName = (p.category?.name_ar && i18n.language === "ar") ? p.category.name_ar : p.category?.name;
         return (
-          <div className="min-w-0">
+          <div className="min-w-0 max-w-[260px]">
             <p className="truncate font-semibold text-slate-900">{p.title}</p>
             {p.title_ar && <p className="truncate text-xs text-slate-400" dir="rtl">{p.title_ar}</p>}
             {catName && (
@@ -122,7 +122,7 @@ export default function ProjectList() {
       render: (p) => (
         <div className="text-xs text-slate-500">
           <p>{fmtDate(p.start_date)}</p>
-          {p.end_date && <p className="text-slate-400">→ {fmtDate(p.end_date)}</p>}
+          {p.end_date && <p className="text-slate-400">{i18n.language === "ar" ? "←" : "→"} {fmtDate(p.end_date)}</p>}
         </div>
       ),
     },
