@@ -1,8 +1,18 @@
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import logo from "assets/brand/LOGO-wbg.png";
 import routes from "routes.js";
+import LanguageSwitcher from "components/navbar/LanguageSwitcher";
 
 export default function Auth() {
+  const { i18n } = useTranslation();
+
+  React.useEffect(() => {
+    document.documentElement.dir  = i18n.language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   const getRoutes = () =>
     routes.map((route, key) =>
       route.layout === "/auth" ? (
@@ -11,18 +21,23 @@ export default function Auth() {
     );
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="relative flex min-h-screen bg-slate-50">
+
+      {/* Language toggle — always visible in the top-start corner of the form panel */}
+      <div className="absolute ltr:right-4 rtl:left-4 top-4 z-20">
+        <LanguageSwitcher />
+      </div>
 
       {/* ── Left — Brand panel ── */}
-      <div className="relative hidden flex-col items-center justify-between bg-green px-10 py-14 lg:flex lg:w-[42%] rounded-br-[100px]">
+      <div className="relative hidden flex-col items-center justify-between bg-green px-10 py-14 lg:flex lg:w-[42%] ltr:rounded-br-[100px] rtl:rounded-bl-[100px]">
 
         {/* Decorative layer — clipped separately so the panel curve isn't cut */}
-        <div className="absolute inset-0 overflow-hidden rounded-br-[100px]">
+        <div className="absolute inset-0 overflow-hidden ltr:rounded-br-[100px] rtl:rounded-bl-[100px]">
           {/* Subtle grid pattern */}
           <div className="absolute inset-0 bg-auth-grid bg-[size:40px_40px] opacity-[0.06]" />
           {/* Glow blobs */}
-          <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-[80px]" />
-          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-green-700/40 blur-[80px]" />
+          <div className="absolute -top-32 ltr:-left-32 rtl:-right-32 h-80 w-80 rounded-full bg-white/10 blur-[80px]" />
+          <div className="absolute -bottom-24 ltr:-right-20 rtl:-left-20 h-72 w-72 rounded-full bg-green-700/40 blur-[80px]" />
         </div>
 
         {/* Top — flag labels */}

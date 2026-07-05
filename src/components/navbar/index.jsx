@@ -4,6 +4,7 @@ import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { MdNotificationsNone } from "react-icons/md";
 import { AuthContext } from "components/features/auth/context/AuthContext";
+import LanguageSwitcher from "components/navbar/LanguageSwitcher";
 
 const ROLE_PROFILE = {
   admin:       "/admin/profile",
@@ -37,8 +38,10 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
         </div>
       </div>
 
-      {/* Right — notifications + avatar */}
+      {/* Right — language switcher + notifications + avatar */}
       <div className="flex flex-shrink-0 items-center gap-2">
+        <LanguageSwitcher />
+
         {/* Notifications */}
         <Dropdown
           button={

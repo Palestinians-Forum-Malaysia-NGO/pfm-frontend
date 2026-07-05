@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdEmail, MdArrowBack } from "react-icons/md";
+import { MdEmail, MdArrowBack, MdArrowForward } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
@@ -10,7 +10,7 @@ import Checkbox      from "components/checkbox";
 import { useAuth, useLogin, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 
 const EMAIL_RULES    = [{ required: true }, { email: true }];
-const PASSWORD_RULES = [{ required: true }, { minLength: 8, message: "Password must be at least 8 characters" }];
+const PASSWORD_RULES = [{ required: true }, { minLength: 8 }];
 
 /* ──────────────────────────────────────────────
    Step 1 — Email + Password
@@ -147,7 +147,9 @@ const OtpStep = ({ email, channel, onBack }) => {
     <>
       <div className="mb-7">
         <button onClick={onBack} className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700">
-          <MdArrowBack className="h-4 w-4" /> {t("auth.back")}
+          <MdArrowBack className="ltr:block rtl:hidden h-4 w-4" />
+          <MdArrowForward className="ltr:hidden rtl:block h-4 w-4" />
+          {t("auth.back")}
         </button>
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10">
           <MdEmail className="h-6 w-6 text-green" />

@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/FooterAuthDefault";
@@ -21,6 +22,7 @@ const SUB_ROUTE_NAMES = {
 
 export default function StaffLayout() {
   const location = useLocation();
+  const { i18n } = useTranslation();
   const [open, setOpen]                 = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("Dashboard");
 
@@ -52,7 +54,10 @@ export default function StaffLayout() {
       ) : null
     );
 
-  document.documentElement.dir = "ltr";
+  React.useEffect(() => {
+    document.documentElement.dir  = i18n.language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -65,7 +70,7 @@ export default function StaffLayout() {
         />
       )}
 
-      <div className="flex flex-1 flex-col min-h-screen min-w-0 xl:ml-[280px]">
+      <div className="flex flex-1 flex-col min-h-screen min-w-0 xl:ltr:ml-[280px] xl:rtl:mr-[280px]">
         <Navbar onOpenSidenav={() => setOpen(true)} brandText={currentRoute} />
 
         <main className="flex-1 p-4 md:p-6">
