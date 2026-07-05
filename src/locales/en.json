@@ -473,6 +473,13 @@
     "delete_btn": "Delete",
     "cancel_btn": "Cancel"
   },
+  "table": {
+    "results": "results",
+    "page": "page",
+    "of": "of",
+    "prev": "Prev",
+    "next": "Next"
+  },
   "projects": {
     "title": "Projects",
     "subtitle": "Manage PFM community projects",

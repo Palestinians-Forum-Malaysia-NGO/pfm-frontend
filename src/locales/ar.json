@@ -473,6 +473,13 @@
     "delete_btn": "حذف",
     "cancel_btn": "إلغاء"
   },
+  "table": {
+    "results": "نتائج",
+    "page": "صفحة",
+    "of": "من",
+    "prev": "السابق",
+    "next": "التالي"
+  },
   "projects": {
     "title": "المشاريع",
     "subtitle": "إدارة مشاريع مجتمع PFM",

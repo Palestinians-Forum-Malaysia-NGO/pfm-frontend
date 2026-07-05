@@ -1,41 +1,11 @@
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import Loading from "components/loading/Loading";
 import EmptyState from "components/empty/empty";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 
-/**
- * DataTable — reusable table with pagination, loading, error, and empty states.
- *
- * Props:
- *   columns      – array of column defs (see below)
- *   data         – array of row objects
- *   keyField     – field used as React key (default: "id")
- *   loading      – boolean
- *   error        – string | null
- *   onRowClick   – (row) => void — makes rows clickable
- *   selectable   – show checkbox column (default: false)
- *   pageSize     – rows per page (default: 8, pass 0 to disable pagination)
- *   emptyIcon    – ReactNode for empty state
- *   emptyTitle   – string
- *   emptyDesc    – string
- *   emptyAction  – { label, onClick } | { label, href }
- *   minWidth     – table min-width class (default: "min-w-[600px]")
- *   className    – extra classes on the outer wrapper
- *
- * Column definition:
- *   {
- *     key            – unique string
- *     label          – header text
- *     icon           – optional icon beside header label
- *     render         – (row) => ReactNode  (required)
- *     headerClass    – extra class on <th>
- *     cellClass      – extra class on <td>
- *     align          – "left" | "right" | "center" (default: "left")
- *     stopPropagation – prevent row onClick when clicking this cell
- *   }
- */
 const DataTable = ({
   columns = [],
   data = [],
@@ -52,27 +22,24 @@ const DataTable = ({
   minWidth = "min-w-[600px]",
   className = "",
 }) => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
 
-  // Reset to page 1 when data changes
-  const totalPages = pageSize > 0
-    ? Math.max(1, Math.ceil(data.length / pageSize))
-    : 1;
+  const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(data.length / pageSize)) : 1;
 
   const paginated = useMemo(() => {
     if (pageSize <= 0) return data;
     return data.slice((page - 1) * pageSize, page * pageSize);
   }, [data, page, pageSize]);
 
-  // Reset page if data shrinks and current page is out of range
   React.useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [totalPages, page]);
 
   const alignClass = (align) => {
-    if (align === "right")  return "text-right";
+    if (align === "right")  return "text-end";
     if (align === "center") return "text-center";
-    return "text-left";
+    return "text-start";
   };
 
   if (loading) return <Loading text="Loading..." />;
@@ -97,7 +64,7 @@ const DataTable = ({
 
           {/* Head */}
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left">
+            <tr className="border-b border-slate-200 bg-slate-50 text-start">
               {selectable && (
                 <th className="w-10 px-4 py-3">
                   <input type="checkbox" className="accent-green h-3.5 w-3.5 rounded" />
@@ -159,9 +126,9 @@ const DataTable = ({
               {data.length}
             </span>
             <span className="text-xs text-slate-400">
-              results &mdash; page{" "}
+              {t("table.results")} &mdash; {t("table.page")}{" "}
               <span className="font-semibold text-slate-600">{page}</span>
-              {" of "}
+              {" "}{t("table.of")}{" "}
               <span className="font-semibold text-slate-600">{totalPages}</span>
             </span>
           </div>
@@ -169,8 +136,8 @@ const DataTable = ({
           {/* Pagination */}
           <div className={`flex items-center justify-center gap-1 sm:justify-end ${totalPages <= 1 ? "pointer-events-none opacity-40" : ""}`}>
             <PrevButton
-              text="Prev"
-              icon={<MdChevronLeft className="h-3.5 w-3.5" />}
+              text={t("table.prev")}
+              icon={<span className="inline-flex rtl:rotate-180"><MdChevronLeft className="h-3.5 w-3.5" /></span>}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
             />
@@ -190,8 +157,8 @@ const DataTable = ({
             </div>
 
             <NextButton
-              text="Next"
-              icon={<MdChevronRight className="h-3.5 w-3.5" />}
+              text={t("table.next")}
+              icon={<span className="inline-flex rtl:rotate-180"><MdChevronRight className="h-3.5 w-3.5" /></span>}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             />
