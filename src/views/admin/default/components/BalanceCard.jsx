@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdPeople, MdCheckCircle, MdHourglassTop,
   MdMale, MdFemale, MdArrowForward,
@@ -43,6 +44,7 @@ const StatCard = ({ icon: Icon, label, value, pct, iconBg, iconColor, badgeColor
 );
 
 const BalanceCard = () => {
+  const { t } = useTranslation();
   const { stats, loading } = useGetBeneficiaryStats();
   const navigate = useNavigate();
 
@@ -56,27 +58,27 @@ const BalanceCard = () => {
 
   const CARDS = [
     {
-      icon: MdPeople,      label: "Total Beneficiaries", value: total,
+      icon: MdPeople,      label: t("beneficiaries.stat_total"), value: total,
       pct: null,           iconBg: "bg-green/10",         iconColor: "text-green",
       badgeColor: "",
     },
     {
-      icon: MdCheckCircle, label: "Active",               value: active,
+      icon: MdCheckCircle, label: t("beneficiaries.stat_active"), value: active,
       pct: pct(active),    iconBg: "bg-green/10",         iconColor: "text-green",
       badgeColor: "bg-green/10 text-green",
     },
     {
-      icon: MdHourglassTop,label: "Pending",              value: pending,
+      icon: MdHourglassTop,label: t("beneficiaries.stat_pending"), value: pending,
       pct: pct(pending),   iconBg: "bg-amber-50",         iconColor: "text-amber-500",
       badgeColor: "bg-amber-50 text-amber-500",
     },
     {
-      icon: MdMale,        label: "Male",                 value: male,
+      icon: MdMale,        label: t("beneficiaries.gender_male"), value: male,
       pct: pct(male),      iconBg: "bg-blue-50",          iconColor: "text-blue-500",
       badgeColor: "bg-blue-50 text-blue-500",
     },
     {
-      icon: MdFemale,      label: "Female",               value: female,
+      icon: MdFemale,      label: t("beneficiaries.gender_female"), value: female,
       pct: pct(female),    iconBg: "bg-pink-50",          iconColor: "text-pink-500",
       badgeColor: "bg-pink-50 text-pink-500",
     },
@@ -85,12 +87,12 @@ const BalanceCard = () => {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-bold text-navy-700">Beneficiary Summary</p>
+        <p className="text-sm font-bold text-navy-700">{t("admin_dashboard.beneficiary_summary")}</p>
         <button
           onClick={() => navigate("/admin/beneficiaries")}
           className="inline-flex items-center gap-1 text-xs font-semibold text-green transition-colors duration-150 hover:text-green-600"
         >
-          View all <MdArrowForward className="h-3.5 w-3.5" />
+          {t("home.view_all")} <MdArrowForward className="h-3.5 w-3.5" />
         </button>
       </div>
 

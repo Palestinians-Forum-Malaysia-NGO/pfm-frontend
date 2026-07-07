@@ -9,7 +9,6 @@ import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateCategory, useGetCategories } from "components/features/categories/hooks";
-import { MODULE_OPTIONS } from "components/features/categories/constants/category";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
@@ -18,6 +17,13 @@ const RULES = {
 
 export default function CategoryCreateForm() {
   const { t, i18n } = useTranslation();
+  const MODULE_OPTIONS = [
+    { value: "beneficiaries", label: t("categories.module_beneficiaries") },
+    { value: "projects",      label: t("categories.module_projects") },
+    { value: "blogs",         label: t("categories.module_blogs") },
+    { value: "donations",     label: t("categories.module_donations") },
+    { value: "campaigns",     label: t("categories.module_campaigns") },
+  ];
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createCategory, loading, error } = useCreateCategory();
@@ -116,7 +122,7 @@ export default function CategoryCreateForm() {
             <TextareaField
               label={t("categories.desc_en")}
               field="description"
-              placeholder="Brief description of this category…"
+              placeholder={t("categories.desc_en_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />

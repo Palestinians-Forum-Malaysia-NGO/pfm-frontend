@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { MdImage, MdDeleteOutline, MdErrorOutline, MdCloudUpload } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 import useStorageUpload from "./useStorageUpload";
 import { ERROR_MSG } from "../utils/fieldStyles";
 
@@ -23,7 +24,7 @@ const ACCEPT = ".jpg,.jpeg,.png,.webp,.gif,.svg";
 const MIME   = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 
 const StorageCoverField = ({
-  label = "Cover Image",
+  label,
   fileType = "image",
   folder,
   currentUrl,
@@ -33,6 +34,8 @@ const StorageCoverField = ({
   errors,
   field = "cover_image",
 }) => {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("common.cover_image");
   const { file, isUploading, progress, error: uploadError, handleFileChange, handleRemove } =
     useStorageUpload({ fileType, folder, onUpload });
 
@@ -46,7 +49,7 @@ const StorageCoverField = ({
 
   const validate = (f) => {
     if (!MIME.includes(f.type)) {
-      setFileError("Only JPG, PNG, WebP, GIF, or SVG images are accepted.");
+      setFileError(t("common.cover_invalid_type"));
       return false;
     }
     setFileError("");
@@ -87,9 +90,9 @@ const StorageCoverField = ({
 
   return (
     <div className="mb-4">
-      {label && (
+      {resolvedLabel && (
         <label className="mb-2 block text-sm font-medium text-slate-900">
-          {label} {required && <span className="text-red-500">*</span>}
+          {resolvedLabel} {required && <span className="text-red-500">*</span>}
         </label>
       )}
 
@@ -110,9 +113,9 @@ const StorageCoverField = ({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-slate-500 group-hover:text-slate-700">
-              Drop an image here or <span className="text-green">browse</span>
+              {t("common.drop_image_prefix")} <span className="text-green">{t("common.browse")}</span>
             </p>
-            <p className="mt-0.5 text-xs text-slate-400">JPG, PNG, WebP, GIF, SVG · up to 20 MB · Landscape recommended</p>
+            <p className="mt-0.5 text-xs text-slate-400">{t("common.cover_hint")}</p>
           </div>
           <input type="file" accept={ACCEPT} className="hidden" onChange={onInputChange} />
         </label>
@@ -123,14 +126,14 @@ const StorageCoverField = ({
         <div className="group relative h-44 w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
           <img
             src={currentUrl}
-            alt="Cover"
+            alt={t("common.cover_image")}
             className="h-full w-full object-cover"
             onError={() => setImgFailed(true)}
           />
           {/* Hover overlay */}
           <div className="absolute inset-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/50 via-transparent to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
             <label className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 backdrop-blur-sm transition hover:bg-white">
-              <MdCloudUpload className="h-3.5 w-3.5" /> Replace
+              <MdCloudUpload className="h-3.5 w-3.5" /> {t("common.replace")}
               <input type="file" accept={ACCEPT} className="hidden" onChange={onInputChange} />
             </label>
             <button
@@ -138,7 +141,7 @@ const StorageCoverField = ({
               onClick={handleExistingRemove}
               className="flex items-center gap-1.5 rounded-lg bg-red-500/90 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-red-600"
             >
-              <MdDeleteOutline className="h-3.5 w-3.5" /> Remove
+              <MdDeleteOutline className="h-3.5 w-3.5" /> {t("common.remove")}
             </button>
           </div>
         </div>
@@ -147,7 +150,7 @@ const StorageCoverField = ({
       {/* ── New file preview + upload progress ── */}
       {showNewPreview && (
         <div className="relative h-44 w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-          <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+          <img src={previewUrl} alt={t("common.preview")} className="h-full w-full object-cover" />
 
           {/* Upload overlay */}
           {isUploading && (
@@ -156,7 +159,7 @@ const StorageCoverField = ({
               <div className="h-2 w-40 overflow-hidden rounded-full bg-white/30">
                 <div className="h-full rounded-full bg-white transition-all duration-300" style={{ width: `${progress}%` }} />
               </div>
-              <p className="text-xs text-white/80">Uploading…</p>
+              <p className="text-xs text-white/80">{t("common.uploading")}</p>
             </div>
           )}
 
@@ -164,7 +167,7 @@ const StorageCoverField = ({
           {!isUploading && (
             <div className="absolute inset-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/50 via-transparent to-transparent p-3 opacity-0 transition-opacity duration-200 hover:opacity-100">
               <label className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700 backdrop-blur-sm transition hover:bg-white">
-                <MdCloudUpload className="h-3.5 w-3.5" /> Replace
+                <MdCloudUpload className="h-3.5 w-3.5" /> {t("common.replace")}
                 <input type="file" accept={ACCEPT} className="hidden" onChange={onInputChange} />
               </label>
               <button
@@ -172,7 +175,7 @@ const StorageCoverField = ({
                 onClick={handleNewRemove}
                 className="flex items-center gap-1.5 rounded-lg bg-red-500/90 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-red-600"
               >
-                <MdDeleteOutline className="h-3.5 w-3.5" /> Remove
+                <MdDeleteOutline className="h-3.5 w-3.5" /> {t("common.remove")}
               </button>
             </div>
           )}

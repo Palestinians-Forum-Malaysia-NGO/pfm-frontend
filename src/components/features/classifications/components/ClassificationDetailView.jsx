@@ -45,7 +45,7 @@ export default function ClassificationDetailView() {
     }
   };
 
-  if (loading)         return <Loading text="Loading classification…" />;
+  if (loading)         return <Loading text={t("classifications.loading")} />;
   if (error)           return <AlertBanner message={error} />;
   if (!classification) return null;
 

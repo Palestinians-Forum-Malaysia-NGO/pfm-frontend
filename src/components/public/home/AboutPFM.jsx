@@ -35,7 +35,7 @@ const AboutPFM = () => {
           </div>
 
           <div style={{ ...show, transitionDelay: "150ms" }} className="overflow-hidden rounded-3xl shadow-xl">
-            <img src={aboutImg} alt="PFM Community" className="h-[420px] w-full object-cover transition-transform duration-500 ease-in-out hover:scale-105" />
+            <img src={aboutImg} alt={t("hero.img_community_alt")} className="h-[420px] w-full object-cover transition-transform duration-500 ease-in-out hover:scale-105" />
           </div>
 
         </div>

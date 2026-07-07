@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdBadge, MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
@@ -12,19 +14,17 @@ import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
-import SimpleDataTable from "components/ui/SimpleDataTable";
+import DataTable from "components/ui/DataTable";
+import StorageImage from "components/ui/StorageImage";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-const STATUS_OPTIONS = [
-  { value: "all",      label: "All Status" },
-  { value: "active",   label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export default function StaffList() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const base = useLayoutBase();
+
   const {
     staffs, loading, error,
     stats,
@@ -35,22 +35,37 @@ export default function StaffList() {
     handleDeleteConfirm,
   } = useStaffList();
 
+  const STATUS_OPTIONS = [
+    { value: "all",      label: t("staff.status_all") },
+    { value: "active",   label: t("staff.status_active") },
+    { value: "inactive", label: t("staff.status_inactive") },
+  ];
+
   const statCards = [
     {
-      key: "total", label: "Total Staff", value: stats.total,
-      icon: <MdPeople className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
+      key: "total",
+      label: t("staff.stat_total"),
+      value: stats.total,
+      icon: <MdPeople className="h-5 w-5" />,
+      color: "text-slate-600", bgColor: "bg-slate-100",
       active: statusFilter === "all",
       onClick: () => setStatusFilter("all"),
     },
     {
-      key: "active", label: "Active", value: stats.active,
-      icon: <MdCheckCircle className="h-5 w-5" />, color: "text-green", bgColor: "bg-green/10",
+      key: "active",
+      label: t("staff.stat_active"),
+      value: stats.active,
+      icon: <MdCheckCircle className="h-5 w-5" />,
+      color: "text-green", bgColor: "bg-green/10",
       active: statusFilter === "active",
       onClick: () => setStatusFilter((s) => s === "active" ? "all" : "active"),
     },
     {
-      key: "inactive", label: "Inactive", value: stats.inactive,
-      icon: <MdCancel className="h-5 w-5" />, color: "text-slate-400", bgColor: "bg-slate-100",
+      key: "inactive",
+      label: t("staff.stat_inactive"),
+      value: stats.inactive,
+      icon: <MdCancel className="h-5 w-5" />,
+      color: "text-slate-400", bgColor: "bg-slate-100",
       active: statusFilter === "inactive",
       onClick: () => setStatusFilter((s) => s === "inactive" ? "all" : "inactive"),
     },
@@ -59,15 +74,21 @@ export default function StaffList() {
   const columns = [
     {
       key: "staff",
-      label: "Staff Member",
+      label: t("staff.col_staff"),
       icon: <MdBadge className="h-3.5 w-3.5" />,
       render: (s) => (
         <div className="flex items-center gap-3">
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-50 text-xs font-bold text-blue-600">
-            {getInitials(s.user?.full_name)}
+            {s.user?.profile_photo
+              ? <StorageImage fileKey={s.user.profile_photo} alt={s.user?.full_name} className="h-full w-full object-cover" fallback={getInitials(s.user?.full_name)} />
+              : getInitials(s.user?.full_name)
+            }
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 max-w-[200px] flex-1">
             <p className="truncate font-semibold text-slate-900">{s.user?.full_name}</p>
+            {s.user?.full_name_ar && (
+              <p className="truncate text-xs text-slate-400" dir="rtl">{s.user.full_name_ar}</p>
+            )}
             <p className="truncate text-xs text-slate-400">{s.employee_id || s.user?.email}</p>
           </div>
         </div>
@@ -75,39 +96,45 @@ export default function StaffList() {
     },
     {
       key: "department",
-      label: "Department",
+      label: t("staff.col_department"),
       icon: <MdDomain className="h-3.5 w-3.5" />,
-      render: (s) => <span className="truncate text-sm text-slate-700">{s.department || <span className="text-slate-300">—</span>}</span>,
+      render: (s) => {
+        const dept = (s.department_ar && i18n.language === "ar") ? s.department_ar : s.department;
+        return <span className="truncate text-sm text-slate-700">{dept || <span className="text-slate-300">—</span>}</span>;
+      },
     },
     {
       key: "position",
-      label: "Position",
+      label: t("staff.col_position"),
       icon: <MdWork className="h-3.5 w-3.5" />,
-      render: (s) => <span className="truncate text-sm text-slate-700">{s.position || <span className="text-slate-300">—</span>}</span>,
+      render: (s) => {
+        const pos = (s.position_ar && i18n.language === "ar") ? s.position_ar : s.position;
+        return <span className="truncate text-sm text-slate-700">{pos || <span className="text-slate-300">—</span>}</span>;
+      },
     },
     {
       key: "status",
-      label: "Status",
+      label: t("staff.col_status"),
       icon: <MdCheckCircle className="h-3.5 w-3.5" />,
       render: (s) => (
         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
           s.user?.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
         }`}>
           <span className={`h-1.5 w-1.5 rounded-full ${s.user?.is_active ? "bg-green" : "bg-slate-400"}`} />
-          {s.user?.is_active ? "Active" : "Inactive"}
+          {s.user?.is_active ? t("staff.stat_active") : t("staff.stat_inactive")}
         </span>
       ),
     },
     {
       key: "actions",
-      label: "Actions",
+      label: t("staff.col_actions"),
       align: "right",
       stopPropagation: true,
       render: (s) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title="View"   onClick={() => navigate(`/admin/staff/${s.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title="Edit"   onClick={() => navigate(`/admin/staff/${s.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title="Remove" onClick={() => setToDelete(s)} variant="danger" />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("staff.view")}   onClick={() => navigate(`${base}/staff/${s.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("staff.edit")}   onClick={() => navigate(`${base}/staff/${s.id}/edit`)} />
+          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("staff.delete")} onClick={() => setToDelete(s)} variant="danger" />
         </div>
       ),
     },
@@ -116,21 +143,21 @@ export default function StaffList() {
   const hasFilters = search !== "" || statusFilter !== "all";
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl border border-slate-200">
+    <div className="mx-auto max-w-5xl bg-white p-6 rounded-2xl border border-slate-200">
 
       <PageHeader
         icon={<MdBadge className="h-5 w-5" />}
-        title="Staff"
-        subtitle="Manage staff members and their profiles"
+        title={t("staff.title")}
+        subtitle={t("staff.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text="Add Staff" onClick={() => navigate("/admin/staff/create")} />
+          <Button icon={<MdAdd className="h-4 w-4" />} text={t("staff.add_staff")} onClick={() => navigate(`${base}/staff/create`)} />
         }
       />
 
       <div className="mb-5 grid grid-cols-3 gap-3">
         {statCards.map((card) => (
           <button key={card.key} onClick={card.onClick}
-            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
+            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-start transition-all duration-200 ease-in-out hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ${
               card.active ? "border-green/30 bg-green/5 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
             }`}
           >
@@ -144,26 +171,25 @@ export default function StaffList() {
       </div>
 
       <div className="mb-4 flex items-center gap-2">
-        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder="Search by name, email, or employee ID…" className="flex-1" />
+        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("staff.search_placeholder")} className="flex-1" />
         <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         {hasFilters && (
-          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text="Clear" onClick={() => { setSearch(""); setStatusFilter("all"); }} />
+          <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("staff.clear")} onClick={() => { setSearch(""); setStatusFilter("all"); }} />
         )}
       </div>
 
-      <SimpleDataTable
+      <DataTable
         columns={columns}
         data={staffs}
         loading={loading}
         error={error}
-        onRowClick={(s) => navigate(`/admin/staff/${s.id}`)}
+        onRowClick={(s) => navigate(`${base}/staff/${s.id}`)}
         pageSize={8}
         emptyIcon={<MdBadge />}
-        emptyTitle="No staff members found"
-        emptyDesc={hasFilters ? "Try adjusting your filters." : "Add the first staff member to get started."}
-        emptyAction={!hasFilters ? { label: "Add Staff", onClick: () => navigate("/admin/staff/create") } : undefined}
+        emptyTitle={t("staff.no_staff")}
+        emptyDesc={hasFilters ? t("staff.adjust_filters") : t("staff.add_first")}
+        emptyAction={!hasFilters ? { label: t("staff.add_staff"), onClick: () => navigate(`${base}/staff/create`) } : undefined}
       />
-
 
       <StaffDeleteModal
         open={!!toDelete}

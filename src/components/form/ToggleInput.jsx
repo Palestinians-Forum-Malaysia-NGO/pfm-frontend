@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
@@ -6,6 +7,7 @@ const ToggleInput = ({
   label, field, formData, updateFormData,
   errors, required = false, rules = [],
 }) => {
+  const { t } = useTranslation();
   const [localError, setLocalError] = useState(null);
 
   const selected = Boolean(formData[field]);
@@ -34,8 +36,8 @@ const ToggleInput = ({
         }`}
       >
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-900">{selected ? "Enabled" : "Disabled"}</span>
-          <span className="text-xs text-slate-400">Click to toggle</span>
+          <span className="text-sm font-medium text-slate-900">{selected ? t("common.enabled") : t("common.disabled")}</span>
+          <span className="text-xs text-slate-400">{t("common.click_to_toggle")}</span>
         </div>
         <div className="relative">
           <input type="checkbox" checked={selected} onChange={handleChange} className="peer sr-only" />

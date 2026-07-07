@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useInView from "hooks/useInView";
 
 const PARTNERS = [
@@ -13,6 +14,7 @@ const PARTNERS = [
 ];
 
 const PartnersGallery = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -23,10 +25,10 @@ const PartnersGallery = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">Together We're Stronger</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">Our Partners</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.partners_label")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("about.partners_title")}</h2>
           <p className="mx-auto mt-3 max-w-md text-base text-slate-400">
-            We work alongside trusted organisations to maximise our impact for the Palestinian community.
+            {t("about.partners_desc")}
           </p>
         </div>
 

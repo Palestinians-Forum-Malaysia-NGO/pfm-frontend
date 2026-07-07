@@ -72,7 +72,7 @@ export default function ClassificationEditForm() {
     }
   };
 
-  if (loading)   return <Loading text="Loading classification…" />;
+  if (loading)   return <Loading text={t("classifications.loading")} />;
   if (loadError) return <p className="py-12 text-center text-sm text-red-500">{loadError}</p>;
 
   return (
@@ -113,7 +113,7 @@ export default function ClassificationEditForm() {
               label={t("classifications.desc_en")}
               field="description"
               rows={3}
-              placeholder="Brief description of this classification…"
+              placeholder={t("classifications.desc_en_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />

@@ -1,10 +1,17 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MdAssignment } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
 
-const AID_TYPES = ["Medical Aid", "Food Assistance", "Financial Support", "Education", "Emergency Relief"];
-
 const NewRequest = () => {
+  const { t } = useTranslation();
+  const AID_TYPES = [
+    { value: "Medical Aid",       label: t("beneficiary_dashboard.aid_type_medical") },
+    { value: "Food Assistance",   label: t("beneficiary_dashboard.aid_type_food") },
+    { value: "Financial Support", label: t("beneficiary_dashboard.aid_type_financial") },
+    { value: "Education",         label: t("beneficiary_dashboard.aid_type_education") },
+    { value: "Emergency Relief",  label: t("beneficiary_dashboard.aid_type_emergency") },
+  ];
   const [type, setType]         = useState("");
   const [desc, setDesc]         = useState("");
   const [urgent, setUrgent]     = useState(false);
@@ -24,7 +31,7 @@ const NewRequest = () => {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green/20">
           <FaHandHoldingHeart className="h-4 w-4 text-green" />
         </div>
-        <h3 className="font-bold text-white">New Aid Request</h3>
+        <h3 className="font-bold text-white">{t("beneficiary_dashboard.new_request_title")}</h3>
       </div>
 
       {submitted ? (
@@ -32,40 +39,40 @@ const NewRequest = () => {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green/20">
             <MdAssignment className="h-6 w-6 text-green" />
           </div>
-          <p className="font-bold text-white">Request Submitted!</p>
-          <p className="text-xs text-gray-400">Our team will review your request within 48 hours.</p>
+          <p className="font-bold text-white">{t("beneficiary_dashboard.request_submitted_title")}</p>
+          <p className="text-xs text-gray-400">{t("beneficiary_dashboard.request_submitted_body")}</p>
           <button
             onClick={() => { setSubmitted(false); setType(""); setDesc(""); setUrgent(false); }}
             className="mt-1 rounded-xl bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/20"
           >
-            New Request
+            {t("beneficiary_dashboard.new_request_btn")}
           </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Aid type */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-400">Aid Type</label>
+            <label className="text-xs font-medium text-gray-400">{t("beneficiary_dashboard.aid_type_label")}</label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-green/75 focus:bg-white/15"
             >
-              <option value="" className="text-navy-700">Select aid type...</option>
-              {AID_TYPES.map((t) => (
-                <option key={t} value={t} className="text-navy-700">{t}</option>
+              <option value="" className="text-navy-700">{t("beneficiary_dashboard.select_aid_type_placeholder")}</option>
+              {AID_TYPES.map((opt) => (
+                <option key={opt.value} value={opt.value} className="text-navy-700">{opt.label}</option>
               ))}
             </select>
           </div>
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-400">Brief Description</label>
+            <label className="text-xs font-medium text-gray-400">{t("beneficiary_dashboard.description_label")}</label>
             <textarea
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               rows={3}
-              placeholder="Describe your need..."
+              placeholder={t("beneficiary_dashboard.description_placeholder")}
               className="w-full resize-none rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition focus:border-green/75 focus:bg-white/15"
             />
           </div>
@@ -81,7 +88,7 @@ const NewRequest = () => {
               className="mt-0.5 h-4 w-4 flex-shrink-0 accent-green"
             />
             <span className="text-xs leading-relaxed text-gray-400">
-              Mark as urgent — I confirm this request requires immediate attention.
+              {t("beneficiary_dashboard.urgent_label")}
             </span>
           </label>
 
@@ -94,7 +101,7 @@ const NewRequest = () => {
                 : "cursor-not-allowed bg-white/10 text-gray-500"
             }`}
           >
-            SUBMIT REQUEST
+            {t("beneficiary_dashboard.submit_request_btn")}
           </button>
         </form>
       )}

@@ -9,7 +9,6 @@ import {
 } from "react-icons/md";
 import { useCategoryList } from "components/features/categories/hooks";
 import CategoryDeleteModal from "./CategoryDeleteModal";
-import { MODULE_FILTER_OPTIONS, MODULE_LABELS } from "components/features/categories/constants/category";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
@@ -19,6 +18,21 @@ import DataTable from "components/ui/DataTable";
 
 export default function CategoryList() {
   const { t } = useTranslation();
+  const MODULE_LABELS = {
+    beneficiaries: t("categories.module_beneficiaries"),
+    projects:      t("categories.module_projects"),
+    blogs:         t("categories.module_blogs"),
+    donations:     t("categories.module_donations"),
+    campaigns:     t("categories.module_campaigns"),
+  };
+  const MODULE_FILTER_OPTIONS = [
+    { value: "all", label: t("categories.module_all") },
+    { value: "beneficiaries", label: MODULE_LABELS.beneficiaries },
+    { value: "projects",      label: MODULE_LABELS.projects },
+    { value: "blogs",         label: MODULE_LABELS.blogs },
+    { value: "donations",     label: MODULE_LABELS.donations },
+    { value: "campaigns",     label: MODULE_LABELS.campaigns },
+  ];
   const navigate = useNavigate();
   const base = useLayoutBase();
   const {

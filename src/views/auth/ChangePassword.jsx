@@ -7,8 +7,8 @@ import { validate }  from "components/form/utils/validation";
 import { usePasswordChange } from "components/features/auth/hooks";
 
 const RULES = {
-  old_password: [{ required: true, message: "Current password is required" }],
-  new_password: [{ required: true, message: "New password is required" }, { minLength: 8, message: "At least 8 characters" }],
+  old_password: [{ required: true }],
+  new_password: [{ required: true }, { minLength: 8 }],
 };
 
 export default function ChangePassword() {

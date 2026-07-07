@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 import { getNestedValue } from "./utils/getNestedValue";
@@ -7,6 +8,7 @@ const SelectField = ({
   label, field, options, required = true,
   formData, errors, updateFormData, rules = [],
 }) => {
+  const { t } = useTranslation();
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
 
@@ -40,7 +42,7 @@ const SelectField = ({
             : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70"
         }`}
       >
-        <option value="" className="text-slate-400">Select ...</option>
+        <option value="" className="text-slate-400">{t("common.select_placeholder")}</option>
         {options.map((opt, index) =>
           typeof opt === "object" && opt !== null ? (
             <option key={opt.value ?? index} value={opt.value ?? ""}>

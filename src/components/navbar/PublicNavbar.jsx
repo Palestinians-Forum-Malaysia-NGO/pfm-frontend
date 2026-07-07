@@ -65,7 +65,7 @@ const PublicNavbar = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-0.5 md:flex" aria-label="Main navigation">
+          <nav className="hidden items-center gap-0.5 md:flex" aria-label={t("common.main_navigation")}>
             {links.map((link) => (
               <NavItem key={link.to + link.label} link={link} isActive={isActive} />
             ))}
@@ -92,7 +92,7 @@ const PublicNavbar = () => {
           <button
             className="relative h-9 w-9 rounded-xl text-slate-500 transition-all duration-200 ease-in-out hover:bg-slate-100 md:hidden"
             onClick={() => setMenuOpen((o) => !o)}
-            aria-label="Toggle menu"
+            aria-label={t("common.toggle_menu")}
             aria-expanded={menuOpen}
           >
             <MdMenu
@@ -116,7 +116,7 @@ const PublicNavbar = () => {
         }`}>
         <div className="overflow-hidden">
           <div className="rounded-2xl border border-slate-100 bg-white/95 px-4 pb-4 pt-2 shadow-lg backdrop-blur-xl">
-            <nav className="flex flex-col gap-0.5" aria-label="Mobile navigation">
+            <nav className="flex flex-col gap-0.5" aria-label={t("common.mobile_navigation")}>
               {links.map((link) => (
                 <MobileNavItem
                   key={link.to + link.label}

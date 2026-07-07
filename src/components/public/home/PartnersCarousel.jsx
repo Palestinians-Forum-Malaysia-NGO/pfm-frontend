@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useInView from "hooks/useInView";
 
 const PARTNERS = [
@@ -11,6 +12,7 @@ const PARTNERS = [
 ];
 
 const PartnersCarousel = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
 
   return (
@@ -20,8 +22,8 @@ const PartnersCarousel = () => {
           className="mb-10 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">Together We're Stronger</span>
-          <h2 className="mt-3 text-3xl font-extrabold text-slate-900">Our Partners & Supporters</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.partners_label")}</span>
+          <h2 className="mt-3 text-3xl font-extrabold text-slate-900">{t("about.partners_carousel_title")}</h2>
         </div>
 
         <div

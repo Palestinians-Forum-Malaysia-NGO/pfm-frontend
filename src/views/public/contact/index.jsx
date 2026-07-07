@@ -42,7 +42,7 @@ export default function Contact() {
 
       {/* ── HERO ── */}
       <section className="relative flex h-[50vh] items-center justify-center overflow-hidden">
-        <img src={heroBg} alt="Contact PFM" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroBg} alt={t("contact.hero_alt")} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70" />
 
         {/* Flag strip */}

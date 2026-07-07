@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdPersonAdd, MdBadge, MdPerson, MdMarkEmailRead } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
 import { InputField, validate } from "components/form";
@@ -10,23 +12,21 @@ import { useCreateStaff } from "components/features/staff/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  full_name: [
-    { required: true, message: "Full name is required" },
-    { maxLength: 255, message: "Name must be 255 characters or fewer" },
-  ],
-  email: [
-    { required: true, message: "Email is required" },
-    { email: true },
-  ],
+  full_name: [{ required: true }, { maxLength: 255 }],
+  email:     [{ required: true }, { email: true }],
 };
 
 export default function StaffCreateForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const base = useLayoutBase();
+
   const { execute: createStaff, loading, error } = useCreateStaff();
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
     full_name:    "",
+    full_name_ar: "",
     email:        "",
     phone_number: "",
     department:   "",
@@ -61,12 +61,12 @@ export default function StaffCreateForm() {
       };
       const created = await createStaff(payload);
       success(
-        "Staff member added",
-        `${form.full_name} has been created. An activation email has been sent to ${form.email}.`,
+        t("staff.toast_created"),
+        `${form.full_name} ${t("staff.toast_created_sub")} ${form.email}.`,
       );
-      navigate(`/admin/staff/${created.id}`);
-    } catch (err) {
-      toastError("Failed to create staff", err?.message);
+      navigate(`${base}/staff/${created.id}`);
+    } catch {
+      toastError(t("staff.toast_create_failed"));
     }
   };
 
@@ -75,54 +75,54 @@ export default function StaffCreateForm() {
 
       <PageHeader
         icon={<MdPersonAdd className="h-5 w-5" />}
-        title="Add Staff Member"
-        subtitle="Create a new staff account — an activation email will be sent automatically"
+        title={t("staff.add_title")}
+        subtitle={t("staff.add_subtitle")}
         actions={
-          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text="Back to Staff" onClick={() => navigate("/admin/staff")} />
+          <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("staff.back_to_member")} onClick={() => navigate(`${base}/staff`)} />
         }
       />
 
-      {/* Activation notice */}
       <div className="flex items-start gap-3 rounded-xl border border-green/20 bg-green/5 px-4 py-3">
         <MdMarkEmailRead className="mt-0.5 h-4 w-4 shrink-0 text-green" />
-        <p className="text-sm text-green/80">
-          When you create a staff member, the system automatically sends an activation email with a one-time code. The staff member uses it to set their own password.
-        </p>
+        <p className="text-sm text-green/80">{t("staff.email_notice")}</p>
       </div>
 
       <AlertBanner message={error} />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-        {/* ── Personal details ── */}
+        {/* ── Account details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Details" subtitle="Basic information for the staff member" />
+          <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("staff.section_account")} subtitle={t("staff.section_account_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Full Name"     field="full_name"    placeholder="Fatima Ali"           formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
-            <InputField label="Email Address" field="email"        type="email" placeholder="fatima@pfm.org.my" formData={form} errors={errors} updateFormData={set} rules={RULES.email} />
+            <InputField label={t("users.full_name_label")} field="full_name" placeholder="Fatima Ali" formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
+            <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي" required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
-          <InputField label="Phone Number" field="phone_number" placeholder="+60 19-876 5432" required={false} formData={form} errors={errors} updateFormData={set} />
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField label={t("users.email_label")} field="email" type="email" placeholder="fatima@pfm.org.my" formData={form} errors={errors} updateFormData={set} rules={RULES.email} />
+            <InputField label={t("users.phone_label")} field="phone_number" placeholder="+60 19-876 5432" required={false} formData={form} errors={errors} updateFormData={set} />
+          </div>
         </div>
 
         {/* ── Employment details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBadge className="h-5 w-5" />} title="Employment Details" subtitle="Organisational role and assignment" />
+          <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("staff.section_employment")} subtitle={t("staff.section_employment_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Department"  field="department"   placeholder="Programs"           required={false} formData={form} errors={errors} updateFormData={set} />
-            <InputField label="Position"    field="position"     placeholder="Program Manager"     required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("staff.info_department")} field="department" placeholder="Programs"          required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("staff.info_position")}   field="position"   placeholder="Program Manager"   required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label="Branch"       field="branch"       placeholder="Kuala Lumpur HQ"    required={false} formData={form} errors={errors} updateFormData={set} />
-            <InputField label="Joining Date" field="joining_date" type="date"                      required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("staff.info_branch")}       field="branch"       placeholder="Kuala Lumpur HQ" required={false} formData={form} errors={errors} updateFormData={set} />
+            <InputField label={t("staff.info_joining_date")} field="joining_date" type="date"                   required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" text="Cancel" onClick={() => navigate("/admin/staff")} className="flex-1" />
+          <Button variant="ghost" text={t("staff.cancel")} onClick={() => navigate(`${base}/staff`)} className="flex-1" />
           <Button
             type="submit"
             variant="primary"
-            text="Add Staff Member"
+            text={t("staff.create_btn")}
             icon={<MdPersonAdd className="h-4 w-4" />}
             loading={loading}
             disabled={!canSubmit || loading}

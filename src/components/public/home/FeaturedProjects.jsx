@@ -7,15 +7,15 @@ import img1 from "assets/img/layout/ngo-bg-4.jpg";
 import img2 from "assets/img/layout/ngo-bg-5.jpg";
 import img3 from "assets/img/layout/ngo-bg-6.jpg";
 
-const PROJECTS = [
-  { img: img1, tag: "Medical Aid",  title: "Gaza Medical Relief Fund",          desc: "Funding critical medical supplies and equipment for hospitals in Gaza.", raised: "RM 145,000", goal: "RM 200,000", progress: 72 },
-  { img: img2, tag: "Education",    title: "Palestine Scholarship Program",      desc: "Supporting Palestinian students in Malaysia with scholarships and mentorship.", raised: "RM 62,000", goal: "RM 100,000", progress: 62 },
-  { img: img3, tag: "Food Aid",     title: "Ramadan Food Baskets",               desc: "Distributing essential food parcels to displaced families during Ramadan.", raised: "RM 38,500", goal: "RM 50,000", progress: 77 },
-];
-
 const FeaturedProjects = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const PROJECTS = [
+    { img: img1, tag: t("home.proj1_tag"), title: "Gaza Medical Relief Fund",     desc: t("home.proj1_desc"), raised: "RM 145,000", goal: "RM 200,000", progress: 72 },
+    { img: img2, tag: t("home.proj2_tag"), title: "Palestine Scholarship Program", desc: t("home.proj2_desc"), raised: "RM 62,000", goal: "RM 100,000", progress: 62 },
+    { img: img3, tag: t("home.proj3_tag"), title: "Ramadan Food Baskets",         desc: t("home.proj3_desc"), raised: "RM 38,500", goal: "RM 50,000", progress: 77 },
+  ];
 
   return (
     <section ref={ref} className="bg-white py-20">

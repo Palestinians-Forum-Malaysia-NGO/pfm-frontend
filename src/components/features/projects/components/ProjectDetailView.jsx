@@ -74,7 +74,7 @@ export default function ProjectDetailView() {
     }
   };
 
-  if (loading)  return <Loading text="Loading project…" />;
+  if (loading)  return <Loading text={t("projects.loading")} />;
   if (error)    return <AlertBanner message={error} />;
   if (!project) return null;
 

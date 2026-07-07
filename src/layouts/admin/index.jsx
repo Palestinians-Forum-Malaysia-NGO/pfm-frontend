@@ -5,6 +5,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/FooterAuthDefault";
 import routes from "routes.js";
+import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
 import UserCreate   from "views/admin/users/UserCreate";
 import UserDetail   from "views/admin/users/UserDetail";
@@ -34,9 +35,10 @@ const SUB_ROUTE_NAMES = {
 
 export default function Admin(props) {
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen]               = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("Dashboard");
+  const [currentRouteName, setCurrentRouteName] = React.useState("Dashboard");
+  const currentRoute = t(ROUTE_KEY[currentRouteName] ?? currentRouteName, { defaultValue: currentRouteName });
 
   React.useEffect(() => {
     const handleResize = () => setOpen(window.innerWidth >= 1200);
@@ -49,24 +51,24 @@ export default function Admin(props) {
     const path = location.pathname;
     // Check explicit sub-route names first
     const subMatch = Object.keys(SUB_ROUTE_NAMES).find((k) => path.endsWith(k));
-    if (subMatch) { setCurrentRoute(SUB_ROUTE_NAMES[subMatch]); return; }
+    if (subMatch) { setCurrentRouteName(SUB_ROUTE_NAMES[subMatch]); return; }
     // Edit pages
-    if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRoute("Edit User");   return; }
-    if (path.match(/\/beneficiaries\/[^/]+\/edit$/)) { setCurrentRoute("Edit Beneficiary"); return; }
-    if (path.match(/\/staff\/\d+\/edit$/))         { setCurrentRoute("Edit Staff");      return; }
-    if (path.match(/\/categories\/[^/]+\/edit$/))       { setCurrentRoute("Edit Category");       return; }
-    if (path.match(/\/classifications\/[^/]+\/edit$/)) { setCurrentRoute("Edit Classification");  return; }
-    if (path.match(/\/projects\/[^/]+\/edit$/))        { setCurrentRoute("Edit Project");         return; }
+    if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRouteName("Edit User");   return; }
+    if (path.match(/\/beneficiaries\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Beneficiary"); return; }
+    if (path.match(/\/staff\/[^/]+\/edit$/))         { setCurrentRouteName("Edit Staff");      return; }
+    if (path.match(/\/categories\/[^/]+\/edit$/))       { setCurrentRouteName("Edit Category");       return; }
+    if (path.match(/\/classifications\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Classification");  return; }
+    if (path.match(/\/projects\/[^/]+\/edit$/))        { setCurrentRouteName("Edit Project");         return; }
     // Detail pages
-    if (path.match(/\/users\/\d+$/))                   { setCurrentRoute("User Detail");          return; }
-    if (path.match(/\/beneficiaries\/[^/]+$/))         { setCurrentRoute("Beneficiary Detail");   return; }
-    if (path.match(/\/staff\/\d+$/))                   { setCurrentRoute("Staff Detail");         return; }
-    if (path.match(/\/categories\/[^/]+$/))            { setCurrentRoute("Category Detail");      return; }
-    if (path.match(/\/classifications\/[^/]+$/))       { setCurrentRoute("Classification Detail"); return; }
-    if (path.match(/\/projects\/[^/]+$/))              { setCurrentRoute("Project Detail");        return; }
+    if (path.match(/\/users\/\d+$/))                   { setCurrentRouteName("User Detail");          return; }
+    if (path.match(/\/beneficiaries\/[^/]+$/))         { setCurrentRouteName("Beneficiary Detail");   return; }
+    if (path.match(/\/staff\/[^/]+$/))                   { setCurrentRouteName("Staff Detail");         return; }
+    if (path.match(/\/categories\/[^/]+$/))            { setCurrentRouteName("Category Detail");      return; }
+    if (path.match(/\/classifications\/[^/]+$/))       { setCurrentRouteName("Classification Detail"); return; }
+    if (path.match(/\/projects\/[^/]+$/))              { setCurrentRouteName("Project Detail");        return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
-    if (active) setCurrentRoute(active.name);
+    if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
 
   const getRoutes = () =>

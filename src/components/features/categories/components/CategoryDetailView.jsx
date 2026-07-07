@@ -17,11 +17,17 @@ import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading from "components/loading/Loading";
 import CategoryDeleteModal from "./CategoryDeleteModal";
 import { useGetCategory, useDeleteCategory } from "components/features/categories/hooks";
-import { MODULE_LABELS } from "components/features/categories/constants/category";
 import { useToast } from "components/ui/toast/ToastContext";
 
 export default function CategoryDetailView() {
   const { t } = useTranslation();
+  const MODULE_LABELS = {
+    beneficiaries: t("categories.module_beneficiaries"),
+    projects:      t("categories.module_projects"),
+    blogs:         t("categories.module_blogs"),
+    donations:     t("categories.module_donations"),
+    campaigns:     t("categories.module_campaigns"),
+  };
   const { id }   = useParams();
   const navigate = useNavigate();
   const base = useLayoutBase();
@@ -43,7 +49,7 @@ export default function CategoryDetailView() {
     }
   };
 
-  if (loading)   return <Loading text="Loading category…" />;
+  if (loading)   return <Loading text={t("categories.loading")} />;
   if (error)     return <AlertBanner message={error} />;
   if (!category) return null;
 

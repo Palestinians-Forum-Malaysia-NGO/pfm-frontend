@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { MdArrowDownward, MdArrowUpward } from "react-icons/md";
 
 const TYPE_STYLES = {
@@ -18,15 +19,29 @@ const TYPE_STYLES = {
   },
 };
 
-const RecentAid = ({ records, asOf }) => (
+const RecentAid = ({ records, asOf }) => {
+  const { t } = useTranslation();
+  const TYPE_LABEL = {
+    "Aid Received": t("beneficiary_dashboard.type_aid_received"),
+    "Request Sent": t("beneficiary_dashboard.type_request_sent"),
+    "Pending":      t("beneficiary_dashboard.type_pending"),
+  };
+  const COLUMNS = [
+    t("beneficiary_dashboard.col_description"),
+    t("beneficiary_dashboard.col_date"),
+    t("beneficiary_dashboard.col_amount"),
+    t("beneficiary_dashboard.col_status"),
+  ];
+
+  return (
   <div className="rounded-2xl bg-white p-6 shadow-sm">
     <div className="mb-5 flex items-start justify-between">
       <div>
-        <h3 className="font-bold text-navy-700">Recent Aid Activity</h3>
+        <h3 className="font-bold text-navy-700">{t("beneficiary_dashboard.recent_activity_title")}</h3>
         <p className="mt-0.5 text-xs text-gray-400">{asOf}</p>
       </div>
       <button className="rounded-xl bg-navy-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-navy-800">
-        View All
+        {t("beneficiary_dashboard.view_all")}
       </button>
     </div>
 
@@ -34,7 +49,7 @@ const RecentAid = ({ records, asOf }) => (
       <table className="w-full min-w-[480px]">
         <thead>
           <tr className="border-b border-gray-100">
-            {["Description", "Date", "Amount", "Status"].map((col) => (
+            {COLUMNS.map((col) => (
               <th key={col} className="pb-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
                 {col}
               </th>
@@ -57,7 +72,7 @@ const RecentAid = ({ records, asOf }) => (
                 </td>
                 <td className="py-3.5">
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${style.badge}`}>
-                    {rec.type}
+                    {TYPE_LABEL[rec.type] ?? rec.type}
                   </span>
                 </td>
               </tr>
@@ -67,6 +82,7 @@ const RecentAid = ({ records, asOf }) => (
       </table>
     </div>
   </div>
-);
+  );
+};
 
 export default RecentAid;

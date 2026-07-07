@@ -36,7 +36,7 @@ export default function UserDetailView() {
     }
   };
 
-  if (loading) return <Loading text="Loading user..." />;
+  if (loading) return <Loading text={t("users.loading_user")} />;
   if (error)   return <AlertBanner message={error} />;
   if (!user)   return null;
 

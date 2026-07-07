@@ -1,10 +1,14 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import useGetBeneficiaries from "./useGetBeneficiaries";
+import useGetBeneficiaryStats from "./useGetBeneficiaryStats";
 import useDeleteBeneficiary from "./useDeleteBeneficiary";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const useBeneficiaryList = () => {
+  const { t } = useTranslation();
   const { beneficiaries, loading, error, refetch } = useGetBeneficiaries();
+  const { stats: apiStats, loading: statsLoading } = useGetBeneficiaryStats();
   const { execute: deleteBeneficiary, loading: deleteLoading } = useDeleteBeneficiary();
   const { success, error: toastError } = useToast();
 
@@ -18,10 +22,12 @@ const useBeneficiaryList = () => {
     return beneficiaries.filter((b) => {
       const matchesSearch =
         !q ||
-        b.user?.full_name?.toLowerCase().includes(q) ||
-        b.user?.email?.toLowerCase().includes(q) ||
-        b.passport_number?.toLowerCase().includes(q) ||
-        b.classification?.name?.toLowerCase().includes(q);
+        (b.user?.full_name    ?? "").toLowerCase().includes(q) ||
+        (b.user?.full_name_ar ?? "").toLowerCase().includes(q) ||
+        (b.user?.email        ?? "").toLowerCase().includes(q) ||
+        (b.passport_number    ?? "").toLowerCase().includes(q) ||
+        (b.classification?.name    ?? "").toLowerCase().includes(q) ||
+        (b.classification?.name_ar ?? "").toLowerCase().includes(q);
 
       const matchesStatus =
         statusFilter === "all" ||
@@ -35,21 +41,17 @@ const useBeneficiaryList = () => {
     });
   }, [beneficiaries, search, statusFilter, accountFilter]);
 
-  const stats = useMemo(() => ({
-    total:    beneficiaries.length,
-    active:   beneficiaries.filter((b) => b.user?.is_active).length,
-    inactive: beneficiaries.filter((b) => !b.user?.is_active).length,
-    pending:  beneficiaries.filter((b) => b.account_status === "pending").length,
-  }), [beneficiaries]);
-
   const handleDeleteConfirm = async () => {
     if (!toDelete) return;
     try {
       await deleteBeneficiary(toDelete.id);
-      success("Beneficiary removed", `${toDelete.user?.full_name || "Beneficiary"} has been removed.`);
+      success(
+        t("beneficiaries.toast_removed"),
+        `${toDelete.user?.full_name || ""} ${t("beneficiaries.toast_removed_sub")}`,
+      );
       refetch();
     } catch {
-      toastError("Failed to remove beneficiary.");
+      toastError(t("beneficiaries.toast_remove_failed"));
     } finally {
       setToDelete(null);
     }
@@ -60,7 +62,8 @@ const useBeneficiaryList = () => {
     loading,
     error,
     refetch,
-    stats,
+    apiStats,
+    statsLoading,
     search,        setSearch,
     statusFilter,  setStatusFilter,
     accountFilter, setAccountFilter,

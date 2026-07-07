@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdExpandMore } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "./utils/fieldStyles";
 import { getNestedValue } from "./utils/getNestedValue";
@@ -7,8 +8,10 @@ import { getNestedValue } from "./utils/getNestedValue";
 const MultiSelect = ({
   label, field, options = [], required = true,
   formData, errors, updateFormData,
-  placeholder = "Select...", disabledOptions = [], rules = [],
+  placeholder, disabledOptions = [], rules = [],
 }) => {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("common.select_placeholder");
   const containerRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -56,7 +59,7 @@ const MultiSelect = ({
         className={`${dropdownTriggerCls(isOpen, !!displayError)} min-h-12 h-auto py-2`}
       >
         <span className={selectedLabels.length ? "text-slate-900" : "text-slate-400"}>
-          {selectedLabels.length ? selectedLabels.join(", ") : placeholder}
+          {selectedLabels.length ? selectedLabels.join(", ") : resolvedPlaceholder}
         </span>
         <MdExpandMore className={`h-5 w-5 shrink-0 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </div>
@@ -65,7 +68,7 @@ const MultiSelect = ({
         <div className={dropdownPanelCls} style={{ width: containerRef.current?.offsetWidth ?? "100%" }}>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t("common.search_placeholder")}
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -89,7 +92,7 @@ const MultiSelect = ({
               );
             })}
             {!filteredOptions.length && (
-              <p className="px-3 py-3 text-center text-sm text-slate-400">No results found</p>
+              <p className="px-3 py-3 text-center text-sm text-slate-400">{t("common.no_results")}</p>
             )}
           </ul>
         </div>

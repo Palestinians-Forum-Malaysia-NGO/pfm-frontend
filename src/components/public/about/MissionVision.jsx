@@ -22,7 +22,7 @@ const MissionVision = () => {
         <div className="mb-16 grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
           <div style={show(0)}>
             <div className="overflow-hidden rounded-3xl shadow-xl">
-              <img src={storyImg} alt="Our Story" className="h-[460px] w-full object-cover transition-transform duration-500 ease-in-out hover:scale-105" />
+              <img src={storyImg} alt={t("about.story_alt")} className="h-[460px] w-full object-cover transition-transform duration-500 ease-in-out hover:scale-105" />
             </div>
           </div>
           <div style={show(150)}>

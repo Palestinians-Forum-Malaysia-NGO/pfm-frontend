@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail,
   MdBadge, MdFamilyRestroom, MdCheck, MdAdd, MdClose,
@@ -16,26 +17,28 @@ import { useRegister, useVerifyOtp, useResendOtp } from "components/features/aut
 import { setTokens }        from "components/features/auth/utils";
 import { OTP_PURPOSE }      from "components/features/auth/types";
 import { useGetClassifications } from "components/features/beneficiaries/hooks";
-import {
-  GENDER_OPTIONS, MARITAL_STATUS_OPTIONS,
-  HAS_VISA_OPTIONS, VISA_TYPE_OPTIONS, SITUATION_OPTIONS, PALESTINE_REGION_OPTIONS,
-} from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
 /* ─────────────────────────────────────────────────
    Step config
 ───────────────────────────────────────────────── */
-const STEPS = [
-  { n: 1, label: "Account",  icon: <MdPersonAdd className="h-4 w-4" /> },
-  { n: 2, label: "Personal", icon: <MdBadge className="h-4 w-4" /> },
-  { n: 3, label: "Status",   icon: <MdCardTravel className="h-4 w-4" /> },
-  { n: 4, label: "Family",   icon: <MdFamilyRestroom className="h-4 w-4" /> },
-];
+const useSteps = () => {
+  const { t } = useTranslation();
+  return [
+    { n: 1, label: t("apply.step_account"),  icon: <MdPersonAdd className="h-4 w-4" /> },
+    { n: 2, label: t("apply.step_personal"), icon: <MdBadge className="h-4 w-4" /> },
+    { n: 3, label: t("apply.step_status"),   icon: <MdCardTravel className="h-4 w-4" /> },
+    { n: 4, label: t("apply.step_family"),   icon: <MdFamilyRestroom className="h-4 w-4" /> },
+  ];
+};
 
 /* ─────────────────────────────────────────────────
    Hero
 ───────────────────────────────────────────────── */
-const Hero = ({ step }) => (
+const Hero = ({ step }) => {
+  const { t } = useTranslation();
+  const STEPS = useSteps();
+  return (
   <div className="relative overflow-hidden bg-green px-6 pb-16 pt-14 text-center text-white">
     {/* Decorative dots */}
     <div className="pointer-events-none absolute inset-0 bg-dot-white bg-[size:24px_24px] opacity-[0.06]" />
@@ -45,14 +48,14 @@ const Hero = ({ step }) => (
     <div className="relative">
       <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold tracking-wide text-white/90 backdrop-blur-sm">
         <MdPeople className="h-3.5 w-3.5" />
-        Palestinian Forum Malaysia
+        {t("apply.badge")}
       </span>
 
       <h1 className="mx-auto mt-5 max-w-lg text-3xl font-extrabold leading-tight sm:text-4xl">
-        Apply for Beneficiary&nbsp;Support
+        {t("apply.title")}
       </h1>
       <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/70">
-        Fill in the application below — your details are kept confidential and used only to process your request.
+        {t("apply.subtitle")}
       </p>
 
       {/* Step tracker */}
@@ -83,7 +86,8 @@ const Hero = ({ step }) => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 /* ─────────────────────────────────────────────────
    Shared nav button classes
@@ -95,11 +99,12 @@ const btnNext  = "flex h-11 flex-1 items-center justify-center gap-2 rounded-ful
    Step 1 — Account
 ───────────────────────────────────────────────── */
 const ACCOUNT_RULES = {
-  full_name: [{ required: true, message: "Full name is required" }, { maxLength: 255 }],
-  email:     [{ required: true, message: "Email is required" }, { email: true }],
+  full_name: [{ required: true }, { maxLength: 255 }],
+  email:     [{ required: true }, { email: true }],
 };
 
 const AccountStep = ({ data, onChange, onNext }) => {
+  const { t } = useTranslation();
   const [errors, setErrors] = useState({});
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
 
@@ -121,29 +126,29 @@ const AccountStep = ({ data, onChange, onNext }) => {
           <MdPersonAdd className="h-5 w-5 text-green" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-navy-700">Create your account</h2>
-          <p className="mt-0.5 text-sm text-slate-400">Enter your contact details to get started.</p>
+          <h2 className="text-xl font-bold text-navy-700">{t("apply.account_title")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("apply.account_subtitle")}</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <InputField label="Full Name" field="full_name" placeholder="Ahmad Faris bin Abdullah"
+        <InputField label={t("apply.full_name")} field="full_name" placeholder="Ahmad Faris bin Abdullah"
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
-        <InputField label="Email Address" field="email" type="email" placeholder="you@example.com"
+        <InputField label={t("apply.email")} field="email" type="email" placeholder="you@example.com"
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.email} />
-        <InputField label="Phone Number" field="phone_number" placeholder="+60 12-345 6789"
+        <InputField label={t("apply.phone")} field="phone_number" placeholder="+60 12-345 6789"
           required={false} formData={data} errors={{}} updateFormData={set} />
       </div>
 
       <button type="button" onClick={handleNext} disabled={!data.full_name.trim() || !data.email.trim()}
         className={`mt-6 w-full ${btnNext}`}>
-        Continue <MdArrowForward className="h-4 w-4" />
+        {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
       </button>
 
       <p className="mt-5 text-center text-sm text-slate-400">
-        Already have an account?{" "}
+        {t("apply.already_have")}{" "}
         <Link to="/auth/sign-in" className="font-medium text-green transition-colors hover:text-[#006833]">
-          Sign in
+          {t("apply.sign_in")}
         </Link>
       </p>
     </>
@@ -154,7 +159,19 @@ const AccountStep = ({ data, onChange, onNext }) => {
    Step 2 — Personal Info
 ───────────────────────────────────────────────── */
 const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
+  const { t } = useTranslation();
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+
+  const GENDER_OPTIONS_T = [
+    { value: "male",   label: t("beneficiaries.gender_male") },
+    { value: "female", label: t("beneficiaries.gender_female") },
+  ];
+  const MARITAL_STATUS_OPTIONS_T = [
+    { value: "single",   label: t("beneficiaries.marital_single") },
+    { value: "married",  label: t("beneficiaries.marital_married") },
+    { value: "divorced", label: t("beneficiaries.marital_divorced") },
+    { value: "widowed",  label: t("beneficiaries.marital_widowed") },
+  ];
 
   return (
     <>
@@ -163,46 +180,46 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
           <MdBadge className="h-5 w-5 text-green" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-navy-700">Personal information</h2>
-          <p className="mt-0.5 text-sm text-slate-400">Help us know you better. All fields are optional.</p>
+          <h2 className="text-xl font-bold text-navy-700">{t("apply.personal_title")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("apply.personal_subtitle")}</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InputField label="Full Name (Arabic)" field="full_name_arabic" placeholder="أحمد فارس"
+          <InputField label={t("apply.full_name_ar")} field="full_name_arabic" placeholder="أحمد فارس"
             required={false} formData={data} errors={{}} updateFormData={set} />
-          <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
+          <InputField label={t("apply.passport")} field="passport_number" placeholder="A12345678"
             required={false} formData={data} errors={{}} updateFormData={set} />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InputField label="Date of Birth" field="date_of_birth" type="date"
+          <InputField label={t("apply.dob")} field="date_of_birth" type="date"
             required={false} formData={data} errors={{}} updateFormData={set} />
-          <SelectField label="Gender" field="gender" options={GENDER_OPTIONS}
+          <SelectField label={t("apply.gender")} field="gender" options={GENDER_OPTIONS_T}
             required={false} formData={data} errors={{}} updateFormData={set} />
         </div>
-        <SelectField label="Marital Status" field="marital_status" options={MARITAL_STATUS_OPTIONS}
+        <SelectField label={t("apply.marital_status")} field="marital_status" options={MARITAL_STATUS_OPTIONS_T}
           required={false} formData={data} errors={{}} updateFormData={set} />
-        <TextareaField label="Background" field="background"
-          placeholder="Brief background about your situation (optional)…"
+        <TextareaField label={t("apply.background")} field="background"
+          placeholder={t("apply.background_placeholder")}
           required={false} formData={data} errors={{}} updateFormData={set} rows={3} />
         <StorageDocumentField
-          label="ID Document"
+          label={t("apply.id_document")}
           folder="beneficiaries/documents"
           accept=".pdf,.jpg,.jpeg,.png"
           onUpload={(key) => onIdDocChange(key)}
           onRemove={() => onIdDocChange(null)}
-          currentName={idDoc ? "Uploaded document" : undefined}
+          currentName={idDoc ? t("common.uploaded_file") : undefined}
           field="id_document" errors={{}}
         />
       </div>
 
       <div className="mt-6 flex gap-3">
         <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
         <button type="button" onClick={onNext} className={btnNext}>
-          Continue <MdArrowForward className="h-4 w-4" />
+          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
         </button>
       </div>
     </>
@@ -213,8 +230,34 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
    Step 3 — Visa & Location
 ───────────────────────────────────────────────── */
 const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack, onNext }) => {
+  const { t } = useTranslation();
   const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
   const setL = (f, v) => onLocChange((p)  => ({ ...p, [f]: v }));
+
+  const HAS_VISA_OPTIONS_T = [
+    { value: "",      label: t("beneficiaries.visa_status_unset") },
+    { value: "true",  label: t("beneficiaries.visa_status_yes") },
+    { value: "false", label: t("beneficiaries.visa_status_no") },
+  ];
+  const VISA_TYPE_OPTIONS_T = [
+    { value: "student",      label: t("beneficiaries.visa_type_student") },
+    { value: "work",         label: t("beneficiaries.visa_type_work") },
+    { value: "dependent",    label: t("beneficiaries.visa_type_dependent") },
+    { value: "social_visit", label: t("beneficiaries.visa_type_social_visit") },
+    { value: "refugee_pass", label: t("beneficiaries.visa_type_refugee_pass") },
+    { value: "other",        label: t("beneficiaries.visa_type_other") },
+  ];
+  const SITUATION_OPTIONS_T = [
+    { value: "refugee",       label: t("beneficiaries.situation_refugee") },
+    { value: "asylum_seeker", label: t("beneficiaries.situation_asylum_seeker") },
+    { value: "undocumented",  label: t("beneficiaries.situation_undocumented") },
+    { value: "overstayed",    label: t("beneficiaries.situation_overstayed") },
+  ];
+  const PALESTINE_REGION_OPTIONS_T = [
+    { value: "gaza",            label: t("beneficiaries.region_gaza") },
+    { value: "west_bank",       label: t("beneficiaries.region_west_bank") },
+    { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
+  ];
 
   return (
     <>
@@ -223,8 +266,8 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
           <MdCardTravel className="h-5 w-5 text-green" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-navy-700">Visa & location</h2>
-          <p className="mt-0.5 text-sm text-slate-400">Your immigration status and residence in Malaysia.</p>
+          <h2 className="text-xl font-bold text-navy-700">{t("apply.visa_title")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("apply.visa_subtitle")}</p>
         </div>
       </div>
 
@@ -232,20 +275,20 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
         {/* Visa status */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <MdCardTravel className="h-3.5 w-3.5" /> Immigration Status
+            <MdCardTravel className="h-3.5 w-3.5" /> {t("apply.immigration_status")}
           </p>
-          <SelectField label="Visa Status" field="has_visa" options={HAS_VISA_OPTIONS}
+          <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T}
             required={false} formData={visaData} errors={{}} updateFormData={setV} />
           {visaData.has_visa === "true" && (
-            <SelectField label="Visa Type" field="visa_type" options={VISA_TYPE_OPTIONS}
+            <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T}
               required={false} formData={visaData} errors={{}} updateFormData={setV} />
           )}
           {visaData.has_visa === "false" && (
             <>
-              <SelectField label="Situation" field="situation" options={SITUATION_OPTIONS}
+              <SelectField label={t("apply.situation")} field="situation" options={SITUATION_OPTIONS_T}
                 required={false} formData={visaData} errors={{}} updateFormData={setV} />
               {visaData.situation === "refugee" && (
-                <InputField label="UNHCR Number" field="unhcr_number" placeholder="e.g. MYS/2023/12345"
+                <InputField label={t("apply.unhcr")} field="unhcr_number" placeholder="e.g. MYS/2023/12345"
                   required={false} formData={visaData} errors={{}} updateFormData={setV} />
               )}
             </>
@@ -253,24 +296,24 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
         </div>
 
         {/* Country & Palestine region */}
-        <SelectField label="Country of Origin" field="country_of_origin" options={COUNTRY_OPTIONS}
+        <SelectField label={t("apply.country_origin")} field="country_of_origin" options={COUNTRY_OPTIONS}
           required={false} formData={locData} errors={{}} updateFormData={setL} />
         {locData.country_of_origin === "PS" && (
-          <SelectField label="Palestine Region" field="palestine_region" options={PALESTINE_REGION_OPTIONS}
+          <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
             required={false} formData={visaData} errors={{}} updateFormData={setV} />
         )}
 
         {/* Residence */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <MdFlight className="h-3.5 w-3.5" /> Residence in Malaysia
+            <MdFlight className="h-3.5 w-3.5" /> {t("apply.residence")}
           </p>
-          <InputField label="Date Arrived in Malaysia" field="date_arrived_in_malaysia" type="date"
+          <InputField label={t("apply.date_arrived")} field="date_arrived_in_malaysia" type="date"
             required={false} formData={locData} errors={{}} updateFormData={setL} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InputField label="Current City" field="current_city" placeholder="Kuala Lumpur"
+            <InputField label={t("apply.city")} field="current_city" placeholder="Kuala Lumpur"
               required={false} formData={locData} errors={{}} updateFormData={setL} />
-            <InputField label="Address" field="address" placeholder="No. 1, Jalan…"
+            <InputField label={t("apply.address")} field="address" placeholder="No. 1, Jalan…"
               required={false} formData={locData} errors={{}} updateFormData={setL} />
           </div>
         </div>
@@ -278,10 +321,10 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
 
       <div className="mt-6 flex gap-3">
         <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
         <button type="button" onClick={onNext} className={btnNext}>
-          Continue <MdArrowForward className="h-4 w-4" />
+          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
         </button>
       </div>
     </>
@@ -297,6 +340,7 @@ const EMPTY_CHILD = {
 };
 
 const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) => {
+  const { t }       = useTranslation();
   const set         = (f, v) => onFamChange((p) => ({ ...p, [f]: v }));
   const addChild    = () => onFamChange((p) => ({ ...p, children: [...p.children, { ...EMPTY_CHILD }] }));
   const removeChild = (i) => onFamChange((p) => ({ ...p, children: p.children.filter((_, idx) => idx !== i) }));
@@ -310,26 +354,26 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
           <MdFamilyRestroom className="h-5 w-5 text-green" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-navy-700">Family information</h2>
-          <p className="mt-0.5 text-sm text-slate-400">Family details and dependants. All optional.</p>
+          <h2 className="text-xl font-bold text-navy-700">{t("apply.family_title")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("apply.family_subtitle")}</p>
         </div>
       </div>
 
       <AlertBanner message={error} />
 
       <div className="flex flex-col gap-3">
-        <ToggleInput label="Family in Malaysia" field="family_in_malaysia"
+        <ToggleInput label={t("apply.family_in_malaysia")} field="family_in_malaysia"
           formData={famData} errors={{}} updateFormData={set} />
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Spouse</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t("apply.spouse")}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InputField label="Spouse Name"          field="spouse_name"        placeholder="Fatimah binti Ali"
+            <InputField label={t("apply.spouse_name")}          field="spouse_name"        placeholder="Fatimah binti Ali"
               required={false} formData={famData} errors={{}} updateFormData={set} />
-            <InputField label="Spouse Name (Arabic)" field="spouse_name_arabic" placeholder="فاطمة بنت علي"
+            <InputField label={t("apply.spouse_name_ar")} field="spouse_name_arabic" placeholder="فاطمة بنت علي"
               required={false} formData={famData} errors={{}} updateFormData={set} />
           </div>
-          <InputField label="Spouse Occupation" field="spouse_job" placeholder="Teacher"
+          <InputField label={t("apply.spouse_job")} field="spouse_job" placeholder="Teacher"
             required={false} formData={famData} errors={{}} updateFormData={set} />
         </div>
 
@@ -337,24 +381,24 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Children ({famData.children.length})
+              {t("apply.children_count", { count: famData.children.length })}
             </p>
             <button type="button" onClick={addChild}
               className="inline-flex items-center gap-1 rounded-lg bg-green/10 px-2.5 py-1 text-xs font-semibold text-green transition-colors hover:bg-green/20">
-              <MdAdd className="h-3.5 w-3.5" /> Add Child
+              <MdAdd className="h-3.5 w-3.5" /> {t("apply.add_child")}
             </button>
           </div>
 
           {famData.children.length === 0 ? (
             <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
-              No children added yet.
+              {t("apply.no_children")}
             </p>
           ) : (
             <div className="flex flex-col gap-3">
               {famData.children.map((child, i) => (
                 <div key={i} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">Child {i + 1}</span>
+                    <span className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_n", { n: i + 1 })}</span>
                     <button type="button" onClick={() => removeChild(i)}
                       className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
                       <MdClose className="h-3.5 w-3.5" />
@@ -362,23 +406,23 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
                   </div>
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <InputField label="Child Name"          field="child_name"         placeholder="Ahmad"
+                      <InputField label={t("apply.child_name")}          field="child_name"         placeholder="Ahmad"
                         formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
-                      <InputField label="Child Name (Arabic)" field="child_name_arabic"  placeholder="أحمد"
+                      <InputField label={t("apply.child_name_ar")} field="child_name_arabic"  placeholder="أحمد"
                         formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
                     </div>
-                    <InputField label="Date of Birth" field="child_date_of_birth" type="date"
+                    <InputField label={t("apply.child_dob")} field="child_date_of_birth" type="date"
                       formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <StorageDocumentField label="Passport Copy"  folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
+                      <StorageDocumentField label={t("apply.passport_copy")}  folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
                         onUpload={(key) => updateChild(i, "passport_copy",  key)}
                         onRemove={() => updateChild(i, "passport_copy",  null)}
-                        currentName={child.passport_copy  ? "Passport uploaded" : undefined}
+                        currentName={child.passport_copy  ? t("apply.passport_uploaded") : undefined}
                         field={`passport_copy_${i}`} errors={{}} />
-                      <StorageDocumentField label="Entrance Stamp" folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
+                      <StorageDocumentField label={t("apply.entrance_stamp")} folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
                         onUpload={(key) => updateChild(i, "entrance_stump", key)}
                         onRemove={() => updateChild(i, "entrance_stump", null)}
-                        currentName={child.entrance_stump ? "Stamp uploaded"    : undefined}
+                        currentName={child.entrance_stump ? t("apply.stamp_uploaded")    : undefined}
                         field={`entrance_stump_${i}`} errors={{}} />
                     </div>
                   </div>
@@ -391,12 +435,12 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
 
       <div className="mt-6 flex gap-3">
         <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
         <button type="button" onClick={onSubmit} disabled={loading} className={btnNext}>
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : <><MdCheckCircle className="h-4 w-4" /> Submit Application</>
+            : <><MdCheckCircle className="h-4 w-4" /> {t("apply.submit")}</>
           }
         </button>
       </div>
@@ -408,6 +452,7 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
    OTP Step
 ───────────────────────────────────────────────── */
 const OtpStep = ({ email, channel, onBack }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { execute: verifyOtp, loading, error: otpError } = useVerifyOtp();
   const { execute: resendOtp, loading: resending }       = useResendOtp();
@@ -440,25 +485,26 @@ const OtpStep = ({ email, channel, onBack }) => {
       <div className="mb-7">
         <button onClick={onBack}
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700">
-          <MdArrowBack className="h-4 w-4" /> Back
+          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-green/10">
           <MdEmail className="h-5 w-5 text-green" />
         </div>
-        <h2 className="mt-4 text-xl font-bold text-navy-700">Verify your account</h2>
+        <h2 className="mt-4 text-xl font-bold text-navy-700">{t("apply.otp_title")}</h2>
         <p className="mt-1 text-sm text-slate-400">
-          We sent a 6-digit code via{" "}
-          <span className="font-semibold text-slate-600">{channel}</span> to{" "}
+          {t("auth.otp_sent_via")}{" "}
+          <span className="font-semibold text-slate-600">{channel}</span>{" "}
+          {t("auth.otp_sent_to")}{" "}
           <span className="font-semibold text-slate-600">{email}</span>
         </p>
       </div>
 
       <AlertBanner message={otpError} />
-      {resent && <AlertBanner message="A new code has been sent." variant="success" />}
+      {resent && <AlertBanner message={t("apply.new_code_sent")} variant="success" />}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-700">6-Digit Code</label>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("auth.six_digit_code")}</label>
           <input
             type="text" inputMode="numeric" maxLength={6}
             value={code}
@@ -466,22 +512,22 @@ const OtpStep = ({ email, channel, onBack }) => {
             placeholder="——————" autoFocus
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-2xl font-bold tracking-[0.6em] text-slate-900 outline-none transition-all duration-200 focus:border-green focus:bg-white placeholder:tracking-normal placeholder:text-base placeholder:font-normal"
           />
-          <p className="mt-1.5 text-center text-xs text-slate-400">{code.length}/6 digits entered</p>
+          <p className="mt-1.5 text-center text-xs text-slate-400">{code.length}/6 {t("auth.digits_entered")}</p>
         </div>
 
         <button type="submit" disabled={loading || !isReady} className={`w-full ${btnNext}`}>
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : "Verify & Continue"
+            : t("apply.verify")
           }
         </button>
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-400">
-        Didn't receive a code?{" "}
+        {t("apply.no_code")}{" "}
         <button onClick={handleResend} disabled={resending}
           className="font-medium text-green transition-colors hover:text-[#006833] disabled:opacity-50">
-          {resending ? "Sending…" : "Resend"}
+          {resending ? t("apply.resending") : t("apply.resend")}
         </button>
       </p>
     </>
@@ -492,6 +538,7 @@ const OtpStep = ({ email, channel, onBack }) => {
    Main
 ───────────────────────────────────────────────── */
 export default function BeneficiaryRegisterForm() {
+  const { t } = useTranslation();
   const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
@@ -604,9 +651,9 @@ export default function BeneficiaryRegisterForm() {
           </div>
 
           <p className="mt-6 text-center text-xs text-slate-400">
-            By applying you agree to our{" "}
-            <a href="/about" className="text-green hover:underline">privacy policy</a>.
-            Your information is kept confidential.
+            {t("apply.privacy")}{" "}
+            <a href="/about" className="text-green hover:underline">{t("apply.privacy_link")}</a>.
+            {" "}{t("apply.privacy_end")}
           </p>
         </div>
       </section>

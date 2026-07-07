@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { MdEdit, MdPhone, MdSecurity, MdPerson } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
@@ -8,6 +9,7 @@ import { useUpdateProfile } from "components/features/profile/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const EditProfileSection = ({ profile, onSaved }) => {
+  const { t } = useTranslation();
   const { execute: updateProfile, loading: saving } = useUpdateProfile();
   const { success, error: toastError } = useToast();
 
@@ -42,7 +44,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!formData.full_name.trim()) newErrors.full_name = "Full name is required";
+    if (!formData.full_name.trim()) newErrors.full_name = t("profile.full_name_required");
     if (Object.keys(newErrors).length) { setFormErrors(newErrors); return; }
     try {
       await updateProfile({
@@ -51,12 +53,12 @@ const EditProfileSection = ({ profile, onSaved }) => {
         whatsapp_enabled: formData.whatsapp_enabled,
         is_2fa_enabled:   formData.is_2fa_enabled,
       });
-      success("Profile updated", "Your changes have been saved.");
+      success(t("profile.toast_profile_updated"), t("profile.toast_profile_updated_sub"));
       setEditMode(false);
       setFormErrors({});
       onSaved?.();
     } catch (err) {
-      toastError("Failed to update profile", err?.message);
+      toastError(t("profile.toast_profile_update_failed"), err?.message);
     }
   };
 
@@ -70,14 +72,14 @@ const EditProfileSection = ({ profile, onSaved }) => {
     <div className="rounded-2xl border border-slate-200 bg-white p-6">
       <FormHeader
         icon={<MdEdit className="h-5 w-5" />}
-        title="Edit Profile"
-        subtitle="Update your name, contact details and preferences"
+        title={t("profile.edit_profile_title")}
+        subtitle={t("profile.edit_profile_sub")}
         actions={
           !editMode && (
             <Button
               variant="ghost"
               icon={<MdEdit className="h-4 w-4" />}
-              text="Edit"
+              text={t("profile.edit_btn")}
               onClick={() => setEditMode(true)}
             />
           )
@@ -88,36 +90,36 @@ const EditProfileSection = ({ profile, onSaved }) => {
         <form onSubmit={handleSubmit} noValidate>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label="Full Name" field="full_name" required
-              placeholder="Your full name"
+              label={t("users.full_name")} field="full_name" required
+              placeholder={t("profile.full_name_placeholder")}
               formData={formData} errors={formErrors} updateFormData={updateFormData}
-              rules={[{ type: "required", message: "Full name is required" }]}
+              rules={[{ required: true }]}
             />
             <InputField
-              label="Phone Number" field="phone_number" required={false}
+              label={t("users.phone")} field="phone_number" required={false}
               placeholder="+60 12 345 6789"
               formData={formData} errors={formErrors} updateFormData={updateFormData}
             />
             <ToggleInput
-              label="WhatsApp Enabled" field="whatsapp_enabled"
+              label={t("profile.whatsapp_enabled")} field="whatsapp_enabled"
               formData={formData} updateFormData={updateFormData} errors={formErrors}
             />
             <ToggleInput
-              label="Two-Factor Authentication" field="is_2fa_enabled"
+              label={t("profile.two_factor_auth")} field="is_2fa_enabled"
               formData={formData} updateFormData={updateFormData} errors={formErrors}
             />
           </div>
           <div className="mt-4 flex gap-3">
-            <Button variant="ghost" text="Cancel" onClick={handleCancel} className="flex-1" />
-            <Button type="submit" variant="primary" text="Save Changes" loading={saving} disabled={!isDirty} className="flex-1" />
+            <Button variant="ghost" text={t("common.cancel")} onClick={handleCancel} className="flex-1" />
+            <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty} className="flex-1" />
           </div>
         </form>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}   label="Full Name"    value={profile.full_name    || "—"} />
-          <InfoRow icon={<MdPhone className="h-4 w-4" />}    label="Phone Number" value={profile.phone_number || "—"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label="WhatsApp"     value={profile.whatsapp_enabled ? "Enabled" : "Disabled"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label="2FA"          value={profile.is_2fa_enabled ? "Enabled" : "Disabled"} />
+          <InfoRow icon={<MdPerson className="h-4 w-4" />}   label={t("users.full_name")}    value={profile.full_name    || "—"} />
+          <InfoRow icon={<MdPhone className="h-4 w-4" />}    label={t("users.phone")} value={profile.phone_number || "—"} />
+          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("contact.whatsapp")}     value={profile.whatsapp_enabled ? t("common.enabled") : t("common.disabled")} />
+          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")}          value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
         </div>
       )}
     </div>

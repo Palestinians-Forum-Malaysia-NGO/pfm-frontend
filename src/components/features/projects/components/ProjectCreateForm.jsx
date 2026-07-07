@@ -139,7 +139,7 @@ export default function ProjectCreateForm() {
           {/* Summary EN / AR */}
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <TextareaField label={t("projects.summary_en")} field="summary" rows={2}
-              placeholder="A short one-paragraph summary visible in the project list…"
+              placeholder={t("projects.summary_en_placeholder")}
               required={false} formData={form} errors={errors} updateFormData={set} />
             <TextareaField label={t("projects.summary_ar_label")} field="summary_ar" rows={2}
               placeholder={t("projects.summary_ar_placeholder")}
@@ -154,7 +154,7 @@ export default function ProjectCreateForm() {
           {/* Description EN / AR */}
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <TextareaField label={t("projects.desc_en")} field="description" rows={5}
-              placeholder="Full project description…"
+              placeholder={t("projects.desc_en_placeholder")}
               required={false} formData={form} errors={errors} updateFormData={set} />
             <TextareaField label={t("projects.desc_ar_label")} field="description_ar" rows={5}
               placeholder={t("projects.desc_ar_placeholder")}
@@ -164,7 +164,7 @@ export default function ProjectCreateForm() {
           {/* Beneficiary EN / AR */}
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <TextareaField label={t("projects.beneficiary_en")} field="beneficiary_info" rows={3}
-              placeholder="Who will benefit from this project?"
+              placeholder={t("projects.beneficiary_en_placeholder")}
               required={false} formData={form} errors={errors} updateFormData={set} />
             <TextareaField label={t("projects.beneficiary_ar_label")} field="beneficiary_info_ar" rows={3}
               placeholder={t("projects.beneficiary_ar_placeholder")}

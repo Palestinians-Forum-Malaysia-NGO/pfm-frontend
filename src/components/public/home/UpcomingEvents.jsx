@@ -4,15 +4,15 @@ import { useTranslation } from "react-i18next";
 import { MdLocationOn, MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const EVENTS = [
-  { date: { day: "15", month: "Jul" }, title: "Palestine Solidarity March KL", location: "Dataran Merdeka, KL",    type: "March",      color: "bg-red-50 text-red-500 border-red-100" },
-  { date: { day: "22", month: "Jul" }, title: "Fundraising Gala Dinner 2025",  location: "Grand Ballroom, KL",    type: "Fundraiser", color: "bg-green/10 text-green border-green/20" },
-  { date: { day: "05", month: "Aug" }, title: "Youth Leadership Workshop",     location: "PFM Community Centre",  type: "Workshop",   color: "bg-blue-50 text-blue-600 border-blue-100" },
-];
-
 const UpcomingEvents = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const EVENTS = [
+    { date: { day: "15", month: "Jul" }, title: "Palestine Solidarity March KL", location: "Dataran Merdeka, KL",   type: t("home.event1_type"), color: "bg-red-50 text-red-500 border-red-100" },
+    { date: { day: "22", month: "Jul" }, title: "Fundraising Gala Dinner 2025",  location: "Grand Ballroom, KL",    type: t("home.event2_type"), color: "bg-green/10 text-green border-green/20" },
+    { date: { day: "05", month: "Aug" }, title: "Youth Leadership Workshop",     location: "PFM Community Centre",  type: t("home.event3_type"), color: "bg-blue-50 text-blue-600 border-blue-100" },
+  ];
 
   return (
     <section ref={ref} className="bg-slate-50 py-20">

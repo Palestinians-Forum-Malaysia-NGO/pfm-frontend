@@ -70,7 +70,7 @@ const LoginStep = ({ onOtpRequired }) => {
         />
         <PasswordField
           label={t("auth.password")} field="password"
-          placeholder="Enter your password"
+          placeholder={t("auth.password_placeholder")}
           formData={formData} errors={errors}
           updateFormData={updateFormData} rules={PASSWORD_RULES}
         />

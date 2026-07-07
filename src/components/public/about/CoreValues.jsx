@@ -1,15 +1,17 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useInView from "hooks/useInView";
 
-const VALUES = [
-  { num: "01", title: "Justice",       desc: "We believe every human life has equal worth. Justice for Palestine is justice for all." },
-  { num: "02", title: "Solidarity",    desc: "We stand together — Malaysian, Palestinian, and all who believe in a just world." },
-  { num: "03", title: "Transparency",  desc: "Every donation is accounted for. We publish reports so you know where your help goes." },
-  { num: "04", title: "Action",        desc: "We don't just raise awareness — we mobilize, fundraise, and act when it matters most." },
-];
-
 const CoreValues = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const VALUES = [
+    { num: "01", title: t("about.value_justice_title"),      desc: t("about.value_justice_desc") },
+    { num: "02", title: t("about.value_solidarity_title"),   desc: t("about.value_solidarity_desc") },
+    { num: "03", title: t("about.value_transparency_title"), desc: t("about.value_transparency_desc") },
+    { num: "04", title: t("about.value_action_title"),       desc: t("about.value_action_desc") },
+  ];
 
   return (
     <section ref={ref} className="bg-slate-50 py-20">
@@ -19,8 +21,8 @@ const CoreValues = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">What Guides Us</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">Our Core Values</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.values_label")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("about.values_title")}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   MdCampaign, MdAdd, MdDeleteOutline, MdPerson, MdEdit, MdCheck, MdClose, MdImage,
 } from "react-icons/md";
@@ -16,6 +17,7 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 export default function UpdatesSection({ projectId, initialUpdates = [] }) {
+  const { t } = useTranslation();
   const [updates, setUpdates] = useState(initialUpdates);
 
   // Create state
@@ -48,9 +50,9 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
       setNewPhotoKey(null);
       setShowPhotoInCreate(false);
       setAddOpen(false);
-      success("Update posted");
+      success(t("projects.toast_update_posted"));
     } catch (err) {
-      toastError("Failed to post update", err?.message);
+      toastError(t("projects.toast_update_post_failed"), err?.message);
     }
   };
 
@@ -77,9 +79,9 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
       const updated = await patchUpdate(projectId, updateId, payload);
       setUpdates((prev) => prev.map((u) => (u.id === updateId ? updated : u)));
       cancelEdit();
-      success("Update saved");
+      success(t("projects.toast_update_saved"));
     } catch (err) {
-      toastError("Failed to save update", err?.message);
+      toastError(t("projects.toast_update_save_failed"), err?.message);
     }
   };
 
@@ -88,9 +90,9 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
     try {
       await deleteUpdate(projectId, id);
       setUpdates((prev) => prev.filter((u) => u.id !== id));
-      success("Update removed");
+      success(t("projects.toast_update_removed"));
     } catch (err) {
-      toastError("Failed to delete update", err?.message);
+      toastError(t("projects.toast_update_remove_failed"), err?.message);
     }
   };
 
@@ -99,13 +101,13 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
       <div className="mb-4 flex items-start justify-between">
         <FormHeader
           icon={<MdCampaign className="h-5 w-5" />}
-          title="Project Updates"
-          subtitle="Progress posts visible to community members"
+          title={t("projects.updates_title")}
+          subtitle={t("projects.updates_subtitle")}
         />
         <Button
           variant="ghost"
           icon={<MdAdd className="h-4 w-4" />}
-          text="Post"
+          text={t("projects.update_post_btn")}
           onClick={() => { setAddOpen((o) => !o); setShowPhotoInCreate(false); setNewPhotoKey(null); setNewBody(""); }}
         />
       </div>
@@ -116,14 +118,14 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
           <textarea
             value={newBody}
             onChange={(e) => setNewBody(e.target.value)}
-            placeholder="Write an update for this project…"
+            placeholder={t("projects.update_placeholder")}
             rows={3}
             required
             className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
           />
           {showPhotoInCreate ? (
             <StorageCoverField
-              label="Photo"
+              label={t("projects.update_photo_label")}
               folder="projects/updates"
               onUpload={(key) => setNewPhotoKey(key)}
               onRemove={() => setNewPhotoKey(null)}
@@ -134,19 +136,19 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
               onClick={() => setShowPhotoInCreate(true)}
               className="flex w-fit items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
             >
-              <MdImage className="h-3.5 w-3.5" /> Attach photo
+              <MdImage className="h-3.5 w-3.5" /> {t("projects.update_attach_photo")}
             </button>
           )}
           <div className="flex gap-2">
-            <Button variant="ghost" text="Cancel" type="button" onClick={() => { setAddOpen(false); setNewBody(""); setNewPhotoKey(null); setShowPhotoInCreate(false); }} className="flex-1" />
-            <Button variant="primary" text="Post Update" type="submit" loading={creating} disabled={!newBody.trim()} className="flex-1" />
+            <Button variant="ghost" text={t("projects.cancel")} type="button" onClick={() => { setAddOpen(false); setNewBody(""); setNewPhotoKey(null); setShowPhotoInCreate(false); }} className="flex-1" />
+            <Button variant="primary" text={t("projects.update_add_submit")} type="submit" loading={creating} disabled={!newBody.trim()} className="flex-1" />
           </div>
         </form>
       )}
 
       {/* ── Updates list ── */}
       {updates.length === 0 ? (
-        <p className="py-6 text-center text-sm text-slate-400">No updates posted yet.</p>
+        <p className="py-6 text-center text-sm text-slate-400">{t("projects.no_updates")}</p>
       ) : (
         <div className="flex flex-col divide-y divide-slate-100">
           {updates.map((u) => (
@@ -161,15 +163,15 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                     className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-green focus:ring-1 focus:ring-green"
                   />
                   <StorageCoverField
-                    label="Photo"
+                    label={t("projects.update_photo_label")}
                     folder="projects/updates"
                     currentUrl={editCurrentUrl}
                     onUpload={(key) => { setEditPhotoKey(key); setEditCurrentUrl(null); }}
                     onRemove={() => { setEditPhotoKey(""); setEditCurrentUrl(null); }}
                   />
                   <div className="flex gap-2">
-                    <Button variant="ghost" text="Cancel" type="button" onClick={cancelEdit} icon={<MdClose className="h-3.5 w-3.5" />} className="flex-1" />
-                    <Button variant="primary" text="Save" type="button" loading={saving} disabled={!editBody.trim()} onClick={() => handleSave(u.id)} icon={<MdCheck className="h-3.5 w-3.5" />} className="flex-1" />
+                    <Button variant="ghost" text={t("projects.cancel")} type="button" onClick={cancelEdit} icon={<MdClose className="h-3.5 w-3.5" />} className="flex-1" />
+                    <Button variant="primary" text={t("projects.update_save_btn")} type="button" loading={saving} disabled={!editBody.trim()} onClick={() => handleSave(u.id)} icon={<MdCheck className="h-3.5 w-3.5" />} className="flex-1" />
                   </div>
                 </div>
               ) : (
@@ -185,12 +187,12 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                     </div>
                     <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
                     {u.photo && (
-                      <StorageImage fileKey={u.photo} alt="Update" className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
+                      <StorageImage fileKey={u.photo} alt={t("projects.update_alt")} className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">
-                    <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title="Edit"   onClick={() => startEdit(u)} />
-                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title="Delete" onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
+                    <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(u)} />
+                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
                   </div>
                 </div>
               )}

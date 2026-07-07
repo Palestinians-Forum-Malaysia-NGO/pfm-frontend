@@ -9,7 +9,7 @@ const AboutHero = () => {
     <section className="relative flex h-[65vh] items-center justify-center overflow-hidden">
       <img
         src={heroBg}
-        alt="About PFM"
+        alt={t("about.hero_alt")}
         className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-[8000ms] ease-out"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />

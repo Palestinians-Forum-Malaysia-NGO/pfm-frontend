@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import ReactApexChart from "react-apexcharts";
 import { MdPeople, MdArrowForward } from "react-icons/md";
 import { useGetBeneficiaryStats } from "components/features/beneficiaries/hooks";
@@ -9,11 +10,9 @@ const Skeleton = ({ className }) => (
 );
 
 const STATUS_COLORS  = ["#007A3D", "#F59E0B", "#F97316", "#EF4444"];
-const STATUS_LABELS  = ["Active", "Pending", "Suspended", "Rejected"];
 const STATUS_KEYS    = ["active", "pending", "suspended", "rejected"];
 
 const GENDER_COLORS  = ["#3B82F6", "#EC4899", "#94A3B8"];
-const GENDER_LABELS  = ["Male", "Female", ];
 const GENDER_KEYS    = ["male", "female",];
 
 const donutOpts = (labels, colors) => ({
@@ -55,6 +54,12 @@ const barOpts = (categories) => ({
 });
 
 export default function BeneficiaryStatsWidget() {
+  const { t } = useTranslation();
+  const STATUS_LABELS = [
+    t("beneficiaries.stat_active"), t("beneficiaries.stat_pending"),
+    t("beneficiaries.stat_suspended"), t("beneficiaries.stat_rejected"),
+  ];
+  const GENDER_LABELS = [t("beneficiaries.gender_male"), t("beneficiaries.gender_female")];
   const { stats, loading } = useGetBeneficiaryStats();
   const navigate = useNavigate();
 
@@ -76,10 +81,10 @@ export default function BeneficiaryStatsWidget() {
             <MdPeople className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-900">Beneficiary Overview</p>
+            <p className="text-sm font-bold text-slate-900">{t("admin_dashboard.beneficiary_overview_title")}</p>
             {loading
               ? <Skeleton className="mt-1 h-3 w-20" />
-              : <p className="text-xs text-slate-400">{total.toLocaleString()} total registered</p>
+              : <p className="text-xs text-slate-400">{t("admin_dashboard.total_registered", { count: total.toLocaleString() })}</p>
             }
           </div>
         </div>
@@ -87,7 +92,7 @@ export default function BeneficiaryStatsWidget() {
           onClick={() => navigate("/admin/beneficiaries")}
           className="inline-flex items-center gap-1 text-xs font-semibold text-green transition-colors hover:text-[#005a2c]"
         >
-          View all <MdArrowForward className="h-3.5 w-3.5" />
+          {t("home.view_all")} <MdArrowForward className="h-3.5 w-3.5" />
         </button>
       </div>
 
@@ -96,7 +101,7 @@ export default function BeneficiaryStatsWidget() {
 
         {/* ── Status donut ── */}
         <div className="flex flex-col items-center rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-3 self-start text-xs font-semibold text-slate-500">By Status</p>
+          <p className="mb-3 self-start text-xs font-semibold text-slate-500">{t("admin_dashboard.by_status_label")}</p>
           {loading ? (
             <Skeleton className="h-40 w-40 rounded-full" />
           ) : (
@@ -120,7 +125,7 @@ export default function BeneficiaryStatsWidget() {
 
         {/* ── Gender donut ── */}
         <div className="flex flex-col items-center rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-3 self-start text-xs font-semibold text-slate-500">By Gender</p>
+          <p className="mb-3 self-start text-xs font-semibold text-slate-500">{t("admin_dashboard.by_gender_label")}</p>
           {loading ? (
             <Skeleton className="h-40 w-40 rounded-full" />
           ) : (
@@ -144,17 +149,17 @@ export default function BeneficiaryStatsWidget() {
 
         {/* ── Top cities bar ── */}
         <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-          <p className="mb-1 text-xs font-semibold text-slate-500">Top Cities</p>
+          <p className="mb-1 text-xs font-semibold text-slate-500">{t("admin_dashboard.top_cities_label")}</p>
           {loading ? (
             <div className="flex flex-col gap-3 pt-2">
               {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-5 w-full" />)}
             </div>
           ) : byCity.length === 0 ? (
-            <p className="pt-4 text-xs text-slate-400">No data yet.</p>
+            <p className="pt-4 text-xs text-slate-400">{t("admin_dashboard.no_data_yet")}</p>
           ) : (
             <ReactApexChart
               type="bar"
-              series={[{ name: "Beneficiaries", data: byCity.map((c) => c.count) }]}
+              series={[{ name: t("beneficiaries.title"), data: byCity.map((c) => c.count) }]}
               options={barOpts(byCity.map((c) => c.city))}
               height={byCity.length * 44 + 20}
             />

@@ -88,7 +88,7 @@ export default function ClassificationCreateForm() {
               label={t("classifications.desc_en")}
               field="description"
               rows={3}
-              placeholder="Brief description of this classification…"
+              placeholder={t("classifications.desc_en_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />

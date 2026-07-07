@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   MdEmail, MdPhone, MdShield, MdCalendarToday,
   MdVerified, MdSecurity, MdUpdate, MdFingerprint,
@@ -9,7 +10,6 @@ import { MdPerson } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow    from "components/ui/InfoRow";
 import {
-  ROLE_LABELS,
   ROLE_BADGE_BORDER as ROLE_BADGE,
   ROLE_AVATAR_GRADIENT as AVATAR_BG,
 } from "components/features/users/constants/roles";
@@ -20,12 +20,22 @@ const getInitials = (name = "") =>
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
 
-const fmtFrequency = (f) => {
-  const map = { monthly: "Monthly", weekly: "Weekly", "bi-weekly": "Bi-Weekly", annually: "Annually" };
-  return map[f] ?? f ?? "—";
-};
-
 const UserProfileCard = ({ user, showId = false }) => {
+  const { t } = useTranslation();
+
+  const ROLE_LABELS = {
+    admin: t("users.role_admin"),
+    staff: t("users.role_staff"),
+    beneficiary: t("users.role_beneficiary"),
+  };
+  const fmtFrequency = (f) => {
+    const map = {
+      monthly: t("users.freq_monthly"), weekly: t("users.freq_weekly"),
+      "bi-weekly": t("users.freq_biweekly"), annually: t("users.freq_annually"),
+    };
+    return map[f] ?? f ?? "—";
+  };
+
   if (!user) return null;
 
   const bi = user.banking_information;
@@ -60,12 +70,12 @@ const UserProfileCard = ({ user, showId = false }) => {
               user.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
             }`}>
               <span className={`h-1.5 w-1.5 rounded-full ${user.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-              {user.is_active ? "Active" : "Inactive"}
+              {user.is_active ? t("users.status_active") : t("users.status_inactive")}
             </span>
             {user.password_reset_required && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
                 <MdWarning className="h-3.5 w-3.5" />
-                Password Reset Required
+                {t("beneficiaries.password_reset")}
               </span>
             )}
           </div>
@@ -74,17 +84,17 @@ const UserProfileCard = ({ user, showId = false }) => {
 
       {/* ── Account Information ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <FormHeader icon={<MdPerson className="h-5 w-5" />} title="Account Information" subtitle="Profile and access details" />
+        <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("users.account_info_title")} subtitle={t("users.account_info_sub")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdEmail className="h-4 w-4" />}         label="Email"   value={user.email} />
-          <InfoRow icon={<MdShield className="h-4 w-4" />}        label="Role"    value={ROLE_LABELS[user.role] ?? user.role} />
-          <InfoRow icon={<MdPhone className="h-4 w-4" />}         label="Phone"   value={user.phone_number || "—"} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Joined"  value={fmtDate(user.created_at)} />
-          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label="Status"  value={user.is_active ? "Active" : "Inactive"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label="2FA"     value={user.is_2fa_enabled ? (user.is_2fa_verified ? "Enabled & Verified" : "Enabled") : "Disabled"} />
-          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label="Updated" value={fmtDate(user.updated_at)} />
+          <InfoRow icon={<MdEmail className="h-4 w-4" />}         label={t("users.info_email")}   value={user.email} />
+          <InfoRow icon={<MdShield className="h-4 w-4" />}        label={t("users.role")}    value={ROLE_LABELS[user.role] ?? user.role} />
+          <InfoRow icon={<MdPhone className="h-4 w-4" />}         label={t("users.info_phone")}   value={user.phone_number || "—"} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("users.info_joined")}  value={fmtDate(user.created_at)} />
+          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label={t("users.info_status")}  value={user.is_active ? t("users.status_active") : t("users.status_inactive")} />
+          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (user.is_2fa_verified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
+          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(user.updated_at)} />
           {showId && (
-            <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label="User ID" value={user.id} />
+            <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label={t("users.info_user_id")} value={user.id} />
           )}
         </div>
       </div>
@@ -92,12 +102,12 @@ const UserProfileCard = ({ user, showId = false }) => {
       {/* ── Employment Details ── */}
       {(user.department || user.job_title || user.branch || user.joining_date) && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title="Employment Details" subtitle="Department and position information" />
+          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.info_employment_sub")} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {user.department   && <InfoRow icon={<MdBusiness className="h-4 w-4" />}       label="Department"   value={user.department} />}
-            {user.job_title    && <InfoRow icon={<MdWork className="h-4 w-4" />}            label="Job Title"    value={user.job_title} />}
-            {user.branch       && <InfoRow icon={<MdBusiness className="h-4 w-4" />}        label="Branch"       value={user.branch} />}
-            {user.joining_date && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label="Joining Date" value={fmtDate(user.joining_date)} />}
+            {user.department   && <InfoRow icon={<MdBusiness className="h-4 w-4" />}       label={t("users.department")}   value={user.department} />}
+            {user.job_title    && <InfoRow icon={<MdWork className="h-4 w-4" />}            label={t("users.job_title")}    value={user.job_title} />}
+            {user.branch       && <InfoRow icon={<MdBusiness className="h-4 w-4" />}        label={t("users.branch")}       value={user.branch} />}
+            {user.joining_date && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label={t("users.joining_date")} value={fmtDate(user.joining_date)} />}
           </div>
         </div>
       )}
@@ -105,11 +115,11 @@ const UserProfileCard = ({ user, showId = false }) => {
       {/* ── Banking Information ── */}
       {hasBanking && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title="Banking Information" subtitle="Bank account details" />
+          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("users.banking_info")} subtitle={t("users.info_banking_sub")} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {bi.bank_name           && <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label="Bank Name"     value={bi.bank_name} />}
-            {bi.account_holder_name && <InfoRow icon={<MdPerson className="h-4 w-4" />}         label="Account Holder" value={bi.account_holder_name} />}
-            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label="Account No."   value={bi.account_number} />}
+            {bi.bank_name           && <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("users.bank_name")}     value={bi.bank_name} />}
+            {bi.account_holder_name && <InfoRow icon={<MdPerson className="h-4 w-4" />}         label={t("users.info_account_holder")} value={bi.account_holder_name} />}
+            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label={t("users.info_account_no")}   value={bi.account_number} />}
           </div>
         </div>
       )}
@@ -117,11 +127,11 @@ const UserProfileCard = ({ user, showId = false }) => {
       {/* ── Financial Information ── */}
       {hasFinancial && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title="Financial Information" subtitle="Salary and payment details" />
+          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("users.financial_info")} subtitle={t("users.info_financial_sub")} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {fi.job_title         && <InfoRow icon={<MdWork className="h-4 w-4" />}          label="Job Title"    value={fi.job_title} />}
-            {fi.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}   label="Salary"       value={`MYR ${fi.salary}`} />}
-            {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label="Pay Frequency" value={fmtFrequency(fi.payment_frequency)} />}
+            {fi.job_title         && <InfoRow icon={<MdWork className="h-4 w-4" />}          label={t("users.job_title")}    value={fi.job_title} />}
+            {fi.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}   label={t("users.salary")}       value={`MYR ${fi.salary}`} />}
+            {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("users.info_pay_frequency")} value={fmtFrequency(fi.payment_frequency)} />}
           </div>
         </div>
       )}

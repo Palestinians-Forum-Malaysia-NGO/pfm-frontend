@@ -8,8 +8,8 @@ import { validate }  from "components/form/utils/validation";
 import { useResetPassword } from "components/features/auth/hooks";
 
 const PASSWORD_RULES = [
-  { required: true, message: "New password is required" },
-  { minLength: 8,   message: "At least 8 characters" },
+  { required: true },
+  { minLength: 8 },
 ];
 
 export default function ResetPassword() {
@@ -31,7 +31,7 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!token.trim()) newErrors.token = "Reset token is required";
+    if (!token.trim()) newErrors.token = t("auth.reset_token_required");
     const pwErr = validate(formData.password, PASSWORD_RULES);
     if (pwErr) newErrors.password = pwErr;
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }

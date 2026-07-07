@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MdMenu, MdClose, MdPerson, MdLogout, MdHome, MdAssignment, MdSettings } from "react-icons/md";
 import logo from "assets/brand/LOGO-wbg.png";
 
-const NAV_LINKS = [
-  { label: "Dashboard",   to: "/beneficiary/default",  icon: <MdHome className="h-4 w-4" /> },
-  { label: "My Requests", to: "/beneficiary/requests", icon: <MdAssignment className="h-4 w-4" /> },
-  { label: "Profile",     to: "/beneficiary/profile",  icon: <MdPerson className="h-4 w-4" /> },
-];
-
-const BeneficiaryNavbar = ({ brandText = "Dashboard" }) => {
+const BeneficiaryNavbar = ({ brandText }) => {
+  const { t } = useTranslation();
+  const resolvedBrandText = brandText ?? t("navbar.dashboard");
+  const NAV_LINKS = [
+    { label: t("navbar.dashboard"),    to: "/beneficiary/default",  icon: <MdHome className="h-4 w-4" /> },
+    { label: t("navbar.my_requests"),  to: "/beneficiary/requests", icon: <MdAssignment className="h-4 w-4" /> },
+    { label: t("navbar.profile"),      to: "/beneficiary/profile",  icon: <MdPerson className="h-4 w-4" /> },
+  ];
   const navigate    = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen,  setUserOpen]  = useState(false);
@@ -23,12 +25,12 @@ const BeneficiaryNavbar = ({ brandText = "Dashboard" }) => {
           <Link to="/beneficiary/default" className="flex items-center gap-2.5 shrink-0">
             <img src={logo} alt="PFM" className="h-9 w-9 object-contain" />
             <div className="hidden leading-tight sm:block">
-              <p className="text-sm font-bold text-slate-900">PFM Portal</p>
-              <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">Beneficiary</p>
+              <p className="text-sm font-bold text-slate-900">{t("navbar.pfm_portal")}</p>
+              <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">{t("navbar.beneficiary_role")}</p>
             </div>
           </Link>
           <div className="hidden h-5 w-px bg-slate-200 sm:block" />
-          <h1 className="hidden text-sm font-semibold text-slate-600 sm:block">{brandText}</h1>
+          <h1 className="hidden text-sm font-semibold text-slate-600 sm:block">{resolvedBrandText}</h1>
         </div>
 
         {/* Desktop nav */}
@@ -56,25 +58,25 @@ const BeneficiaryNavbar = ({ brandText = "Dashboard" }) => {
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green/10 text-green text-xs font-bold">
                 B
               </div>
-              <span className="hidden sm:block">Beneficiary</span>
+              <span className="hidden sm:block">{t("navbar.beneficiary_role")}</span>
             </button>
 
             {userOpen && (
               <div className="absolute right-0 top-[calc(100%+6px)] z-50 w-48 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-xl">
                 <Link to="/beneficiary/profile" onClick={() => setUserOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
-                  <MdPerson className="h-4 w-4 text-slate-400" /> My Profile
+                  <MdPerson className="h-4 w-4 text-slate-400" /> {t("navbar.my_profile")}
                 </Link>
                 <Link to="/beneficiary/settings" onClick={() => setUserOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
-                  <MdSettings className="h-4 w-4 text-slate-400" /> Settings
+                  <MdSettings className="h-4 w-4 text-slate-400" /> {t("navbar.settings")}
                 </Link>
                 <div className="my-1 mx-3 border-t border-slate-100" />
                 <button
                   onClick={() => navigate("/auth/sign-in")}
                   className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50"
                 >
-                  <MdLogout className="h-4 w-4" /> Sign Out
+                  <MdLogout className="h-4 w-4" /> {t("navbar.sign_out")}
                 </button>
               </div>
             )}

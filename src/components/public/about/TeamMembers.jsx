@@ -3,18 +3,18 @@ import { useTranslation } from "react-i18next";
 import { MdLinkedIn, MdEmail } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const TEAM = [
-  { name: "Dr. Ahmad Al-Faris",   role: "President",             initials: "AA", color: "from-green/20 to-green/10 text-green" },
-  { name: "Nurul Huda Ismail",    role: "Vice President",        initials: "NI", color: "from-blue-100 to-blue-50 text-blue-600" },
-  { name: "Yusuf Al-Khalidi",     role: "Secretary General",     initials: "YK", color: "from-purple-100 to-purple-50 text-purple-600" },
-  { name: "Siti Fatimah Yusof",   role: "Treasurer",             initials: "SF", color: "from-amber-100 to-amber-50 text-amber-600" },
-  { name: "Hassan Mahmoud",       role: "Head of Advocacy",      initials: "HM", color: "from-green/20 to-green/10 text-green" },
-  { name: "Rohani binti Hamid",   role: "Head of Community",     initials: "RH", color: "from-blue-100 to-blue-50 text-blue-600" },
-];
-
 const TeamMembers = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const TEAM = [
+    { name: "Dr. Ahmad Al-Faris",   role: t("about.role_president"),         initials: "AA", color: "from-green/20 to-green/10 text-green" },
+    { name: "Nurul Huda Ismail",    role: t("about.role_vice_president"),    initials: "NI", color: "from-blue-100 to-blue-50 text-blue-600" },
+    { name: "Yusuf Al-Khalidi",     role: t("about.role_secretary_general"), initials: "YK", color: "from-purple-100 to-purple-50 text-purple-600" },
+    { name: "Siti Fatimah Yusof",   role: t("about.role_treasurer"),         initials: "SF", color: "from-amber-100 to-amber-50 text-amber-600" },
+    { name: "Hassan Mahmoud",       role: t("about.role_head_advocacy"),     initials: "HM", color: "from-green/20 to-green/10 text-green" },
+    { name: "Rohani binti Hamid",   role: t("about.role_head_community"),    initials: "RH", color: "from-blue-100 to-blue-50 text-blue-600" },
+  ];
 
   return (
     <section ref={ref} className="bg-white py-20">

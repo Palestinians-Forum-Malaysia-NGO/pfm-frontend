@@ -7,7 +7,7 @@ import AlertBanner from "components/ui/AlertBanner";
 import { validate } from "components/form/utils/validation";
 import { useForgotPassword } from "components/features/auth/hooks";
 
-const EMAIL_RULES = [{ required: true, message: "Email is required" }, { email: true }];
+const EMAIL_RULES = [{ required: true }, { email: true }];
 
 export default function ForgotPassword() {
   const { t }    = useTranslation();

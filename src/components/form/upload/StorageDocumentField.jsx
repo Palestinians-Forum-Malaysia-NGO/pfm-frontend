@@ -3,6 +3,7 @@ import {
   MdCloudUpload, MdDeleteOutline, MdInsertDriveFile,
   MdErrorOutline, MdOpenInNew,
 } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 import { WRAPPER, LABEL, ERROR_MSG } from "../utils/fieldStyles";
 import useStorageUpload from "./useStorageUpload";
 
@@ -36,6 +37,7 @@ const StorageDocumentField = ({
   errors,
   field = "document",
 }) => {
+  const { t } = useTranslation();
   const { file, isUploading, progress, error, handleFileChange, handleRemove } =
     useStorageUpload({ fileType, folder, onUpload });
 
@@ -62,7 +64,7 @@ const StorageDocumentField = ({
         <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center transition-all hover:border-green/75 hover:bg-green/10">
           <MdCloudUpload className="mb-2 h-8 w-8 text-slate-400" />
           <p className="text-sm text-slate-500">
-            Drag & drop or <span className="font-semibold text-green">browse</span>
+            {t("common.drag_drop_prefix")} <span className="font-semibold text-green">{t("common.browse")}</span>
           </p>
           <p className="mt-1 text-xs text-slate-400">{accept}</p>
           <input type="file" accept={accept} className="hidden" onChange={handleChange} />
@@ -79,7 +81,7 @@ const StorageDocumentField = ({
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-slate-900">
-                  {currentName ?? "Uploaded file"}
+                  {currentName ?? t("common.uploaded_file")}
                 </p>
                 {currentUrl && (
                   <a
@@ -89,14 +91,14 @@ const StorageDocumentField = ({
                     className="inline-flex items-center gap-1 text-xs text-green hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Open <MdOpenInNew className="h-3 w-3" />
+                    {t("common.open")} <MdOpenInNew className="h-3 w-3" />
                   </a>
                 )}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <label className="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-100">
-                Replace
+                {t("common.replace")}
                 <input type="file" accept={accept} className="hidden" onChange={handleChange} />
               </label>
               <button
@@ -104,7 +106,7 @@ const StorageDocumentField = ({
                 onClick={onRemove}
                 className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-100"
               >
-                <MdDeleteOutline className="h-3.5 w-3.5" /> Remove
+                <MdDeleteOutline className="h-3.5 w-3.5" /> {t("common.remove")}
               </button>
             </div>
           </div>
@@ -124,7 +126,7 @@ const StorageDocumentField = ({
                   {file.name}
                 </p>
                 <p className={`text-xs ${error ? "text-red-400" : "text-slate-400"}`}>
-                  {isUploading ? `Uploading… ${progress}%` : error ? "Upload failed" : "Uploaded"}
+                  {isUploading ? t("common.uploading_percent", { progress }) : error ? t("common.upload_failed") : t("common.uploaded")}
                 </p>
               </div>
             </div>

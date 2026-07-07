@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import routes from "routes.js";
 
 import PublicNavbar from "components/navbar/PublicNavbar";
@@ -7,6 +8,13 @@ import Footer from "components/footer/Footer";
 import ProjectDetail from "views/public/projects/ProjectDetail";
 
 export default function PublicLayout() {
+  const { i18n } = useTranslation();
+
+  React.useEffect(() => {
+    document.documentElement.dir  = i18n.language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   const getRoutes = () =>
     routes
       .filter((r) => r.layout === "/")

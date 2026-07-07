@@ -93,12 +93,12 @@ const HeroSection = () => {
 
           {/* Main image — top right */}
           <div className="absolute right-0 top-0 h-[58%] w-[58%] overflow-hidden rounded-3xl shadow-2xl">
-            <img src={img1} alt="PFM Community" className="h-full w-full object-cover" />
+            <img src={img1} alt={t("hero.img_community_alt")} className="h-full w-full object-cover" />
           </div>
 
           {/* Secondary image — bottom left */}
           <div className="absolute bottom-0 left-0 h-[52%] w-[65%] overflow-hidden rounded-3xl shadow-xl">
-            <img src={img2} alt="PFM Action" className="h-full w-full object-cover" />
+            <img src={img2} alt={t("hero.img_action_alt")} className="h-full w-full object-cover" />
           </div>
 
           {/* Floating stat cards */}

@@ -1,18 +1,20 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MdPeople, MdCampaign, MdSchool, MdLocalHospital, MdHandshake, MdGroups } from "react-icons/md";
 import useInView from "hooks/useInView";
 
-const OBJECTIVES = [
-  { num: "01", icon: <MdPeople className="h-5 w-5" />,       title: "Build a Unified Community",    desc: "Create a strong, connected network of Palestinians and supporters across all Malaysian states." },
-  { num: "02", icon: <MdCampaign className="h-5 w-5" />,     title: "Advocate for Palestinian Rights", desc: "Raise the Palestinian cause in Malaysian public, political, and academic spheres." },
-  { num: "03", icon: <MdLocalHospital className="h-5 w-5" />,title: "Deliver Humanitarian Aid",     desc: "Coordinate and dispatch medical, food, and financial aid to Palestinians in need." },
-  { num: "04", icon: <MdSchool className="h-5 w-5" />,       title: "Support Education",            desc: "Fund scholarships and mentorship programmes for Palestinian students in Malaysia." },
-  { num: "05", icon: <MdHandshake className="h-5 w-5" />,    title: "Foster Strategic Partnerships",desc: "Build alliances with Malaysian NGOs, institutions, and international organisations." },
-  { num: "06", icon: <MdGroups className="h-5 w-5" />,       title: "Empower Youth Leadership",     desc: "Develop the next generation of Palestinian-Malaysian advocates and community leaders." },
-];
-
 const Objectives = () => {
+  const { t } = useTranslation();
   const [ref, inView] = useInView();
+
+  const OBJECTIVES = [
+    { num: "01", icon: <MdPeople className="h-5 w-5" />,        title: t("about.obj1_title"), desc: t("about.obj1_desc") },
+    { num: "02", icon: <MdCampaign className="h-5 w-5" />,      title: t("about.obj2_title"), desc: t("about.obj2_desc") },
+    { num: "03", icon: <MdLocalHospital className="h-5 w-5" />, title: t("about.obj3_title"), desc: t("about.obj3_desc") },
+    { num: "04", icon: <MdSchool className="h-5 w-5" />,        title: t("about.obj4_title"), desc: t("about.obj4_desc") },
+    { num: "05", icon: <MdHandshake className="h-5 w-5" />,     title: t("about.obj5_title"), desc: t("about.obj5_desc") },
+    { num: "06", icon: <MdGroups className="h-5 w-5" />,        title: t("about.obj6_title"), desc: t("about.obj6_desc") },
+  ];
 
   return (
     <section ref={ref} className="bg-white py-20">
@@ -22,8 +24,8 @@ const Objectives = () => {
           className="mb-12 text-center"
           style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 0.7s ease-in-out" }}
         >
-          <span className="text-xs font-bold uppercase tracking-widest text-green">What We Aim To Do</span>
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">Our Objectives</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-green">{t("about.objectives_label")}</span>
+          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("about.objectives_title")}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

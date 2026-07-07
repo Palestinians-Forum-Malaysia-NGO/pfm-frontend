@@ -10,7 +10,6 @@ import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetCategory, useUpdateCategory, useGetCategories } from "components/features/categories/hooks";
-import { MODULE_OPTIONS } from "components/features/categories/constants/category";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
@@ -19,6 +18,13 @@ const RULES = {
 
 export default function CategoryEditForm() {
   const { t, i18n } = useTranslation();
+  const MODULE_OPTIONS = [
+    { value: "beneficiaries", label: t("categories.module_beneficiaries") },
+    { value: "projects",      label: t("categories.module_projects") },
+    { value: "blogs",         label: t("categories.module_blogs") },
+    { value: "donations",     label: t("categories.module_donations") },
+    { value: "campaigns",     label: t("categories.module_campaigns") },
+  ];
   const { id }   = useParams();
   const navigate = useNavigate();
   const base = useLayoutBase();
@@ -97,7 +103,7 @@ export default function CategoryEditForm() {
     }
   };
 
-  if (loading)   return <Loading text="Loading category…" />;
+  if (loading)   return <Loading text={t("categories.loading")} />;
   if (loadError) return <p className="py-12 text-center text-sm text-red-500">{loadError}</p>;
 
   return (
@@ -149,7 +155,7 @@ export default function CategoryEditForm() {
             <TextareaField
               label={t("categories.desc_en")}
               field="description"
-              placeholder="Brief description of this category…"
+              placeholder={t("categories.desc_en_placeholder")}
               required={false}
               formData={form} errors={errors} updateFormData={set}
             />

@@ -146,7 +146,7 @@ export default function UserEditForm() {
     }
   };
 
-  if (loading)   return <Loading text="Loading user..." />;
+  if (loading)   return <Loading text={t("users.loading_user")} />;
   if (loadError) return <p className="py-12 text-center text-sm text-red-500">{loadError}</p>;
 
   return (

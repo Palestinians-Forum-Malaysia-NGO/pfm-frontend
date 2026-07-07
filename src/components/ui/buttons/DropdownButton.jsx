@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MdMoreVert, MdKeyboardArrowDown } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 
 /**
  * Reusable dropdown button.
@@ -15,13 +16,15 @@ import { MdMoreVert, MdKeyboardArrowDown } from "react-icons/md";
  *     { divider: true }
  */
 const DropdownButton = ({
-  label    = "Actions",
+  label,
   icon,
   align    = "right",
   variant  = "outline",
   disabled = false,
   items    = [],
 }) => {
+  const { t } = useTranslation();
+  const triggerLabel = label ?? t("common.actions");
   const [open, setOpen] = useState(false);
   const ref             = useRef(null);
 
@@ -60,7 +63,7 @@ const DropdownButton = ({
         <span className="flex items-center text-slate-400">
           {icon ?? <MdMoreVert className="h-4 w-4" />}
         </span>
-        <span>{label}</span>
+        <span>{triggerLabel}</span>
         <MdKeyboardArrowDown
           className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ease-in-out ${open ? "rotate-180" : ""}`}
         />

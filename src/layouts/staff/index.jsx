@@ -5,6 +5,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer from "components/footer/FooterAuthDefault";
 import routes from "routes.js";
+import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
 import BeneficiaryDetail from "views/admin/beneficiaries/BeneficiaryDetail";
 import BeneficiaryEdit   from "views/admin/beneficiaries/BeneficiaryEdit";
@@ -22,9 +23,10 @@ const SUB_ROUTE_NAMES = {
 
 export default function StaffLayout() {
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen]                 = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("Dashboard");
+  const [currentRouteName, setCurrentRouteName] = React.useState("Dashboard");
+  const currentRoute = t(ROUTE_KEY[currentRouteName] ?? currentRouteName, { defaultValue: currentRouteName });
 
   React.useEffect(() => {
     const handleResize = () => setOpen(window.innerWidth >= 1200);
@@ -36,15 +38,15 @@ export default function StaffLayout() {
   React.useEffect(() => {
     const path = location.pathname;
     const subMatch = Object.keys(SUB_ROUTE_NAMES).find((k) => path.endsWith(k));
-    if (subMatch) { setCurrentRoute(SUB_ROUTE_NAMES[subMatch]); return; }
-    if (path.match(/\/beneficiaries\/[^/]+\/edit$/)) { setCurrentRoute("Edit Beneficiary"); return; }
-    if (path.match(/\/categories\/[^/]+\/edit$/))    { setCurrentRoute("Edit Category");    return; }
-    if (path.match(/\/projects\/[^/]+\/edit$/))      { setCurrentRoute("Edit Project");     return; }
-    if (path.match(/\/beneficiaries\/[^/]+$/))       { setCurrentRoute("Beneficiary Detail"); return; }
-    if (path.match(/\/categories\/[^/]+$/))          { setCurrentRoute("Category Detail");  return; }
-    if (path.match(/\/projects\/[^/]+$/))            { setCurrentRoute("Project Detail");   return; }
+    if (subMatch) { setCurrentRouteName(SUB_ROUTE_NAMES[subMatch]); return; }
+    if (path.match(/\/beneficiaries\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Beneficiary"); return; }
+    if (path.match(/\/categories\/[^/]+\/edit$/))    { setCurrentRouteName("Edit Category");    return; }
+    if (path.match(/\/projects\/[^/]+\/edit$/))      { setCurrentRouteName("Edit Project");     return; }
+    if (path.match(/\/beneficiaries\/[^/]+$/))       { setCurrentRouteName("Beneficiary Detail"); return; }
+    if (path.match(/\/categories\/[^/]+$/))          { setCurrentRouteName("Category Detail");  return; }
+    if (path.match(/\/projects\/[^/]+$/))            { setCurrentRouteName("Project Detail");   return; }
     const active = routes.find((r) => r.layout === "/staff" && path.includes(r.path));
-    if (active) setCurrentRoute(active.name);
+    if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
 
   const getRoutes = () =>

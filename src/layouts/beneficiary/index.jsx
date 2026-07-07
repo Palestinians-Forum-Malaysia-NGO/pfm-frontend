@@ -5,13 +5,15 @@ import Navbar  from "components/navbar";
 import Sidebar from "components/sidebar";
 import Footer  from "components/footer/FooterAuthDefault";
 import routes  from "routes.js";
+import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
 
 export default function BeneficiaryLayout() {
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen]                 = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("Dashboard");
+  const [currentRouteName, setCurrentRouteName] = React.useState("Dashboard");
+  const currentRoute = t(ROUTE_KEY[currentRouteName] ?? currentRouteName, { defaultValue: currentRouteName });
 
   React.useEffect(() => {
     const handleResize = () => setOpen(window.innerWidth >= 1200);
@@ -24,7 +26,7 @@ export default function BeneficiaryLayout() {
     const active = routes.find(
       (r) => r.layout === "/beneficiary" && location.pathname.includes(r.path)
     );
-    if (active) setCurrentRoute(active.name);
+    if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
 
   const getRoutes = () =>

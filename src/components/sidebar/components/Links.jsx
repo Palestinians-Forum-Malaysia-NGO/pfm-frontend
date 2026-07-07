@@ -14,7 +14,7 @@ const SECTION_KEY = {
   ACCOUNT:   "sidebar.section_account",
 };
 
-const ROUTE_KEY = {
+export const ROUTE_KEY = {
   "Dashboard":           "sidebar.dashboard",
   "Projects":            "sidebar.projects",
   "Beneficiaries":       "sidebar.beneficiaries",
@@ -35,6 +35,28 @@ const ROUTE_KEY = {
   "Add Staff":           "sidebar.add_staff",
   "All Users":           "sidebar.all_users",
   "Add User":            "sidebar.add_user",
+  "New User":            "sidebar.new_user_title",
+  "New Staff":           "sidebar.new_staff_title",
+  "New Category":        "sidebar.new_category_title",
+  "New Classification":  "sidebar.new_classification_title",
+  "New Project":         "projects.add_title",
+  "Edit User":           "users.edit_user",
+  "Edit Beneficiary":    "beneficiaries.edit_title",
+  "Edit Staff":          "sidebar.edit_staff_title",
+  "Edit Category":       "categories.edit_title",
+  "Edit Classification": "classifications.edit_title",
+  "Edit Project":        "projects.edit_project",
+  "User Detail":         "sidebar.user_detail_title",
+  "Beneficiary Detail":  "sidebar.beneficiary_detail_title",
+  "Staff Detail":        "sidebar.staff_detail_title",
+  "Category Detail":     "sidebar.category_detail_title",
+  "Classification Detail": "sidebar.classification_detail_title",
+  "Project Detail":      "sidebar.project_detail_title",
+  "News & Updates":      "sidebar.news_updates",
+  "Events":              "nav.events",
+  "Donations":           "categories.module_donations",
+  "Campaigns":           "categories.module_campaigns",
+  "Reports":             "staff_dashboard.reports",
 };
 
 // ── Single nav item (with or without children) ─────────────────────────────────

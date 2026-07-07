@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdAssignment, MdCalendarToday, MdCategory,
   MdAttachMoney, MdTrendingUp, MdPeople, MdFlag,
@@ -7,7 +8,7 @@ import {
 } from "react-icons/md";
 import { useGetProject } from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
+import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Loading from "components/loading/Loading";
 
 const fmtDate = (d) =>
@@ -20,23 +21,31 @@ const fmtMYR = (val) => {
 };
 
 export default function ProjectPublicDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams();
   const navigate  = useNavigate();
 
   const { project, execute: fetchProject, loading, error } = useGetProject();
 
+  const statusLabels = {
+    active:    t("projects.status_active"),
+    completed: t("projects.status_completed"),
+    on_hold:   t("projects.status_on_hold"),
+    cancelled: t("projects.status_cancelled"),
+  };
+
   useEffect(() => { fetchProject(slug); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) return <Loading text="Loading project…" />;
+  if (loading) return <Loading text={t("projects.public_loading")} />;
 
   if (error || !project) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <MdAssignment className="mx-auto mb-4 h-16 w-16 text-slate-200" />
-        <h2 className="mb-2 text-xl font-bold text-slate-700">Project not found</h2>
-        <p className="mb-6 text-sm text-slate-400">This project may have been removed or is not yet published.</p>
+        <h2 className="mb-2 text-xl font-bold text-slate-700">{t("projects.public_not_found_title")}</h2>
+        <p className="mb-6 text-sm text-slate-400">{t("projects.public_not_found_body")}</p>
         <button onClick={() => navigate("/projects")} className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90">
-          <MdArrowBack className="h-4 w-4" /> Back to Projects
+          <MdArrowBack className="h-4 w-4" /> {t("projects.public_back_to_projects")}
         </button>
       </div>
     );
@@ -59,7 +68,7 @@ export default function ProjectPublicDetail() {
                   onClick={() => navigate("/projects")}
                   className="inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-150 hover:bg-black/40"
                 >
-                  <MdArrowBack className="h-3.5 w-3.5" /> Projects
+                  <MdArrowBack className="h-3.5 w-3.5" /> {t("projects.public_breadcrumb")}
                 </button>
               </div>
             </div>
@@ -68,7 +77,7 @@ export default function ProjectPublicDetail() {
               <div className="mx-auto max-w-4xl">
                 <div className="mb-2 flex flex-wrap gap-2">
                   <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${PROJECT_STATUS_BADGE[project.status] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
-                    {PROJECT_STATUS_LABELS[project.status] ?? project.status}
+                    {statusLabels[project.status] ?? project.status}
                   </span>
                   {project.category?.name && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
@@ -90,7 +99,7 @@ export default function ProjectPublicDetail() {
                   onClick={() => navigate("/projects")}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-150 hover:bg-white/25"
                 >
-                  <MdArrowBack className="h-3.5 w-3.5" /> Projects
+                  <MdArrowBack className="h-3.5 w-3.5" /> {t("projects.public_breadcrumb")}
                 </button>
               </div>
             </div>
@@ -99,7 +108,7 @@ export default function ProjectPublicDetail() {
               <div className="mx-auto max-w-4xl">
                 <div className="mb-2 flex flex-wrap gap-2">
                   <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-white/10 text-white border-white/20`}>
-                    {PROJECT_STATUS_LABELS[project.status] ?? project.status}
+                    {statusLabels[project.status] ?? project.status}
                   </span>
                   {project.category?.name && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white">
@@ -132,13 +141,13 @@ export default function ProjectPublicDetail() {
                 {project.start_date && (
                   <span className="flex items-center gap-1.5">
                     <MdCalendarToday className="h-4 w-4 text-green" />
-                    Started: {fmtDate(project.start_date)}
+                    {t("projects.public_started_prefix")} {fmtDate(project.start_date)}
                   </span>
                 )}
                 {project.end_date && (
                   <span className="flex items-center gap-1.5">
                     <MdCalendarToday className="h-4 w-4 text-slate-400" />
-                    Ends: {fmtDate(project.end_date)}
+                    {t("projects.public_ends_prefix")} {fmtDate(project.end_date)}
                   </span>
                 )}
               </div>
@@ -147,7 +156,7 @@ export default function ProjectPublicDetail() {
             {/* Description */}
             {project.description && (
               <div className="mb-8">
-                <h2 className="mb-3 text-lg font-bold text-slate-900">About This Project</h2>
+                <h2 className="mb-3 text-lg font-bold text-slate-900">{t("projects.public_about_project")}</h2>
                 <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{project.description}</p>
               </div>
             )}
@@ -156,7 +165,7 @@ export default function ProjectPublicDetail() {
             {project.beneficiary_info && (
               <div className="mb-8 rounded-2xl border border-green/20 bg-green/5 p-5">
                 <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-green">
-                  <MdPeople className="h-4 w-4" /> Who Benefits
+                  <MdPeople className="h-4 w-4" /> {t("projects.public_who_benefits")}
                 </h3>
                 <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{project.beneficiary_info}</p>
               </div>
@@ -166,7 +175,7 @@ export default function ProjectPublicDetail() {
             {project.milestones?.length > 0 && (
               <div className="mb-8">
                 <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
-                  <MdFlag className="h-5 w-5 text-green" /> Milestones
+                  <MdFlag className="h-5 w-5 text-green" /> {t("projects.milestones_title")}
                 </h2>
                 <div className="flex flex-col divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
                   {project.milestones.map((m) => (
@@ -180,7 +189,7 @@ export default function ProjectPublicDetail() {
                       <div className="min-w-0 flex-1">
                         <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
                         {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
-                        {m.target_date && <p className="mt-0.5 text-xs text-slate-400">Target: {fmtDate(m.target_date)}</p>}
+                        {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
                         {m.percentage && (
                           <div className="mt-2 flex items-center gap-2">
                             <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
@@ -200,7 +209,7 @@ export default function ProjectPublicDetail() {
             {project.updates?.length > 0 && (
               <div>
                 <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
-                  <MdCampaign className="h-5 w-5 text-green" /> Latest Updates
+                  <MdCampaign className="h-5 w-5 text-green" /> {t("projects.public_latest_updates")}
                 </h2>
                 <div className="flex flex-col gap-4">
                   {project.updates.map((u) => (
@@ -215,7 +224,7 @@ export default function ProjectPublicDetail() {
                         </div>
                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
                         {u.photo && (
-                          <img src={u.photo} alt="Update" className="mt-3 max-h-56 rounded-xl object-cover border border-slate-100" />
+                          <img src={u.photo} alt={t("projects.update_alt")} className="mt-3 max-h-56 rounded-xl object-cover border border-slate-100" />
                         )}
                       </div>
                     </div>
@@ -228,13 +237,13 @@ export default function ProjectPublicDetail() {
           {/* Right sidebar — funding stats */}
           <aside className="w-full lg:w-72 shrink-0">
             <div className="sticky top-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="mb-4 text-base font-bold text-slate-900">Project Progress</h3>
+              <h3 className="mb-4 text-base font-bold text-slate-900">{t("projects.public_progress_title")}</h3>
 
               {project.target ? (
                 <>
                   <div className="mb-3">
                     <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
-                      <span>Funding raised</span>
+                      <span>{t("projects.public_funding_raised")}</span>
                       <span className="font-bold text-green">{progressPct.toFixed(0)}%</span>
                     </div>
                     <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
@@ -242,28 +251,28 @@ export default function ProjectPublicDetail() {
                     </div>
                   </div>
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdTrendingUp className="h-3.5 w-3.5" /> Raised</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdTrendingUp className="h-3.5 w-3.5" /> {t("projects.public_raised")}</span>
                     <span className="text-sm font-bold text-slate-900">{fmtMYR(project.amount_raised) ?? "—"}</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdAttachMoney className="h-3.5 w-3.5" /> Target</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdAttachMoney className="h-3.5 w-3.5" /> {t("projects.public_target")}</span>
                     <span className="text-sm font-bold text-slate-900">{fmtMYR(project.target)}</span>
                   </div>
                 </>
               ) : (
-                <p className="mb-4 text-xs text-slate-400">Funding target not set.</p>
+                <p className="mb-4 text-xs text-slate-400">{t("projects.public_funding_not_set")}</p>
               )}
 
               {project.total_beneficiaries_helped && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 flex items-center gap-1"><MdPeople className="h-3.5 w-3.5" /> Beneficiaries helped</span>
+                  <span className="text-xs text-slate-400 flex items-center gap-1"><MdPeople className="h-3.5 w-3.5" /> {t("projects.public_beneficiaries_helped")}</span>
                   <span className="text-sm font-bold text-slate-900">{project.total_beneficiaries_helped}</span>
                 </div>
               )}
 
               <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-400 space-y-1">
-                {project.start_date && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> Started: {fmtDate(project.start_date)}</p>}
-                {project.end_date   && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5 text-slate-300" /> Ends: {fmtDate(project.end_date)}</p>}
+                {project.start_date && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> {t("projects.public_started_prefix")} {fmtDate(project.start_date)}</p>}
+                {project.end_date   && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5 text-slate-300" /> {t("projects.public_ends_prefix")} {fmtDate(project.end_date)}</p>}
                 {project.category?.name && <p className="flex items-center gap-1"><MdCategory className="h-3.5 w-3.5" /> {project.category.name}</p>}
               </div>
             </div>

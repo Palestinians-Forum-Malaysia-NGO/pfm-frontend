@@ -16,7 +16,7 @@ const DataTable = ({
   selectable = false,
   pageSize = 8,
   emptyIcon,
-  emptyTitle = "No records found",
+  emptyTitle,
   emptyDesc,
   emptyAction,
   minWidth = "min-w-[600px]",
@@ -42,7 +42,7 @@ const DataTable = ({
     return "text-start";
   };
 
-  if (loading) return <Loading text="Loading..." />;
+  if (loading) return <Loading text={t("common.loading")} />;
   if (error)   return <p className="py-6 text-center text-sm text-red-500">{error}</p>;
 
   if (data.length === 0) {

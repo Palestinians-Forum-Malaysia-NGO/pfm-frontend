@@ -2,6 +2,7 @@ import React from "react";
 import { MdArrowBack } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 /**
  * Full-page "Coming Soon" — use as the root component for an unbuilt route/section.
@@ -14,12 +15,15 @@ import { useNavigate } from "react-router-dom";
  *   showBack    – show the back button          (default true)
  */
 const ComingSoonPage = ({
-  title       = "Coming Soon",
-  description = "This section is currently under development. We'll notify you when it's ready.",
+  title,
+  description,
   icon,
   backPath,
   showBack = true,
 }) => {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("common.coming_soon");
+  const resolvedDescription = description ?? t("common.coming_soon_description");
   const navigate = useNavigate();
   const handleBack = () => (backPath ? navigate(backPath) : navigate(-1));
 
@@ -47,17 +51,17 @@ const ComingSoonPage = ({
       {/* ── Badge ── */}
       <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-green/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-green">
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green" />
-        Coming Soon
+        {t("common.coming_soon")}
       </span>
 
       {/* ── Heading ── */}
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-        {title}
+        {resolvedTitle}
       </h1>
 
       {/* ── Description ── */}
       <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-400">
-        {description}
+        {resolvedDescription}
       </p>
 
       {/* ── Divider dots ── */}
@@ -74,7 +78,7 @@ const ComingSoonPage = ({
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 ease-in-out hover:border-slate-300 hover:bg-slate-50 active:scale-[0.97]"
         >
           <MdArrowBack className="h-4 w-4" />
-          Go Back
+          {t("common.go_back")}
         </button>
       )}
 

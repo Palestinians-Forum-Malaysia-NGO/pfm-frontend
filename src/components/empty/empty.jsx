@@ -1,11 +1,15 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const EmptyState = ({
   icon,
-  title = "Nothing here yet",
+  title,
   description,
   action,      // { label: string, onClick: fn } or { label: string, href: string }
-}) => (
+}) => {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("common.nothing_here_yet");
+  return (
   <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
     {/* Icon ring */}
     {icon && (
@@ -15,7 +19,7 @@ const EmptyState = ({
     )}
 
     {/* Text */}
-    <p className="text-base font-semibold text-slate-700">{title}</p>
+    <p className="text-base font-semibold text-slate-700">{resolvedTitle}</p>
     {description && (
       <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-slate-400">
         {description}
@@ -43,6 +47,7 @@ const EmptyState = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 export default EmptyState;
