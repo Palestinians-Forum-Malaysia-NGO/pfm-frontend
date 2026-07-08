@@ -6,7 +6,7 @@ import {
   FaFacebook, FaInstagram, FaYoutube, FaWhatsapp, FaTelegram,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import logo from "assets/brand/LOGO-wbg.png";
+import logo from "assets/branding/LOGO-wbg.png";
 
 const SOCIALS = [
   { icon: <FaFacebook size={15} />,  label: "Facebook",    href: "https://facebook.com/pfmalaysia" },

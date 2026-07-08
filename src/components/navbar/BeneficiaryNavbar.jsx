@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdMenu, MdClose, MdPerson, MdLogout, MdHome, MdAssignment, MdSettings } from "react-icons/md";
-import logo from "assets/brand/LOGO-wbg.png";
+import logo from "assets/branding/LOGO-wbg.png";
 
 const BeneficiaryNavbar = ({ brandText }) => {
   const { t } = useTranslation();

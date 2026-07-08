@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdMenu, MdClose } from "react-icons/md";
-import logo          from "assets/brand/LOGO-wbg.png";
+import logo          from "assets/branding/LOGO-wbg.png";
 import getNavLinks   from "./navLinks";
 import NavItem       from "./NavItem";
 import MobileNavItem from "./MobileNavItem";

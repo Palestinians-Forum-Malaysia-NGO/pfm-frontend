@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MdPeople, MdCampaign } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
-import logo from "assets/brand/LOGO-wbg.png";
+import logo from "assets/branding/LOGO-wbg.png";
 
 const PILLARS = [
   {

@@ -2,7 +2,7 @@
 import { HiX } from "react-icons/hi";
 import { MdLogout } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import logo from "assets/brand/LOGO-wbg.png";
+import logo from "assets/branding/LOGO-wbg.png";
 import Links from "./components/Links";
 import routes from "routes.js";
 import useAuth from "components/features/auth/hooks/useAuth";

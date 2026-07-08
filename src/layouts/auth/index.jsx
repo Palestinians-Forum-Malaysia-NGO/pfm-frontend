@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import logo from "assets/brand/LOGO-wbg.png";
+import logo from "assets/branding/LOGO-wbg.png";
 import routes from "routes.js";
 import LanguageSwitcher from "components/navbar/LanguageSwitcher";
 
