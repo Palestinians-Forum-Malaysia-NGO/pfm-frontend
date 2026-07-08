@@ -10,7 +10,9 @@ module.exports = defineConfig({
   reporter: "list",
 
   use: {
-    baseURL: "https://staging.pfmy.org",
+    // Defaults to the local dev server so tests reflect uncommitted/unpushed
+    // work. Point at staging with: set PW_BASE_URL=https://staging.pfmy.org
+    baseURL: process.env.PW_BASE_URL || "http://localhost:3000",
     headless: true,
     viewport: { width: 1280, height: 900 },
     screenshot: "only-on-failure",
@@ -21,10 +23,42 @@ module.exports = defineConfig({
   projects: [
     { name: "setup", testMatch: /auth\.setup\.js/ },
     {
+      // No storageState/dependency — starts every test logged out.
+      // For specs that exercise sign-in/register/forgot-password themselves.
+      name: "unauth",
+      testMatch: /\.unauth\.spec\.js$/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      // Logged-out specs (*.unauth.spec.js) run under the "unauth" project
+      // above — exclude them here so they don't also run pre-authenticated.
       name: "chromium",
+      testIgnore: /\.unauth\.spec\.js$/,
       use: {
         ...devices["Desktop Chrome"],
         storageState: "e2e/.auth/admin.json",
+      },
+      dependencies: ["setup"],
+    },
+    {
+      // Admin-only specs (e.g. classifications.spec.js) will fail under this
+      // role's session — give staff-only specs a *.staff.spec.js suffix and
+      // this testMatch will pick them up without breaking the admin suite.
+      name: "staff",
+      testMatch: /\.staff\.spec\.js$/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "e2e/.auth/staff.json",
+      },
+      dependencies: ["setup"],
+    },
+    {
+      // Give beneficiary-only specs a *.beneficiary.spec.js suffix.
+      name: "beneficiary",
+      testMatch: /\.beneficiary\.spec\.js$/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "e2e/.auth/beneficiary.json",
       },
       dependencies: ["setup"],
     },

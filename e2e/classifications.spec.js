@@ -27,7 +27,7 @@ test.describe("Classifications — admin CRUD", () => {
   test("1. list page loads with heading and Add button", async ({ page }) => {
     await gotoList(page);
 
-    await expect(page.getByRole("heading", { name: "Classifications", level: 1 })).toBeVisible();
+    await expect(page.getByRole("main").getByRole("heading", { name: "Classifications", level: 1 })).toBeVisible();
     await expect(page.getByRole("button", { name: "Add Classification" })).toBeVisible();
 
     // After loading: table or empty-state must be visible (not spinner)
@@ -47,7 +47,7 @@ test.describe("Classifications — admin CRUD", () => {
     await nameInput(page).fill("");
     await nameInput(page).blur();
 
-    await expect(page.getByText("Name is required")).toBeVisible();
+    await expect(page.getByText("This field is required")).toBeVisible();
     await expect(submit).toBeDisabled();
   });
 
