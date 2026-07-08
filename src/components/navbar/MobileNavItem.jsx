@@ -89,7 +89,9 @@ const MobileNavItem = ({ link, isActive, onClose }) => {
                 </div>
 
                 {/* Arrow */}
-                <MdArrowForward className="h-3.5 w-3.5 shrink-0 text-slate-300 transition-all duration-200 ease-in-out group-hover:translate-x-0.5 group-hover:text-green" />
+                <span className="inline-flex shrink-0 rtl:rotate-180">
+                  <MdArrowForward className="h-3.5 w-3.5 text-slate-300 transition-all duration-200 ease-in-out group-hover:translate-x-0.5 group-hover:text-green rtl:group-hover:-translate-x-0.5" />
+                </span>
               </Link>
             ))}
           </div>

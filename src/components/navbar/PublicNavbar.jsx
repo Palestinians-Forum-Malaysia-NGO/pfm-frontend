@@ -59,7 +59,7 @@ const PublicNavbar = () => {
           <Link to="/" className="flex shrink-0 items-center gap-2.5">
             <img src={logo} alt="PFM" className="h-9 w-9 object-contain" />
             <div className="hidden leading-tight sm:block">
-              <p className="text-sm font-bold text-slate-900">Palestinians Forum</p>
+              <p className="text-sm font-bold text-slate-900">Palestinian Forum</p>
               <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">Malaysia</p>
             </div>
           </Link>
