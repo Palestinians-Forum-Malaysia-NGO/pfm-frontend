@@ -1,14 +1,22 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import AlertBanner from "components/ui/AlertBanner";
+import DonateHero from "components/public/donate/DonateHero";
+import QRCodeSection from "components/public/donate/QRCodeSection";
+import BankDetailsSection from "components/public/donate/BankDetailsSection";
+import FAQSection from "components/public/donate/FAQSection";
 
-const Donate = () => {
+export default function Donate() {
   const { t } = useTranslation();
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16">
-      <h1 className="text-3xl font-bold text-navy-700">{t("nav.donate")}</h1>
-      <p className="mt-4 text-slate-500">{t("nav.donate_page_desc")}</p>
+    <div className="flex flex-col">
+      <DonateHero />
+      <div className="mx-auto w-full max-w-3xl px-6 pt-10">
+        <AlertBanner variant="warning" message={t("donate.placeholder_notice")} />
+      </div>
+      <QRCodeSection />
+      <BankDetailsSection />
+      <FAQSection />
     </div>
   );
-};
-
-export default Donate;
+}
