@@ -290,7 +290,14 @@
     "go_back": "Go Back",
     "main_navigation": "Main navigation",
     "toggle_menu": "Toggle menu",
-    "mobile_navigation": "Mobile navigation"
+    "mobile_navigation": "Mobile navigation",
+    "profile_photo": "Profile Photo",
+    "upload": "Upload",
+    "image_types_label": "PNG or JPG",
+    "file_types_label": "PDF, JPG, PNG",
+    "types_accepted_suffix": "accepted",
+    "invalid_file_type": "Invalid file type. Only {{types}} files are allowed.",
+    "current_image": "Current"
   },
   "home": {
     "our_work": "Our Work",

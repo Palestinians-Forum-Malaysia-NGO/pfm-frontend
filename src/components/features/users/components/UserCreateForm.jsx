@@ -7,7 +7,7 @@ import {
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
 import PageHeader   from "components/ui/PageHeader";
-import { InputField, SelectField, validate } from "components/form";
+import { InputField, SelectField, StorageImageField, validate } from "components/form";
 import Button       from "components/ui/buttons/Button";
 import FormHeader   from "components/ui/form/FormHeader";
 import AlertBanner  from "components/ui/AlertBanner";
@@ -20,7 +20,7 @@ const RULES = {
 };
 
 const EMPTY = {
-  full_name: "", email: "", phone_number: "", role: "admin",
+  full_name: "", full_name_ar: "", email: "", phone_number: "", role: "admin", profile_photo: null,
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
@@ -74,6 +74,7 @@ export default function UserCreateForm() {
 
     const payload = {
       full_name:    formData.full_name,
+      full_name_ar: formData.full_name_ar  || undefined,
       email:        formData.email,
       phone_number: formData.phone_number  || undefined,
       role:         formData.role,
@@ -81,6 +82,7 @@ export default function UserCreateForm() {
       job_title:    formData.job_title     || undefined,
       branch:       formData.branch        || undefined,
       joining_date: formData.joining_date  || undefined,
+      profile_photo: formData.profile_photo || undefined,
       banking_information: (bi.bank_name || bi.account_number || bi.account_holder_name)
         ? {
             bank_name:           bi.bank_name           || undefined,
@@ -126,28 +128,41 @@ export default function UserCreateForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("users.account_details")} subtitle={t("users.account_details_sub_create")} />
           <AlertBanner variant="info" message={t("users.activation_info")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="users/photos"
+            onUpload={(key) => updateFormData("profile_photo", key)}
+            onRemove={() => updateFormData("profile_photo", null)}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label={t("users.full_name")} field="full_name" placeholder="John Doe"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
             />
             <InputField
-              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
+              label={t("users.full_name_ar")} field="full_name_ar" placeholder="جون دو"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
+              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
+            />
             <InputField
               label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
-            <SelectField
-              label={t("users.role")} field="role"
-              options={ROLE_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateFormData}
-            />
           </div>
+          <SelectField
+            label={t("users.role")} field="role"
+            options={ROLE_OPTIONS}
+            formData={formData} errors={errors} updateFormData={updateFormData}
+          />
         </div>
 
         {/* ── Employment Details ── */}

@@ -290,7 +290,14 @@
     "go_back": "رجوع",
     "main_navigation": "التنقل الرئيسي",
     "toggle_menu": "فتح/إغلاق القائمة",
-    "mobile_navigation": "تنقل الجوال"
+    "mobile_navigation": "تنقل الجوال",
+    "profile_photo": "الصورة الشخصية",
+    "upload": "رفع",
+    "image_types_label": "PNG أو JPG",
+    "file_types_label": "PDF، JPG، PNG",
+    "types_accepted_suffix": "مقبولة",
+    "invalid_file_type": "نوع الملف غير صالح. يُقبل فقط ملفات {{types}}.",
+    "current_image": "الحالية"
   },
   "home": {
     "our_work": "أعمالنا",

@@ -9,6 +9,7 @@ import {
 import { MdPerson } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow    from "components/ui/InfoRow";
+import StorageImage from "components/ui/StorageImage";
 import {
   ROLE_BADGE_BORDER as ROLE_BADGE,
   ROLE_AVATAR_GRADIENT as AVATAR_BG,
@@ -52,9 +53,9 @@ const UserProfileCard = ({ user, showId = false }) => {
         </div>
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[user.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[user.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
               {user.profile_photo
-                ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full rounded-2xl object-cover" />
+                ? <StorageImage fileKey={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" fallback={getInitials(user.full_name)} />
                 : getInitials(user.full_name)
               }
             </div>
@@ -64,6 +65,9 @@ const UserProfileCard = ({ user, showId = false }) => {
             </span>
           </div>
           <h2 className="text-xl font-bold text-slate-900">{user.full_name}</h2>
+          {user.full_name_ar && (
+            <p className="mt-0.5 text-sm text-slate-400" dir="rtl">{user.full_name_ar}</p>
+          )}
           <p className="mt-0.5 text-sm text-slate-400">{user.email}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${

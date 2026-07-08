@@ -4,9 +4,10 @@ import { MdEdit, MdPhone, MdSecurity, MdPerson } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
-import { InputField, ToggleInput } from "components/form";
+import { InputField, ToggleInput, StorageImageField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 
 const EditProfileSection = ({ profile, onSaved }) => {
   const { t } = useTranslation();
@@ -17,6 +18,8 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const [formData, setFormData] = useState({});
   const [snapshot, setSnapshot] = useState(null);
   const [formErrors, setFormErrors] = useState({});
+  const [photoKey, setPhotoKey] = useState(null);
+  const { url: currentPhotoUrl } = useStorageUrl(photoKey);
 
   useEffect(() => {
     if (profile) {
@@ -25,9 +28,11 @@ const EditProfileSection = ({ profile, onSaved }) => {
         phone_number:     profile.phone_number     ?? "",
         whatsapp_enabled: profile.whatsapp_enabled ?? false,
         is_2fa_enabled:   profile.is_2fa_enabled   ?? false,
+        profile_photo:    profile.profile_photo    ?? null,
       };
       setFormData(initial);
       setSnapshot(initial);
+      setPhotoKey(profile.profile_photo ?? null);
     }
   }, [profile]);
 
@@ -38,7 +43,8 @@ const EditProfileSection = ({ profile, onSaved }) => {
     formData.full_name        !== snapshot.full_name        ||
     formData.phone_number     !== snapshot.phone_number     ||
     formData.whatsapp_enabled !== snapshot.whatsapp_enabled ||
-    formData.is_2fa_enabled   !== snapshot.is_2fa_enabled
+    formData.is_2fa_enabled   !== snapshot.is_2fa_enabled   ||
+    formData.profile_photo    !== snapshot.profile_photo
   );
 
   const handleSubmit = async (e) => {
@@ -52,6 +58,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
         phone_number:     formData.phone_number,
         whatsapp_enabled: formData.whatsapp_enabled,
         is_2fa_enabled:   formData.is_2fa_enabled,
+        profile_photo:    formData.profile_photo || undefined,
       });
       success(t("profile.toast_profile_updated"), t("profile.toast_profile_updated_sub"));
       setEditMode(false);
@@ -63,7 +70,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
   };
 
   const handleCancel = () => {
-    if (snapshot) setFormData(snapshot);
+    if (snapshot) { setFormData(snapshot); setPhotoKey(snapshot.profile_photo ?? null); }
     setFormErrors({});
     setEditMode(false);
   };
@@ -88,6 +95,15 @@ const EditProfileSection = ({ profile, onSaved }) => {
 
       {editMode ? (
         <form onSubmit={handleSubmit} noValidate>
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="profiles/photos"
+            currentUrl={currentPhotoUrl}
+            onUpload={(key) => { updateFormData("profile_photo", key); setPhotoKey(null); }}
+            onRemove={() => { updateFormData("profile_photo", null); setPhotoKey(null); }}
+            errors={formErrors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label={t("users.full_name")} field="full_name" required

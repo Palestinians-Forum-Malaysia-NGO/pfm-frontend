@@ -1,15 +1,14 @@
 ﻿import { MdCloudUpload, MdDeleteOutline, MdInsertDriveFile, MdErrorOutline, MdPhotoCamera } from "react-icons/md";
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 const ALLOWED_FILE_TYPES = {
   mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/jpg"],
   extensions: [".pdf", ".png", ".jpg", ".jpeg"],
-  label: "PDF, JPG, PNG",
 };
 
 const IMAGE_ONLY_TYPES = {
   mimeTypes: ["image/png", "image/jpeg", "image/jpg"],
   extensions: ".png,.jpg,.jpeg",
-  label: "PNG or JPG",
 };
 
 const ImageUploadField = ({
@@ -20,9 +19,10 @@ const ImageUploadField = ({
   existingUrl = null, onExistingRemove = null,
   errors, required = false, multiple = false, imageOnly = false, accept = null,
 }) => {
+  const { t } = useTranslation();
   const resolvedAccept = accept ?? (imageOnly ? IMAGE_ONLY_TYPES.extensions : ALLOWED_FILE_TYPES.extensions.join(","));
   const resolvedMimeTypes = imageOnly ? IMAGE_ONLY_TYPES.mimeTypes : ALLOWED_FILE_TYPES.mimeTypes;
-  const resolvedLabel = imageOnly ? IMAGE_ONLY_TYPES.label : ALLOWED_FILE_TYPES.label;
+  const resolvedLabel = imageOnly ? t("common.image_types_label") : t("common.file_types_label");
 
   const [fileError, setFileError] = useState("");
   const [imgError, setImgError] = useState(false);
@@ -43,7 +43,7 @@ const ImageUploadField = ({
     if (!uploadHandler) return;
     const selected = e.target.files?.[0];
     if (selected && !resolvedMimeTypes.includes(selected.type)) {
-      setFileError(`Invalid file type. Only ${resolvedLabel} files are allowed.`);
+      setFileError(t("common.invalid_file_type", { types: resolvedLabel }));
       e.target.value = "";
       return;
     }
@@ -57,7 +57,7 @@ const ImageUploadField = ({
     const selected = e.target.files?.[0];
     if (!selected) return;
     if (!resolvedMimeTypes.includes(selected.type)) {
-      setFileError(`Invalid file type. Only ${resolvedLabel} files are allowed.`);
+      setFileError(t("common.invalid_file_type", { types: resolvedLabel }));
       e.target.value = "";
       return;
     }
@@ -85,11 +85,11 @@ const ImageUploadField = ({
           <label className="group relative cursor-pointer">
             <div className="flex h-24 w-24 flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all group-hover:border-green/75 group-hover:bg-green/10">
               <MdPhotoCamera className="h-6 w-6 text-slate-400 group-hover:text-green" />
-              <span className="mt-1 text-[10px] font-medium text-slate-400 group-hover:text-green">Upload</span>
+              <span className="mt-1 text-[10px] font-medium text-slate-400 group-hover:text-green">{t("common.upload")}</span>
             </div>
             <input type="file" multiple={multiple} accept={resolvedAccept} className="hidden" onChange={handleSimpleUpload} />
           </label>
-          <p className="text-xs text-slate-400">{resolvedLabel} accepted</p>
+          <p className="text-xs text-slate-400">{resolvedLabel} {t("common.types_accepted_suffix")}</p>
         </div>
       )}
 
@@ -97,8 +97,8 @@ const ImageUploadField = ({
       {showDropzone && !isSimpleMode && (
         <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center transition-all hover:border-green/75 hover:bg-green/10">
           <MdCloudUpload className="mb-2 h-8 w-8 text-slate-400" />
-          <p className="text-sm text-slate-500">Drag & drop or <span className="font-semibold text-green">browse</span></p>
-          <p className="mt-1 text-xs text-slate-400">{resolvedLabel} accepted</p>
+          <p className="text-sm text-slate-500">{t("common.drag_drop_prefix")} <span className="font-semibold text-green">{t("common.browse")}</span></p>
+          <p className="mt-1 text-xs text-slate-400">{resolvedLabel} {t("common.types_accepted_suffix")}</p>
           <input type="file" multiple={multiple} accept={resolvedAccept} className="hidden" onChange={handleDocUpload} />
         </label>
       )}

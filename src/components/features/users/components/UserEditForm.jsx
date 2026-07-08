@@ -7,12 +7,13 @@ import {
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, SelectField, ToggleInput, validate } from "components/form";
+import { InputField, SelectField, ToggleInput, StorageImageField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading     from "components/loading/Loading";
 import { useGetUser, useUpdateUser } from "components/features/users/hooks";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import {
   ROLE_BADGE_BORDER as ROLE_BADGE,
   ROLE_AVATAR_GRADIENT as AVATAR_BG,
@@ -28,8 +29,8 @@ const RULES = {
 };
 
 const EMPTY = {
-  full_name: "", email: "", phone_number: "",
-  role: "admin", is_active: true,
+  full_name: "", full_name_ar: "", email: "", phone_number: "",
+  role: "admin", is_active: true, profile_photo: null,
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
@@ -48,6 +49,8 @@ export default function UserEditForm() {
   const [formData, setFormData] = useState(EMPTY);
   const [initial, setInitial]   = useState(null);
   const [errors, setErrors]     = useState({});
+  const [photoKey, setPhotoKey] = useState(null);
+  const { url: currentPhotoUrl } = useStorageUrl(photoKey);
 
   const ROLE_OPTIONS = [
     { value: "admin",       label: t("users.role_admin") },
@@ -78,10 +81,12 @@ export default function UserEditForm() {
       if (!data) return;
       const snapshot = {
         full_name:    data.full_name    ?? "",
+        full_name_ar: data.full_name_ar ?? "",
         email:        data.email        ?? "",
         phone_number: data.phone_number ?? "",
         role:         data.role         ?? "admin",
         is_active:    data.is_active    ?? true,
+        profile_photo: data.profile_photo ?? null,
         department:   data.department   ?? "",
         job_title:    data.job_title    ?? "",
         branch:       data.branch       ?? "",
@@ -99,6 +104,7 @@ export default function UserEditForm() {
       };
       setFormData(snapshot);
       setInitial(snapshot);
+      setPhotoKey(data.profile_photo ?? null);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -117,10 +123,12 @@ export default function UserEditForm() {
 
     const payload = {
       full_name:    formData.full_name,
+      full_name_ar: formData.full_name_ar  || undefined,
       email:        formData.email,
       phone_number: formData.phone_number  || undefined,
       role:         formData.role,
       is_active:    formData.is_active,
+      profile_photo: formData.profile_photo || undefined,
       department:   formData.department    || undefined,
       job_title:    formData.job_title     || undefined,
       branch:       formData.branch        || undefined,
@@ -168,8 +176,12 @@ export default function UserEditForm() {
         </div>
         <div className="px-6 pb-5">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[formData.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
-              {getInitials(formData.full_name) || "?"}
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[formData.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
+              {currentPhotoUrl ? (
+                <img src={currentPhotoUrl} alt={formData.full_name} className="h-full w-full object-cover" />
+              ) : (
+                getInitials(formData.full_name) || "?"
+              )}
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ROLE_BADGE[formData.role] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
               <MdVerified className="h-3.5 w-3.5" />
@@ -198,28 +210,42 @@ export default function UserEditForm() {
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("users.account_details")} subtitle={t("users.account_details_sub_edit")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="users/photos"
+            currentUrl={currentPhotoUrl}
+            onUpload={(key) => { updateFormData("profile_photo", key); setPhotoKey(null); }}
+            onRemove={() => { updateFormData("profile_photo", null); setPhotoKey(null); }}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label={t("users.full_name")} field="full_name" placeholder="John Doe"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
             />
             <InputField
-              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
+              label={t("users.full_name_ar")} field="full_name_ar" placeholder="جون دو"
+              required={false}
+              formData={formData} errors={errors} updateFormData={updateFormData}
             />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InputField
+              label={t("users.email")} field="email" type="email" placeholder="john@example.com"
+              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.email}
+            />
             <InputField
               label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
               required={false}
               formData={formData} errors={errors} updateFormData={updateFormData}
             />
-            <SelectField
-              label={t("users.role")} field="role"
-              options={ROLE_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateFormData}
-            />
           </div>
+          <SelectField
+            label={t("users.role")} field="role"
+            options={ROLE_OPTIONS}
+            formData={formData} errors={errors} updateFormData={updateFormData}
+          />
           <ToggleInput label={t("users.account_active")} field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
         </div>
 

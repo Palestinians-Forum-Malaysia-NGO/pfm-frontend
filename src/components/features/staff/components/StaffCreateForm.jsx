@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdPersonAdd, MdBadge, MdPerson, MdMarkEmailRead } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, validate } from "components/form";
+import { InputField, StorageImageField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -33,6 +33,7 @@ export default function StaffCreateForm() {
     position:     "",
     branch:       "",
     joining_date: "",
+    profile_photo: null,
   });
   const [errors, setErrors] = useState({});
 
@@ -58,6 +59,7 @@ export default function StaffCreateForm() {
         position:     form.position      || undefined,
         branch:       form.branch        || undefined,
         joining_date: form.joining_date  || undefined,
+        profile_photo: form.profile_photo || undefined,
       };
       const created = await createStaff(payload);
       success(
@@ -94,6 +96,14 @@ export default function StaffCreateForm() {
         {/* ── Account details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("staff.section_account")} subtitle={t("staff.section_account_sub")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="staff/photos"
+            onUpload={(key) => set("profile_photo", key)}
+            onRemove={() => set("profile_photo", null)}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("users.full_name_label")} field="full_name" placeholder="Fatima Ali" formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
             <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي" required={false} formData={form} errors={errors} updateFormData={set} />

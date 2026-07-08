@@ -9,7 +9,7 @@ import {
 import PageHeader from "components/ui/PageHeader";
 import {
   InputField, SelectField, TextareaField,
-  ToggleInput, StorageDocumentField, validate,
+  ToggleInput, StorageDocumentField, StorageImageField, validate,
 } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
@@ -37,7 +37,7 @@ export default function BeneficiaryCreateForm() {
   const { success, error: toastError } = useToast();
 
   /* ── Form state ── */
-  const [accountForm,  setAccountForm]  = useState({ full_name: "", email: "", phone_number: "" });
+  const [accountForm,  setAccountForm]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
   const [classForm,    setClassForm]    = useState({ classification: "" });
   const [personalForm, setPersonalForm] = useState({
     full_name_arabic: "", passport_number: "", date_of_birth: "",
@@ -131,6 +131,7 @@ export default function BeneficiaryCreateForm() {
         full_name:    accountForm.full_name,
         email:        accountForm.email,
         phone_number: accountForm.phone_number || undefined,
+        profile_photo: accountForm.profile_photo || undefined,
 
         classification:           classForm.classification             || undefined,
         full_name_arabic:         personalForm.full_name_arabic        || undefined,
@@ -198,6 +199,14 @@ export default function BeneficiaryCreateForm() {
         {/* ── Account Details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("beneficiaries.section_account")} subtitle={t("beneficiaries.section_account_sub")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="beneficiaries/photos"
+            onUpload={(key) => setA("profile_photo", key)}
+            onRemove={() => setA("profile_photo", null)}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("beneficiaries.full_name")} field="full_name" placeholder="Ahmad Faris" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.full_name} />
             <InputField label={t("beneficiaries.email")}     field="email"     type="email" placeholder="ahmad@email.com" formData={accountForm} errors={errors} updateFormData={setA} rules={RULES.email} />

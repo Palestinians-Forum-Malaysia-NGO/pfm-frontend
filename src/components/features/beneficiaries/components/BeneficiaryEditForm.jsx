@@ -10,13 +10,14 @@ import {
 import PageHeader from "components/ui/PageHeader";
 import {
   InputField, SelectField, TextareaField,
-  ToggleInput, StorageDocumentField, validate,
+  ToggleInput, StorageDocumentField, StorageImageField, validate,
 } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import { useGetBeneficiary, useUpdateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -36,7 +37,9 @@ export default function BeneficiaryEditForm() {
   const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
 
-  const [userForm, setUserForm] = useState({ full_name: "", email: "", phone_number: "", is_active: true });
+  const [userForm, setUserForm] = useState({ full_name: "", email: "", phone_number: "", is_active: true, profile_photo: null });
+  const [photoKey, setPhotoKey] = useState(null);
+  const { url: currentPhotoUrl } = useStorageUrl(photoKey);
   const [classForm, setClassForm] = useState({ classification: "" });
   const [personalForm, setPersonalForm] = useState({
     full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "",
@@ -151,7 +154,7 @@ export default function BeneficiaryEditForm() {
       const bi  = u.banking_information   ?? {};
       const fi2 = u.financial_information ?? {};
 
-      const uSnap = { full_name: u.full_name ?? "", email: u.email ?? "", phone_number: u.phone_number ?? "", is_active: u.is_active ?? true };
+      const uSnap = { full_name: u.full_name ?? "", email: u.email ?? "", phone_number: u.phone_number ?? "", is_active: u.is_active ?? true, profile_photo: u.profile_photo ?? null };
       const cSnap = { classification: cd.id ?? data.classification ?? "" };
       const pSnap = {
         full_name_arabic: data.full_name_ar       ?? "",
@@ -189,6 +192,7 @@ export default function BeneficiaryEditForm() {
       setUserForm(uSnap);    setClassForm(cSnap);    setPersonalForm(pSnap);
       setLocationForm(lSnap); setFamilyForm(faSnap); setVisaForm(vSnap);
       setBankForm(bSnap);    setFinForm(fiSnap);     setIdDoc(docSnap);
+      setPhotoKey(u.profile_photo ?? null);
 
       setInitialUser(uSnap);    setInitialClass(cSnap);    setInitialPersonal(pSnap);
       setInitialLocation(lSnap); setInitialFamily(faSnap); setInitialVisa(vSnap);
@@ -214,6 +218,7 @@ export default function BeneficiaryEditForm() {
           email:        userForm.email,
           phone_number: userForm.phone_number || undefined,
           is_active:    userForm.is_active,
+          profile_photo: userForm.profile_photo || undefined,
           banking_information: {
             bank_name:           bankForm.bank_name           || undefined,
             account_number:      bankForm.account_number      || undefined,
@@ -281,6 +286,15 @@ export default function BeneficiaryEditForm() {
         {/* ── User Account ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("beneficiaries.section_user")} subtitle={t("beneficiaries.section_user_sub")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="beneficiaries/photos"
+            currentUrl={currentPhotoUrl}
+            onUpload={(key) => { setU("profile_photo", key); setPhotoKey(null); }}
+            onRemove={() => { setU("profile_photo", null); setPhotoKey(null); }}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("beneficiaries.full_name")} field="full_name" placeholder="Ahmad Faris"       formData={userForm} errors={errors} updateFormData={setU} rules={RULES.full_name} />
             <InputField label={t("beneficiaries.email")}     field="email"     type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={RULES.email} />

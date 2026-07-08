@@ -7,12 +7,13 @@ import {
   MdAccountBalance, MdAttachMoney,
 } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, SelectField, ToggleInput, validate } from "components/form";
+import { InputField, SelectField, ToggleInput, StorageImageField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading     from "components/loading/Loading";
 import { useGetStaff, useUpdateStaff } from "components/features/staff/hooks";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -24,7 +25,7 @@ const RULES = {
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-const EMPTY_USER  = { full_name: "", full_name_ar: "", email: "", phone_number: "", is_active: true };
+const EMPTY_USER  = { full_name: "", full_name_ar: "", email: "", phone_number: "", is_active: true, profile_photo: null };
 const EMPTY_BANK  = { bank_name: "", account_number: "", account_holder_name: "" };
 const EMPTY_FIN   = { job_title: "", job_title_ar: "", salary: "", payment_frequency: "" };
 const EMPTY_STAFF = { department: "", department_ar: "", position: "", position_ar: "", branch: "", branch_ar: "", joining_date: "" };
@@ -45,6 +46,8 @@ export default function StaffEditForm() {
   const [staffForm, setStaffForm] = useState(EMPTY_STAFF);
   const [initial,   setInitial]   = useState(null);
   const [errors,    setErrors]    = useState({});
+  const [photoKey,  setPhotoKey]  = useState(null);
+  const { url: currentPhotoUrl } = useStorageUrl(photoKey);
 
   const setU = (f, v) => setUserForm((p)  => ({ ...p, [f]: v }));
   const setB = (f, v) => setBankForm((p)  => ({ ...p, [f]: v }));
@@ -71,6 +74,7 @@ export default function StaffEditForm() {
         email:        u.email        ?? "",
         phone_number: u.phone_number ?? "",
         is_active:    u.is_active    ?? true,
+        profile_photo: u.profile_photo ?? null,
       };
       const bankSnap  = {
         bank_name:           bi.bank_name           ?? "",
@@ -98,6 +102,7 @@ export default function StaffEditForm() {
       setFinForm(finSnap);
       setStaffForm(staffSnap);
       setInitial({ user: userSnap, bank: bankSnap, fin: finSnap, staff: staffSnap });
+      setPhotoKey(u.profile_photo ?? null);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -119,6 +124,7 @@ export default function StaffEditForm() {
           email:        userForm.email,
           phone_number: userForm.phone_number || undefined,
           is_active:    userForm.is_active,
+          profile_photo: userForm.profile_photo || undefined,
           banking_information: {
             bank_name:           bankForm.bank_name           || undefined,
             account_number:      bankForm.account_number      || undefined,
@@ -179,8 +185,12 @@ export default function StaffEditForm() {
         </div>
         <div className="px-6 pb-5">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
-              {getInitials(userForm.full_name) || "?"}
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
+              {currentPhotoUrl ? (
+                <img src={currentPhotoUrl} alt={userForm.full_name} className="h-full w-full object-cover" />
+              ) : (
+                getInitials(userForm.full_name) || "?"
+              )}
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ROLE_BADGE[role] ?? "bg-blue-50 text-blue-600 border-blue-100"}`}>
               <MdVerified className="h-3.5 w-3.5" />
@@ -214,6 +224,15 @@ export default function StaffEditForm() {
         {/* ── Account details ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("staff.section_account")} subtitle={t("staff.section_account_sub")} />
+          <StorageImageField
+            label={t("common.profile_photo")}
+            folder="staff/photos"
+            currentUrl={currentPhotoUrl}
+            onUpload={(key) => { setU("profile_photo", key); setPhotoKey(null); }}
+            onRemove={() => { setU("profile_photo", null); setPhotoKey(null); }}
+            errors={errors}
+            field="profile_photo"
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("users.full_name_label")}    field="full_name"    placeholder="Fatima Ali"             formData={userForm} errors={errors} updateFormData={setU} rules={RULES.full_name} />
             <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي"              required={false} formData={userForm} errors={errors} updateFormData={setU} />
