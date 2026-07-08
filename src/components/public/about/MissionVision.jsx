@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
 import useInView from "hooks/useInView";
-import storyImg from "assets/img/layout/ngo-bg-2.jpg";
+import storyImg from "assets/img/gallery/gallery-4.jpg";
 
 const MissionVision = () => {
   const { t } = useTranslation();

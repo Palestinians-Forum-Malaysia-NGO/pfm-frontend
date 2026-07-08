@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import heroBg from "assets/img/layout/ngo-bg-1.jpg";
+import heroBg from "assets/img/gallery/gallery-5.jpg";
 
 const AboutHero = () => {
   const { t } = useTranslation();
@@ -13,14 +13,6 @@ const AboutHero = () => {
         className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-[8000ms] ease-out"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
-
-      {/* Flag strip */}
-      <div className="absolute left-0 top-0 flex h-1 w-full">
-        <div className="flex-1 bg-black" />
-        <div className="flex-1 bg-white/80" />
-        <div className="flex-1 bg-white/20" />
-        <div className="flex-1 bg-pfmRed-500" />
-      </div>
 
       <div className="relative z-10 px-6 text-center text-white">
         <span

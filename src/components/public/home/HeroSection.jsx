@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdFavorite, MdArrowForward, MdPeople, MdCampaign } from "react-icons/md";
 import { FaHandHoldingHeart } from "react-icons/fa";
-import img1 from "assets/img/layout/ngo-bg-4.jpg";
-import img2 from "assets/img/layout/ngo-bg-5.jpg";
+import img1 from "assets/img/gallery/gallery-16.jpg";
+import img2 from "assets/img/gallery/gallery-4.jpg";
 
 const PARTNERS = ["Islamic Relief", "MERCY Malaysia", "AMAN Palestine", "UNRWA"];
 
@@ -74,18 +74,6 @@ const HeroSection = () => {
             </Link>
           </div>
 
-          {/* Partners */}
-          <div
-            className="mt-10 border-t border-slate-100 pt-7"
-            style={{ animation: "fadeUp 0.7s 0.4s ease both" }}
-          >
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">{t("hero.supported_by")}</p>
-            <div className="flex flex-wrap items-center gap-4">
-              {PARTNERS.map((p) => (
-                <span key={p} className="text-xs font-semibold text-slate-400 transition-colors hover:text-slate-600">{p}</span>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* ── RIGHT — Image collage ── */}

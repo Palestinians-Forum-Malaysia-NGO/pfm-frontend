@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
-import img1 from "assets/img/layout/ngo-bg-7.jpg";
-import img2 from "assets/img/layout/ngo-bg-8.jpg";
-import img3 from "assets/img/layout/ngo-bg-9.jpg";
+import img1 from "assets/img/gallery/gallery-6.jpg";
+import img2 from "assets/img/gallery/gallery-23.jpg";
+import img3 from "assets/img/gallery/gallery-15.jpg";
 
 const NEWS = [
   { img: img1, date: "10 Jun 2025", tag: "Announcement", title: "PFM Launches New Scholarship Programme for Palestinian Students in Malaysia" },

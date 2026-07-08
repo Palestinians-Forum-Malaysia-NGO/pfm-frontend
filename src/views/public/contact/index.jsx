@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdEmail, MdPhone, MdLocationOn, MdSend, MdCheckCircle } from "react-icons/md";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
 
-import heroBg from "assets/img/layout/ngo-bg-2.jpg";
+import heroBg from "assets/img/gallery/gallery-2.jpg";
 
 const SOCIALS = [
   { icon: <FaFacebook size={18} />,  href: "https://facebook.com/pfm",   label: "Facebook" },
@@ -44,14 +44,6 @@ export default function Contact() {
       <section className="relative flex h-[50vh] items-center justify-center overflow-hidden">
         <img src={heroBg} alt={t("contact.hero_alt")} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70" />
-
-        {/* Flag strip */}
-        <div className="absolute left-0 top-0 flex h-1 w-full">
-          <div className="flex-1 bg-black" />
-          <div className="flex-1 bg-white/80" />
-          <div className="flex-1 bg-white/20" />
-          <div className="flex-1 bg-pfmRed-500" />
-        </div>
 
         <div className="relative z-10 text-center text-white px-6">
           <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60">{t("contact.how_to_reach")}</span>

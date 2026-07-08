@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
-import img1 from "assets/img/layout/ngo-bg-4.jpg";
-import img2 from "assets/img/layout/ngo-bg-5.jpg";
-import img3 from "assets/img/layout/ngo-bg-6.jpg";
+import img1 from "assets/img/gallery/gallery-1.jpg";
+import img2 from "assets/img/gallery/gallery-8.jpg";
+import img3 from "assets/img/gallery/gallery-12.jpg";
 
 const FeaturedProjects = () => {
   const { t } = useTranslation();

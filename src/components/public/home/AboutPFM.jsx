@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
-import aboutImg from "assets/img/layout/ngo-bg-3.jpg";
+import aboutImg from "assets/img/gallery/gallery-2.jpg";
 
 const AboutPFM = () => {
   const { t } = useTranslation();

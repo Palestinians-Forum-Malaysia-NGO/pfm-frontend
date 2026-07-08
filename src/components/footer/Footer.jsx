@@ -72,14 +72,6 @@ const Footer = () => {
       {/* Glow blob */}
       <div className="pointer-events-none absolute -top-40 -right-40 h-96 w-96 rounded-full bg-green-400/20 blur-3xl" />
 
-      {/* Palestinian flag strip */}
-      <div className="relative flex h-1 w-full">
-        <div className="flex-1 bg-black" />
-        <div className="flex-1 bg-white/80" />
-        <div className="flex-1 bg-white/20" />
-        <div className="flex-1 bg-pfmRed-500" />
-      </div>
-
       {/* ── Main grid ── */}
       <div className="relative mx-auto max-w-7xl px-6 pb-12 pt-14">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.9fr_repeat(4,1fr)]">
