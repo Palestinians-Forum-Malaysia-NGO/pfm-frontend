@@ -17,10 +17,36 @@ import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
-const RULES = {
-  full_name: [{ required: true }, { maxLength: 255 }],
-  email:     [{ required: true }, { email: true }],
+const USER_RULES = {
+  full_name:    [{ required: true }, { maxLength: 255 }],
+  full_name_ar: [{ required: true }, { maxLength: 255 }],
+  email:        [{ required: true }, { email: true }],
+  phone_number: [{ required: true }],
+  profile_photo: [{ required: true }],
 };
+const STAFF_RULES = {
+  department:    [{ required: true }],
+  department_ar: [{ required: true }],
+  position:      [{ required: true }],
+  position_ar:   [{ required: true }],
+  branch:        [{ required: true }],
+  branch_ar:     [{ required: true }],
+  joining_date:  [{ required: true }],
+};
+const BANK_RULES = {
+  bank_name:           [{ required: true }],
+  account_number:      [{ required: true }],
+  account_holder_name: [{ required: true }],
+};
+const FIN_RULES = {
+  job_title:         [{ required: true }],
+  job_title_ar:      [{ required: true }],
+  salary:            [{ required: true }],
+  payment_frequency: [{ required: true }],
+};
+
+const runRules = (data, rules) =>
+  Object.entries(rules).some(([field, r]) => !!validate(data[field], r));
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -60,6 +86,12 @@ export default function StaffEditForm() {
     JSON.stringify(finForm)   !== JSON.stringify(initial.fin)   ||
     JSON.stringify(staffForm) !== JSON.stringify(initial.staff)
   );
+
+  const hasErrors =
+    runRules(userForm, USER_RULES) ||
+    runRules(staffForm, STAFF_RULES) ||
+    runRules(bankForm, BANK_RULES) ||
+    runRules(finForm, FIN_RULES);
 
   useEffect(() => {
     fetchStaff(id).then((data) => {
@@ -109,9 +141,16 @@ export default function StaffEditForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    Object.entries(RULES).forEach(([field, rules]) => {
-      const err = validate(userForm[field], rules);
-      if (err) newErrors[field] = err;
+    [
+      [userForm,  USER_RULES],
+      [staffForm, STAFF_RULES],
+      [bankForm,  BANK_RULES],
+      [finForm,   FIN_RULES],
+    ].forEach(([data, rules]) => {
+      Object.entries(rules).forEach(([field, r]) => {
+        const err = validate(data[field], r);
+        if (err) newErrors[field] = err;
+      });
     });
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
     setErrors({});
@@ -120,30 +159,30 @@ export default function StaffEditForm() {
       const payload = {
         user: {
           full_name:    userForm.full_name,
-          full_name_ar: userForm.full_name_ar || undefined,
+          full_name_ar: userForm.full_name_ar,
           email:        userForm.email,
-          phone_number: userForm.phone_number || undefined,
+          phone_number: userForm.phone_number,
           is_active:    userForm.is_active,
-          profile_photo: userForm.profile_photo || undefined,
+          profile_photo: userForm.profile_photo,
           banking_information: {
-            bank_name:           bankForm.bank_name           || undefined,
-            account_number:      bankForm.account_number      || undefined,
-            account_holder_name: bankForm.account_holder_name || undefined,
+            bank_name:           bankForm.bank_name,
+            account_number:      bankForm.account_number,
+            account_holder_name: bankForm.account_holder_name,
           },
           financial_information: {
-            job_title:         finForm.job_title         || undefined,
-            job_title_ar:      finForm.job_title_ar      || undefined,
-            salary:            finForm.salary            || undefined,
-            payment_frequency: finForm.payment_frequency || undefined,
+            job_title:         finForm.job_title,
+            job_title_ar:      finForm.job_title_ar,
+            salary:            finForm.salary,
+            payment_frequency: finForm.payment_frequency,
           },
         },
-        department:    staffForm.department    || undefined,
-        department_ar: staffForm.department_ar || undefined,
-        position:      staffForm.position      || undefined,
-        position_ar:   staffForm.position_ar   || undefined,
-        branch:        staffForm.branch        || undefined,
-        branch_ar:     staffForm.branch_ar     || undefined,
-        joining_date:  staffForm.joining_date  || undefined,
+        department:    staffForm.department,
+        department_ar: staffForm.department_ar,
+        position:      staffForm.position,
+        position_ar:   staffForm.position_ar,
+        branch:        staffForm.branch,
+        branch_ar:     staffForm.branch_ar,
+        joining_date:  staffForm.joining_date,
       };
       await updateStaff(id, payload);
       success(t("staff.toast_updated"), `${userForm.full_name} ${t("staff.toast_updated_sub")}`);
@@ -167,7 +206,7 @@ export default function StaffEditForm() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="mx-auto max-w-5xl flex flex-col gap-4">
 
       <PageHeader
         icon={<MdEdit className="h-5 w-5" />}
@@ -198,7 +237,7 @@ export default function StaffEditForm() {
             </span>
           </div>
           <h2 className="text-xl font-bold text-slate-900">
-            {userForm.full_name || <span className="text-slate-300">{t("users.full_name_label")}</span>}
+            {userForm.full_name || <span className="text-slate-300">{t("users.full_name")}</span>}
           </h2>
           <p className="mt-0.5 text-sm text-slate-400">{userForm.email || "email@example.com"}</p>
           {(staffForm.position || staffForm.department) && (
@@ -217,87 +256,90 @@ export default function StaffEditForm() {
         </div>
       </div>
 
-      <AlertBanner message={saveError} />
+      <div className="flex flex-col rounded-2xl border border-slate-200 bg-white">
+        <AlertBanner message={saveError} className="p-6 border-b border-slate-200" />
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col">
 
-        {/* ── Account details ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("staff.section_account")} subtitle={t("staff.section_account_sub")} />
-          <StorageImageField
-            label={t("common.profile_photo")}
-            folder="staff/photos"
-            currentUrl={currentPhotoUrl}
-            onUpload={(key) => { setU("profile_photo", key); setPhotoKey(null); }}
-            onRemove={() => { setU("profile_photo", null); setPhotoKey(null); }}
-            errors={errors}
-            field="profile_photo"
-          />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("users.full_name_label")}    field="full_name"    placeholder="Fatima Ali"             formData={userForm} errors={errors} updateFormData={setU} rules={RULES.full_name} />
-            <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي"              required={false} formData={userForm} errors={errors} updateFormData={setU} />
+          {/* ── Account details ── */}
+          <div className="bg-white p-6 border-b border-slate-200">
+            <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("staff.section_account")} subtitle={t("staff.section_account_sub")} />
+            <StorageImageField
+              label={t("common.profile_photo")}
+              folder="staff/photos"
+              required
+              currentUrl={currentPhotoUrl}
+              onUpload={(key) => { setU("profile_photo", key); setPhotoKey(null); }}
+              onRemove={() => { setU("profile_photo", null); setPhotoKey(null); }}
+              errors={errors}
+              field="profile_photo"
+            />
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("users.full_name")}    field="full_name"    placeholder="Fatima Ali"        formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
+              <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي"         formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name_ar} />
+            </div>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("users.email")} field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
+              <InputField label={t("users.phone")} field="phone_number" placeholder="+60 19-876 5432" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.phone_number} />
+            </div>
+            <ToggleInput label={t("staff.account_active")} field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("users.email_label")} field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} rules={RULES.email} />
-            <InputField label={t("users.phone_label")} field="phone_number" placeholder="+60 19-876 5432" required={false} formData={userForm} errors={errors} updateFormData={setU} />
-          </div>
-          <ToggleInput label={t("staff.account_active")} field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
-        </div>
 
-        {/* ── Employment details ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("staff.section_employment")} subtitle={t("staff.section_employment_sub")} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_department")}      field="department"    placeholder="Programs"         required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label={t("staff.department_ar_label")}  field="department_ar" placeholder="البرامج"          required={false} formData={staffForm} errors={errors} updateFormData={setS} />
+          {/* ── Employment details ── */}
+          <div className="border-b border-slate-200 bg-white p-6">
+            <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("staff.section_employment")} subtitle={t("staff.section_employment_sub")} />
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("staff.info_department")}      field="department"    placeholder="Programs" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.department} />
+              <InputField label={t("staff.department_ar_label")}  field="department_ar" placeholder="البرامج"  formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.department_ar} />
+            </div>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("staff.info_position")}     field="position"    placeholder="Program Manager" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position} />
+              <InputField label={t("staff.position_ar_label")} field="position_ar" placeholder="مدير البرامج"    formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position_ar} />
+            </div>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("staff.info_branch")}     field="branch"    placeholder="Kuala Lumpur HQ" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.branch} />
+              <InputField label={t("staff.branch_ar_label")} field="branch_ar" placeholder="المقر الرئيسي"   formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.branch_ar} />
+            </div>
+            <InputField label={t("staff.info_joining")} field="joining_date" type="date" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.joining_date} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_position")}     field="position"    placeholder="Program Manager"  required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label={t("staff.position_ar_label")} field="position_ar" placeholder="مدير البرامج"     required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_branch")}     field="branch"    placeholder="Kuala Lumpur HQ" required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-            <InputField label={t("staff.branch_ar_label")} field="branch_ar" placeholder="المقر الرئيسي"   required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-          </div>
-          <InputField label={t("staff.info_joining_date")} field="joining_date" type="date" required={false} formData={staffForm} errors={errors} updateFormData={setS} />
-        </div>
 
-        {/* ── Banking Information ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("staff.section_banking")} subtitle={t("staff.section_banking_sub")} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_bank_name")}      field="bank_name"           placeholder="e.g. Maybank"        required={false} formData={bankForm} errors={errors} updateFormData={setB} />
-            <InputField label={t("staff.info_account_holder")} field="account_holder_name" placeholder="As per bank records" required={false} formData={bankForm} errors={errors} updateFormData={setB} />
+          {/* ── Banking Information ── */}
+          <div className="border-b border-slate-200 bg-white p-6">
+            <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("staff.section_banking")} subtitle={t("staff.section_banking_sub")} />
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("staff.info_bank_name")}      field="bank_name"           placeholder="e.g. Maybank"        formData={bankForm} errors={errors} updateFormData={setB} rules={BANK_RULES.bank_name} />
+              <InputField label={t("staff.info_account_holder")} field="account_holder_name" placeholder="As per bank records" formData={bankForm} errors={errors} updateFormData={setB} rules={BANK_RULES.account_holder_name} />
+            </div>
+            <InputField label={t("staff.info_account_no")} field="account_number" placeholder="e.g. 1234567890" formData={bankForm} errors={errors} updateFormData={setB} rules={BANK_RULES.account_number} />
           </div>
-          <InputField label={t("staff.info_account_number")} field="account_number" placeholder="e.g. 1234567890" required={false} formData={bankForm} errors={errors} updateFormData={setB} />
-        </div>
 
-        {/* ── Financial Information ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("staff.section_financial")} subtitle={t("staff.section_financial_sub")} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_job_title")}     field="job_title"    placeholder="e.g. Senior Officer" required={false} formData={finForm} errors={errors} updateFormData={setF} />
-            <InputField label={t("staff.job_title_ar_label")} field="job_title_ar" placeholder="مثلاً: كبير الموظفين"  required={false} formData={finForm} errors={errors} updateFormData={setF} />
+          {/* ── Financial Information ── */}
+          <div className="border-b border-slate-200 bg-white p-6">
+            <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("staff.section_financial")} subtitle={t("staff.section_financial_sub")} />
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("staff.info_job_title")}     field="job_title"    placeholder="e.g. Senior Officer"  formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.job_title} />
+              <InputField label={t("staff.job_title_ar_label")} field="job_title_ar" placeholder="مثلاً: كبير الموظفين" formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.job_title_ar} />
+            </div>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField  label={t("staff.info_salary")}       field="salary"            placeholder="e.g. 3500.00" formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.salary} />
+              <SelectField label={t("staff.info_pay_freq")} field="payment_frequency" options={PAYMENT_FREQUENCY_OPTIONS} formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.payment_frequency} />
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label={t("staff.info_salary")}       field="salary"            placeholder="e.g. 3500.00" required={false} formData={finForm} errors={errors} updateFormData={setF} />
-            <SelectField label={t("staff.info_pay_frequency")} field="payment_frequency" options={PAYMENT_FREQUENCY_OPTIONS} required={false} formData={finForm} errors={errors} updateFormData={setF} />
+
+          <div className="flex gap-3 p-6">
+            <Button variant="ghost" text={t("staff.cancel")} onClick={() => navigate(`${base}/staff/${id}`)} className="flex-1" />
+            <Button
+              type="submit"
+              variant="primary"
+              text={t("staff.save_changes")}
+              loading={saving}
+              disabled={hasErrors || !isDirty || saving}
+              className="flex-1"
+            />
           </div>
-        </div>
 
-        <div className="flex gap-3">
-          <Button variant="ghost" text={t("staff.cancel")} onClick={() => navigate(`${base}/staff/${id}`)} className="flex-1" />
-          <Button
-            type="submit"
-            variant="primary"
-            text={t("staff.save_changes")}
-            loading={saving}
-            disabled={!userForm.full_name.trim() || !userForm.email.trim() || !isDirty || saving}
-            className="flex-1"
-          />
-        </div>
-
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

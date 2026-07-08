@@ -153,7 +153,7 @@ export default function StaffDetailView() {
           <InfoRow icon={<MdDomain className="h-4 w-4" />}        label={t("staff.info_department")}   value={deptDisplay || "—"} />
           <InfoRow icon={<MdWork className="h-4 w-4" />}          label={t("staff.info_position")}     value={posDisplay || "—"} />
           <InfoRow icon={<MdLocationCity className="h-4 w-4" />}  label={t("staff.info_branch")}       value={branchDisplay || "—"} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.info_joining_date")} value={fmtDate(staff.joining_date)} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.info_joining")} value={fmtDate(staff.joining_date)} />
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export default function StaffDetailView() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {bi.bank_name           && <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("staff.info_bank_name")}      value={bi.bank_name} />}
             {bi.account_holder_name && <InfoRow icon={<MdPerson className="h-4 w-4" />}         label={t("staff.info_account_holder")} value={bi.account_holder_name} />}
-            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label={t("staff.info_account_number")} value={bi.account_number} />}
+            {bi.account_number      && <InfoRow icon={<MdFingerprint className="h-4 w-4" />}    label={t("staff.info_account_no")} value={bi.account_number} />}
           </div>
         </div>
       )}
@@ -177,7 +177,7 @@ export default function StaffDetailView() {
             {fi.job_title         && <InfoRow icon={<MdWork className="h-4 w-4" />}          label={t("staff.info_job_title")}      value={fi.job_title} />}
             {fi.job_title_ar      && <InfoRow icon={<MdWork className="h-4 w-4" />}          label={t("staff.job_title_ar_label")}  value={fi.job_title_ar} />}
             {fi.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}   label={t("staff.info_salary")}         value={`MYR ${fi.salary}`} />}
-            {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.info_pay_frequency")}  value={t(`staff.freq_${fi.payment_frequency}`, { defaultValue: fi.payment_frequency })} />}
+            {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.info_pay_freq")}  value={t(`staff.freq_${fi.payment_frequency}`, { defaultValue: fi.payment_frequency })} />}
           </div>
         </div>
       )}

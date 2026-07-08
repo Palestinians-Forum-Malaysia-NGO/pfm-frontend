@@ -12,15 +12,17 @@ const VARIANTS = {
  * Inline alert banner for form errors, warnings, and feedback.
  *
  * Props:
- *   message – string | ReactNode  (renders nothing if falsy)
- *   variant – "error" | "success" | "warning" | "info"  (default "error")
+ *   message   – string | ReactNode  (renders nothing if falsy)
+ *   variant   – "error" | "success" | "warning" | "info"  (default "error")
+ *   className – overrides the default spacing/rounding/border (color/icon stay tied to variant)
  */
-const AlertBanner = ({ message, variant = "error" }) => {
+const AlertBanner = ({ message, variant = "error", className }) => {
   if (!message) return null;
   const { wrapper, icon } = VARIANTS[variant] ?? VARIANTS.error;
+  const layoutCls = className ?? "mb-4 rounded-xl border px-4 py-3";
 
   return (
-    <div className={`mb-4 flex items-center gap-2.5 rounded-xl border px-4 py-3 text-sm font-medium ${wrapper}`}>
+    <div className={`flex items-center gap-2.5 text-sm font-medium ${layoutCls} ${wrapper}`}>
       {icon}
       <span>{message}</span>
     </div>
