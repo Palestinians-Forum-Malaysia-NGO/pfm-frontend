@@ -8,15 +8,17 @@ import useStorageUpload from "./useStorageUpload";
  * Handles the full presigned-upload flow internally.
  *
  * Props:
- *   label        – field label
- *   fileType     – "image" | "thumbnail"  (default: "image")
- *   folder       – Spaces folder, e.g. "profiles", "projects"
- *   currentUrl   – URL of the currently stored image (shown when no local file is staged)
- *   onUpload     – (fileKey: string | null) => void — called after upload OR removal
- *   onRemove     – () => void — called when the existing image is removed
- *   required     – show required asterisk
- *   errors       – validation errors object (keyed by field name)
- *   field        – key used to look up errors (default: "image")
+ *   label                  – field label
+ *   fileType               – "image" | "thumbnail"  (default: "image")
+ *   folder                 – Spaces folder, e.g. "profiles", "projects"
+ *   currentUrl             – URL of the currently stored image (shown when no local file is staged)
+ *   onUpload               – (fileKey: string | null) => void — called after upload OR removal
+ *   onRemove               – () => void — called when the existing image is removed
+ *   required               – show required asterisk
+ *   errors                 – validation errors object (keyed by field name)
+ *   field                  – key used to look up errors (default: "image")
+ *   maxSizeMB              – max upload size shown/enforced (default: 2)
+ *   recommendedDimensions  – e.g. "300×300", shown as a hint (default: "300×300")
  */
 const StorageImageField = ({
   label,
@@ -28,6 +30,8 @@ const StorageImageField = ({
   required = false,
   errors,
   field = "image",
+  maxSizeMB = 2,
+  recommendedDimensions = "300×300",
 }) => {
   const { file, isUploading, progress, error, handleFileChange, handleRemove } =
     useStorageUpload({ fileType, folder, onUpload });
@@ -49,6 +53,8 @@ const StorageImageField = ({
         simpleProgress={progress}
         existingUrl={!file ? currentUrl : null}
         onExistingRemove={onRemove}
+        maxSizeMB={maxSizeMB}
+        recommendedDimensions={recommendedDimensions}
       />
       {error && <p className={`mb-4 ${ERROR_MSG}`}>{error}</p>}
     </>

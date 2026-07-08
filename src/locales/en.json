@@ -297,6 +297,10 @@
     "file_types_label": "PDF, JPG, PNG",
     "types_accepted_suffix": "accepted",
     "invalid_file_type": "Invalid file type. Only {{types}} files are allowed.",
+    "upload_photo": "Upload Photo",
+    "change_photo": "Change Photo",
+    "image_size_hint": "Recommended {{dimensions}}px, up to {{size}} MB",
+    "file_too_large": "File is too large. Maximum size is {{size}} MB.",
     "current_image": "Current"
   },
   "home": {

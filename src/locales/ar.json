@@ -297,7 +297,11 @@
     "file_types_label": "PDF، JPG، PNG",
     "types_accepted_suffix": "مقبولة",
     "invalid_file_type": "نوع الملف غير صالح. يُقبل فقط ملفات {{types}}.",
-    "current_image": "الحالية"
+    "current_image": "الحالية",
+    "upload_photo": "رفع صورة",
+    "change_photo": "تغيير الصورة",
+    "image_size_hint": "المقاس الموصى به {{dimensions}} بكسل، بحد أقصى {{size}} ميجابايت",
+    "file_too_large": "حجم الملف كبير جداً. الحد الأقصى {{size}} ميجابايت."
   },
   "home": {
     "our_work": "أعمالنا",
