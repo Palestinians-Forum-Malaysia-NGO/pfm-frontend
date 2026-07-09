@@ -1,19 +1,36 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { MdHandshake } from "react-icons/md";
 import useInView from "hooks/useInView";
+import { useGetPartnerships } from "components/features/partnerships/hooks";
 
-const PARTNERS = [
-  { name: "Islamic Relief Malaysia",  short: "IRM" },
-  { name: "AMAN Palestine",           short: "AP" },
-  { name: "MERCY Malaysia",           short: "MM" },
-  { name: "UNRWA Malaysia",           short: "UN" },
-  { name: "Palestinian Red Crescent", short: "PRC" },
-  { name: "Majlis Agama Islam KL",    short: "MAIK" },
-];
+const getInitials = (name = "") =>
+  name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+
+const Card = ({ p }) => (
+  <div title={p.name} className="shrink-0 px-2" style={{ width: "180px" }}>
+    <div className="flex h-full flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-5 text-center transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-green/20 hover:shadow-sm">
+      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-white text-sm font-black text-green shadow-sm">
+        {p.logo?.public_url
+          ? <img src={p.logo.public_url} alt={p.name} className="h-full w-full object-contain p-1" />
+          : getInitials(p.name)
+        }
+      </div>
+      <p className="text-[10px] font-medium leading-tight text-slate-400">{p.name}</p>
+    </div>
+  </div>
+);
 
 const PartnersCarousel = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
+  const { partnerships, loading } = useGetPartnerships({ ordering: "order" });
+
+  if (!loading && partnerships.length === 0) return null;
+
+  // Duplicate the strip so the 0% -> -50% loop is seamless.
+  const track = [...partnerships, ...partnerships];
+  const duration = Math.max(partnerships.length * 3, 15);
 
   return (
     <section ref={ref} className="bg-white py-16">
@@ -27,22 +44,17 @@ const PartnersCarousel = () => {
         </div>
 
         <div
-          className="grid grid-cols-3 gap-4 sm:grid-cols-6"
-          style={{ opacity: inView ? 1 : 0, transition: "all 0.7s ease-in-out", transitionDelay: "150ms" }}
+          className="group overflow-hidden"
+          style={{ opacity: inView ? 1 : 0, transition: "opacity 0.7s ease-in-out", transitionDelay: "150ms" }}
         >
-          {PARTNERS.map((p, i) => (
+          {!loading && (
             <div
-              key={p.name}
-              title={p.name}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-5 text-center transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-green/20 hover:shadow-sm"
-              style={{ transitionDelay: `${i * 50}ms` }}
+              className="flex w-max group-hover:[animation-play-state:paused] rtl:[animation-direction:reverse]"
+              style={{ animation: `marquee ${duration}s linear infinite` }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-sm font-black text-green shadow-sm">
-                {p.short}
-              </div>
-              <p className="text-[10px] font-medium leading-tight text-slate-400">{p.name}</p>
+              {track.map((p, i) => <Card key={`${p.id}-${i}`} p={p} />)}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </section>
