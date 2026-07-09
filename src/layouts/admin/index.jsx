@@ -21,6 +21,7 @@ import CategoryEdit     from "views/admin/categories/CategoryEdit";
 import ClassificationCreate from "views/admin/classifications/ClassificationCreate";
 import ClassificationDetail from "views/admin/classifications/ClassificationDetail";
 import ClassificationEdit   from "views/admin/classifications/ClassificationEdit";
+import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDetail";
 import ProjectCreate    from "views/admin/projects/ProjectCreate";
 import ProjectDetail    from "views/admin/projects/ProjectDetail";
 import ProjectEdit      from "views/admin/projects/ProjectEdit";
@@ -66,6 +67,7 @@ export default function Admin(props) {
     if (path.match(/\/categories\/[^/]+$/))            { setCurrentRouteName("Category Detail");      return; }
     if (path.match(/\/classifications\/[^/]+$/))       { setCurrentRouteName("Classification Detail"); return; }
     if (path.match(/\/projects\/[^/]+$/))              { setCurrentRouteName("Project Detail");        return; }
+    if (path.match(/\/contact-messages\/[^/]+$/))      { setCurrentRouteName("Contact Message Detail"); return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
     if (active) setCurrentRouteName(active.name);
@@ -121,6 +123,7 @@ export default function Admin(props) {
               <Route path="/projects/create"       element={<ProjectCreate />} />
               <Route path="/projects/:id"          element={<ProjectDetail />} />
               <Route path="/projects/:id/edit"     element={<ProjectEdit />} />
+              <Route path="/contact-messages/:id"  element={<ContactMessageDetail />} />
               <Route path="/" element={<Navigate to="/admin/default" replace />} />
             </Routes>
           </PageTransition>

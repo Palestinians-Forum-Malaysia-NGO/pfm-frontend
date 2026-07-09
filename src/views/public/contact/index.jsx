@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { MdEmail, MdPhone, MdLocationOn, MdSend, MdCheckCircle } from "react-icons/md";
+import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
+import ContactForm from "components/public/contact/ContactForm";
 
 import heroBg from "assets/img/gallery/gallery-2.jpg";
 
@@ -14,9 +15,6 @@ const SOCIALS = [
 
 export default function Contact() {
   const { t } = useTranslation();
-  const [form, setForm]           = useState({ name: "", email: "", subject: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending]     = useState(false);
 
   const CONTACT_INFO = [
     { icon: <MdLocationOn className="h-5 w-5" />, label: t("contact.address"), value: "Kuala Lumpur, Malaysia", sub: "Wilayah Persekutuan" },
@@ -24,18 +22,6 @@ export default function Contact() {
     { icon: <MdPhone className="h-5 w-5" />,      label: t("contact.phone"),   value: "+60 12-345 6789",        href: "tel:+60123456789" },
     { icon: <FaWhatsapp className="h-5 w-5" />,   label: t("contact.whatsapp"),value: "+60 12-345 6789",        href: "https://wa.me/60123456789" },
   ];
-
-  const set = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSending(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitted(true);
-    setSending(false);
-  };
-
-  const inputCls = "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 ease-in-out focus:border-green focus:bg-white placeholder:text-slate-400";
 
   return (
     <div className="flex flex-col">
@@ -102,64 +88,7 @@ export default function Contact() {
             </div>
 
             {/* ── Right: Form ── */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-              {submitted ? (
-                <div className="flex h-full flex-col items-center justify-center gap-4 py-12 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
-                    <MdCheckCircle className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900">{t("contact.success_title")}</h3>
-                  <p className="max-w-xs text-sm text-slate-400">{t("contact.success_body")}</p>
-                  <button
-                    onClick={() => { setSubmitted(false); setForm({ name: "", email: "", subject: "", message: "" }); }}
-                    className="mt-2 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
-                  >
-                    {t("contact.send_another")}
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <h3 className="text-xl font-bold text-slate-900">{t("contact.send_message")}</h3>
-                  <p className="mt-1 text-sm text-slate-400">{t("contact.response_time")}</p>
-
-                  <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.full_name")}</label>
-                        <input value={form.name} onChange={set("name")} required placeholder={t("contact.name_placeholder")} className={inputCls} />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.email_address")}</label>
-                        <input value={form.email} onChange={set("email")} type="email" required placeholder="ahmad@email.com" className={inputCls} />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.subject")}</label>
-                      <input value={form.subject} onChange={set("subject")} required placeholder={t("contact.subject_placeholder")} className={inputCls} />
-                    </div>
-
-                    <div>
-                      <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("contact.message")}</label>
-                      <textarea value={form.message} onChange={set("message")} required rows={5} placeholder={t("contact.message_placeholder")} className={`${inputCls} resize-none`} />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={sending}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {sending ? (
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      ) : (
-                        <MdSend className="h-4 w-4" />
-                      )}
-                      {sending ? t("contact.sending") : t("contact.send")}
-                    </button>
-                  </form>
-                </>
-              )}
-            </div>
+            <ContactForm />
 
           </div>
         </div>

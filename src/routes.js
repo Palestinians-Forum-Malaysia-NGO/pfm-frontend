@@ -7,6 +7,7 @@ import StaffPage from "views/admin/staff";
 import BeneficiariesPage from "views/admin/beneficiaries";
 import CategoriesPage        from "views/admin/categories";
 import ClassificationsPage   from "views/admin/classifications";
+import ContactMessagesPage   from "views/admin/contactMessages";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -47,6 +48,7 @@ import {
   MdCategory,
   MdFolderSpecial,
   MdGroups,
+  MdMailOutline,
 } from "react-icons/md";
 
 const routes = [
@@ -102,6 +104,14 @@ const routes = [
     path: "beneficiaries",
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
+    section: "COMMUNITY",
+  },
+  {
+    name: "Contact Messages",
+    layout: "/admin",
+    path: "contact-messages",
+    icon: <MdMailOutline className="h-5 w-5" />,
+    component: <ContactMessagesPage />,
     section: "COMMUNITY",
   },
   {
@@ -247,6 +257,14 @@ const routes = [
     path: "beneficiaries",
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
+    section: "COMMUNITY",
+  },
+  {
+    name: "Contact Messages",
+    layout: "/staff",
+    path: "contact-messages",
+    icon: <MdMailOutline className="h-5 w-5" />,
+    component: <ContactMessagesPage />,
     section: "COMMUNITY",
   },
   {

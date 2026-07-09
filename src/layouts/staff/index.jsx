@@ -15,6 +15,7 @@ import CategoryEdit      from "views/admin/categories/CategoryEdit";
 import ProjectCreate     from "views/admin/projects/ProjectCreate";
 import ProjectDetail     from "views/admin/projects/ProjectDetail";
 import ProjectEdit       from "views/admin/projects/ProjectEdit";
+import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDetail";
 
 const SUB_ROUTE_NAMES = {
   "/categories/create":    "New Category",
@@ -45,6 +46,7 @@ export default function StaffLayout() {
     if (path.match(/\/beneficiaries\/[^/]+$/))       { setCurrentRouteName("Beneficiary Detail"); return; }
     if (path.match(/\/categories\/[^/]+$/))          { setCurrentRouteName("Category Detail");  return; }
     if (path.match(/\/projects\/[^/]+$/))            { setCurrentRouteName("Project Detail");   return; }
+    if (path.match(/\/contact-messages\/[^/]+$/))    { setCurrentRouteName("Contact Message Detail"); return; }
     const active = routes.find((r) => r.layout === "/staff" && path.includes(r.path));
     if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
@@ -87,6 +89,7 @@ export default function StaffLayout() {
               <Route path="/projects/create"        element={<ProjectCreate />} />
               <Route path="/projects/:id"           element={<ProjectDetail />} />
               <Route path="/projects/:id/edit"      element={<ProjectEdit />} />
+              <Route path="/contact-messages/:id"   element={<ContactMessageDetail />} />
               <Route path="/" element={<Navigate to="/staff/default" replace />} />
             </Routes>
           </PageTransition>
