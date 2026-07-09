@@ -95,7 +95,7 @@ export default function PartnershipList() {
       render: (p) => p.website_url ? (
         <a href={p.website_url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-green">
-          <MdLink className="h-3.5 w-3.5" /> <span className="max-w-[160px] truncate">{p.website_url}</span>
+          <MdLink className="h-3.5 w-3.5" /> {t("partnerships.visit_link")}
         </a>
       ) : <span className="text-slate-300">—</span>,
     },

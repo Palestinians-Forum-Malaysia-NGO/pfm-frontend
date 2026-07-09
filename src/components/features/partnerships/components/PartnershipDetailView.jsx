@@ -115,7 +115,11 @@ export default function PartnershipDetailView() {
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader icon={<MdHandshake className="h-5 w-5" />} title={t("partnerships.section_info_title")} subtitle={t("partnerships.section_info_subtitle")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdLink className="h-4 w-4" />}          label={t("partnerships.info_website")} value={partnership.website_url || "—"} />
+          <InfoRow icon={<MdLink className="h-4 w-4" />}          label={t("partnerships.info_website")} value={
+            partnership.website_url
+              ? <a href={partnership.website_url} target="_blank" rel="noreferrer" className="text-green hover:underline">{t("partnerships.visit_link")}</a>
+              : "—"
+          } />
           <InfoRow icon={<MdSort className="h-4 w-4" />}          label={t("partnerships.info_order")}   value={partnership.order ?? "—"} />
           <InfoRow icon={<MdCheckCircle className="h-4 w-4" />}   label={t("partnerships.info_status")}  value={partnership.is_active ? t("partnerships.status_active") : t("partnerships.status_inactive")} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("partnerships.info_created")} value={formatDate(partnership.created_at)} />
