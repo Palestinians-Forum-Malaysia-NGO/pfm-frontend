@@ -8,6 +8,7 @@ import BeneficiariesPage from "views/admin/beneficiaries";
 import CategoriesPage        from "views/admin/categories";
 import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
+import PartnershipsPage      from "views/admin/partnerships";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -49,6 +50,7 @@ import {
   MdFolderSpecial,
   MdGroups,
   MdMailOutline,
+  MdHandshake,
 } from "react-icons/md";
 
 const routes = [
@@ -185,6 +187,18 @@ const routes = [
     ],
   },
   {
+    name: "Partnerships",
+    layout: "/admin",
+    path: "partnerships",
+    icon: <MdHandshake className="h-5 w-5" />,
+    component: <PartnershipsPage />,
+    section: "SYSTEM",
+    children: [
+      { name: "All Partnerships", path: "partnerships" },
+      { name: "Add Partnership",  path: "partnerships/create" },
+    ],
+  },
+  {
     name: "Staff",
     layout: "/admin",
     path: "staff",
@@ -277,6 +291,18 @@ const routes = [
     children: [
       { name: "All Categories", path: "categories" },
       { name: "Add Category",   path: "categories/create" },
+    ],
+  },
+  {
+    name: "Partnerships",
+    layout: "/staff",
+    path: "partnerships",
+    icon: <MdHandshake className="h-5 w-5" />,
+    component: <PartnershipsPage />,
+    section: "SYSTEM",
+    children: [
+      { name: "All Partnerships", path: "partnerships" },
+      { name: "Add Partnership",  path: "partnerships/create" },
     ],
   },
   {

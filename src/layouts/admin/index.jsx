@@ -22,6 +22,9 @@ import ClassificationCreate from "views/admin/classifications/ClassificationCrea
 import ClassificationDetail from "views/admin/classifications/ClassificationDetail";
 import ClassificationEdit   from "views/admin/classifications/ClassificationEdit";
 import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDetail";
+import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
+import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
+import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
 import ProjectCreate    from "views/admin/projects/ProjectCreate";
 import ProjectDetail    from "views/admin/projects/ProjectDetail";
 import ProjectEdit      from "views/admin/projects/ProjectEdit";
@@ -32,6 +35,7 @@ const SUB_ROUTE_NAMES = {
   "/categories/create":      "New Category",
   "/classifications/create": "New Classification",
   "/projects/create":   "New Project",
+  "/partnerships/create": "New Partnership",
 };
 
 export default function Admin(props) {
@@ -60,6 +64,7 @@ export default function Admin(props) {
     if (path.match(/\/categories\/[^/]+\/edit$/))       { setCurrentRouteName("Edit Category");       return; }
     if (path.match(/\/classifications\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Classification");  return; }
     if (path.match(/\/projects\/[^/]+\/edit$/))        { setCurrentRouteName("Edit Project");         return; }
+    if (path.match(/\/partnerships\/[^/]+\/edit$/))    { setCurrentRouteName("Edit Partnership");      return; }
     // Detail pages
     if (path.match(/\/users\/\d+$/))                   { setCurrentRouteName("User Detail");          return; }
     if (path.match(/\/beneficiaries\/[^/]+$/))         { setCurrentRouteName("Beneficiary Detail");   return; }
@@ -68,6 +73,7 @@ export default function Admin(props) {
     if (path.match(/\/classifications\/[^/]+$/))       { setCurrentRouteName("Classification Detail"); return; }
     if (path.match(/\/projects\/[^/]+$/))              { setCurrentRouteName("Project Detail");        return; }
     if (path.match(/\/contact-messages\/[^/]+$/))      { setCurrentRouteName("Contact Message Detail"); return; }
+    if (path.match(/\/partnerships\/[^/]+$/))          { setCurrentRouteName("Partnership Detail");    return; }
     // Top-level route names from routes.js
     const active = routes.find((r) => r.layout === "/admin" && path.includes(r.path));
     if (active) setCurrentRouteName(active.name);
@@ -124,6 +130,9 @@ export default function Admin(props) {
               <Route path="/projects/:id"          element={<ProjectDetail />} />
               <Route path="/projects/:id/edit"     element={<ProjectEdit />} />
               <Route path="/contact-messages/:id"  element={<ContactMessageDetail />} />
+              <Route path="/partnerships/create"   element={<PartnershipCreate />} />
+              <Route path="/partnerships/:id"      element={<PartnershipDetail />} />
+              <Route path="/partnerships/:id/edit" element={<PartnershipEdit />} />
               <Route path="/" element={<Navigate to="/admin/default" replace />} />
             </Routes>
           </PageTransition>
