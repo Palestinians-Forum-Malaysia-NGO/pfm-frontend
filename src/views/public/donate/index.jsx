@@ -11,7 +11,7 @@ export default function Donate() {
   return (
     <div className="flex flex-col">
       <DonateHero />
-      <div className="mx-auto w-full max-w-3xl px-6 pt-10">
+      <div className="mx-auto w-full max-w-3xl px-6 pt-10" style={{ animation: "fadeUp 0.7s 0.3s ease both" }}>
         <AlertBanner variant="warning" message={t("donate.placeholder_notice")} />
       </div>
       <QRCodeSection />

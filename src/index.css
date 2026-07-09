@@ -46,6 +46,20 @@ html[dir="ltr"] textarea::placeholder {
 	direction: ltr !important;
 }
 
+/* ── Shared entrance animation — used via inline style={{ animation: "fadeUp ..." }}
+   across public hero sections. Global (not component-scoped) so it works on every page. ── */
+@keyframes fadeUp {
+	from { opacity: 0; transform: translateY(20px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Infinite auto-scroll for logo marquees (e.g. PartnersCarousel). The
+   track renders its content twice, so 0% -> -50% is a seamless loop. ── */
+@keyframes marquee {
+	from { transform: translateX(0); }
+	to   { transform: translateX(-50%); }
+}
+
 /* ── Reduced motion accessibility ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

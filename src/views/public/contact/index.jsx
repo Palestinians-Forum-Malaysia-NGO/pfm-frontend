@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
 import ContactForm from "components/public/contact/ContactForm";
+import useInView from "hooks/useInView";
 
 import heroBg from "assets/img/gallery/gallery-2.jpg";
 
@@ -15,6 +16,12 @@ const SOCIALS = [
 
 export default function Contact() {
   const { t } = useTranslation();
+  const [infoRef, infoInView] = useInView();
+  const show = (delay = 0) => ({
+    opacity: infoInView ? 1 : 0,
+    transform: infoInView ? "translateY(0)" : "translateY(24px)",
+    transition: `opacity 0.7s ease-in-out ${delay}ms, transform 0.7s ease-in-out ${delay}ms`,
+  });
 
   const CONTACT_INFO = [
     { icon: <MdLocationOn className="h-5 w-5" />, label: t("contact.address"), value: "Kuala Lumpur, Malaysia", sub: "Wilayah Persekutuan" },
@@ -32,19 +39,19 @@ export default function Contact() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70" />
 
         <div className="relative z-10 text-center text-white px-6">
-          <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60">{t("contact.how_to_reach")}</span>
-          <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">{t("contact.title")}</h1>
-          <p className="mt-4 text-white/60 text-base">{t("contact.subtitle")}</p>
+          <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60" style={{ animation: "fadeUp 0.8s ease both" }}>{t("contact.how_to_reach")}</span>
+          <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl" style={{ animation: "fadeUp 0.8s 0.1s ease both" }}>{t("contact.title")}</h1>
+          <p className="mt-4 text-white/60 text-base" style={{ animation: "fadeUp 0.8s 0.2s ease both" }}>{t("contact.subtitle")}</p>
         </div>
       </section>
 
       {/* ── MAIN CONTENT ── */}
-      <section className="bg-white py-20">
+      <section ref={infoRef} className="bg-white py-20">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
 
             {/* ── Left: Contact info ── */}
-            <div>
+            <div style={show(0)}>
               <span className="text-xs font-bold uppercase tracking-widest text-green">{t("contact.how_to_reach")}</span>
               <h2 className="mt-3 text-3xl font-extrabold text-slate-900">{t("contact.how_to_reach")}</h2>
               <p className="mt-4 text-slate-500 leading-relaxed">{t("contact.description")}</p>

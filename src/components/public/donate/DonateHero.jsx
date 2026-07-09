@@ -12,9 +12,24 @@ const DonateHero = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/70" />
 
       <div className="relative z-10 px-6 text-center text-white">
-        <span className="text-xs font-bold uppercase tracking-[0.25em] text-white/60">{t("donate.hero_label")}</span>
-        <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">{t("donate.hero_title")}</h1>
-        <p className="mt-4 text-base text-white/60">{t("donate.hero_subtitle")}</p>
+        <span
+          className="text-xs font-bold uppercase tracking-[0.25em] text-white/60"
+          style={{ animation: "fadeUp 0.8s ease both" }}
+        >
+          {t("donate.hero_label")}
+        </span>
+        <h1
+          className="mt-3 text-5xl font-black tracking-tight sm:text-6xl"
+          style={{ animation: "fadeUp 0.8s 0.1s ease both" }}
+        >
+          {t("donate.hero_title")}
+        </h1>
+        <p
+          className="mt-4 text-base text-white/60"
+          style={{ animation: "fadeUp 0.8s 0.2s ease both" }}
+        >
+          {t("donate.hero_subtitle")}
+        </p>
       </div>
     </section>
   );

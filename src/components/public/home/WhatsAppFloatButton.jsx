@@ -9,7 +9,10 @@ const WhatsAppFloatButton = ({ phone = "60123456789", message = "Hi PFM, I'd lik
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    <div
+      className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2"
+      style={{ animation: "fadeUp 0.5s 1s ease both" }}
+    >
 
       {/* Tooltip bubble */}
       {showTooltip && (

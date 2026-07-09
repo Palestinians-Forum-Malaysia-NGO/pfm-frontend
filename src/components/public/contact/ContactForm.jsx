@@ -4,6 +4,7 @@ import { MdSend, MdCheckCircle } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import { InputField, TextareaField, validate } from "components/form";
 import { useSubmitContactMessage } from "components/features/contact/hooks";
+import useInView from "hooks/useInView";
 
 const RULES = {
   name:    [{ required: true }, { maxLength: 255 }],
@@ -16,6 +17,7 @@ const EMPTY = { name: "", email: "", subject: "", message: "" };
 
 const ContactForm = () => {
   const { t } = useTranslation();
+  const [ref, inView] = useInView();
   const [form, setForm]           = useState(EMPTY);
   const [errors, setErrors]       = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -49,7 +51,11 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div
+      ref={ref}
+      className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+      style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(28px)", transition: "all 0.7s ease-in-out" }}
+    >
       {submitted ? (
         <div className="flex h-full flex-col items-center justify-center py-12 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
