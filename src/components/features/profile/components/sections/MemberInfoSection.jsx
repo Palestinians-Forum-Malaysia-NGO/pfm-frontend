@@ -50,8 +50,8 @@ const MemberInfoSection = ({ profile }) => {
         subtitle={t("profile.personal_sub")}
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {p.full_name_arabic && (
-            <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={p.full_name_arabic} />
+          {profile.full_name_ar && (
+            <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={profile.full_name_ar} />
           )}
           <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_passport")}      value={p.passport_number || "—"} />
           <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.gender")}            value={GENDER_LABELS[p.gender] ?? p.gender ?? "—"} />
@@ -98,8 +98,8 @@ const MemberInfoSection = ({ profile }) => {
             {p.family_information.spouse_name && (
               <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}         value={p.family_information.spouse_name} />
             )}
-            {p.family_information.spouse_name_arabic && (
-              <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={p.family_information.spouse_name_arabic} />
+            {p.family_information.spouse_name_ar && (
+              <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={p.family_information.spouse_name_ar} />
             )}
             {p.family_information.spouse_job && (
               <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}   value={p.family_information.spouse_job} />
@@ -114,7 +114,7 @@ const MemberInfoSection = ({ profile }) => {
                 {p.family_information.children_information.map((child, i) => (
                   <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                     <p className="text-sm font-medium text-slate-900">{child.child_name || t("beneficiaries.child_n", { n: i + 1 })}</p>
-                    {child.child_name_arabic && <p className="text-xs text-slate-400">{child.child_name_arabic}</p>}
+                    {child.child_name_ar && <p className="text-xs text-slate-400">{child.child_name_ar}</p>}
                     {child.child_date_of_birth && (
                       <p className="mt-1 text-xs text-slate-400">{t("profile.dob_prefix")} {fmtDate(child.child_date_of_birth)}</p>
                     )}

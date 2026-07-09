@@ -39,6 +39,14 @@ const UserProfileCard = ({ user, showId = false }) => {
 
   if (!user) return null;
 
+  // Self-service GET /accounts/me/ nests these under profile.user.* instead of
+  // returning them at the top level (unlike /accounts/users/{id} or /staff/{id}).
+  const nestedUser = user.profile?.user;
+  const isActive      = user.is_active       ?? nestedUser?.is_active;
+  const createdAt     = user.created_at      ?? nestedUser?.created_at;
+  const updatedAt      = user.updated_at      ?? nestedUser?.updated_at;
+  const is2faVerified = user.is_2fa_verified ?? nestedUser?.is_2fa_verified;
+
   const bi = user.banking_information;
   const fi = user.financial_information;
   const hasBanking  = bi && (bi.bank_name || bi.account_number || bi.account_holder_name);
@@ -71,10 +79,10 @@ const UserProfileCard = ({ user, showId = false }) => {
           <p className="mt-0.5 text-sm text-slate-400">{user.email}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-              user.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
+              isActive ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
             }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${user.is_active ? "bg-green animate-pulse" : "bg-slate-400"}`} />
-              {user.is_active ? t("users.status_active") : t("users.status_inactive")}
+              <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green animate-pulse" : "bg-slate-400"}`} />
+              {isActive ? t("users.status_active") : t("users.status_inactive")}
             </span>
             {user.password_reset_required && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
@@ -93,10 +101,10 @@ const UserProfileCard = ({ user, showId = false }) => {
           <InfoRow icon={<MdEmail className="h-4 w-4" />}         label={t("users.info_email")}   value={user.email} />
           <InfoRow icon={<MdShield className="h-4 w-4" />}        label={t("users.role")}    value={ROLE_LABELS[user.role] ?? user.role} />
           <InfoRow icon={<MdPhone className="h-4 w-4" />}         label={t("users.info_phone")}   value={user.phone_number || "—"} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("users.info_joined")}  value={fmtDate(user.created_at)} />
-          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label={t("users.info_status")}  value={user.is_active ? t("users.status_active") : t("users.status_inactive")} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (user.is_2fa_verified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
-          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(user.updated_at)} />
+          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("users.info_joined")}  value={fmtDate(createdAt)} />
+          <InfoRow icon={<MdVerified className="h-4 w-4" />}      label={t("users.info_status")}  value={isActive ? t("users.status_active") : t("users.status_inactive")} />
+          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (is2faVerified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
+          <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(updatedAt)} />
           {showId && (
             <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label={t("users.info_user_id")} value={user.id} />
           )}
