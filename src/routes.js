@@ -9,6 +9,7 @@ import CategoriesPage        from "views/admin/categories";
 import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
 import PartnershipsPage      from "views/admin/partnerships";
+import BranchesPage          from "views/admin/branches";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -51,6 +52,7 @@ import {
   MdGroups,
   MdMailOutline,
   MdHandshake,
+  MdBusiness,
 } from "react-icons/md";
 
 const routes = [
@@ -199,6 +201,18 @@ const routes = [
     ],
   },
   {
+    name: "Branches",
+    layout: "/admin",
+    path: "branches",
+    icon: <MdBusiness className="h-5 w-5" />,
+    component: <BranchesPage />,
+    section: "SYSTEM",
+    children: [
+      { name: "All Branches", path: "branches" },
+      { name: "Add Branch",   path: "branches/create" },
+    ],
+  },
+  {
     name: "Staff",
     layout: "/admin",
     path: "staff",
@@ -303,6 +317,18 @@ const routes = [
     children: [
       { name: "All Partnerships", path: "partnerships" },
       { name: "Add Partnership",  path: "partnerships/create" },
+    ],
+  },
+  {
+    name: "Branches",
+    layout: "/staff",
+    path: "branches",
+    icon: <MdBusiness className="h-5 w-5" />,
+    component: <BranchesPage />,
+    section: "SYSTEM",
+    children: [
+      { name: "All Branches", path: "branches" },
+      { name: "Add Branch",   path: "branches/create" },
     ],
   },
   {

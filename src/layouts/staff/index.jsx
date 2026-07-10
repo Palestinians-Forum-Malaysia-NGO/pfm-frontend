@@ -19,11 +19,15 @@ import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDeta
 import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
 import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
 import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
+import BranchCreate from "views/admin/branches/BranchCreate";
+import BranchDetail from "views/admin/branches/BranchDetail";
+import BranchEdit   from "views/admin/branches/BranchEdit";
 
 const SUB_ROUTE_NAMES = {
   "/categories/create":    "New Category",
   "/projects/create":      "New Project",
   "/partnerships/create":  "New Partnership",
+  "/branches/create":      "New Branch",
 };
 
 export default function StaffLayout() {
@@ -48,11 +52,13 @@ export default function StaffLayout() {
     if (path.match(/\/categories\/[^/]+\/edit$/))    { setCurrentRouteName("Edit Category");    return; }
     if (path.match(/\/projects\/[^/]+\/edit$/))      { setCurrentRouteName("Edit Project");     return; }
     if (path.match(/\/partnerships\/[^/]+\/edit$/))  { setCurrentRouteName("Edit Partnership");  return; }
+    if (path.match(/\/branches\/[^/]+\/edit$/))      { setCurrentRouteName("Edit Branch");       return; }
     if (path.match(/\/beneficiaries\/[^/]+$/))       { setCurrentRouteName("Beneficiary Detail"); return; }
     if (path.match(/\/categories\/[^/]+$/))          { setCurrentRouteName("Category Detail");  return; }
     if (path.match(/\/projects\/[^/]+$/))            { setCurrentRouteName("Project Detail");   return; }
     if (path.match(/\/contact-messages\/[^/]+$/))    { setCurrentRouteName("Contact Message Detail"); return; }
     if (path.match(/\/partnerships\/[^/]+$/))        { setCurrentRouteName("Partnership Detail"); return; }
+    if (path.match(/\/branches\/[^/]+$/))            { setCurrentRouteName("Branch Detail");     return; }
     const active = routes.find((r) => r.layout === "/staff" && path.includes(r.path));
     if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
@@ -99,6 +105,9 @@ export default function StaffLayout() {
               <Route path="/partnerships/create"    element={<PartnershipCreate />} />
               <Route path="/partnerships/:id"       element={<PartnershipDetail />} />
               <Route path="/partnerships/:id/edit"  element={<PartnershipEdit />} />
+              <Route path="/branches/create"    element={<BranchCreate />} />
+              <Route path="/branches/:id"       element={<BranchDetail />} />
+              <Route path="/branches/:id/edit"  element={<BranchEdit />} />
               <Route path="/" element={<Navigate to="/staff/default" replace />} />
             </Routes>
           </PageTransition>
