@@ -48,7 +48,7 @@ const STATS = [
 ];
 
 const Dashboard = () => (
-  <div className="flex flex-col gap-4">
+  <div className="flex flex-col gap-4 max-w-5xl mx-auto px-4">
     
     {/* ── Beneficiary stats (live) ── */}
 
