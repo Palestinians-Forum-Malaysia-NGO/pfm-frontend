@@ -10,6 +10,7 @@ import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
+import ApplicationsPage      from "views/admin/applications";
 import ProjectsPage from "views/admin/projects";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
@@ -53,6 +54,7 @@ import {
   MdMailOutline,
   MdHandshake,
   MdBusiness,
+  MdFactCheck,
 } from "react-icons/md";
 
 const routes = [
@@ -109,6 +111,18 @@ const routes = [
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
     section: "COMMUNITY",
+  },
+  {
+    name: "Applications",
+    layout: "/admin",
+    path: "applications",
+    icon: <MdFactCheck className="h-5 w-5" />,
+    component: <ApplicationsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Applications", path: "applications" },
+      { name: "New Application",  path: "applications/create" },
+    ],
   },
   {
     name: "Contact Messages",
@@ -286,6 +300,18 @@ const routes = [
     icon: <MdPeople className="h-5 w-5" />,
     component: <BeneficiariesPage />,
     section: "COMMUNITY",
+  },
+  {
+    name: "Applications",
+    layout: "/staff",
+    path: "applications",
+    icon: <MdFactCheck className="h-5 w-5" />,
+    component: <ApplicationsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Applications", path: "applications" },
+      { name: "New Application",  path: "applications/create" },
+    ],
   },
   {
     name: "Contact Messages",
