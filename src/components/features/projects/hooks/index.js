@@ -5,6 +5,8 @@ export { default as useUpdateProject     } from "./useUpdateProject";
 export { default as useDeleteProject     } from "./useDeleteProject";
 export { default as usePublishProject    } from "./usePublishProject";
 export { default as useUnpublishProject  } from "./useUnpublishProject";
+export { default as useAssignStaff       } from "./useAssignStaff";
+export { default as useUnassignStaff     } from "./useUnassignStaff";
 export { default as useCreateMilestone   } from "./useCreateMilestone";
 export { default as useUpdateMilestone   } from "./useUpdateMilestone";
 export { default as useDeleteMilestone   } from "./useDeleteMilestone";

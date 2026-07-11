@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
@@ -6,7 +6,7 @@ import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdAssignment,
   MdCalendarToday, MdPublic, MdPublicOff, MdPerson,
   MdCategory, MdInfoOutline, MdUpdate, MdAttachMoney,
-  MdTrendingUp, MdPeople,
+  MdTrendingUp, MdPeople, MdPersonAdd, MdClose,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -17,11 +17,14 @@ import Loading from "components/loading/Loading";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import StorageImage from "components/ui/StorageImage";
 import ProjectDeleteModal from "./ProjectDeleteModal";
+import AssignStaffModal from "./AssignStaffModal";
 import MilestoneSection from "./MilestoneSection";
 import UpdatesSection from "./UpdatesSection";
 import {
   useGetProject, useDeleteProject, usePublishProject, useUnpublishProject,
+  useAssignStaff, useUnassignStaff,
 } from "components/features/projects/hooks";
+import { useGetStaffs } from "components/features/staff/hooks";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -44,8 +47,17 @@ export default function ProjectDetailView() {
   const { execute: deleteProject,    loading: deleteLoading  } = useDeleteProject();
   const { execute: publishProject,   loading: publishing     } = usePublishProject();
   const { execute: unpublishProject                          } = useUnpublishProject();
+  const { execute: assignStaff,   loading: assigning   } = useAssignStaff();
+  const { execute: unassignStaff, loading: unassigning } = useUnassignStaff();
+  const { staffs } = useGetStaffs();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+
+  const staffLookup = useMemo(
+    () => new Map(staffs.map((s) => [`${s.user?.full_name} (${s.user?.email})`, s.user?.id])),
+    [staffs]
+  );
 
   useEffect(() => { fetchProject(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -56,6 +68,29 @@ export default function ProjectDetailView() {
       navigate(`${base}/projects`);
     } catch (err) {
       toastError(t("projects.toast_delete_failed"), err?.message);
+    }
+  };
+
+  const handleAssignStaff = async (userIds) => {
+    try {
+      await assignStaff(id, userIds);
+      success(t("projects.toast_staff_assigned"));
+      setAssignOpen(false);
+      fetchProject(id);
+    } catch (err) {
+      toastError(t("projects.toast_staff_assign_failed"), err?.message);
+    }
+  };
+
+  const handleUnassignStaff = async (label) => {
+    const userId = staffLookup.get(label);
+    if (!userId) return;
+    try {
+      await unassignStaff(id, [userId]);
+      success(t("projects.toast_staff_unassigned"));
+      fetchProject(id);
+    } catch (err) {
+      toastError(t("projects.toast_staff_unassign_failed"), err?.message);
     }
   };
 
@@ -196,6 +231,36 @@ export default function ProjectDetailView() {
         </div>
       </div>
 
+      {/* ── Assigned Staff ── */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <FormHeader icon={<MdPeople className="h-5 w-5" />} title={t("projects.assigned_staff")} subtitle={t("projects.assigned_staff_sub")} />
+          <Button variant="secondary" icon={<MdPersonAdd className="h-4 w-4" />} text={t("projects.assign_staff_btn")} onClick={() => setAssignOpen(true)} />
+        </div>
+        {project.assigned_staff?.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {project.assigned_staff.map((label) => (
+              <span key={label} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1.5 text-xs font-medium text-slate-700">
+                {label}
+                {staffLookup.has(label) && (
+                  <button
+                    type="button"
+                    onClick={() => handleUnassignStaff(label)}
+                    disabled={unassigning}
+                    title={t("projects.unassign_staff_btn")}
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors duration-200 hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <MdClose className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-400">{t("projects.no_assigned_staff")}</p>
+        )}
+      </div>
+
       {/* ── Description ── */}
       {(project.description || project.description_ar || project.beneficiary_info || project.beneficiary_info_ar) && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -251,6 +316,13 @@ export default function ProjectDetailView() {
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
         loading={deleteLoading}
+      />
+
+      <AssignStaffModal
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        onConfirm={handleAssignStaff}
+        loading={assigning}
       />
     </div>
   );
