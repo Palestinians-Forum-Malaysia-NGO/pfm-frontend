@@ -16,4 +16,8 @@ export { default as useDeleteProjectUpdate } from "./useDeleteProjectUpdate";
 export { default as useCreateGalleryPhoto  } from "./useCreateGalleryPhoto";
 export { default as useUpdateGalleryPhoto  } from "./useUpdateGalleryPhoto";
 export { default as useDeleteGalleryPhoto  } from "./useDeleteGalleryPhoto";
+export { default as useGetMilestoneBeneficiaries } from "./useGetMilestoneBeneficiaries";
+export { default as useCreateMilestoneBeneficiary } from "./useCreateMilestoneBeneficiary";
+export { default as useUpdateMilestoneBeneficiary } from "./useUpdateMilestoneBeneficiary";
+export { default as useDeleteMilestoneBeneficiary } from "./useDeleteMilestoneBeneficiary";
 export { default as useProjectList       } from "./useProjectList";

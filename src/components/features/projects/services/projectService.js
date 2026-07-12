@@ -26,4 +26,9 @@ export const projectService = {
   async createGalleryPhoto(projectId, payload)     { const { data } = await api.post(`/projects/${projectId}/gallery`, payload); return data; },
   async updateGalleryPhoto(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/gallery/${id}`, payload); return data; },
   async deleteGalleryPhoto(projectId, id)          { await api.delete(`/projects/${projectId}/gallery/${id}`); },
+  // Milestone beneficiaries
+  async getMilestoneBeneficiaries(projectId, milestoneId)              { const { data } = await api.get(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`); return data; },
+  async createMilestoneBeneficiary(projectId, milestoneId, payload)    { const { data } = await api.post(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`, payload); return data; },
+  async updateMilestoneBeneficiary(projectId, milestoneId, id, payload){ const { data } = await api.patch(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries/${id}`, payload); return data; },
+  async deleteMilestoneBeneficiary(projectId, milestoneId, id)         { await api.delete(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries/${id}`); },
 };

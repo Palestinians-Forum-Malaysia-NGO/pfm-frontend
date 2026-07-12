@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdFlag, MdAdd, MdDeleteOutline, MdEdit, MdCheck, MdClose, MdRadioButtonUnchecked } from "react-icons/md";
+import {
+  MdFlag, MdAdd, MdDeleteOutline, MdEdit, MdCheck, MdClose, MdRadioButtonUnchecked,
+  MdPeople, MdExpandMore, MdExpandLess,
+} from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import Button from "components/ui/buttons/Button";
 import RowIconButton from "components/ui/buttons/RowIconButton";
+import MilestoneBeneficiariesPanel from "./MilestoneBeneficiariesPanel";
 import { useCreateMilestone, useUpdateMilestone, useDeleteMilestone } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -18,6 +22,7 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
   const [addForm,  setAddForm]  = useState(EMPTY_FORM);
   const [editId,   setEditId]   = useState(null);
   const [editForm, setEditForm] = useState(EMPTY_FORM);
+  const [expandedId, setExpandedId] = useState(null);
 
   const { execute: createMilestone, loading: creating } = useCreateMilestone();
   const { execute: updateMilestone, loading: updating } = useUpdateMilestone();
@@ -149,22 +154,41 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
                 </div>
               </form>
             ) : (
-              <div key={m.id} className="flex items-start gap-3 py-3">
-                <button onClick={() => handleToggle(m)} className="mt-0.5 shrink-0 text-slate-400 hover:text-green transition-colors duration-150">
-                  {m.is_completed
-                    ? <MdCheck className="h-5 w-5 text-green" />
-                    : <MdRadioButtonUnchecked className="h-5 w-5" />
-                  }
-                </button>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
-                  {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
-                  {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
+              <div key={m.id} className="py-3">
+                <div className="flex items-start gap-3">
+                  <button onClick={() => handleToggle(m)} className="mt-0.5 shrink-0 text-slate-400 hover:text-green transition-colors duration-150">
+                    {m.is_completed
+                      ? <MdCheck className="h-5 w-5 text-green" />
+                      : <MdRadioButtonUnchecked className="h-5 w-5" />
+                    }
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
+                    {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
+                    {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
+                    <button
+                      onClick={() => setExpandedId((cur) => (cur === m.id ? null : m.id))}
+                      className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                    >
+                      <MdPeople className="h-3.5 w-3.5" />
+                      {t("projects.milestone_beneficiaries_count", { count: m.beneficiaries_helped ?? 0 })}
+                      {expandedId === m.id ? <MdExpandLess className="h-3.5 w-3.5" /> : <MdExpandMore className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(m)} />
+                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(m.id)} variant="danger" disabled={deleting} />
+                  </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(m)} />
-                  <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(m.id)} variant="danger" disabled={deleting} />
-                </div>
+                {expandedId === m.id && (
+                  <MilestoneBeneficiariesPanel
+                    projectId={projectId}
+                    milestoneId={m.id}
+                    onCountChange={(count) =>
+                      setMilestones((prev) => prev.map((x) => (x.id === m.id ? { ...x, beneficiaries_helped: count } : x)))
+                    }
+                  />
+                )}
               </div>
             )
           )}
