@@ -21,4 +21,9 @@ export const projectService = {
   async createUpdate(projectId, payload)           { const { data } = await api.post(`/projects/${projectId}/updates`, payload); return data; },
   async updateUpdate(projectId, id, payload)       { const { data } = await api.patch(`/projects/${projectId}/updates/${id}`, payload); return data; },
   async deleteUpdate(projectId, id)                { await api.delete(`/projects/${projectId}/updates/${id}`); },
+  // Gallery
+  async getGallery(projectId)                      { const { data } = await api.get(`/projects/${projectId}/gallery`); return data; },
+  async createGalleryPhoto(projectId, payload)     { const { data } = await api.post(`/projects/${projectId}/gallery`, payload); return data; },
+  async updateGalleryPhoto(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/gallery/${id}`, payload); return data; },
+  async deleteGalleryPhoto(projectId, id)          { await api.delete(`/projects/${projectId}/gallery/${id}`); },
 };

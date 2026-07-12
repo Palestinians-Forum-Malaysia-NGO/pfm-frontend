@@ -13,4 +13,7 @@ export { default as useDeleteMilestone   } from "./useDeleteMilestone";
 export { default as useCreateProjectUpdate } from "./useCreateProjectUpdate";
 export { default as useUpdateProjectUpdate } from "./useUpdateProjectUpdate";
 export { default as useDeleteProjectUpdate } from "./useDeleteProjectUpdate";
+export { default as useCreateGalleryPhoto  } from "./useCreateGalleryPhoto";
+export { default as useUpdateGalleryPhoto  } from "./useUpdateGalleryPhoto";
+export { default as useDeleteGalleryPhoto  } from "./useDeleteGalleryPhoto";
 export { default as useProjectList       } from "./useProjectList";

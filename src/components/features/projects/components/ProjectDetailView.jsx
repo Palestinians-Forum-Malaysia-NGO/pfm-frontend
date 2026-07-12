@@ -20,6 +20,7 @@ import ProjectDeleteModal from "./ProjectDeleteModal";
 import AssignStaffModal from "./AssignStaffModal";
 import MilestoneSection from "./MilestoneSection";
 import UpdatesSection from "./UpdatesSection";
+import GallerySection from "./GallerySection";
 import {
   useGetProject, useDeleteProject, usePublishProject, useUnpublishProject,
   useAssignStaff, useUnassignStaff,
@@ -309,6 +310,9 @@ export default function ProjectDetailView() {
 
       {/* ── Updates ── */}
       <UpdatesSection projectId={id} initialUpdates={project.updates ?? []} />
+
+      {/* ── Gallery ── */}
+      <GallerySection projectId={id} initialGallery={project.gallery ?? []} />
 
       <ProjectDeleteModal
         open={deleteOpen}
