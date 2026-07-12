@@ -10,7 +10,7 @@ const getInitials = (name = "") =>
 const Card = ({ p }) => (
   <div title={p.name} className="shrink-0 px-2" style={{ width: "180px" }}>
     <div className="flex h-full flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-5 text-center transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-green/20 hover:shadow-sm">
-      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-white text-sm font-black text-green shadow-sm">
+      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-black text-green shadow-sm">
         {p.logo?.public_url
           ? <img src={p.logo.public_url} alt={p.name} className="h-full w-full object-contain p-1" />
           : getInitials(p.name)

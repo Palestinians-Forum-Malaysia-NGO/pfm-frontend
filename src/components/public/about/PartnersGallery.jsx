@@ -6,7 +6,7 @@ import { useGetPartnerships } from "components/features/partnerships/hooks";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 4;
 
 const PartnersGallery = () => {
   const { t } = useTranslation();

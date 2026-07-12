@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
-  MdPeople, MdCheckCircle, MdCancel,
+  MdPeople, MdCheckCircle,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
-  MdGroups, MdHourglassEmpty, MdFlag, MdLink, MdCheck,
+  MdGroups, MdHourglassEmpty, MdFlag,
   MdPerson, MdBlock,
 } from "react-icons/md";
 import { useBeneficiaryList } from "components/features/beneficiaries/hooks";
@@ -23,20 +23,10 @@ import StorageImage from "components/ui/StorageImage";
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-const APPLY_URL = `${window.location.origin}/apply`;
-
 export default function BeneficiaryList() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(APPLY_URL).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
 
   const {
     beneficiaries, loading, error,
@@ -203,15 +193,6 @@ export default function BeneficiaryList() {
         icon={<MdPeople className="h-5 w-5" />}
         title={t("beneficiaries.title")}
         subtitle={t("beneficiaries.subtitle")}
-        actions={
-          <button onClick={handleCopyLink}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition-all duration-200 hover:border-green/40 hover:bg-green/5 hover:text-green active:scale-[0.98]">
-            {copied
-              ? <><MdCheck className="h-4 w-4 text-green" /> {t("beneficiaries.copied")}</>
-              : <><MdLink className="h-4 w-4" /> {t("beneficiaries.copy_link")}</>
-            }
-          </button>
-        }
       />
 
       {/* ── Stat cards ── */}
