@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
@@ -13,6 +13,7 @@ import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading     from "components/loading/Loading";
 import { useGetStaff, useUpdateStaff } from "components/features/staff/hooks";
+import { useGetBranches } from "components/features/branches/hooks";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -30,7 +31,6 @@ const STAFF_RULES = {
   position:      [{ required: true }],
   position_ar:   [{ required: true }],
   branch:        [{ required: true }],
-  branch_ar:     [{ required: true }],
   joining_date:  [{ required: true }],
 };
 const BANK_RULES = {
@@ -54,7 +54,7 @@ const getInitials = (name = "") =>
 const EMPTY_USER  = { full_name: "", full_name_ar: "", email: "", phone_number: "", is_active: true, profile_photo: null };
 const EMPTY_BANK  = { bank_name: "", account_number: "", account_holder_name: "" };
 const EMPTY_FIN   = { job_title: "", job_title_ar: "", salary: "", payment_frequency: "" };
-const EMPTY_STAFF = { department: "", department_ar: "", position: "", position_ar: "", branch: "", branch_ar: "", joining_date: "" };
+const EMPTY_STAFF = { department: "", department_ar: "", position: "", position_ar: "", branch: "", joining_date: "" };
 
 export default function StaffEditForm() {
   const { id }   = useParams();
@@ -64,6 +64,7 @@ export default function StaffEditForm() {
 
   const { staff, execute: fetchStaff, loading, error: loadError } = useGetStaff();
   const { execute: updateStaff, loading: saving, error: saveError } = useUpdateStaff();
+  const { branches } = useGetBranches();
   const { success, error: toastError } = useToast();
 
   const [userForm,  setUserForm]  = useState(EMPTY_USER);
@@ -74,6 +75,16 @@ export default function StaffEditForm() {
   const [errors,    setErrors]    = useState({});
   const [photoKey,  setPhotoKey]  = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
+
+  const activeBranches = branches.filter((b) => b.is_active);
+  const showBranchPicker = activeBranches.length !== 1;
+  const branchOptions = useMemo(() => {
+    const active = activeBranches.map((b) => ({ value: b.name, label: b.name }));
+    if (staffForm.branch && !active.some((o) => o.value === staffForm.branch)) {
+      return [{ value: staffForm.branch, label: `${staffForm.branch} (${t("staff.branch_unlisted")})` }, ...active];
+    }
+    return active;
+  }, [activeBranches, staffForm.branch, t]);
 
   const setU = (f, v) => setUserForm((p)  => ({ ...p, [f]: v }));
   const setB = (f, v) => setBankForm((p)  => ({ ...p, [f]: v }));
@@ -125,7 +136,6 @@ export default function StaffEditForm() {
         position:     data.position     ?? "",
         position_ar:  data.position_ar  ?? "",
         branch:       data.branch       ?? "",
-        branch_ar:    data.branch_ar    ?? "",
         joining_date: data.joining_date ? data.joining_date.slice(0, 10) : "",
       };
 
@@ -137,6 +147,10 @@ export default function StaffEditForm() {
       setPhotoKey(u.profile_photo ?? null);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (activeBranches.length === 1 && !staffForm.branch) setS("branch", activeBranches[0].name);
+  }, [activeBranches.length, staffForm.branch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -181,7 +195,6 @@ export default function StaffEditForm() {
         position:      staffForm.position,
         position_ar:   staffForm.position_ar,
         branch:        staffForm.branch,
-        branch_ar:     staffForm.branch_ar,
         joining_date:  staffForm.joining_date,
       };
       await updateStaff(id, payload);
@@ -296,11 +309,12 @@ export default function StaffEditForm() {
               <InputField label={t("staff.info_position")}     field="position"    placeholder="Program Manager" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position} />
               <InputField label={t("staff.position_ar_label")} field="position_ar" placeholder="مدير البرامج"    formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position_ar} />
             </div>
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-              <InputField label={t("staff.info_branch")}     field="branch"    placeholder="Kuala Lumpur HQ" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.branch} />
-              <InputField label={t("staff.branch_ar_label")} field="branch_ar" placeholder="المقر الرئيسي"   formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.branch_ar} />
+            <div className={showBranchPicker ? "grid grid-cols-1 gap-x-5 sm:grid-cols-2" : ""}>
+              {showBranchPicker && (
+                <SelectField label={t("staff.info_branch")} field="branch" options={branchOptions} formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.branch} />
+              )}
+              <InputField label={t("staff.info_joining")} field="joining_date" type="date" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.joining_date} />
             </div>
-            <InputField label={t("staff.info_joining")} field="joining_date" type="date" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.joining_date} />
           </div>
 
           {/* ── Banking Information ── */}

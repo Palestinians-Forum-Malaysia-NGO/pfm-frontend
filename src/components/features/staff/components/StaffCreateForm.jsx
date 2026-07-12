@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdPersonAdd, MdBadge, MdPerson } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, StorageImageField, validate } from "components/form";
+import { InputField, SelectField, StorageImageField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateStaff } from "components/features/staff/hooks";
+import { useGetBranches } from "components/features/branches/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
@@ -29,7 +30,12 @@ export default function StaffCreateForm() {
   const base = useLayoutBase();
 
   const { execute: createStaff, loading, error } = useCreateStaff();
+  const { branches } = useGetBranches();
   const { success, error: toastError } = useToast();
+
+  const activeBranches = branches.filter((b) => b.is_active);
+  const branchOptions  = activeBranches.map((b) => ({ value: b.name, label: b.name }));
+  const showBranchPicker = activeBranches.length !== 1;
 
   const [form, setForm] = useState({
     full_name:    "",
@@ -45,6 +51,10 @@ export default function StaffCreateForm() {
   const [errors, setErrors] = useState({});
 
   const set = (field, value) => setForm((p) => ({ ...p, [field]: value }));
+
+  useEffect(() => {
+    if (activeBranches.length === 1) set("branch", activeBranches[0].name);
+  }, [activeBranches.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules));
 
@@ -126,8 +136,10 @@ export default function StaffCreateForm() {
             <InputField label={t("staff.info_department")} field="department" placeholder="Programs"        formData={form} errors={errors} updateFormData={set} rules={RULES.department} />
             <InputField label={t("staff.info_position")}   field="position"   placeholder="Program Manager" formData={form} errors={errors} updateFormData={set} rules={RULES.position} />
           </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("staff.info_branch")}       field="branch"       placeholder="Kuala Lumpur HQ" formData={form} errors={errors} updateFormData={set} rules={RULES.branch} />
+          <div className={showBranchPicker ? "grid grid-cols-1 gap-x-5 sm:grid-cols-2" : ""}>
+            {showBranchPicker && (
+              <SelectField label={t("staff.info_branch")} field="branch" options={branchOptions} formData={form} errors={errors} updateFormData={set} rules={RULES.branch} />
+            )}
             <InputField label={t("staff.info_joining")} field="joining_date" type="date"                   formData={form} errors={errors} updateFormData={set} rules={RULES.joining_date} />
           </div>
         </div>
