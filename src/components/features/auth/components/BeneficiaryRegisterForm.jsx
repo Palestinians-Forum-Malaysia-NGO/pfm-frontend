@@ -99,14 +99,17 @@ const btnNext  = "flex h-11 flex-1 items-center justify-center gap-2 rounded-ful
    Step 1 — Account
 ───────────────────────────────────────────────── */
 const ACCOUNT_RULES = {
-  full_name: [{ required: true }, { maxLength: 255 }],
-  email:     [{ required: true }, { email: true }],
+  full_name:    [{ required: true }, { maxLength: 255 }],
+  email:        [{ required: true }, { email: true }],
+  phone_number: [{ required: true }, { maxLength: 30 }],
 };
 
 const AccountStep = ({ data, onChange, onNext }) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState({});
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+
+  const canProceed = !Object.entries(ACCOUNT_RULES).some(([field, rules]) => !!validate(data[field], rules));
 
   const handleNext = () => {
     const newErrors = {};
@@ -137,10 +140,10 @@ const AccountStep = ({ data, onChange, onNext }) => {
         <InputField label={t("apply.email")} field="email" type="email" placeholder="you@example.com"
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.email} />
         <InputField label={t("apply.phone")} field="phone_number" placeholder="+60 12-345 6789"
-          required={false} formData={data} errors={{}} updateFormData={set} />
+          formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.phone_number} />
       </div>
 
-      <button type="button" onClick={handleNext} disabled={!data.full_name.trim() || !data.email.trim()}
+      <button type="button" onClick={handleNext} disabled={!canProceed}
         className={`mt-6 w-full ${btnNext}`}>
         {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
       </button>
@@ -158,8 +161,19 @@ const AccountStep = ({ data, onChange, onNext }) => {
 /* ─────────────────────────────────────────────────
    Step 2 — Personal Info
 ───────────────────────────────────────────────── */
+const PERSONAL_RULES = {
+  full_name_arabic: [{ required: true }, { maxLength: 255 }],
+  passport_number:  [{ required: true }, { maxLength: 50 }],
+  date_of_birth:    [{ required: true }],
+  gender:           [{ required: true }],
+  marital_status:   [{ required: true }],
+  background:       [{ required: true }],
+};
+
 const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
   const { t } = useTranslation();
+  const [errors, setErrors]     = useState({});
+  const [idDocError, setIdDocError] = useState(null);
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
 
   const GENDER_OPTIONS_T = [
@@ -172,6 +186,26 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
     { value: "divorced", label: t("beneficiaries.marital_divorced") },
     { value: "widowed",  label: t("beneficiaries.marital_widowed") },
   ];
+
+  const canProceed =
+    !Object.entries(PERSONAL_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc;
+
+  const handleNext = () => {
+    const newErrors = {};
+    Object.entries(PERSONAL_RULES).forEach(([field, rules]) => {
+      const err = validate(data[field], rules);
+      if (err) newErrors[field] = err;
+    });
+    const idErr = idDoc ? null : t("validation.required");
+    if (Object.keys(newErrors).length || idErr) {
+      setErrors(newErrors);
+      setIdDocError(idErr);
+      return;
+    }
+    setErrors({});
+    setIdDocError(null);
+    onNext();
+  };
 
   return (
     <>
@@ -188,29 +222,30 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InputField label={t("apply.full_name_ar")} field="full_name_arabic" placeholder="أحمد فارس"
-            required={false} formData={data} errors={{}} updateFormData={set} />
+            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.full_name_arabic} />
           <InputField label={t("apply.passport")} field="passport_number" placeholder="A12345678"
-            required={false} formData={data} errors={{}} updateFormData={set} />
+            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.passport_number} />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InputField label={t("apply.dob")} field="date_of_birth" type="date"
-            required={false} formData={data} errors={{}} updateFormData={set} />
+            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.date_of_birth} />
           <SelectField label={t("apply.gender")} field="gender" options={GENDER_OPTIONS_T}
-            required={false} formData={data} errors={{}} updateFormData={set} />
+            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.gender} />
         </div>
         <SelectField label={t("apply.marital_status")} field="marital_status" options={MARITAL_STATUS_OPTIONS_T}
-          required={false} formData={data} errors={{}} updateFormData={set} />
+          formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.marital_status} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
-          required={false} formData={data} errors={{}} updateFormData={set} rows={3} />
+          formData={data} errors={errors} updateFormData={set} rows={3} rules={PERSONAL_RULES.background} />
         <StorageDocumentField
           label={t("apply.id_document")}
           folder="beneficiaries/documents"
           accept=".pdf,.jpg,.jpeg,.png"
-          onUpload={(key) => onIdDocChange(key)}
+          required
+          onUpload={(key) => { onIdDocChange(key); setIdDocError(null); }}
           onRemove={() => onIdDocChange(null)}
           currentName={idDoc ? t("common.uploaded_file") : undefined}
-          field="id_document" errors={{}}
+          field="id_document" errors={{ id_document: idDocError }}
         />
       </div>
 
@@ -218,7 +253,7 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
         <button type="button" onClick={onBack} className={btnBack}>
           <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
-        <button type="button" onClick={onNext} className={btnNext}>
+        <button type="button" onClick={handleNext} disabled={!canProceed} className={btnNext}>
           {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
         </button>
       </div>
@@ -229,8 +264,48 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
 /* ─────────────────────────────────────────────────
    Step 3 — Visa & Location
 ───────────────────────────────────────────────── */
+const REQUIRED = [{ required: true }];
+
+const validateVisaLocationStep = (visaData, locData) => {
+  const visaErrors = {};
+  const locErrors  = {};
+
+  const hasVisaErr = validate(visaData.has_visa, REQUIRED);
+  if (hasVisaErr) visaErrors.has_visa = hasVisaErr;
+
+  if (visaData.has_visa === "true") {
+    const err = validate(visaData.visa_type, REQUIRED);
+    if (err) visaErrors.visa_type = err;
+  } else if (visaData.has_visa === "false") {
+    const err = validate(visaData.situation, REQUIRED);
+    if (err) visaErrors.situation = err;
+    if (visaData.situation === "refugee") {
+      const uErr = validate(visaData.unhcr_number, REQUIRED);
+      if (uErr) visaErrors.unhcr_number = uErr;
+    }
+  }
+
+  const countryErr = validate(locData.country_of_origin, REQUIRED);
+  if (countryErr) locErrors.country_of_origin = countryErr;
+  if (locData.country_of_origin === "PS") {
+    const regionErr = validate(visaData.palestine_region, REQUIRED);
+    if (regionErr) visaErrors.palestine_region = regionErr;
+  }
+
+  const dateErr = validate(locData.date_arrived_in_malaysia, REQUIRED);
+  if (dateErr) locErrors.date_arrived_in_malaysia = dateErr;
+  const cityErr = validate(locData.current_city, REQUIRED);
+  if (cityErr) locErrors.current_city = cityErr;
+  const addrErr = validate(locData.address, REQUIRED);
+  if (addrErr) locErrors.address = addrErr;
+
+  return { visaErrors, locErrors };
+};
+
 const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack, onNext }) => {
   const { t } = useTranslation();
+  const [visaErrors, setVisaErrors] = useState({});
+  const [locErrors,  setLocErrors]  = useState({});
   const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
   const setL = (f, v) => onLocChange((p)  => ({ ...p, [f]: v }));
 
@@ -259,6 +334,21 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
     { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
   ];
 
+  const { visaErrors: liveVisaErrors, locErrors: liveLocErrors } = validateVisaLocationStep(visaData, locData);
+  const canProceed = Object.keys(liveVisaErrors).length === 0 && Object.keys(liveLocErrors).length === 0;
+
+  const handleNext = () => {
+    const { visaErrors: nextVisaErrors, locErrors: nextLocErrors } = validateVisaLocationStep(visaData, locData);
+    if (Object.keys(nextVisaErrors).length || Object.keys(nextLocErrors).length) {
+      setVisaErrors(nextVisaErrors);
+      setLocErrors(nextLocErrors);
+      return;
+    }
+    setVisaErrors({});
+    setLocErrors({});
+    onNext();
+  };
+
   return (
     <>
       <div className="mb-6 flex items-start gap-4">
@@ -278,18 +368,18 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
             <MdCardTravel className="h-3.5 w-3.5" /> {t("apply.immigration_status")}
           </p>
           <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T}
-            required={false} formData={visaData} errors={{}} updateFormData={setV} />
+            formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
           {visaData.has_visa === "true" && (
             <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T}
-              required={false} formData={visaData} errors={{}} updateFormData={setV} />
+              formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
           )}
           {visaData.has_visa === "false" && (
             <>
               <SelectField label={t("apply.situation")} field="situation" options={SITUATION_OPTIONS_T}
-                required={false} formData={visaData} errors={{}} updateFormData={setV} />
+                formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
               {visaData.situation === "refugee" && (
                 <InputField label={t("apply.unhcr")} field="unhcr_number" placeholder="e.g. MYS/2023/12345"
-                  required={false} formData={visaData} errors={{}} updateFormData={setV} />
+                  formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
               )}
             </>
           )}
@@ -297,10 +387,10 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
 
         {/* Country & Palestine region */}
         <SelectField label={t("apply.country_origin")} field="country_of_origin" options={COUNTRY_OPTIONS}
-          required={false} formData={locData} errors={{}} updateFormData={setL} />
+          formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
         {locData.country_of_origin === "PS" && (
           <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
-            required={false} formData={visaData} errors={{}} updateFormData={setV} />
+            formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         )}
 
         {/* Residence */}
@@ -309,12 +399,12 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
             <MdFlight className="h-3.5 w-3.5" /> {t("apply.residence")}
           </p>
           <InputField label={t("apply.date_arrived")} field="date_arrived_in_malaysia" type="date"
-            required={false} formData={locData} errors={{}} updateFormData={setL} />
+            formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <InputField label={t("apply.city")} field="current_city" placeholder="Kuala Lumpur"
-              required={false} formData={locData} errors={{}} updateFormData={setL} />
+              formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
             <InputField label={t("apply.address")} field="address" placeholder="No. 1, Jalan…"
-              required={false} formData={locData} errors={{}} updateFormData={setL} />
+              formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
           </div>
         </div>
       </div>
@@ -323,7 +413,7 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
         <button type="button" onClick={onBack} className={btnBack}>
           <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
-        <button type="button" onClick={onNext} className={btnNext}>
+        <button type="button" onClick={handleNext} disabled={!canProceed} className={btnNext}>
           {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
         </button>
       </div>
@@ -339,13 +429,63 @@ const EMPTY_CHILD = {
   passport_copy: null, entrance_stump: null,
 };
 
+const validateFamilyStep = (famData) => {
+  const errors = {};
+  const childErrors = famData.children.map(() => ({}));
+
+  if (!famData.has_family) return { errors, childErrors };
+
+  const nameErr = validate(famData.spouse_name, REQUIRED);
+  if (nameErr) errors.spouse_name = nameErr;
+  const nameArErr = validate(famData.spouse_name_arabic, REQUIRED);
+  if (nameArErr) errors.spouse_name_arabic = nameArErr;
+  const jobErr = validate(famData.spouse_job, REQUIRED);
+  if (jobErr) errors.spouse_job = jobErr;
+
+  famData.children.forEach((child, i) => {
+    const ce = {};
+    const cn  = validate(child.child_name, REQUIRED);
+    if (cn) ce.child_name = cn;
+    const cna = validate(child.child_name_arabic, REQUIRED);
+    if (cna) ce.child_name_arabic = cna;
+    const cdob = validate(child.child_date_of_birth, REQUIRED);
+    if (cdob) ce.child_date_of_birth = cdob;
+    const cpc = validate(child.passport_copy, REQUIRED);
+    if (cpc) ce.passport_copy = cpc;
+    const ces = validate(child.entrance_stump, REQUIRED);
+    if (ces) ce.entrance_stump = ces;
+    childErrors[i] = ce;
+  });
+
+  return { errors, childErrors };
+};
+
 const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) => {
   const { t }       = useTranslation();
+  const [errors, setErrors]         = useState({});
+  const [childErrors, setChildErrors] = useState([]);
   const set         = (f, v) => onFamChange((p) => ({ ...p, [f]: v }));
   const addChild    = () => onFamChange((p) => ({ ...p, children: [...p.children, { ...EMPTY_CHILD }] }));
   const removeChild = (i) => onFamChange((p) => ({ ...p, children: p.children.filter((_, idx) => idx !== i) }));
   const updateChild = (i, f, v) =>
     onFamChange((p) => ({ ...p, children: p.children.map((c, idx) => idx === i ? { ...c, [f]: v } : c) }));
+
+  const { errors: liveErrors, childErrors: liveChildErrors } = validateFamilyStep(famData);
+  const canSubmit =
+    Object.keys(liveErrors).length === 0 && liveChildErrors.every((ce) => Object.keys(ce).length === 0);
+
+  const handleSubmitClick = () => {
+    const { errors: nextErrors, childErrors: nextChildErrors } = validateFamilyStep(famData);
+    const hasChildErrors = nextChildErrors.some((ce) => Object.keys(ce).length > 0);
+    if (Object.keys(nextErrors).length || hasChildErrors) {
+      setErrors(nextErrors);
+      setChildErrors(nextChildErrors);
+      return;
+    }
+    setErrors({});
+    setChildErrors([]);
+    onSubmit();
+  };
 
   return (
     <>
@@ -362,82 +502,94 @@ const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) 
       <AlertBanner message={error} />
 
       <div className="flex flex-col gap-3">
-        <ToggleInput label={t("apply.family_in_malaysia")} field="family_in_malaysia"
+        <ToggleInput label={t("apply.has_family")} field="has_family"
           formData={famData} errors={{}} updateFormData={set} />
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t("apply.spouse")}</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InputField label={t("apply.spouse_name")}          field="spouse_name"        placeholder="Fatimah binti Ali"
-              required={false} formData={famData} errors={{}} updateFormData={set} />
-            <InputField label={t("apply.spouse_name_ar")} field="spouse_name_arabic" placeholder="فاطمة بنت علي"
-              required={false} formData={famData} errors={{}} updateFormData={set} />
-          </div>
-          <InputField label={t("apply.spouse_job")} field="spouse_job" placeholder="Teacher"
-            required={false} formData={famData} errors={{}} updateFormData={set} />
-        </div>
+        {famData.has_family && (
+          <>
+            <ToggleInput label={t("apply.family_in_malaysia")} field="family_in_malaysia"
+              formData={famData} errors={{}} updateFormData={set} />
 
-        {/* Children */}
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              {t("apply.children_count", { count: famData.children.length })}
-            </p>
-            <button type="button" onClick={addChild}
-              className="inline-flex items-center gap-1 rounded-lg bg-green/10 px-2.5 py-1 text-xs font-semibold text-green transition-colors hover:bg-green/20">
-              <MdAdd className="h-3.5 w-3.5" /> {t("apply.add_child")}
-            </button>
-          </div>
-
-          {famData.children.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
-              {t("apply.no_children")}
-            </p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {famData.children.map((child, i) => (
-                <div key={i} className="rounded-xl border border-slate-200 bg-white p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_n", { n: i + 1 })}</span>
-                    <button type="button" onClick={() => removeChild(i)}
-                      className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
-                      <MdClose className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <InputField label={t("apply.child_name")}          field="child_name"         placeholder="Ahmad"
-                        formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
-                      <InputField label={t("apply.child_name_ar")} field="child_name_arabic"  placeholder="أحمد"
-                        formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
-                    </div>
-                    <InputField label={t("apply.child_dob")} field="child_date_of_birth" type="date"
-                      formData={child} errors={{}} updateFormData={(f, v) => updateChild(i, f, v)} />
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <StorageDocumentField label={t("apply.passport_copy")}  folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
-                        onUpload={(key) => updateChild(i, "passport_copy",  key)}
-                        onRemove={() => updateChild(i, "passport_copy",  null)}
-                        currentName={child.passport_copy  ? t("apply.passport_uploaded") : undefined}
-                        field={`passport_copy_${i}`} errors={{}} />
-                      <StorageDocumentField label={t("apply.entrance_stamp")} folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
-                        onUpload={(key) => updateChild(i, "entrance_stump", key)}
-                        onRemove={() => updateChild(i, "entrance_stump", null)}
-                        currentName={child.entrance_stump ? t("apply.stamp_uploaded")    : undefined}
-                        field={`entrance_stump_${i}`} errors={{}} />
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t("apply.spouse")}</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <InputField label={t("apply.spouse_name")}    field="spouse_name"        placeholder="Fatimah binti Ali"
+                  formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
+                <InputField label={t("apply.spouse_name_ar")} field="spouse_name_arabic" placeholder="فاطمة بنت علي"
+                  formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
+              </div>
+              <InputField label={t("apply.spouse_job")} field="spouse_job" placeholder="Teacher"
+                formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
             </div>
-          )}
-        </div>
+
+            {/* Children */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  {t("apply.children_count", { count: famData.children.length })}
+                </p>
+                <button type="button" onClick={addChild}
+                  className="inline-flex items-center gap-1 rounded-lg bg-green/10 px-2.5 py-1 text-xs font-semibold text-green transition-colors hover:bg-green/20">
+                  <MdAdd className="h-3.5 w-3.5" /> {t("apply.add_child")}
+                </button>
+              </div>
+
+              {famData.children.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
+                  {t("apply.no_children")}
+                </p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {famData.children.map((child, i) => {
+                    const ce = childErrors[i] ?? {};
+                    return (
+                    <div key={i} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_n", { n: i + 1 })}</span>
+                        <button type="button" onClick={() => removeChild(i)}
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
+                          <MdClose className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <InputField label={t("apply.child_name")}    field="child_name"         placeholder="Ahmad"
+                            formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
+                          <InputField label={t("apply.child_name_ar")} field="child_name_arabic"  placeholder="أحمد"
+                            formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
+                        </div>
+                        <InputField label={t("apply.child_dob")} field="child_date_of_birth" type="date"
+                          formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <StorageDocumentField label={t("apply.passport_copy")}  folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
+                            required
+                            onUpload={(key) => updateChild(i, "passport_copy",  key)}
+                            onRemove={() => updateChild(i, "passport_copy",  null)}
+                            currentName={child.passport_copy  ? t("apply.passport_uploaded") : undefined}
+                            field="passport_copy" errors={ce} />
+                          <StorageDocumentField label={t("apply.entrance_stamp")} folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
+                            required
+                            onUpload={(key) => updateChild(i, "entrance_stump", key)}
+                            onRemove={() => updateChild(i, "entrance_stump", null)}
+                            currentName={child.entrance_stump ? t("apply.stamp_uploaded")    : undefined}
+                            field="entrance_stump" errors={ce} />
+                        </div>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-6 flex gap-3">
         <button type="button" onClick={onBack} className={btnBack}>
           <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
         </button>
-        <button type="button" onClick={onSubmit} disabled={loading} className={btnNext}>
+        <button type="button" onClick={handleSubmitClick} disabled={loading || !canSubmit} className={btnNext}>
           {loading
             ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
             : <><MdCheckCircle className="h-4 w-4" /> {t("apply.submit")}</>
@@ -558,7 +710,7 @@ export default function BeneficiaryRegisterForm() {
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
   });
   const [family, setFamily] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "",
+    has_family: false, family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "",
     children: [],
   });
 
@@ -592,7 +744,7 @@ export default function BeneficiaryRegisterForm() {
         address:                  location.address                          || undefined,
 
         family_information: {
-          family_in_malaysia:   family.family_in_malaysia,
+          family_in_malaysia:   family.has_family ? family.family_in_malaysia : false,
           spouse_name:          family.spouse_name        || null,
           spouse_name_arabic:   family.spouse_name_arabic || null,
           spouse_job:           family.spouse_job         || null,
@@ -611,8 +763,6 @@ export default function BeneficiaryRegisterForm() {
       setStep(5);
     } catch { /* error shown by useRegister */ }
   };
-
-  const heroStep = step <= 4 ? step : 4;
 
   return (
     <div>
