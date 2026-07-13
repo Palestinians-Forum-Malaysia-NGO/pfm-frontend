@@ -22,6 +22,7 @@ import ClassificationCreate from "views/admin/classifications/ClassificationCrea
 import ClassificationDetail from "views/admin/classifications/ClassificationDetail";
 import ClassificationEdit   from "views/admin/classifications/ClassificationEdit";
 import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDetail";
+import FeedbackDetail from "views/admin/feedback/FeedbackDetail";
 import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
 import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
 import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
@@ -81,6 +82,7 @@ export default function Admin(props) {
     if (path.match(/\/classifications\/[^/]+$/))       { setCurrentRouteName("Classification Detail"); return; }
     if (path.match(/\/projects\/[^/]+$/))              { setCurrentRouteName("Project Detail");        return; }
     if (path.match(/\/contact-messages\/[^/]+$/))      { setCurrentRouteName("Contact Message Detail"); return; }
+    if (path.match(/\/feedback\/[^/]+$/))               { setCurrentRouteName("Feedback Detail"); return; }
     if (path.match(/\/partnerships\/[^/]+$/))          { setCurrentRouteName("Partnership Detail");    return; }
     if (path.match(/\/branches\/[^/]+$/))              { setCurrentRouteName("Branch Detail");         return; }
     if (path.match(/\/applications\/[^/]+$/))          { setCurrentRouteName("Application Detail");    return; }
@@ -140,6 +142,7 @@ export default function Admin(props) {
               <Route path="/projects/:id"          element={<ProjectDetail />} />
               <Route path="/projects/:id/edit"     element={<ProjectEdit />} />
               <Route path="/contact-messages/:id"  element={<ContactMessageDetail />} />
+              <Route path="/feedback/:id"          element={<FeedbackDetail />} />
               <Route path="/partnerships/create"   element={<PartnershipCreate />} />
               <Route path="/partnerships/:id"      element={<PartnershipDetail />} />
               <Route path="/partnerships/:id/edit" element={<PartnershipEdit />} />

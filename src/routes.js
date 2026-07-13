@@ -8,6 +8,7 @@ import BeneficiariesPage from "views/admin/beneficiaries";
 import CategoriesPage        from "views/admin/categories";
 import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
+import FeedbackPage          from "views/admin/feedback";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -55,6 +56,7 @@ import {
   MdHandshake,
   MdBusiness,
   MdFactCheck,
+  MdRateReview,
 } from "react-icons/md";
 
 const routes = [
@@ -130,6 +132,14 @@ const routes = [
     path: "contact-messages",
     icon: <MdMailOutline className="h-5 w-5" />,
     component: <ContactMessagesPage />,
+    section: "COMMUNITY",
+  },
+  {
+    name: "Feedback",
+    layout: "/admin",
+    path: "feedback",
+    icon: <MdRateReview className="h-5 w-5" />,
+    component: <FeedbackPage />,
     section: "COMMUNITY",
   },
   {
@@ -319,6 +329,14 @@ const routes = [
     path: "contact-messages",
     icon: <MdMailOutline className="h-5 w-5" />,
     component: <ContactMessagesPage />,
+    section: "COMMUNITY",
+  },
+  {
+    name: "Feedback",
+    layout: "/staff",
+    path: "feedback",
+    icon: <MdRateReview className="h-5 w-5" />,
+    component: <FeedbackPage />,
     section: "COMMUNITY",
   },
   {

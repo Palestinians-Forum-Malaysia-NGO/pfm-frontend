@@ -1,15 +1,18 @@
 import React, { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdAssignment, MdCalendarToday, MdCategory,
   MdAttachMoney, MdTrendingUp, MdPeople, MdFlag,
-  MdRadioButtonUnchecked, MdCheck, MdPerson, MdCampaign,
+  MdRadioButtonUnchecked, MdCheck, MdPerson, MdCampaign, MdRateReview, MdLogin,
 } from "react-icons/md";
 import { useGetProject } from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Loading from "components/loading/Loading";
+import FeedbackForm from "components/public/projects/FeedbackForm";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { ROLES } from "components/features/auth/types";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
@@ -26,6 +29,8 @@ export default function ProjectPublicDetail() {
   const navigate  = useNavigate();
 
   const { project, execute: fetchProject, loading, error } = useGetProject();
+  const { user, isAuthenticated } = useAuth();
+  const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 
   const statusLabels = {
     active:    t("projects.status_active"),
@@ -230,6 +235,31 @@ export default function ProjectPublicDetail() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Feedback — beneficiaries only */}
+            {(isBeneficiary || !isAuthenticated) && (
+              <div className="mt-8">
+                <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-900">
+                  <MdRateReview className="h-5 w-5 text-green" /> {t("feedback.section_title")}
+                </h2>
+                {isBeneficiary ? (
+                  <FeedbackForm projectId={project.id} fullName={user.full_name} />
+                ) : (
+                  <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green">
+                      <MdLogin className="h-6 w-6" />
+                    </div>
+                    <p className="text-sm text-slate-600">{t("feedback.signin_prompt")}</p>
+                    <Link
+                      to="/auth/sign-in"
+                      className="inline-flex items-center gap-2 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90"
+                    >
+                      {t("feedback.signin_cta")}
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>
