@@ -98,34 +98,20 @@ export default function ProjectPublicList() {
     on_hold:   t("projects.status_on_hold"),
     cancelled: t("projects.status_cancelled"),
   };
-  const STATUS_FILTER_OPTIONS = [
-    { value: "all", label: t("projects.public_all_option") },
-    { value: "active",    label: statusLabels.active },
-    { value: "completed", label: statusLabels.completed },
-    { value: "on_hold",   label: statusLabels.on_hold },
-    { value: "cancelled", label: statusLabels.cancelled },
-  ];
 
-  const [search,       setSearch]       = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const projects = useMemo(() => {
-    let list = allProjects;
-    if (statusFilter !== "all") list = list.filter((p) => p.status === statusFilter);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((p) =>
-        p.title?.toLowerCase().includes(q) ||
-        p.summary?.toLowerCase().includes(q) ||
-        p.category?.name?.toLowerCase().includes(q)
-      );
-    }
-    return list;
-  }, [allProjects, search, statusFilter]);
+    if (!search.trim()) return allProjects;
+    const q = search.toLowerCase();
+    return allProjects.filter((p) =>
+      p.title?.toLowerCase().includes(q) ||
+      p.summary?.toLowerCase().includes(q) ||
+      p.category?.name?.toLowerCase().includes(q)
+    );
+  }, [allProjects, search]);
 
-  const hasFilters = search !== "" || statusFilter !== "all";
-
-  const clearFilters = () => { setSearch(""); setStatusFilter("all"); };
+  const hasSearch = search !== "";
 
   const activeCount = allProjects.filter((p) => p.status === "active").length;
 
@@ -152,8 +138,8 @@ export default function ProjectPublicList() {
 
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
 
-      {/* Filters */}
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+      {/* Search */}
+      <div className="mb-8 flex items-center gap-2">
         <div className="relative flex-1">
           <MdSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -163,25 +149,14 @@ export default function ProjectPublicList() {
             className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm text-slate-900 outline-none focus:border-green focus:ring-2 focus:ring-green/20 placeholder:text-slate-400"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-green focus:ring-2 focus:ring-green/20"
+        {hasSearch && (
+          <button
+            onClick={() => setSearch("")}
+            className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            {STATUS_FILTER_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              <MdClose className="h-4 w-4" /> {t("projects.clear")}
-            </button>
-          )}
-        </div>
+            <MdClose className="h-4 w-4" /> {t("projects.clear")}
+          </button>
+        )}
       </div>
 
       {/* Grid */}
@@ -194,9 +169,9 @@ export default function ProjectPublicList() {
       ) : projects.length === 0 ? (
         <div className="py-20 text-center">
           <MdAssignment className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-          <p className="text-slate-500">{hasFilters ? t("projects.public_no_match") : t("projects.public_no_projects")}</p>
-          {hasFilters && (
-            <button onClick={clearFilters} className="mt-4 text-sm font-medium text-green hover:underline">{t("projects.public_clear_filters")}</button>
+          <p className="text-slate-500">{hasSearch ? t("projects.public_no_match") : t("projects.public_no_projects")}</p>
+          {hasSearch && (
+            <button onClick={() => setSearch("")} className="mt-4 text-sm font-medium text-green hover:underline">{t("projects.clear")}</button>
           )}
         </div>
       ) : (
