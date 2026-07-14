@@ -78,7 +78,7 @@ const Footer = () => {
 
           {/* Brand column */}
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white p-2 shadow-lg shadow-black/10">
                 <img src={logo} alt="PFM" className="h-full w-full object-contain" />
               </div>
@@ -86,7 +86,7 @@ const Footer = () => {
                 <p className="text-sm font-extrabold leading-tight text-white">Palestinian Forum</p>
                 <p className="text-[11px] font-medium text-white/50 uppercase tracking-widest">Malaysia</p>
               </div>
-            </div>
+            </Link>
 
             <p className="max-w-[230px] text-sm leading-relaxed text-white/55">
               {t("footer.tagline")}

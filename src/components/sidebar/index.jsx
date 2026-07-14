@@ -2,6 +2,7 @@
 import { HiX } from "react-icons/hi";
 import { MdLogout } from "react-icons/md";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import logo from "assets/branding/LOGO-wbg.png";
 import Links from "./components/Links";
 import routes from "routes.js";
@@ -26,7 +27,7 @@ const Sidebar = ({ open, onClose, layout = "/admin" }) => {
       </button>
 
       {/* ── Logo ── */}
-      <div className="flex items-center gap-3 px-5 pb-4 pt-6">
+      <Link to="/" className="flex items-center gap-3 px-5 pb-4 pt-6 transition-opacity hover:opacity-80">
         <img src={logo} alt="PFM" className="h-12 w-12 flex-shrink-0 object-contain" />
         <div className="leading-tight">
           <p className="text-sm font-bold text-navy-700">{t("sidebar.org")}</p>
@@ -34,7 +35,7 @@ const Sidebar = ({ open, onClose, layout = "/admin" }) => {
             {t("sidebar.country")}
           </p>
         </div>
-      </div>
+      </Link>
 
       {/* ── Top divider ── */}
       <div className="mx-5 h-px bg-gray-100" />

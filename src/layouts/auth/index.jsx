@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import logo from "assets/branding/LOGO-wbg.png";
 import routes from "routes.js";
@@ -49,9 +49,9 @@ export default function Auth() {
 
         {/* Center — logo + identity */}
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="mb-7 flex h-44 w-44 items-center justify-center rounded-3xl bg-white p-4 shadow-2xl">
+          <Link to="/" className="mb-7 flex h-44 w-44 items-center justify-center rounded-3xl bg-white p-4 shadow-2xl transition-opacity hover:opacity-90">
             <img src={logo} alt="PFM" className="h-full w-full object-contain" />
-          </div>
+          </Link>
 
           <p className="text-xl font-bold leading-snug text-white" dir="rtl">
             المنتدى الفلسطيني ماليزيا
@@ -77,10 +77,10 @@ export default function Auth() {
       <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-[58%]">
 
         {/* Mobile logo */}
-        <div className="mb-8 flex flex-col items-center lg:hidden">
+        <Link to="/" className="mb-8 flex flex-col items-center lg:hidden">
           <img src={logo} alt="PFM" className="h-20 w-20 object-contain" />
           <p className="mt-2 text-sm font-semibold text-navy-700">Palestinian Forum Malaysia</p>
-        </div>
+        </Link>
 
         <div className="w-full max-w-[420px]">
           <Routes>
