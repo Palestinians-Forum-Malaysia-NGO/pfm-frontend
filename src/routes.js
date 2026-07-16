@@ -9,6 +9,7 @@ import CategoriesPage        from "views/admin/categories";
 import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
 import FeedbackPage          from "views/admin/feedback";
+import OpportunitiesPage     from "views/admin/opportunities";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -34,6 +35,7 @@ import Donate from "views/public/donate";
 import Contact from "views/public/contact";
 import PublicProjectsPage from "views/public/projects";
 import RegisterPage from "views/public/register";
+import PublicOpportunitiesPage from "views/public/opportunities";
 
 // Icon Imports
 import {
@@ -57,6 +59,7 @@ import {
   MdBusiness,
   MdFactCheck,
   MdRateReview,
+  MdWork,
 } from "react-icons/md";
 
 const routes = [
@@ -141,6 +144,18 @@ const routes = [
     icon: <MdRateReview className="h-5 w-5" />,
     component: <FeedbackPage />,
     section: "COMMUNITY",
+  },
+  {
+    name: "Opportunities",
+    layout: "/admin",
+    path: "opportunities",
+    icon: <MdWork className="h-5 w-5" />,
+    component: <OpportunitiesPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Opportunities", path: "opportunities" },
+      { name: "New Opportunity",   path: "opportunities/create" },
+    ],
   },
   {
     name: "Donations",
@@ -340,6 +355,18 @@ const routes = [
     section: "COMMUNITY",
   },
   {
+    name: "Opportunities",
+    layout: "/staff",
+    path: "opportunities",
+    icon: <MdWork className="h-5 w-5" />,
+    component: <OpportunitiesPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Opportunities", path: "opportunities" },
+      { name: "New Opportunity",   path: "opportunities/create" },
+    ],
+  },
+  {
     name: "Categories",
     layout: "/staff",
     path: "categories",
@@ -426,6 +453,7 @@ const routes = [
   { name: "Projects", layout: "/", path: "/projects", component: <PublicProjectsPage /> },
   { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
+  { name: "Opportunities", layout: "/", path: "/opportunities", component: <PublicOpportunitiesPage /> },
   { name: "Apply",    layout: "/", path: "/apply",    component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────

@@ -20,7 +20,7 @@ const getNavLinks = (t) => [
     label: t("nav.contact"), to: "/contact",
     children: [
       { label: t("nav.get_in_touch"), to: "/contact", desc: t("nav.get_in_touch_desc"), icon: <MdMail className="h-4 w-4" />,   bg: "bg-green/10 text-green" },
-      { label: t("nav.volunteer"),    to: "/contact", desc: t("nav.volunteer_desc"),    icon: <MdPeople className="h-4 w-4" />, bg: "bg-purple-50 text-purple-500" },
+      { label: t("nav.volunteer"),    to: "/opportunities", desc: t("nav.volunteer_desc"),    icon: <MdPeople className="h-4 w-4" />, bg: "bg-purple-50 text-purple-500" },
     ],
   },
 ];

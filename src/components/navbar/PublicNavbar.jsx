@@ -7,10 +7,16 @@ import getNavLinks   from "./navLinks";
 import NavItem       from "./NavItem";
 import MobileNavItem from "./MobileNavItem";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useGetOpportunities } from "components/features/opportunities/hooks";
 
 const PublicNavbar = () => {
   const { t } = useTranslation();
-  const links = getNavLinks(t);
+  const { opportunities } = useGetOpportunities();
+  const links = getNavLinks(t)
+    .map((link) => link.children
+      ? { ...link, children: link.children.filter((c) => c.to !== "/opportunities" || opportunities.length > 0) }
+      : link
+    );
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

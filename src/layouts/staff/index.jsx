@@ -17,6 +17,10 @@ import ProjectDetail     from "views/admin/projects/ProjectDetail";
 import ProjectEdit       from "views/admin/projects/ProjectEdit";
 import ContactMessageDetail from "views/admin/contactMessages/ContactMessageDetail";
 import FeedbackDetail from "views/admin/feedback/FeedbackDetail";
+import OpportunityCreate from "views/admin/opportunities/OpportunityCreate";
+import OpportunityDetail from "views/admin/opportunities/OpportunityDetail";
+import OpportunityEdit   from "views/admin/opportunities/OpportunityEdit";
+import OpportunityApplicationDetail from "views/admin/opportunities/OpportunityApplicationDetail";
 import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
 import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
 import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
@@ -32,6 +36,7 @@ const SUB_ROUTE_NAMES = {
   "/partnerships/create":  "New Partnership",
   "/branches/create":      "New Branch",
   "/applications/create":  "New Application",
+  "/opportunities/create": "New Opportunity",
 };
 
 export default function StaffLayout() {
@@ -57,11 +62,14 @@ export default function StaffLayout() {
     if (path.match(/\/projects\/[^/]+\/edit$/))      { setCurrentRouteName("Edit Project");     return; }
     if (path.match(/\/partnerships\/[^/]+\/edit$/))  { setCurrentRouteName("Edit Partnership");  return; }
     if (path.match(/\/branches\/[^/]+\/edit$/))      { setCurrentRouteName("Edit Branch");       return; }
+    if (path.match(/\/opportunities\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Opportunity");  return; }
     if (path.match(/\/beneficiaries\/[^/]+$/))       { setCurrentRouteName("Beneficiary Detail"); return; }
     if (path.match(/\/categories\/[^/]+$/))          { setCurrentRouteName("Category Detail");  return; }
     if (path.match(/\/projects\/[^/]+$/))            { setCurrentRouteName("Project Detail");   return; }
     if (path.match(/\/contact-messages\/[^/]+$/))    { setCurrentRouteName("Contact Message Detail"); return; }
     if (path.match(/\/feedback\/[^/]+$/))            { setCurrentRouteName("Feedback Detail"); return; }
+    if (path.match(/\/opportunities\/[^/]+\/applications\/[^/]+$/)) { setCurrentRouteName("Opportunity Application Detail"); return; }
+    if (path.match(/\/opportunities\/[^/]+$/))       { setCurrentRouteName("Opportunity Detail"); return; }
     if (path.match(/\/partnerships\/[^/]+$/))        { setCurrentRouteName("Partnership Detail"); return; }
     if (path.match(/\/branches\/[^/]+$/))            { setCurrentRouteName("Branch Detail");     return; }
     if (path.match(/\/applications\/[^/]+$/))        { setCurrentRouteName("Application Detail"); return; }
@@ -109,6 +117,10 @@ export default function StaffLayout() {
               <Route path="/projects/:id/edit"      element={<ProjectEdit />} />
               <Route path="/contact-messages/:id"   element={<ContactMessageDetail />} />
               <Route path="/feedback/:id"           element={<FeedbackDetail />} />
+              <Route path="/opportunities/create"   element={<OpportunityCreate />} />
+              <Route path="/opportunities/:id"      element={<OpportunityDetail />} />
+              <Route path="/opportunities/:id/edit" element={<OpportunityEdit />} />
+              <Route path="/opportunities/:opportunityId/applications/:id" element={<OpportunityApplicationDetail />} />
               <Route path="/partnerships/create"    element={<PartnershipCreate />} />
               <Route path="/partnerships/:id"       element={<PartnershipDetail />} />
               <Route path="/partnerships/:id/edit"  element={<PartnershipEdit />} />
