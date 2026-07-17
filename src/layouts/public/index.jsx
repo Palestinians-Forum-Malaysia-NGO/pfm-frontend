@@ -6,6 +6,7 @@ import routes from "routes.js";
 import PublicNavbar from "components/navbar/PublicNavbar";
 import Footer from "components/footer/Footer";
 import ProjectDetail from "views/public/projects/ProjectDetail";
+import NewsDetail from "views/public/news/NewsDetail";
 
 export default function PublicLayout() {
   const { i18n } = useTranslation();
@@ -29,6 +30,7 @@ export default function PublicLayout() {
         <Routes>
           {getRoutes()}
           <Route path="/projects/:slug" element={<ProjectDetail />} />
+          <Route path="/news/:slug" element={<NewsDetail />} />
         </Routes>
       </main>
       <Footer />

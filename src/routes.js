@@ -10,6 +10,7 @@ import ClassificationsPage   from "views/admin/classifications";
 import ContactMessagesPage   from "views/admin/contactMessages";
 import FeedbackPage          from "views/admin/feedback";
 import OpportunitiesPage     from "views/admin/opportunities";
+import NewsPage              from "views/admin/news";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -36,6 +37,7 @@ import Contact from "views/public/contact";
 import PublicProjectsPage from "views/public/projects";
 import RegisterPage from "views/public/register";
 import PublicOpportunitiesPage from "views/public/opportunities";
+import PublicNewsListPage from "views/public/news";
 
 // Icon Imports
 import {
@@ -60,6 +62,7 @@ import {
   MdFactCheck,
   MdRateReview,
   MdWork,
+  MdArticle,
 } from "react-icons/md";
 
 const routes = [
@@ -155,6 +158,18 @@ const routes = [
     children: [
       { name: "All Opportunities", path: "opportunities" },
       { name: "New Opportunity",   path: "opportunities/create" },
+    ],
+  },
+  {
+    name: "News",
+    layout: "/admin",
+    path: "news",
+    icon: <MdArticle className="h-5 w-5" />,
+    component: <NewsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All News",     path: "news" },
+      { name: "New Article",  path: "news/create" },
     ],
   },
   {
@@ -367,6 +382,18 @@ const routes = [
     ],
   },
   {
+    name: "News",
+    layout: "/staff",
+    path: "news",
+    icon: <MdArticle className="h-5 w-5" />,
+    component: <NewsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All News",    path: "news" },
+      { name: "New Article", path: "news/create" },
+    ],
+  },
+  {
     name: "Categories",
     layout: "/staff",
     path: "categories",
@@ -454,6 +481,7 @@ const routes = [
   { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
   { name: "Opportunities", layout: "/", path: "/opportunities", component: <PublicOpportunitiesPage /> },
+  { name: "News",          layout: "/", path: "/news",          component: <PublicNewsListPage /> },
   { name: "Apply",    layout: "/", path: "/apply",    component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
