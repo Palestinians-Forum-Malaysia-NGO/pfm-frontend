@@ -1,17 +1,27 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MdFavorite, MdPeople, MdCampaign, MdEvent } from "react-icons/md";
+import { MdFolderSpecial, MdTrendingUp, MdPeople, MdAttachMoney } from "react-icons/md";
 import useInView from "hooks/useInView";
+import { useGetStats } from "components/features/stats/hooks";
+
+const fmtMYR = (val) => {
+  const n = parseFloat(val);
+  if (isNaN(n)) return "—";
+  return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+};
 
 const ImpactStats = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
+  const { stats, loading } = useGetStats();
+
+  const projects = stats?.projects ?? {};
 
   const STATS = [
-    { icon: <MdPeople className="h-6 w-6" />,   value: "500+",   label: t("home.stat_members") },
-    { icon: <MdFavorite className="h-6 w-6" />, value: "RM 1M+", label: t("home.stat_donations") },
-    { icon: <MdCampaign className="h-6 w-6" />, value: "30+",    label: t("home.stat_campaigns") },
-    { icon: <MdEvent className="h-6 w-6" />,    value: "120+",   label: t("home.stat_events") },
+    { icon: <MdFolderSpecial className="h-6 w-6" />, value: loading ? "—" : (projects.total ?? 0),                    label: t("home.stat_projects") },
+    { icon: <MdTrendingUp className="h-6 w-6" />,    value: loading ? "—" : (projects.by_status?.active ?? 0),        label: t("home.stat_active_projects") },
+    { icon: <MdPeople className="h-6 w-6" />,        value: loading ? "—" : (stats?.total_beneficiaries_helped ?? 0), label: t("home.stat_beneficiaries_helped") },
+    { icon: <MdAttachMoney className="h-6 w-6" />,   value: loading ? "—" : fmtMYR(stats?.total_amount_spent),        label: t("home.stat_amount_spent") },
   ];
 
   return (
