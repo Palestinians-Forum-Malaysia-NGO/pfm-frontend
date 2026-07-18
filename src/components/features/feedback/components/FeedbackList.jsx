@@ -7,6 +7,7 @@ import {
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
 import { useFeedbackList } from "components/features/feedback/hooks";
+import { useGetProjects } from "components/features/projects/hooks";
 import FeedbackDeleteModal from "./FeedbackDeleteModal";
 import StarRating         from "components/ui/StarRating";
 import Button        from "components/ui/buttons/Button";
@@ -38,6 +39,8 @@ export default function FeedbackList() {
     handleDeleteConfirm,
     handleQuickApprove,
   } = useFeedbackList();
+  const { projects } = useGetProjects();
+  const projectTitleById = Object.fromEntries(projects.map((p) => [p.id, p.title]));
 
   const STATUS_LABEL = {
     pending:  t("feedbackMessages.status_pending"),
@@ -70,7 +73,7 @@ export default function FeedbackList() {
       render: (f) => (
         <div className="min-w-0 max-w-[200px]">
           <p className="truncate font-semibold text-slate-900">{f.full_name}</p>
-          <p className="truncate text-xs text-slate-400">{f.project?.title ?? f.project ?? "—"}</p>
+          <p className="truncate text-xs text-slate-400">{f.project?.title ?? projectTitleById[f.project] ?? "—"}</p>
         </div>
       ),
     },

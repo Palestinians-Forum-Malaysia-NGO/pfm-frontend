@@ -20,6 +20,7 @@ import {
   useGetFeedback, useUpdateFeedback, useDeleteFeedback,
   useApproveFeedback, useRejectFeedback,
 } from "components/features/feedback/hooks";
+import { useGetProjects } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const fmtDate = (iso) => {
@@ -45,6 +46,8 @@ export default function FeedbackDetailView() {
   const { execute: rejectFeedback, loading: rejecting } = useRejectFeedback();
   const { execute: deleteFeedback, loading: deleteLoading, error: deleteError } = useDeleteFeedback();
   const { success, error: toastError } = useToast();
+  const { projects } = useGetProjects();
+  const projectTitleById = Object.fromEntries(projects.map((p) => [p.id, p.title]));
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm]     = useState({ full_name: "", message: "", rating: 0 });
@@ -130,7 +133,7 @@ export default function FeedbackDetailView() {
         <FormHeader icon={<MdPerson className="h-5 w-5" />} title={t("feedbackMessages.section_reviewer")} subtitle={t("feedbackMessages.section_reviewer_sub")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdPerson className="h-4 w-4" />}         label={t("feedbackMessages.info_name")}      value={feedback.full_name} />
-          <InfoRow icon={<MdFolderSpecial className="h-4 w-4" />}  label={t("feedbackMessages.info_project")}   value={feedback.project?.title ?? feedback.project ?? "—"} />
+          <InfoRow icon={<MdFolderSpecial className="h-4 w-4" />}  label={t("feedbackMessages.info_project")}   value={feedback.project?.title ?? projectTitleById[feedback.project] ?? "—"} />
           <InfoRow icon={<MdStar className="h-4 w-4" />}           label={t("feedbackMessages.info_rating")}    value={<StarRating value={feedback.rating} size="h-4 w-4" />} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label={t("feedbackMessages.info_submitted")} value={fmtDate(feedback.created_at)} />
         </div>

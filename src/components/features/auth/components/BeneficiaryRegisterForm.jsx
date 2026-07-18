@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail,
-  MdBadge, MdFamilyRestroom, MdCheck, MdAdd, MdClose,
-  MdCardTravel, MdFlight, MdPeople, MdCheckCircle,
+  MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail, MdCheck,
+  MdDescription, MdCardTravel, MdPeople, MdCheckCircle,
 } from "react-icons/md";
 import InputField           from "components/form/InputField";
 import SelectField          from "components/form/SelectField";
@@ -16,7 +15,6 @@ import { validate }         from "components/form/utils/validation";
 import { useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { setTokens }        from "components/features/auth/utils";
 import { OTP_PURPOSE }      from "components/features/auth/types";
-import { useGetClassifications } from "components/features/beneficiaries/hooks";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
 /* ─────────────────────────────────────────────────
@@ -25,10 +23,9 @@ import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/cou
 const useSteps = () => {
   const { t } = useTranslation();
   return [
-    { n: 1, label: t("apply.step_account"),  icon: <MdPersonAdd className="h-4 w-4" /> },
-    { n: 2, label: t("apply.step_personal"), icon: <MdBadge className="h-4 w-4" /> },
-    { n: 3, label: t("apply.step_status"),   icon: <MdCardTravel className="h-4 w-4" /> },
-    { n: 4, label: t("apply.step_family"),   icon: <MdFamilyRestroom className="h-4 w-4" /> },
+    { n: 1, label: t("apply.step_account"),   icon: <MdPersonAdd className="h-4 w-4" /> },
+    { n: 2, label: t("apply.step_documents"), icon: <MdDescription className="h-4 w-4" /> },
+    { n: 3, label: t("apply.step_status"),    icon: <MdCardTravel className="h-4 w-4" /> },
   ];
 };
 
@@ -159,40 +156,24 @@ const AccountStep = ({ data, onChange, onNext }) => {
 };
 
 /* ─────────────────────────────────────────────────
-   Step 2 — Personal Info
+   Step 2 — Documents & Background
 ───────────────────────────────────────────────── */
-const PERSONAL_RULES = {
-  full_name_arabic: [{ required: true }, { maxLength: 255 }],
-  passport_number:  [{ required: true }, { maxLength: 50 }],
-  date_of_birth:    [{ required: true }],
-  gender:           [{ required: true }],
-  marital_status:   [{ required: true }],
-  background:       [{ required: true }],
+const DOCUMENTS_RULES = {
+  background: [{ required: true }],
 };
 
-const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
+const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
   const { t } = useTranslation();
-  const [errors, setErrors]     = useState({});
+  const [errors, setErrors]         = useState({});
   const [idDocError, setIdDocError] = useState(null);
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
 
-  const GENDER_OPTIONS_T = [
-    { value: "male",   label: t("beneficiaries.gender_male") },
-    { value: "female", label: t("beneficiaries.gender_female") },
-  ];
-  const MARITAL_STATUS_OPTIONS_T = [
-    { value: "single",   label: t("beneficiaries.marital_single") },
-    { value: "married",  label: t("beneficiaries.marital_married") },
-    { value: "divorced", label: t("beneficiaries.marital_divorced") },
-    { value: "widowed",  label: t("beneficiaries.marital_widowed") },
-  ];
-
   const canProceed =
-    !Object.entries(PERSONAL_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc;
+    !Object.entries(DOCUMENTS_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc;
 
   const handleNext = () => {
     const newErrors = {};
-    Object.entries(PERSONAL_RULES).forEach(([field, rules]) => {
+    Object.entries(DOCUMENTS_RULES).forEach(([field, rules]) => {
       const err = validate(data[field], rules);
       if (err) newErrors[field] = err;
     });
@@ -211,32 +192,18 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
     <>
       <div className="mb-6 flex items-start gap-4">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
-          <MdBadge className="h-5 w-5 text-green" />
+          <MdDescription className="h-5 w-5 text-green" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-navy-700">{t("apply.personal_title")}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{t("apply.personal_subtitle")}</p>
+          <h2 className="text-xl font-bold text-navy-700">{t("apply.documents_title")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("apply.documents_subtitle")}</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InputField label={t("apply.full_name_ar")} field="full_name_arabic" placeholder="أحمد فارس"
-            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.full_name_arabic} />
-          <InputField label={t("apply.passport")} field="passport_number" placeholder="A12345678"
-            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.passport_number} />
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InputField label={t("apply.dob")} field="date_of_birth" type="date"
-            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.date_of_birth} />
-          <SelectField label={t("apply.gender")} field="gender" options={GENDER_OPTIONS_T}
-            formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.gender} />
-        </div>
-        <SelectField label={t("apply.marital_status")} field="marital_status" options={MARITAL_STATUS_OPTIONS_T}
-          formData={data} errors={errors} updateFormData={set} rules={PERSONAL_RULES.marital_status} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
-          formData={data} errors={errors} updateFormData={set} rows={3} rules={PERSONAL_RULES.background} />
+          formData={data} errors={errors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
         <StorageDocumentField
           label={t("apply.id_document")}
           folder="beneficiaries/documents"
@@ -262,52 +229,42 @@ const PersonalStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) 
 };
 
 /* ─────────────────────────────────────────────────
-   Step 3 — Visa & Location
+   Step 3 — Status, Country & Terms
 ───────────────────────────────────────────────── */
 const REQUIRED = [{ required: true }];
 
-const validateVisaLocationStep = (visaData, locData) => {
-  const visaErrors = {};
-  const locErrors  = {};
+const validateStatusStep = (visaData) => {
+  const errors = {};
 
   const hasVisaErr = validate(visaData.has_visa, REQUIRED);
-  if (hasVisaErr) visaErrors.has_visa = hasVisaErr;
+  if (hasVisaErr) errors.has_visa = hasVisaErr;
 
   if (visaData.has_visa === "true") {
     const err = validate(visaData.visa_type, REQUIRED);
-    if (err) visaErrors.visa_type = err;
+    if (err) errors.visa_type = err;
   } else if (visaData.has_visa === "false") {
     const err = validate(visaData.situation, REQUIRED);
-    if (err) visaErrors.situation = err;
+    if (err) errors.situation = err;
     if (visaData.situation === "refugee") {
       const uErr = validate(visaData.unhcr_number, REQUIRED);
-      if (uErr) visaErrors.unhcr_number = uErr;
+      if (uErr) errors.unhcr_number = uErr;
     }
   }
 
-  const countryErr = validate(locData.country_of_origin, REQUIRED);
-  if (countryErr) locErrors.country_of_origin = countryErr;
-  if (locData.country_of_origin === "PS") {
+  const countryErr = validate(visaData.country, REQUIRED);
+  if (countryErr) errors.country = countryErr;
+  if (visaData.country === "PS") {
     const regionErr = validate(visaData.palestine_region, REQUIRED);
-    if (regionErr) visaErrors.palestine_region = regionErr;
+    if (regionErr) errors.palestine_region = regionErr;
   }
 
-  const dateErr = validate(locData.date_arrived_in_malaysia, REQUIRED);
-  if (dateErr) locErrors.date_arrived_in_malaysia = dateErr;
-  const cityErr = validate(locData.current_city, REQUIRED);
-  if (cityErr) locErrors.current_city = cityErr;
-  const addrErr = validate(locData.address, REQUIRED);
-  if (addrErr) locErrors.address = addrErr;
-
-  return { visaErrors, locErrors };
+  return errors;
 };
 
-const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack, onNext }) => {
+const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }) => {
   const { t } = useTranslation();
   const [visaErrors, setVisaErrors] = useState({});
-  const [locErrors,  setLocErrors]  = useState({});
   const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
-  const setL = (f, v) => onLocChange((p)  => ({ ...p, [f]: v }));
 
   const HAS_VISA_OPTIONS_T = [
     { value: "",      label: t("beneficiaries.visa_status_unset") },
@@ -334,19 +291,19 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
     { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
   ];
 
-  const { visaErrors: liveVisaErrors, locErrors: liveLocErrors } = validateVisaLocationStep(visaData, locData);
-  const canProceed = Object.keys(liveVisaErrors).length === 0 && Object.keys(liveLocErrors).length === 0;
+  const liveErrors  = validateStatusStep(visaData);
+  const termsMissing = !visaData.terms_accepted;
+  const canSubmit   = Object.keys(liveErrors).length === 0 && !termsMissing;
 
-  const handleNext = () => {
-    const { visaErrors: nextVisaErrors, locErrors: nextLocErrors } = validateVisaLocationStep(visaData, locData);
-    if (Object.keys(nextVisaErrors).length || Object.keys(nextLocErrors).length) {
-      setVisaErrors(nextVisaErrors);
-      setLocErrors(nextLocErrors);
+  const handleSubmitClick = () => {
+    const nextErrors = validateStatusStep(visaData);
+    if (termsMissing) nextErrors.terms_accepted = t("validation.required");
+    if (Object.keys(nextErrors).length) {
+      setVisaErrors(nextErrors);
       return;
     }
     setVisaErrors({});
-    setLocErrors({});
-    onNext();
+    onSubmit();
   };
 
   return (
@@ -360,6 +317,8 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
           <p className="mt-0.5 text-sm text-slate-400">{t("apply.visa_subtitle")}</p>
         </div>
       </div>
+
+      <AlertBanner message={error} />
 
       <div className="flex flex-col gap-3">
         {/* Visa status */}
@@ -385,204 +344,19 @@ const VisaLocationStep = ({ visaData, onVisaChange, locData, onLocChange, onBack
           )}
         </div>
 
-        {/* Country & Palestine region */}
-        <SelectField label={t("apply.country_origin")} field="country_of_origin" options={COUNTRY_OPTIONS}
-          formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
-        {locData.country_of_origin === "PS" && (
+        {/* Country */}
+        <SelectField label={t("apply.country_origin")} field="country" options={COUNTRY_OPTIONS}
+          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+        {visaData.country === "PS" && (
           <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
             formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         )}
 
-        {/* Residence */}
+        {/* Terms */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <MdFlight className="h-3.5 w-3.5" /> {t("apply.residence")}
-          </p>
-          <InputField label={t("apply.date_arrived")} field="date_arrived_in_malaysia" type="date"
-            formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InputField label={t("apply.city")} field="current_city" placeholder="Kuala Lumpur"
-              formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
-            <InputField label={t("apply.address")} field="address" placeholder="No. 1, Jalan…"
-              formData={locData} errors={locErrors} updateFormData={setL} rules={REQUIRED} />
-          </div>
+          <ToggleInput label={t("apply.terms_label")} field="terms_accepted"
+            formData={visaData} errors={visaErrors} updateFormData={setV} />
         </div>
-      </div>
-
-      <div className="mt-6 flex gap-3">
-        <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
-        </button>
-        <button type="button" onClick={handleNext} disabled={!canProceed} className={btnNext}>
-          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
-        </button>
-      </div>
-    </>
-  );
-};
-
-/* ─────────────────────────────────────────────────
-   Step 4 — Family
-───────────────────────────────────────────────── */
-const EMPTY_CHILD = {
-  child_name: "", child_name_arabic: "", child_date_of_birth: "",
-  passport_copy: null, entrance_stump: null,
-};
-
-const validateFamilyStep = (famData) => {
-  const errors = {};
-  const childErrors = famData.children.map(() => ({}));
-
-  if (!famData.has_family) return { errors, childErrors };
-
-  const nameErr = validate(famData.spouse_name, REQUIRED);
-  if (nameErr) errors.spouse_name = nameErr;
-  const nameArErr = validate(famData.spouse_name_arabic, REQUIRED);
-  if (nameArErr) errors.spouse_name_arabic = nameArErr;
-  const jobErr = validate(famData.spouse_job, REQUIRED);
-  if (jobErr) errors.spouse_job = jobErr;
-
-  famData.children.forEach((child, i) => {
-    const ce = {};
-    const cn  = validate(child.child_name, REQUIRED);
-    if (cn) ce.child_name = cn;
-    const cna = validate(child.child_name_arabic, REQUIRED);
-    if (cna) ce.child_name_arabic = cna;
-    const cdob = validate(child.child_date_of_birth, REQUIRED);
-    if (cdob) ce.child_date_of_birth = cdob;
-    const cpc = validate(child.passport_copy, REQUIRED);
-    if (cpc) ce.passport_copy = cpc;
-    const ces = validate(child.entrance_stump, REQUIRED);
-    if (ces) ce.entrance_stump = ces;
-    childErrors[i] = ce;
-  });
-
-  return { errors, childErrors };
-};
-
-const FamilyStep = ({ famData, onFamChange, onBack, onSubmit, loading, error }) => {
-  const { t }       = useTranslation();
-  const [errors, setErrors]         = useState({});
-  const [childErrors, setChildErrors] = useState([]);
-  const set         = (f, v) => onFamChange((p) => ({ ...p, [f]: v }));
-  const addChild    = () => onFamChange((p) => ({ ...p, children: [...p.children, { ...EMPTY_CHILD }] }));
-  const removeChild = (i) => onFamChange((p) => ({ ...p, children: p.children.filter((_, idx) => idx !== i) }));
-  const updateChild = (i, f, v) =>
-    onFamChange((p) => ({ ...p, children: p.children.map((c, idx) => idx === i ? { ...c, [f]: v } : c) }));
-
-  const { errors: liveErrors, childErrors: liveChildErrors } = validateFamilyStep(famData);
-  const canSubmit =
-    Object.keys(liveErrors).length === 0 && liveChildErrors.every((ce) => Object.keys(ce).length === 0);
-
-  const handleSubmitClick = () => {
-    const { errors: nextErrors, childErrors: nextChildErrors } = validateFamilyStep(famData);
-    const hasChildErrors = nextChildErrors.some((ce) => Object.keys(ce).length > 0);
-    if (Object.keys(nextErrors).length || hasChildErrors) {
-      setErrors(nextErrors);
-      setChildErrors(nextChildErrors);
-      return;
-    }
-    setErrors({});
-    setChildErrors([]);
-    onSubmit();
-  };
-
-  return (
-    <>
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
-          <MdFamilyRestroom className="h-5 w-5 text-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-navy-700">{t("apply.family_title")}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{t("apply.family_subtitle")}</p>
-        </div>
-      </div>
-
-      <AlertBanner message={error} />
-
-      <div className="flex flex-col gap-3">
-        <ToggleInput label={t("apply.has_family")} field="has_family"
-          formData={famData} errors={{}} updateFormData={set} />
-
-        {famData.has_family && (
-          <>
-            <ToggleInput label={t("apply.family_in_malaysia")} field="family_in_malaysia"
-              formData={famData} errors={{}} updateFormData={set} />
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t("apply.spouse")}</p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <InputField label={t("apply.spouse_name")}    field="spouse_name"        placeholder="Fatimah binti Ali"
-                  formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
-                <InputField label={t("apply.spouse_name_ar")} field="spouse_name_arabic" placeholder="فاطمة بنت علي"
-                  formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
-              </div>
-              <InputField label={t("apply.spouse_job")} field="spouse_job" placeholder="Teacher"
-                formData={famData} errors={errors} updateFormData={set} rules={REQUIRED} />
-            </div>
-
-            {/* Children */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  {t("apply.children_count", { count: famData.children.length })}
-                </p>
-                <button type="button" onClick={addChild}
-                  className="inline-flex items-center gap-1 rounded-lg bg-green/10 px-2.5 py-1 text-xs font-semibold text-green transition-colors hover:bg-green/20">
-                  <MdAdd className="h-3.5 w-3.5" /> {t("apply.add_child")}
-                </button>
-              </div>
-
-              {famData.children.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
-                  {t("apply.no_children")}
-                </p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {famData.children.map((child, i) => {
-                    const ce = childErrors[i] ?? {};
-                    return (
-                    <div key={i} className="rounded-xl border border-slate-200 bg-white p-4">
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_n", { n: i + 1 })}</span>
-                        <button type="button" onClick={() => removeChild(i)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
-                          <MdClose className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <InputField label={t("apply.child_name")}    field="child_name"         placeholder="Ahmad"
-                            formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
-                          <InputField label={t("apply.child_name_ar")} field="child_name_arabic"  placeholder="أحمد"
-                            formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
-                        </div>
-                        <InputField label={t("apply.child_dob")} field="child_date_of_birth" type="date"
-                          formData={child} errors={ce} updateFormData={(f, v) => updateChild(i, f, v)} rules={REQUIRED} />
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <StorageDocumentField label={t("apply.passport_copy")}  folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
-                            required
-                            onUpload={(key) => updateChild(i, "passport_copy",  key)}
-                            onRemove={() => updateChild(i, "passport_copy",  null)}
-                            currentName={child.passport_copy  ? t("apply.passport_uploaded") : undefined}
-                            field="passport_copy" errors={ce} />
-                          <StorageDocumentField label={t("apply.entrance_stamp")} folder="beneficiaries/documents" accept=".pdf,.jpg,.jpeg,.png"
-                            required
-                            onUpload={(key) => updateChild(i, "entrance_stump", key)}
-                            onRemove={() => updateChild(i, "entrance_stump", null)}
-                            currentName={child.entrance_stump ? t("apply.stamp_uploaded")    : undefined}
-                            field="entrance_stump" errors={ce} />
-                        </div>
-                      </div>
-                    </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </>
-        )}
       </div>
 
       <div className="mt-6 flex gap-3">
@@ -694,24 +468,12 @@ export default function BeneficiaryRegisterForm() {
   const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
-  const { classifications }   = useGetClassifications();
-  const defaultClass          = useMemo(() => classifications[0]?.id ?? "", [classifications]);
-
   const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "" });
-  const [personal, setPersonal] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "",
-    gender: "", marital_status: "", background: "",
-  });
+  const [documents, setDocuments] = useState({ background: "" });
   const [idDoc, setIdDoc] = useState(null);
   const [visa,  setVisa]  = useState({
-    has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
-  });
-  const [location, setLocation] = useState({
-    country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
-  });
-  const [family, setFamily] = useState({
-    has_family: false, family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "",
-    children: [],
+    has_visa: "", visa_type: "", situation: "", unhcr_number: "",
+    country: "", palestine_region: "", terms_accepted: false,
   });
 
   const { execute: register, loading, error } = useRegister();
@@ -720,53 +482,29 @@ export default function BeneficiaryRegisterForm() {
     const hasVisaBool = visa.has_visa === "true" ? true : visa.has_visa === "false" ? false : undefined;
     try {
       const payload = {
-        full_name:    account.full_name    || undefined,
-        email:        account.email        || undefined,
-        phone_number: account.phone_number || undefined,
+        full_name:        account.full_name    || undefined,
+        email:            account.email        || undefined,
+        phone_number:     account.phone_number || undefined,
+        background:       documents.background || undefined,
+        id_document:      idDoc                || undefined,
+        terms_accepted:   visa.terms_accepted,
 
-        classification:           defaultClass                               || undefined,
-        full_name_arabic:         personal.full_name_arabic                 || undefined,
-        passport_number:          personal.passport_number                  || undefined,
-        date_of_birth:            personal.date_of_birth                    || undefined,
-        gender:                   personal.gender                           || undefined,
-        marital_status:           personal.marital_status                   || undefined,
-        background:               personal.background                       || undefined,
-        id_document:              idDoc                                      || undefined,
-
-        has_visa:                 hasVisaBool,
-        visa_type:                hasVisaBool === true  ? (visa.visa_type     || undefined) : undefined,
-        situation:                hasVisaBool === false ? (visa.situation      || undefined) : undefined,
-        unhcr_number:             (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
-        country_of_origin:        location.country_of_origin                || undefined,
-        palestine_region:         location.country_of_origin === "PS"       ? (visa.palestine_region || undefined) : undefined,
-        date_arrived_in_malaysia: location.date_arrived_in_malaysia         || undefined,
-        current_city:             location.current_city                     || undefined,
-        address:                  location.address                          || undefined,
-
-        family_information: {
-          family_in_malaysia:   family.has_family ? family.family_in_malaysia : false,
-          spouse_name:          family.spouse_name        || null,
-          spouse_name_arabic:   family.spouse_name_arabic || null,
-          spouse_job:           family.spouse_job         || null,
-          number_of_children:   family.children.length,
-          children_information: family.children.map((c) => ({
-            child_name:          c.child_name          || "",
-            child_name_arabic:   c.child_name_arabic   || "",
-            child_date_of_birth: c.child_date_of_birth || undefined,
-            passport_copy:       c.passport_copy       || undefined,
-            entrance_stump:      c.entrance_stump      || undefined,
-          })),
-        },
+        has_visa:         hasVisaBool,
+        visa_type:        hasVisaBool === true  ? (visa.visa_type || undefined) : undefined,
+        situation:        hasVisaBool === false ? (visa.situation || undefined) : undefined,
+        unhcr_number:     (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
+        country:          visa.country || undefined,
+        palestine_region: visa.country === "PS" ? (visa.palestine_region || undefined) : undefined,
       };
       const data = await register(payload);
       setOtpMeta({ email: account.email, channel: data.channel ?? "email" });
-      setStep(5);
+      setStep(4);
     } catch { /* error shown by useRegister */ }
   };
 
   return (
     <div>
-      <Hero step={step <= 4 ? step : 5} />
+      <Hero step={step <= 3 ? step : 4} />
 
       <section className="bg-slate-50 px-4 py-12">
         <div className="mx-auto max-w-2xl">
@@ -775,27 +513,20 @@ export default function BeneficiaryRegisterForm() {
               <AccountStep data={account} onChange={setAccount} onNext={() => setStep(2)} />
             )}
             {step === 2 && (
-              <PersonalStep
-                data={personal} onChange={setPersonal}
+              <DocumentsStep
+                data={documents} onChange={setDocuments}
                 idDoc={idDoc} onIdDocChange={setIdDoc}
                 onBack={() => setStep(1)} onNext={() => setStep(3)}
               />
             )}
             {step === 3 && (
-              <VisaLocationStep
-                visaData={visa}     onVisaChange={setVisa}
-                locData={location}  onLocChange={setLocation}
-                onBack={() => setStep(2)} onNext={() => setStep(4)}
-              />
-            )}
-            {step === 4 && (
-              <FamilyStep
-                famData={family} onFamChange={setFamily}
-                onBack={() => setStep(3)} onSubmit={handleSubmit}
+              <StatusStep
+                visaData={visa} onVisaChange={setVisa}
+                onBack={() => setStep(2)} onSubmit={handleSubmit}
                 loading={loading} error={error}
               />
             )}
-            {step === 5 && (
+            {step === 4 && (
               <OtpStep email={otpMeta.email} channel={otpMeta.channel} onBack={() => setStep(1)} />
             )}
           </div>

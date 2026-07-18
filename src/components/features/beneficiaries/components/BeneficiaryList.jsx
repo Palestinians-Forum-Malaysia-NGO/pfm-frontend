@@ -132,12 +132,12 @@ export default function BeneficiaryList() {
       key: "classification",
       label: t("beneficiaries.col_classification"),
       render: (b) => {
-        const name = (b.classification?.name_ar && i18n.language === "ar")
-          ? b.classification.name_ar
-          : b.classification?.name;
+        const names = (b.classifications ?? []).map((c) =>
+          (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name
+        );
         return (
           <span className="truncate text-sm text-slate-700">
-            {name || <span className="text-slate-300">—</span>}
+            {names.length > 0 ? names.join(", ") : <span className="text-slate-300">—</span>}
           </span>
         );
       },

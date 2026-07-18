@@ -71,7 +71,7 @@ export default function ProjectEditForm() {
         title:              data.title              ?? "",
         title_ar:           data.title_ar           ?? "",
         cover_image:        null,
-        category_id:        data.category?.slug     ?? "",
+        category_id:        categories.find((c) => c.slug === data.category?.slug)?.id ?? "",
         status:             data.status             ?? "active",
         summary:            data.summary            ?? "",
         summary_ar:         data.summary_ar         ?? "",
@@ -89,6 +89,16 @@ export default function ProjectEditForm() {
       setInitial(snap);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // categories may finish loading after the project snapshot above already ran —
+  // backfill category_id once both are available, unless the user already picked one.
+  useEffect(() => {
+    if (form.category_id || !project?.category?.slug || categories.length === 0) return;
+    const match = categories.find((c) => c.slug === project.category.slug);
+    if (!match) return;
+    setForm((p) => ({ ...p, category_id: match.id }));
+    setInitial((p) => p ? { ...p, category_id: match.id } : p);
+  }, [project, categories]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();

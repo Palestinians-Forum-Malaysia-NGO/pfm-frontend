@@ -81,14 +81,15 @@ export default function BeneficiaryDetailView() {
 
   const u   = beneficiary.user ?? {};
   const fi  = beneficiary.family_information ?? {};
-  const cd  = beneficiary.classification_details ?? {};
+  const classifications = beneficiary.classifications ?? [];
   const bi  = u.banking_information  ?? {};
   const fin = u.financial_information ?? {};
   const hasBanking   = bi.bank_name || bi.account_number || bi.account_holder_name;
   const hasFinancial = fin.job_title || fin.salary || fin.payment_frequency;
   const children     = fi.children_information ?? [];
 
-  const classDisplayName = (cd.name_ar && i18n.language === "ar") ? cd.name_ar : cd.name;
+  const classDisplayName = (cls) => (cls.name_ar && i18n.language === "ar") ? cls.name_ar : cls.name;
+  const classNamesSummary = classifications.map(classDisplayName).join(", ");
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -167,7 +168,7 @@ export default function BeneficiaryDetailView() {
             <p className="mt-0.5 text-sm font-medium text-slate-500" dir="rtl">{u.full_name_ar}</p>
           )}
           <p className="mt-0.5 text-sm text-slate-400">{u.email}</p>
-          {classDisplayName && <p className="mt-1 text-xs font-medium text-green">{classDisplayName}</p>}
+          {classNamesSummary && <p className="mt-1 text-xs font-medium text-green">{classNamesSummary}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
               u.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"
@@ -266,15 +267,21 @@ export default function BeneficiaryDetailView() {
         </div>
       )}
 
-      {/* ── Classification ── */}
-      {classDisplayName && (
+      {/* ── Classification(s) ── */}
+      {classifications.length > 0 && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdShield className="h-5 w-5" />} title={t("beneficiaries.section_classification_info")} subtitle={t("beneficiaries.section_classification_info_sub")} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdShield className="h-4 w-4" />}        label={t("beneficiaries.info_category")}    value={classDisplayName} />
-            <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.info_assigned")}    value={fmtDate(cd.assigned_at)} />
-            {cd.description && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label={t("beneficiaries.info_description")} value={cd.description} />}
-            {cd.assigned_by && <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_assigned_by")} value={cd.assigned_by?.full_name || cd.assigned_by?.email} />}
+          <div className="flex flex-col gap-4">
+            {classifications.map((cls) => (
+              <div key={cls.id} className={classifications.length > 1 ? "rounded-xl border border-slate-200 bg-slate-50 p-3" : undefined}>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <InfoRow icon={<MdShield className="h-4 w-4" />}        label={t("beneficiaries.info_category")}    value={classDisplayName(cls)} />
+                  <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.info_assigned")}    value={fmtDate(cls.assigned_at)} />
+                  {cls.description && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label={t("beneficiaries.info_description")} value={cls.description} />}
+                  {cls.assigned_by && <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_assigned_by")} value={cls.assigned_by?.full_name || cls.assigned_by?.email} />}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

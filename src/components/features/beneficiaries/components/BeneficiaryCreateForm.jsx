@@ -4,17 +4,17 @@ import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdPersonAdd, MdPerson, MdFlight,
-  MdFamilyRestroom, MdBadge, MdInfoOutline, MdShield, MdCardTravel,
+  MdFamilyRestroom, MdInfoOutline, MdCardTravel,
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import {
-  InputField, SelectField, TextareaField,
+  InputField, SelectField,
   ToggleInput, StorageDocumentField, StorageImageField, validate,
 } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
-import { useCreateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
+import { useCreateBeneficiary } from "components/features/beneficiaries/hooks";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -29,23 +29,15 @@ const EMPTY_CHILD = {
 };
 
 export default function BeneficiaryCreateForm() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
-  const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
 
   /* ── Form state ── */
   const [accountForm,  setAccountForm]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
-  const [classForm,    setClassForm]    = useState({ classification: "" });
-  const [personalForm, setPersonalForm] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "",
-    gender: "", marital_status: "", background: "",
-  });
-  const [locationForm, setLocationForm] = useState({
-    country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
-  });
+  const [locationForm, setLocationForm] = useState({ country_of_origin: "", address: "" });
   const [familyForm, setFamilyForm] = useState({
     family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "",
     spouse_job: "", number_of_children: "",
@@ -54,38 +46,15 @@ export default function BeneficiaryCreateForm() {
   const [visaForm, setVisaForm] = useState({
     has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
   });
-  const [idDoc,   setIdDoc]   = useState(null);
   const [errors,  setErrors]  = useState({});
 
   const setA  = (f, v) => setAccountForm((p)  => ({ ...p, [f]: v }));
-  const setC  = (f, v) => setClassForm((p)    => ({ ...p, [f]: v }));
-  const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
   const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
   const setFa = (f, v) => setFamilyForm((p)   => ({ ...p, [f]: v }));
   const setV  = (f, v) => setVisaForm((p)     => ({ ...p, [f]: v }));
 
   const setChild = (i, f, v) =>
     setChildren((prev) => prev.map((c, idx) => idx === i ? { ...c, [f]: v } : c));
-
-  const CLASSIFICATION_OPTIONS = [
-    { value: "", label: t("beneficiaries.classification_placeholder") },
-    ...classifications.map((c) => ({
-      value: c.id,
-      label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
-    })),
-  ];
-
-  const GENDER_OPTIONS_T = [
-    { value: "male",   label: t("beneficiaries.gender_male") },
-    { value: "female", label: t("beneficiaries.gender_female") },
-  ];
-
-  const MARITAL_OPTIONS_T = [
-    { value: "single",   label: t("beneficiaries.marital_single") },
-    { value: "married",  label: t("beneficiaries.marital_married") },
-    { value: "divorced", label: t("beneficiaries.marital_divorced") },
-    { value: "widowed",  label: t("beneficiaries.marital_widowed") },
-  ];
 
   const HAS_VISA_OPTIONS_T = [
     { value: "",      label: t("beneficiaries.visa_status_unset") },
@@ -133,22 +102,12 @@ export default function BeneficiaryCreateForm() {
         phone_number: accountForm.phone_number || undefined,
         profile_photo: accountForm.profile_photo || undefined,
 
-        classification:           classForm.classification             || undefined,
-        full_name_arabic:         personalForm.full_name_arabic        || undefined,
-        passport_number:          personalForm.passport_number         || undefined,
-        date_of_birth:            personalForm.date_of_birth           || undefined,
-        gender:                   personalForm.gender                  || undefined,
-        marital_status:           personalForm.marital_status          || undefined,
-        background:               personalForm.background              || undefined,
-        id_document:              idDoc                                || undefined,
         has_visa:                 visaForm.has_visa === "true" ? true : visaForm.has_visa === "false" ? false : undefined,
         visa_type:                visaForm.has_visa === "true"  ? (visaForm.visa_type    || undefined) : undefined,
         situation:                visaForm.has_visa === "false" ? (visaForm.situation    || undefined) : undefined,
         unhcr_number:             (visaForm.has_visa === "false" && visaForm.situation === "refugee") ? (visaForm.unhcr_number || undefined) : undefined,
         palestine_region:         locationForm.country_of_origin === "PS" ? (visaForm.palestine_region || undefined) : undefined,
         country_of_origin:        locationForm.country_of_origin        || undefined,
-        date_arrived_in_malaysia: locationForm.date_arrived_in_malaysia  || undefined,
-        current_city:             locationForm.current_city             || undefined,
         address:                  locationForm.address                  || undefined,
 
         family_information: {
@@ -214,46 +173,12 @@ export default function BeneficiaryCreateForm() {
           <InputField label={t("beneficiaries.phone")} field="phone_number" placeholder="+60 12-345 6789" required={false} formData={accountForm} errors={errors} updateFormData={setA} />
         </div>
 
-        {/* ── Classification ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdShield className="h-5 w-5" />} title={t("beneficiaries.section_classification")} subtitle={t("beneficiaries.section_classification_sub")} />
-          <SelectField label={t("beneficiaries.classification")} field="classification" options={CLASSIFICATION_OPTIONS} required={false} formData={classForm} errors={errors} updateFormData={setC} />
-        </div>
-
-        {/* ── Personal Information ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_personal")} subtitle={t("beneficiaries.section_personal_sub")} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("beneficiaries.full_name_ar_label")} field="full_name_arabic" placeholder={t("beneficiaries.full_name_ar_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-            <InputField label={t("beneficiaries.passport_number")}    field="passport_number"  placeholder="A12345678" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth"  type="date" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-            <SelectField label={t("beneficiaries.gender")}        field="gender"         options={GENDER_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          </div>
-          <SelectField   label={t("beneficiaries.marital_status")} field="marital_status" options={MARITAL_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          <TextareaField label={t("beneficiaries.background")} field="background" rows={3} placeholder={t("beneficiaries.background_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          <StorageDocumentField
-            label={t("beneficiaries.id_document")}
-            folder="beneficiaries/documents"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onUpload={(key) => setIdDoc(key)}
-            onRemove={() => setIdDoc(null)}
-            errors={errors}
-            field="id_document"
-          />
-        </div>
-
-        {/* ── Location & Travel ── */}
+        {/* ── Location ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdFlight className="h-5 w-5" />} title={t("beneficiaries.section_location")} subtitle={t("beneficiaries.section_location_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <SelectField label={t("beneficiaries.country_of_origin")} field="country_of_origin"       options={COUNTRY_OPTIONS} required={false} formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField  label={t("beneficiaries.date_arrived")}      field="date_arrived_in_malaysia" type="date" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("beneficiaries.current_city")} field="current_city" placeholder="Kuala Lumpur"  required={false} formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField label={t("beneficiaries.address")}      field="address"      placeholder="No. 1, Jalan…" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <SelectField label={t("beneficiaries.country_of_origin")} field="country_of_origin" options={COUNTRY_OPTIONS} required={false} formData={locationForm} errors={errors} updateFormData={setL} />
+            <InputField  label={t("beneficiaries.address")}            field="address"           placeholder="No. 1, Jalan…" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
         </div>
 

@@ -9,7 +9,7 @@ import {
 } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
 import {
-  InputField, SelectField, TextareaField,
+  InputField, SelectField, MultiSelect, TextareaField,
   ToggleInput, StorageDocumentField, StorageImageField, validate,
 } from "components/form";
 import Button from "components/ui/buttons/Button";
@@ -40,7 +40,7 @@ export default function BeneficiaryEditForm() {
   const [userForm, setUserForm] = useState({ full_name: "", email: "", phone_number: "", is_active: true, profile_photo: null });
   const [photoKey, setPhotoKey] = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
-  const [classForm, setClassForm] = useState({ classification: "" });
+  const [classForm, setClassForm] = useState({ classifications: [] });
   const [personalForm, setPersonalForm] = useState({
     full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "",
     marital_status: "", account_status: "", background: "",
@@ -78,13 +78,10 @@ export default function BeneficiaryEditForm() {
   const setB  = (f, v) => setBankForm((p)    => ({ ...p, [f]: v }));
   const setFi = (f, v) => setFinForm((p)     => ({ ...p, [f]: v }));
 
-  const CLASSIFICATION_OPTIONS = [
-    { value: "", label: t("beneficiaries.classification_placeholder") },
-    ...classifications.map((c) => ({
-      value: c.id,
-      label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
-    })),
-  ];
+  const CLASSIFICATION_OPTIONS = classifications.map((c) => ({
+    value: c.id,
+    label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
+  }));
 
   const ACCOUNT_STATUS_FORM_OPTIONS_T = [
     { value: "active",    label: t("beneficiaries.account_status_active") },
@@ -150,12 +147,11 @@ export default function BeneficiaryEditForm() {
       if (!data) return;
       const u   = data.user ?? {};
       const fi  = data.family_information ?? {};
-      const cd  = data.classification_details ?? {};
       const bi  = u.banking_information   ?? {};
       const fi2 = u.financial_information ?? {};
 
       const uSnap = { full_name: u.full_name ?? "", email: u.email ?? "", phone_number: u.phone_number ?? "", is_active: u.is_active ?? true, profile_photo: u.profile_photo ?? null };
-      const cSnap = { classification: cd.id ?? data.classification ?? "" };
+      const cSnap = { classifications: (data.classifications ?? []).map((c) => c.id) };
       const pSnap = {
         full_name_arabic: data.full_name_ar       ?? "",
         passport_number:  data.passport_number    ?? "",
@@ -230,7 +226,7 @@ export default function BeneficiaryEditForm() {
             payment_frequency: finForm.payment_frequency || undefined,
           },
         },
-        classification:             classForm.classification             || undefined,
+        classifications:            classForm.classifications,
         full_name_arabic:           personalForm.full_name_arabic        || undefined,
         passport_number:            personalForm.passport_number         || undefined,
         date_of_birth:              personalForm.date_of_birth           || undefined,
@@ -306,7 +302,7 @@ export default function BeneficiaryEditForm() {
         {/* ── Classification ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdShield className="h-5 w-5" />} title={t("beneficiaries.section_classification")} subtitle={t("beneficiaries.section_classification_sub")} />
-          <SelectField label={t("beneficiaries.classification")} field="classification" options={CLASSIFICATION_OPTIONS} required={false} formData={classForm} errors={errors} updateFormData={setC} />
+          <MultiSelect label={t("beneficiaries.classification")} field="classifications" options={CLASSIFICATION_OPTIONS} required={false} formData={classForm} errors={errors} updateFormData={setC} />
         </div>
 
         {/* ── Personal Information ── */}
