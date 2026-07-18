@@ -12,6 +12,8 @@ import FeedbackPage          from "views/admin/feedback";
 import OpportunitiesPage     from "views/admin/opportunities";
 import NewsPage              from "views/admin/news";
 import EventsPage            from "views/admin/events";
+import SubscribersPage       from "views/admin/newsletter/Subscribers";
+import NotificationsPage     from "views/admin/newsletter/Notifications";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -64,6 +66,7 @@ import {
   MdRateReview,
   MdWork,
   MdArticle,
+  MdEmail,
 } from "react-icons/md";
 
 const routes = [
@@ -95,6 +98,18 @@ const routes = [
     children: [
       { name: "All Events", path: "events" },
       { name: "New Event",  path: "events/create" },
+    ],
+  },
+  {
+    name: "Newsletter",
+    layout: "/admin",
+    path: "newsletter/subscribers",
+    icon: <MdEmail className="h-5 w-5" />,
+    component: <SubscribersPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "Subscribers",   path: "newsletter/subscribers" },
+      { name: "Notifications", path: "newsletter/notifications" },
     ],
   },
 
@@ -402,6 +417,18 @@ const routes = [
     children: [
       { name: "All Events", path: "events" },
       { name: "New Event",  path: "events/create" },
+    ],
+  },
+  {
+    name: "Newsletter",
+    layout: "/staff",
+    path: "newsletter/subscribers",
+    icon: <MdEmail className="h-5 w-5" />,
+    component: <SubscribersPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "Subscribers",   path: "newsletter/subscribers" },
+      { name: "Notifications", path: "newsletter/notifications" },
     ],
   },
   {

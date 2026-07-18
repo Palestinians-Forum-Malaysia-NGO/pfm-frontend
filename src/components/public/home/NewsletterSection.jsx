@@ -2,16 +2,25 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdEmail, MdArrowForward, MdCheckCircle } from "react-icons/md";
 import useInView from "hooks/useInView";
+import AlertBanner from "components/ui/AlertBanner";
+import { useSubscribeNewsletter } from "components/features/newsletter/hooks";
 
 const NewsletterSection = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
   const [email, setEmail]         = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const { execute: subscribe, loading, error } = useSubscribeNewsletter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email.trim()) setSubmitted(true);
+    if (!email.trim()) return;
+    try {
+      await subscribe(email.trim());
+      setSubmitted(true);
+    } catch {
+      // error state is surfaced via the hook's `error`
+    }
   };
 
   return (
@@ -32,25 +41,29 @@ const NewsletterSection = () => {
 
         <div className="mt-8">
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative flex-1">
-                <MdEmail className="pointer-events-none absolute ltr:left-4 rtl:right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="your@email.com"
-                  className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 text-sm text-start text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
-                />
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-green px-6 py-3 text-sm font-bold text-white shadow-glow-green-sm transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-              >
-                {t("home.subscribe")} <MdArrowForward className="h-4 w-4" />
-              </button>
-            </form>
+            <>
+              <AlertBanner message={error} />
+              <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <MdEmail className="pointer-events-none absolute ltr:left-4 rtl:right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="your@email.com"
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 text-sm text-start text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-green px-6 py-3 text-sm font-bold text-white shadow-glow-green-sm transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:opacity-60"
+                >
+                  {loading ? t("home.subscribing") : t("home.subscribe")} <MdArrowForward className="h-4 w-4" />
+                </button>
+              </form>
+            </>
           ) : (
             <div className="inline-flex items-center gap-2 rounded-full border border-green/20 bg-green/5 px-6 py-3 text-sm font-semibold text-green">
               <MdCheckCircle className="h-5 w-5" />

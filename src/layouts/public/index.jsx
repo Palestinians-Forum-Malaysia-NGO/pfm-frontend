@@ -8,6 +8,7 @@ import Footer from "components/footer/Footer";
 import ProjectDetail from "views/public/projects/ProjectDetail";
 import NewsDetail from "views/public/news/NewsDetail";
 import EventDetail from "views/public/events/EventDetail";
+import NewsletterUnsubscribe from "views/public/newsletter/Unsubscribe";
 
 export default function PublicLayout() {
   const { i18n } = useTranslation();
@@ -33,6 +34,7 @@ export default function PublicLayout() {
           <Route path="/projects/:slug" element={<ProjectDetail />} />
           <Route path="/news/:slug" element={<NewsDetail />} />
           <Route path="/events/:slug" element={<EventDetail />} />
+          <Route path="/newsletter/unsubscribe/:token" element={<NewsletterUnsubscribe />} />
         </Routes>
       </main>
       <Footer />

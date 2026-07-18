@@ -35,6 +35,8 @@ import BranchDetail from "views/admin/branches/BranchDetail";
 import BranchEdit   from "views/admin/branches/BranchEdit";
 import ApplicationCreate from "views/admin/applications/ApplicationCreate";
 import ApplicationDetail from "views/admin/applications/ApplicationDetail";
+import NotificationsPage    from "views/admin/newsletter/Notifications";
+import NotificationDetail   from "views/admin/newsletter/NotificationDetail";
 
 const SUB_ROUTE_NAMES = {
   "/categories/create":    "New Category",
@@ -45,6 +47,7 @@ const SUB_ROUTE_NAMES = {
   "/opportunities/create": "New Opportunity",
   "/news/create": "New Article",
   "/events/create": "New Event",
+  "/newsletter/notifications": "Notifications",
 };
 
 export default function StaffLayout() {
@@ -85,6 +88,7 @@ export default function StaffLayout() {
     if (path.match(/\/partnerships\/[^/]+$/))        { setCurrentRouteName("Partnership Detail"); return; }
     if (path.match(/\/branches\/[^/]+$/))            { setCurrentRouteName("Branch Detail");     return; }
     if (path.match(/\/applications\/[^/]+$/))        { setCurrentRouteName("Application Detail"); return; }
+    if (path.match(/\/newsletter\/notifications\/[^/]+$/)) { setCurrentRouteName("Notification Detail"); return; }
     const active = routes.find((r) => r.layout === "/staff" && path.includes(r.path));
     if (active) setCurrentRouteName(active.name);
   }, [location.pathname]);
@@ -147,6 +151,8 @@ export default function StaffLayout() {
               <Route path="/branches/:id/edit"  element={<BranchEdit />} />
               <Route path="/applications/create" element={<ApplicationCreate />} />
               <Route path="/applications/:id"    element={<ApplicationDetail />} />
+              <Route path="/newsletter/notifications"     element={<NotificationsPage />} />
+              <Route path="/newsletter/notifications/:id" element={<NotificationDetail />} />
               <Route path="/" element={<Navigate to="/staff/default" replace />} />
             </Routes>
           </PageTransition>
