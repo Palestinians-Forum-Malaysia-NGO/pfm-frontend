@@ -2,6 +2,7 @@ import api from "services/app";
 
 export const partnershipService = {
   async getAll(params = {})   { const { data } = await api.get("/partnerships", { params }); return data; },
+  async getInactive(params = {}) { const { data } = await api.get("/partnerships/inactive", { params }); return data; },
   async getById(id)           { const { data } = await api.get(`/partnerships/${id}`); return data; },
   async create(payload)       { const { data } = await api.post("/partnerships", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/partnerships/${id}`, payload); return data; },

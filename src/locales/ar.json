@@ -1817,6 +1817,7 @@
     "col_website": "الموقع الإلكتروني",
     "col_order": "الترتيب",
     "col_status": "الحالة",
+    "col_deactivated_at": "تاريخ الإلغاء",
     "col_actions": "الإجراءات",
     "view": "عرض",
     "edit": "تعديل",
@@ -1869,7 +1870,12 @@
     "delete_confirm_pre": "هل أنت متأكد أنك تريد إزالة",
     "delete_confirm_post": "لن يتم عرضه للجمهور بعد الآن، ولكن يمكن استرجاعه لاحقاً.",
     "delete_btn": "إزالة",
-    "cancel_btn": "إلغاء"
+    "cancel_btn": "إلغاء",
+    "inactive_title": "الشركاء غير النشطين",
+    "inactive_subtitle": "الشركاء الذين تم إلغاء تنشيطهم",
+    "back_to_all": "رجوع للشراكات",
+    "no_inactive_partnerships": "لا يوجد شركاء غير نشطين",
+    "no_inactive_partnerships_desc": "سيظهر الشركاء الملغى تنشيطهم هنا."
   },
   "branches": {
     "title": "الفروع",
@@ -2099,6 +2105,7 @@
     "add_classification": "إضافة تصنيف",
     "all_partnerships": "جميع الشراكات",
     "add_partnership": "إضافة شراكة",
+    "inactive_partners": "الشركاء غير النشطين",
     "all_opportunities": "جميع الفرص",
     "all_news": "جميع الأخبار",
     "all_events": "جميع الفعاليات",

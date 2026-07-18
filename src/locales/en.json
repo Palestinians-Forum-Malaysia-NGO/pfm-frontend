@@ -1817,6 +1817,7 @@
     "col_website": "Website",
     "col_order": "Order",
     "col_status": "Status",
+    "col_deactivated_at": "Deactivated",
     "col_actions": "Actions",
     "view": "View",
     "edit": "Edit",
@@ -1869,7 +1870,12 @@
     "delete_confirm_pre": "Are you sure you want to remove",
     "delete_confirm_post": "It will no longer be shown publicly, but can be restored later.",
     "delete_btn": "Remove",
-    "cancel_btn": "Cancel"
+    "cancel_btn": "Cancel",
+    "inactive_title": "Inactive Partners",
+    "inactive_subtitle": "Partners that have been deactivated",
+    "back_to_all": "Back to Partnerships",
+    "no_inactive_partnerships": "No inactive partners found",
+    "no_inactive_partnerships_desc": "Deactivated partners will show up here."
   },
   "branches": {
     "title": "Branches",
@@ -2099,6 +2105,7 @@
     "add_classification": "Add Classification",
     "all_partnerships": "All Partnerships",
     "add_partnership": "Add Partnership",
+    "inactive_partners": "Inactive Partners",
     "all_opportunities": "All Opportunities",
     "all_news": "All News",
     "all_events": "All Events",

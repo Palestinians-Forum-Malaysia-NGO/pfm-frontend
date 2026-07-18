@@ -36,6 +36,7 @@ import EventEdit   from "views/admin/events/EventEdit";
 import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
 import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
 import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
+import InactivePartnerships from "views/admin/partnerships/InactivePartnerships";
 import BranchCreate from "views/admin/branches/BranchCreate";
 import BranchDetail from "views/admin/branches/BranchDetail";
 import BranchEdit   from "views/admin/branches/BranchEdit";
@@ -54,6 +55,7 @@ const SUB_ROUTE_NAMES = {
   "/classifications/create": "New Classification",
   "/projects/create":   "New Project",
   "/partnerships/create": "New Partnership",
+  "/partnerships/inactive": "Inactive Partners",
   "/branches/create": "New Branch",
   "/applications/create": "New Application",
   "/opportunities/create": "New Opportunity",
@@ -178,6 +180,7 @@ export default function Admin(props) {
               <Route path="/events/:id"      element={<EventDetail />} />
               <Route path="/events/:id/edit" element={<EventEdit />} />
               <Route path="/partnerships/create"   element={<PartnershipCreate />} />
+              <Route path="/partnerships/inactive" element={<InactivePartnerships />} />
               <Route path="/partnerships/:id"      element={<PartnershipDetail />} />
               <Route path="/partnerships/:id/edit" element={<PartnershipEdit />} />
               <Route path="/branches/create"   element={<BranchCreate />} />

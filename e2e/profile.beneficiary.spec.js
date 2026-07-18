@@ -6,10 +6,13 @@ test.describe("Self-service profile — GET /accounts/me/ field mapping", () => 
 
     // Regression check: UserProfileCard used to read is_active/created_at at the
     // top level, which /accounts/me/ doesn't have — always showed Inactive + "—".
-    await expect(page.getByText("Active", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText("Inactive")).toHaveCount(0);
+    // Scoped to <main> — the sidebar can contain unrelated "Inactive" text (e.g. an
+    // "Inactive Partners" nav item) that would otherwise false-positive this check.
+    const main = page.getByRole("main");
+    await expect(main.getByText("Active", { exact: true }).first()).toBeVisible();
+    await expect(main.getByText("Inactive")).toHaveCount(0);
 
-    const joinedRow = page.locator("text=Joined").locator("..");
+    const joinedRow = main.locator("text=Joined").locator("..");
     await expect(joinedRow.getByText("—")).toHaveCount(0);
   });
 });

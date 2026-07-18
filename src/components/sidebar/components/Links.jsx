@@ -43,6 +43,7 @@ export const ROUTE_KEY = {
   "Add Classification":  "sidebar.add_classification",
   "All Partnerships":    "sidebar.all_partnerships",
   "Add Partnership":     "sidebar.add_partnership",
+  "Inactive Partners":   "sidebar.inactive_partners",
   "All Opportunities":   "sidebar.all_opportunities",
   "All News":            "sidebar.all_news",
   "All Events":          "sidebar.all_events",

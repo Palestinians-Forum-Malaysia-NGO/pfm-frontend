@@ -266,6 +266,7 @@ const routes = [
     children: [
       { name: "All Partnerships", path: "partnerships" },
       { name: "Add Partnership",  path: "partnerships/create" },
+      { name: "Inactive Partners", path: "partnerships/inactive" },
     ],
   },
   {
@@ -453,6 +454,7 @@ const routes = [
     children: [
       { name: "All Partnerships", path: "partnerships" },
       { name: "Add Partnership",  path: "partnerships/create" },
+      { name: "Inactive Partners", path: "partnerships/inactive" },
     ],
   },
   {

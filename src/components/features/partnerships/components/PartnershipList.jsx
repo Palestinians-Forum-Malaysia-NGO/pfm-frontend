@@ -143,7 +143,10 @@ export default function PartnershipList() {
         title={t("partnerships.title")}
         subtitle={t("partnerships.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text={t("partnerships.add_partnership")} onClick={() => navigate(`${base}/partnerships/create`)} />
+          <>
+            <Button variant="ghost" icon={<MdCancel className="h-4 w-4" />} text={t("partnerships.inactive_title")} onClick={() => navigate(`${base}/partnerships/inactive`)} />
+            <Button icon={<MdAdd className="h-4 w-4" />} text={t("partnerships.add_partnership")} onClick={() => navigate(`${base}/partnerships/create`)} />
+          </>
         }
       />
 
