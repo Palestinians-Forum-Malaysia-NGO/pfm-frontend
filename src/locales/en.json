@@ -2058,7 +2058,10 @@
     "info_sent": "Sent",
     "info_failed": "Failed",
     "info_sent_at": "Sent At",
-    "info_created_at": "Created At"
+    "info_created_at": "Created At",
+    "view_news": "View Article",
+    "view_project": "View Project",
+    "view_event": "View Event"
   },
   "newsletterPublic": {
     "unsubscribing": "Unsubscribing…",

@@ -2058,7 +2058,10 @@
     "info_sent": "تم الإرسال",
     "info_failed": "فشل",
     "info_sent_at": "تاريخ الإرسال",
-    "info_created_at": "تاريخ الإنشاء"
+    "info_created_at": "تاريخ الإنشاء",
+    "view_news": "عرض المقال",
+    "view_project": "عرض المشروع",
+    "view_event": "عرض الفعالية"
   },
   "newsletterPublic": {
     "unsubscribing": "جارٍ إلغاء الاشتراك…",
