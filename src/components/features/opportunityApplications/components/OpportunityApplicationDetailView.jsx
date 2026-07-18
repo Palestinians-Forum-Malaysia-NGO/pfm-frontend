@@ -20,6 +20,7 @@ import {
   useApproveOpportunityApplication, useRejectOpportunityApplication,
 } from "components/features/opportunityApplications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import { isSafeUrl } from "utils/url";
 
 const fmtDate = (iso) => {
   if (!iso) return "—";
@@ -139,12 +140,12 @@ export default function OpportunityApplicationDetailView() {
         <FormHeader icon={<MdDescription className="h-5 w-5" />} title={t("opportunityApplications.section_documents")} subtitle={t("opportunityApplications.section_documents_sub")} />
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_resume")} value={
-            application.applicant_resume
+            isSafeUrl(application.applicant_resume)
               ? <a href={application.applicant_resume} target="_blank" rel="noreferrer" className="text-green hover:underline">{t("opportunityApplications.view_link")}</a>
               : "—"
           } />
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_portfolio")} value={
-            application.applicant_portfolio
+            isSafeUrl(application.applicant_portfolio)
               ? <a href={application.applicant_portfolio} target="_blank" rel="noreferrer" className="text-green hover:underline">{t("opportunityApplications.view_link")}</a>
               : "—"
           } />

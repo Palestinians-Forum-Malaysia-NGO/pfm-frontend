@@ -7,6 +7,7 @@ import {
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
+import StorageFileLink from "components/ui/StorageFileLink";
 import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
 
 const STATUS_BADGE   = {
@@ -156,14 +157,12 @@ const MemberInfoSection = ({ profile }) => {
                   {doc.remarks && <p className="mt-0.5 text-xs text-slate-400">{doc.remarks}</p>}
                 </div>
                 {doc.document_file && (
-                  <a
-                    href={doc.document_file}
-                    target="_blank"
-                    rel="noreferrer"
+                  <StorageFileLink
+                    fileKey={doc.document_file}
                     className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-green/50 hover:text-green"
                   >
                     <MdOpenInNew className="h-3.5 w-3.5" /> {t("beneficiaries.doc_view")}
-                  </a>
+                  </StorageFileLink>
                 )}
               </div>
             ))}

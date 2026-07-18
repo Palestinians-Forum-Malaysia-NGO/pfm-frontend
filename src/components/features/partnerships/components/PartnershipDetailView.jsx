@@ -16,6 +16,7 @@ import Loading        from "components/loading/Loading";
 import PartnershipDeleteModal from "./PartnershipDeleteModal";
 import { useGetPartnership, useDeletePartnership, useRestorePartnership } from "components/features/partnerships/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import { isSafeUrl } from "utils/url";
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -116,7 +117,7 @@ export default function PartnershipDetailView() {
         <FormHeader icon={<MdHandshake className="h-5 w-5" />} title={t("partnerships.section_info_title")} subtitle={t("partnerships.section_info_subtitle")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdLink className="h-4 w-4" />}          label={t("partnerships.info_website")} value={
-            partnership.website_url
+            isSafeUrl(partnership.website_url)
               ? <a href={partnership.website_url} target="_blank" rel="noreferrer" className="text-green hover:underline">{t("partnerships.visit_link")}</a>
               : "—"
           } />

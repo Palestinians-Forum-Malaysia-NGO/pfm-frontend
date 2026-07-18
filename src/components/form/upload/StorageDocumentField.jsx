@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   MdCloudUpload, MdDeleteOutline, MdInsertDriveFile,
   MdErrorOutline, MdOpenInNew,
@@ -6,6 +6,19 @@ import {
 import { useTranslation } from "react-i18next";
 import { WRAPPER, LABEL, ERROR_MSG } from "../utils/fieldStyles";
 import useStorageUpload from "./useStorageUpload";
+import { isSafeUrl } from "utils/url";
+
+const EXT_TO_MIME = {
+  ".pdf":  "application/pdf",
+  ".doc":  "application/msword",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".jpg":  "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png":  "image/png",
+};
+
+const MAX_SIZE_MB    = 10;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 /**
  * Smart document / file upload field backed by DigitalOcean Spaces.
@@ -41,9 +54,27 @@ const StorageDocumentField = ({
   const { file, isUploading, progress, error, handleFileChange, handleRemove } =
     useStorageUpload({ fileType, folder, onUpload });
 
+  const [fileError, setFileError] = useState("");
+
+  const allowedMimes = useMemo(
+    () => accept.split(",").map((ext) => EXT_TO_MIME[ext.trim().toLowerCase()]).filter(Boolean),
+    [accept]
+  );
+
   const handleChange = (e) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
+    if (allowedMimes.length && !allowedMimes.includes(selected.type)) {
+      setFileError(t("common.invalid_file_type", { types: accept }));
+      e.target.value = "";
+      return;
+    }
+    if (selected.size > MAX_SIZE_BYTES) {
+      setFileError(t("common.file_too_large", { size: MAX_SIZE_MB }));
+      e.target.value = "";
+      return;
+    }
+    setFileError("");
     handleFileChange(selected);
     e.target.value = "";
   };
@@ -83,7 +114,7 @@ const StorageDocumentField = ({
                 <p className="truncate text-sm font-medium text-slate-900">
                   {currentName ?? t("common.uploaded_file")}
                 </p>
-                {currentUrl && (
+                {isSafeUrl(currentUrl) && (
                   <a
                     href={currentUrl}
                     target="_blank"
@@ -151,11 +182,11 @@ const StorageDocumentField = ({
         </div>
       )}
 
-      {/* ── Upload error banner ── */}
-      {error && (
+      {/* ── Validation / upload error banner ── */}
+      {(fileError || error) && (
         <div className="mt-2 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5">
           <MdErrorOutline className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
-          <p className="text-xs text-red-600">{error}</p>
+          <p className="text-xs text-red-600">{fileError || error}</p>
         </div>
       )}
 

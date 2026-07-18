@@ -494,7 +494,8 @@
     "pattern": "Invalid format",
     "min": "Minimum value is {{count}}",
     "max": "Maximum value is {{count}}",
-    "minItems": "Select at least {{count}} item"
+    "minItems": "Select at least {{count}} item",
+    "url": "Enter a valid http:// or https:// link"
   },
   "users": {
     "title": "Users",

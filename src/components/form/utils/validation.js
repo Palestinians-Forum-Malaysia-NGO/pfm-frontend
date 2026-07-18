@@ -17,6 +17,13 @@ export const validate = (value, rules = []) => {
       if (rule.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v))) {
         return rule.message ?? t("validation.email");
       }
+      if (rule.url) {
+        let scheme;
+        try { scheme = new URL(String(v)).protocol; } catch { scheme = null; }
+        if (scheme !== "http:" && scheme !== "https:") {
+          return rule.message ?? t("validation.url");
+        }
+      }
       if (rule.minLength && String(v).length < rule.minLength) {
         return rule.message ?? t("validation.minLength", { count: rule.minLength });
       }

@@ -13,6 +13,7 @@ import useGetProjectBeneficiaries from "components/features/projects/hooks/useGe
 import { useGetClassifications } from "components/features/classifications/hooks";
 import { useGetCategories } from "components/features/categories/hooks";
 import { ACCOUNT_STATUS_OPTIONS } from "components/features/beneficiaries/constants/beneficiary";
+import { isSafeUrl } from "utils/url";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -22,6 +23,7 @@ function ProofCell({ fileKey }) {
   const { url } = useStorageUrl(fileKey);
   if (!fileKey) return <span className="text-slate-300">—</span>;
   if (!url) return <span className="text-xs text-slate-400">{t("projects.beneficiaries_loading_proof")}</span>;
+  if (!isSafeUrl(url)) return <span className="text-slate-300">—</span>;
   return (
     <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
       <MdInsertDriveFile className="h-3.5 w-3.5" /> {t("projects.beneficiaries_view_proof")} <MdOpenInNew className="h-3 w-3" />

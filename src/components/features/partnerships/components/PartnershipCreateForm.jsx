@@ -19,7 +19,7 @@ const RULES = {
   name:             [{ required: true }, { maxLength: 200 }],
   logo:             [{ required: true }],
   partnership_type: [{ required: true }],
-  website_url:      [{ required: true }, { maxLength: 500 }],
+  website_url:      [{ required: true }, { maxLength: 500 }, { url: true }],
 };
 
 const EMPTY = {

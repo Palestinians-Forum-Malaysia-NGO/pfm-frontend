@@ -5,6 +5,7 @@ import { MdHandshake, MdOpenInNew, MdRestore, MdClose, MdLink } from "react-icon
 import useLayoutBase from "hooks/useLayoutBase";
 import { useInactivePartnershipList } from "components/features/partnerships/hooks";
 import { PARTNERSHIP_TYPES } from "components/features/partnerships/constants/partnershipTypes";
+import { isSafeUrl } from "utils/url";
 import Button        from "components/ui/buttons/Button";
 import PageHeader     from "components/ui/PageHeader";
 import RowIconButton  from "components/ui/buttons/RowIconButton";
@@ -57,7 +58,7 @@ export default function InactivePartnershipsList() {
     {
       key: "website",
       label: t("partnerships.col_website"),
-      render: (p) => p.website_url ? (
+      render: (p) => isSafeUrl(p.website_url) ? (
         <a href={p.website_url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-green">
           <MdLink className="h-3.5 w-3.5" /> {t("partnerships.visit_link")}

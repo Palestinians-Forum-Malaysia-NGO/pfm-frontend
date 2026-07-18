@@ -9,6 +9,7 @@ import {
 } from "components/features/projects/hooks";
 import { useGetBeneficiaries } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import { isSafeUrl } from "utils/url";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -168,7 +169,7 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
                       ))}
                     </div>
                     {r.note && <p className="mt-0.5 text-sm text-slate-600">{r.note}</p>}
-                    {r.proof?.public_url && (
+                    {isSafeUrl(r.proof?.public_url) && (
                       <a href={r.proof.public_url} target="_blank" rel="noreferrer" className="mt-1.5 inline-block">
                         <img src={r.proof.public_url} alt={t("projects.milestone_proof_label")} className="h-16 w-16 rounded-lg border border-slate-200 object-cover" />
                       </a>
