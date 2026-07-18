@@ -19,6 +19,7 @@ import StorageImage from "components/ui/StorageImage";
 import ProjectDeleteModal from "./ProjectDeleteModal";
 import AssignStaffModal from "./AssignStaffModal";
 import MilestoneSection from "./MilestoneSection";
+import ProjectBeneficiariesSection from "./ProjectBeneficiariesSection";
 import UpdatesSection from "./UpdatesSection";
 import GallerySection from "./GallerySection";
 import {
@@ -307,6 +308,9 @@ export default function ProjectDetailView() {
 
       {/* ── Milestones ── */}
       <MilestoneSection projectId={id} initialMilestones={project.milestones ?? []} />
+
+      {/* ── Beneficiaries Helped (aggregate across milestones) ── */}
+      <ProjectBeneficiariesSection projectId={id} />
 
       {/* ── Updates ── */}
       <UpdatesSection projectId={id} initialUpdates={project.updates ?? []} />

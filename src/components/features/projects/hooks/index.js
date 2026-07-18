@@ -1,4 +1,5 @@
 export { default as useGetProjects       } from "./useGetProjects";
+export { default as useExportProjects    } from "./useExportProjects";
 export { default as useGetProject        } from "./useGetProject";
 export { default as useCreateProject     } from "./useCreateProject";
 export { default as useUpdateProject     } from "./useUpdateProject";
@@ -16,6 +17,7 @@ export { default as useDeleteProjectUpdate } from "./useDeleteProjectUpdate";
 export { default as useCreateGalleryPhoto  } from "./useCreateGalleryPhoto";
 export { default as useUpdateGalleryPhoto  } from "./useUpdateGalleryPhoto";
 export { default as useDeleteGalleryPhoto  } from "./useDeleteGalleryPhoto";
+export { default as useGetProjectBeneficiaries } from "./useGetProjectBeneficiaries";
 export { default as useGetMilestoneBeneficiaries } from "./useGetMilestoneBeneficiaries";
 export { default as useCreateMilestoneBeneficiary } from "./useCreateMilestoneBeneficiary";
 export { default as useUpdateMilestoneBeneficiary } from "./useUpdateMilestoneBeneficiary";

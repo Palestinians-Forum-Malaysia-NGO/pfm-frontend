@@ -30,6 +30,9 @@ import OpportunityApplicationDetail from "views/admin/opportunities/OpportunityA
 import NewsCreate from "views/admin/news/NewsCreate";
 import NewsDetail from "views/admin/news/NewsDetail";
 import NewsEdit   from "views/admin/news/NewsEdit";
+import EventCreate from "views/admin/events/EventCreate";
+import EventDetail from "views/admin/events/EventDetail";
+import EventEdit   from "views/admin/events/EventEdit";
 import PartnershipCreate from "views/admin/partnerships/PartnershipCreate";
 import PartnershipDetail from "views/admin/partnerships/PartnershipDetail";
 import PartnershipEdit   from "views/admin/partnerships/PartnershipEdit";
@@ -53,6 +56,7 @@ const SUB_ROUTE_NAMES = {
   "/applications/create": "New Application",
   "/opportunities/create": "New Opportunity",
   "/news/create": "New Article",
+  "/events/create": "New Event",
 };
 
 export default function Admin(props) {
@@ -85,6 +89,7 @@ export default function Admin(props) {
     if (path.match(/\/branches\/[^/]+\/edit$/))        { setCurrentRouteName("Edit Branch");           return; }
     if (path.match(/\/opportunities\/[^/]+\/edit$/))   { setCurrentRouteName("Edit Opportunity");      return; }
     if (path.match(/\/news\/[^/]+\/edit$/))            { setCurrentRouteName("Edit News Article");     return; }
+    if (path.match(/\/events\/[^/]+\/edit$/))          { setCurrentRouteName("Edit Event");             return; }
     // Detail pages
     if (path.match(/\/users\/\d+$/))                   { setCurrentRouteName("User Detail");          return; }
     if (path.match(/\/beneficiaries\/[^/]+$/))         { setCurrentRouteName("Beneficiary Detail");   return; }
@@ -97,6 +102,7 @@ export default function Admin(props) {
     if (path.match(/\/opportunities\/[^/]+\/applications\/[^/]+$/)) { setCurrentRouteName("Opportunity Application Detail"); return; }
     if (path.match(/\/opportunities\/[^/]+$/))         { setCurrentRouteName("Opportunity Detail");    return; }
     if (path.match(/\/news\/[^/]+$/))                  { setCurrentRouteName("News Article Detail");   return; }
+    if (path.match(/\/events\/[^/]+$/))                { setCurrentRouteName("Event Detail");           return; }
     if (path.match(/\/partnerships\/[^/]+$/))          { setCurrentRouteName("Partnership Detail");    return; }
     if (path.match(/\/branches\/[^/]+$/))              { setCurrentRouteName("Branch Detail");         return; }
     if (path.match(/\/applications\/[^/]+$/))          { setCurrentRouteName("Application Detail");    return; }
@@ -164,6 +170,9 @@ export default function Admin(props) {
               <Route path="/news/create"   element={<NewsCreate />} />
               <Route path="/news/:id"      element={<NewsDetail />} />
               <Route path="/news/:id/edit" element={<NewsEdit />} />
+              <Route path="/events/create"   element={<EventCreate />} />
+              <Route path="/events/:id"      element={<EventDetail />} />
+              <Route path="/events/:id/edit" element={<EventEdit />} />
               <Route path="/partnerships/create"   element={<PartnershipCreate />} />
               <Route path="/partnerships/:id"      element={<PartnershipDetail />} />
               <Route path="/partnerships/:id/edit" element={<PartnershipEdit />} />

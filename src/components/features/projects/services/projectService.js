@@ -3,6 +3,7 @@ import api from "services/app";
 export const projectService = {
   // Projects
   async getAll(params = {})   { const { data } = await api.get("/projects", { params }); return data; },
+  async exportReport(params = {}) { const { data } = await api.get("/projects/export", { params, responseType: "blob" }); return data; },
   async getById(id)           { const { data } = await api.get(`/projects/${id}`); return data; },
   async create(payload)       { const { data } = await api.post("/projects", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/projects/${id}`, payload); return data; },
@@ -26,6 +27,8 @@ export const projectService = {
   async createGalleryPhoto(projectId, payload)     { const { data } = await api.post(`/projects/${projectId}/gallery`, payload); return data; },
   async updateGalleryPhoto(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/gallery/${id}`, payload); return data; },
   async deleteGalleryPhoto(projectId, id)          { await api.delete(`/projects/${projectId}/gallery/${id}`); },
+  // Project beneficiaries (aggregate across all milestones)
+  async getProjectBeneficiaries(projectId, params = {}) { const { data } = await api.get(`/projects/${projectId}/beneficiaries`, { params }); return data; },
   // Milestone beneficiaries
   async getMilestoneBeneficiaries(projectId, milestoneId)              { const { data } = await api.get(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`); return data; },
   async createMilestoneBeneficiary(projectId, milestoneId, payload)    { const { data } = await api.post(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`, payload); return data; },

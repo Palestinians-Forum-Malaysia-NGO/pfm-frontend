@@ -11,6 +11,7 @@ import ContactMessagesPage   from "views/admin/contactMessages";
 import FeedbackPage          from "views/admin/feedback";
 import OpportunitiesPage     from "views/admin/opportunities";
 import NewsPage              from "views/admin/news";
+import EventsPage            from "views/admin/events";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -89,13 +90,11 @@ const routes = [
     layout: "/admin",
     path: "events",
     icon: <MdEvent className="h-5 w-5" />,
-    component: <Placeholder pageName="Events" />,
-    section: "MAIN",
-    hidden: true,
+    component: <EventsPage />,
+    section: "COMMUNITY",
     children: [
-      { name: "All Events",      path: "events" },
-      { name: "Create Event",    path: "events/create" },
-      { name: "Past Events",     path: "events/archive" },
+      { name: "All Events", path: "events" },
+      { name: "New Event",  path: "events/create" },
     ],
   },
 
@@ -391,6 +390,18 @@ const routes = [
     children: [
       { name: "All News",    path: "news" },
       { name: "New Article", path: "news/create" },
+    ],
+  },
+  {
+    name: "Events",
+    layout: "/staff",
+    path: "events",
+    icon: <MdEvent className="h-5 w-5" />,
+    component: <EventsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Events", path: "events" },
+      { name: "New Event",  path: "events/create" },
     ],
   },
   {
