@@ -23,7 +23,7 @@ const PartnersGallery = () => {
   if (!loading && partnerships.length === 0) return null;
 
   return (
-    <section ref={ref} className="bg-slate-50 py-20">
+    <section id="partners" ref={ref} className="scroll-mt-24 bg-slate-50 py-20">
       <div className="mx-auto max-w-5xl px-6">
 
         <div

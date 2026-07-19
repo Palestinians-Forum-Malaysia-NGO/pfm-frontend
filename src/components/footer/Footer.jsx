@@ -28,8 +28,8 @@ const Footer = () => {
       heading: t("footer.get_involved"),
       links: [
         { label: t("footer.donate"),     to: "/donate" },
-        { label: t("footer.volunteer"),  to: "/contact" },
-        { label: t("footer.membership"), to: "/contact" },
+        { label: t("footer.volunteer"),  to: "/opportunities" },
+        { label: t("footer.apply"),      to: "/apply" },
         { label: t("footer.events"),     to: "/events" },
         { label: t("footer.campaigns"),  to: "/projects" },
       ],
@@ -37,20 +37,15 @@ const Footer = () => {
     {
       heading: t("footer.projects"),
       links: [
-        { label: t("footer.all_projects"), to: "/projects" },
-        { label: t("footer.medical"),      to: "/projects?category=medical" },
-        { label: t("footer.education"),    to: "/projects?category=education" },
-        { label: t("footer.food"),         to: "/projects?category=food" },
-        { label: t("footer.community"),    to: "/projects?category=community" },
+        { label: t("footer.all_projects"),      to: "/projects" },
+        { label: t("footer.active_projects"),   to: "/projects" },
+        { label: t("footer.completed_projects"), to: "/projects" },
       ],
     },
     {
       heading: t("footer.resources"),
       links: [
-        { label: t("footer.news"),      to: "/news" },
-        { label: t("footer.gallery"),   to: "/gallery" },
-        { label: t("footer.privacy"),   to: "/privacy" },
-        { label: t("footer.terms"),     to: "/terms" },
+        { label: t("footer.news"), to: "/news" },
       ],
     },
   ];

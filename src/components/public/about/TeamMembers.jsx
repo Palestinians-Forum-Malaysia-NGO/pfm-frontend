@@ -12,7 +12,7 @@ const TeamMembers = () => {
   ];
 
   return (
-    <section ref={ref} className="bg-white py-20">
+    <section id="team" ref={ref} className="scroll-mt-24 bg-white py-20">
       <div className="mx-auto max-w-3xl px-6">
 
         <div
