@@ -5,16 +5,24 @@ import { MdFavorite, MdArrowForward, MdPeople, MdCampaign } from "react-icons/md
 import { FaHandHoldingHeart } from "react-icons/fa";
 import img1 from "assets/img/gallery/gallery-16.jpg";
 import img2 from "assets/img/gallery/gallery-4.jpg";
+import { useGetStats } from "components/features/stats/hooks";
 
-const PARTNERS = ["Islamic Relief", "MERCY Malaysia", "AMAN Palestine", "UNRWA"];
+const fmtMYR = (val) => {
+  const n = parseFloat(val);
+  if (!n) return "RM 0";
+  if (n >= 1_000_000) return `RM ${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `RM ${Math.round(n / 1_000)}K+`;
+  return `RM ${Math.round(n)}`;
+};
 
 const HeroSection = () => {
   const { t } = useTranslation();
+  const { stats, loading } = useGetStats();
 
   const STATS = [
-    { value: "500+",   label: t("hero.members"),   icon: <MdPeople className="h-4 w-4" />,           color: "bg-green text-white",     delay: "0.5s" },
-    { value: "RM 1M+", label: t("hero.raised"),    icon: <FaHandHoldingHeart className="h-4 w-4" />, color: "bg-white text-slate-900", delay: "0.65s" },
-    { value: "30+",    label: t("hero.campaigns"),  icon: <MdCampaign className="h-4 w-4" />,         color: "bg-red-500 text-white",   delay: "0.8s" },
+    { value: loading ? "—" : `${stats?.projects?.by_status?.active ?? 0}+`, label: t("hero.active_projects"), icon: <MdCampaign className="h-4 w-4" />,         color: "bg-green text-white",     delay: "0.5s" },
+    { value: loading ? "—" : fmtMYR(stats?.total_amount_spent),             label: t("hero.raised"),          icon: <FaHandHoldingHeart className="h-4 w-4" />, color: "bg-white text-slate-900", delay: "0.65s" },
+    { value: loading ? "—" : `${stats?.total_beneficiaries_helped ?? 0}+`,  label: t("hero.beneficiaries"),   icon: <MdPeople className="h-4 w-4" />,           color: "bg-red-500 text-white",   delay: "0.8s" },
   ];
 
   return (

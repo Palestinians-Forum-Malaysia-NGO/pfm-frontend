@@ -2,19 +2,16 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { MdLocationOn } from "react-icons/md";
 import useInView from "hooks/useInView";
-
-const LOCATIONS = [
-  { city: "Kuala Lumpur",  state: "Federal Territory", members: "180+", primary: true },
-  { city: "Selangor",      state: "Selangor",          members: "95+" },
-  { city: "Penang",        state: "Pulau Pinang",      members: "60+" },
-  { city: "Johor Bahru",   state: "Johor",             members: "45+" },
-  { city: "Kota Kinabalu", state: "Sabah",             members: "30+" },
-  { city: "Kuching",       state: "Sarawak",           members: "25+" },
-];
+import { useGetBranches } from "components/features/branches/hooks";
 
 const CoverageMap = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [ref, inView] = useInView();
+  const { branches: allBranches, loading } = useGetBranches();
+
+  const branches = allBranches.filter((b) => b.is_active);
+
+  if (!loading && branches.length === 0) return null;
 
   return (
     <section ref={ref} className="bg-slate-50 py-20">
@@ -32,11 +29,11 @@ const CoverageMap = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {LOCATIONS.map((loc, i) => (
+          {(loading ? Array.from({ length: 3 }) : branches).map((b, i) => (
             <div
-              key={loc.city}
+              key={b?.id ?? i}
               className={`flex flex-col gap-3 rounded-2xl p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md transition-[opacity,transform] duration-700 ease-in-out ${
-                loc.primary
+                i === 0
                   ? "border-2 border-green/20 bg-green/5"
                   : "border border-slate-200 bg-white"
               }`}
@@ -46,16 +43,14 @@ const CoverageMap = () => {
                 transitionDelay: `${i * 70}ms`,
               }}
             >
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${loc.primary ? "bg-green text-white" : "bg-green/10 text-green"}`}>
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${i === 0 ? "bg-green text-white" : "bg-green/10 text-green"}`}>
                 <MdLocationOn className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-bold text-slate-900">{loc.city}</p>
-                <p className="text-xs text-slate-400">{loc.state}</p>
+                <p className="font-bold text-slate-900">
+                  {b ? ((b.name_ar && i18n.language === "ar") ? b.name_ar : b.name) : "—"}
+                </p>
               </div>
-              <span className={`w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold ${loc.primary ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"}`}>
-                {loc.members} {t("about.members_suffix")}
-              </span>
             </div>
           ))}
         </div>
