@@ -28,7 +28,7 @@ export default function Home() {
       <JoinRoadmap />
       <PartnersCarousel />
       <NewsletterSection />
-      <WhatsAppFloatButton phone="60123456789" />
+      <WhatsAppFloatButton phone="601156563044" />
     </>
   );
 }

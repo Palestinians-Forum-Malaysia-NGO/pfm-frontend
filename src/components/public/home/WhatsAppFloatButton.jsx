@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaWhatsapp } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 
-const WhatsAppFloatButton = ({ phone = "60123456789", message = "Hi PFM, I'd like to know more about your work!" }) => {
+const WhatsAppFloatButton = ({ phone = "601156563044", message = "Hi PFM, I'd like to know more about your work!" }) => {
   const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
