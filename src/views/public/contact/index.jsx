@@ -8,10 +8,10 @@ import useInView from "hooks/useInView";
 import heroBg from "assets/img/gallery/gallery-2.jpg";
 
 const SOCIALS = [
-  { icon: <FaFacebook size={18} />,  href: "https://facebook.com/pfm",   label: "Facebook" },
-  { icon: <FaInstagram size={18} />, href: "https://instagram.com/pfm",  label: "Instagram" },
-  { icon: <FaWhatsapp size={18} />,  href: "https://wa.me/60123456789",  label: "WhatsApp" },
-  { icon: <MdEmail size={18} />,     href: "mailto:info@pfm.org.my",     label: "Email" },
+  { icon: <FaFacebook size={18} />,  href: "https://facebook.com/PalestinianForumMalaysia", label: "Facebook" },
+  { icon: <FaInstagram size={18} />, href: "https://instagram.com/pfm_malaysia",             label: "Instagram" },
+  { icon: <FaWhatsapp size={18} />,  href: "https://wa.me/601156563044",                      label: "WhatsApp" },
+  { icon: <MdEmail size={18} />,     href: "mailto:palforummy@gmail.com",                     label: "Email" },
 ];
 
 export default function Contact() {
@@ -24,10 +24,10 @@ export default function Contact() {
   });
 
   const CONTACT_INFO = [
-    { icon: <MdLocationOn className="h-5 w-5" />, label: t("contact.address"), value: "Kuala Lumpur, Malaysia", sub: "Wilayah Persekutuan" },
-    { icon: <MdEmail className="h-5 w-5" />,      label: t("contact.email"),   value: "info@pfm.org.my",        href: "mailto:info@pfm.org.my" },
-    { icon: <MdPhone className="h-5 w-5" />,      label: t("contact.phone"),   value: "+60 12-345 6789",        href: "tel:+60123456789" },
-    { icon: <FaWhatsapp className="h-5 w-5" />,   label: t("contact.whatsapp"),value: "+60 12-345 6789",        href: "https://wa.me/60123456789" },
+    { icon: <MdLocationOn className="h-5 w-5" />, label: t("contact.address"), value: "Diamond Square, Kuala Lumpur", sub: "Unit 1, Level 5, Block B-12, 53100 Kuala Lumpur" },
+    { icon: <MdEmail className="h-5 w-5" />,      label: t("contact.email"),   value: "palforummy@gmail.com",   href: "mailto:palforummy@gmail.com" },
+    { icon: <MdPhone className="h-5 w-5" />,      label: t("contact.phone"),   value: "+603-4032 8482",         href: "tel:+60340328482" },
+    { icon: <FaWhatsapp className="h-5 w-5" />,   label: t("contact.whatsapp"),value: "+60 11-5656 3044",       href: "https://wa.me/601156563044" },
   ];
 
   return (

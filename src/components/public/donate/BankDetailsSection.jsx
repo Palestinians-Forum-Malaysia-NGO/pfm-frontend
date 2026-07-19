@@ -21,7 +21,6 @@ const BankDetailsSection = () => {
     { label: t("donate.bank_name_label"),    value: t("donate.bank_name_value") },
     { label: t("donate.account_name_label"), value: t("donate.account_name_value") },
     { label: t("donate.account_number_label"), value: accountNumber, copyable: true },
-    { label: t("donate.swift_label"),        value: t("donate.swift_value") },
   ];
 
   return (

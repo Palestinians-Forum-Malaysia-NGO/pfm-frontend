@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MdLinkedIn, MdEmail } from "react-icons/md";
 import useInView from "hooks/useInView";
 
 const TeamMembers = () => {
@@ -8,17 +7,13 @@ const TeamMembers = () => {
   const [ref, inView] = useInView();
 
   const TEAM = [
-    { name: "Dr. Ahmad Al-Faris",   role: t("about.role_president"),         initials: "AA", color: "from-green/20 to-green/10 text-green" },
-    { name: "Nurul Huda Ismail",    role: t("about.role_vice_president"),    initials: "NI", color: "from-blue-100 to-blue-50 text-blue-600" },
-    { name: "Yusuf Al-Khalidi",     role: t("about.role_secretary_general"), initials: "YK", color: "from-purple-100 to-purple-50 text-purple-600" },
-    { name: "Siti Fatimah Yusof",   role: t("about.role_treasurer"),         initials: "SF", color: "from-amber-100 to-amber-50 text-amber-600" },
-    { name: "Hassan Mahmoud",       role: t("about.role_head_advocacy"),     initials: "HM", color: "from-green/20 to-green/10 text-green" },
-    { name: "Rohani binti Hamid",   role: t("about.role_head_community"),    initials: "RH", color: "from-blue-100 to-blue-50 text-blue-600" },
+    { name: "Rusli Bin Abdul Rashid",   role: t("about.role_trustee"), bio: t("about.trustee1_bio"), initials: "RA", color: "from-green/20 to-green/10 text-green" },
+    { name: "Mohamad Yusoff Bin Omar",  role: t("about.role_trustee"), bio: t("about.trustee2_bio"), initials: "MY", color: "from-blue-100 to-blue-50 text-blue-600" },
   ];
 
   return (
     <section ref={ref} className="bg-white py-20">
-      <div className="mx-auto max-w-5xl px-6">
+      <div className="mx-auto max-w-3xl px-6">
 
         <div
           className="mb-12 text-center"
@@ -28,7 +23,7 @@ const TeamMembers = () => {
           <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("about.team_title")}</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {TEAM.map((member, i) => (
             <div
               key={member.name}
@@ -40,23 +35,14 @@ const TeamMembers = () => {
                 transitionDelay: `${i * 70}ms`,
               }}
             >
-              {/* Avatar */}
               <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br text-xl font-black transition-transform duration-200 group-hover:scale-105 ${member.color}`}>
                 {member.initials}
               </div>
               <div>
                 <p className="font-bold text-slate-900">{member.name}</p>
-                <p className="mt-0.5 text-xs text-slate-400">{member.role}</p>
+                <p className="mt-0.5 text-xs font-semibold text-green">{member.role}</p>
               </div>
-              {/* Social links */}
-              <div className="flex items-center gap-2">
-                <a href="#" className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition-all duration-200 hover:-translate-y-0.5 hover:border-green/30 hover:text-green">
-                  <MdLinkedIn className="h-3.5 w-3.5" />
-                </a>
-                <a href="#" className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition-all duration-200 hover:-translate-y-0.5 hover:border-green/30 hover:text-green">
-                  <MdEmail className="h-3.5 w-3.5" />
-                </a>
-              </div>
+              {member.bio && <p className="text-xs leading-relaxed text-slate-400">{member.bio}</p>}
             </div>
           ))}
         </div>

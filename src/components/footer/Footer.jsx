@@ -2,19 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdLocationOn, MdEmail, MdPhone, MdArrowForward } from "react-icons/md";
-import {
-  FaFacebook, FaInstagram, FaYoutube, FaWhatsapp, FaTelegram,
-} from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import logo from "assets/branding/LOGO-wbg.png";
 
 const SOCIALS = [
-  { icon: <FaFacebook size={15} />,  label: "Facebook",    href: "https://facebook.com/pfmalaysia" },
-  { icon: <FaXTwitter size={14} />,  label: "X / Twitter", href: "https://x.com/pfmalaysia" },
-  { icon: <FaInstagram size={15} />, label: "Instagram",   href: "https://instagram.com/pfmalaysia" },
-  { icon: <FaYoutube size={15} />,   label: "YouTube",     href: "https://youtube.com/@pfmalaysia" },
-  { icon: <FaTelegram size={15} />,  label: "Telegram",    href: "https://t.me/pfmalaysia" },
-  { icon: <FaWhatsapp size={15} />,  label: "WhatsApp",    href: "https://wa.me/60123456789" },
+  { icon: <FaFacebook size={15} />,  label: "Facebook",  href: "https://facebook.com/PalestinianForumMalaysia" },
+  { icon: <FaInstagram size={15} />, label: "Instagram", href: "https://instagram.com/pfm_malaysia" },
+  { icon: <FaWhatsapp size={15} />,  label: "WhatsApp",  href: "https://wa.me/601156563044" },
 ];
 
 const Footer = () => {
@@ -153,6 +147,8 @@ const Footer = () => {
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-1.5 px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-start">
           <p className="text-xs text-white/35">
             © {new Date().getFullYear()} Palestinian Forum Malaysia. {t("footer.rights")}
+            <span className="mx-2 hidden sm:inline">·</span>
+            <span className="block sm:inline">{t("footer.registration")}</span>
           </p>
           <p className="text-xs font-semibold text-white/60">
             {t("footer.standing")} 🇵🇸
