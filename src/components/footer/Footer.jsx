@@ -145,8 +145,6 @@ const Footer = () => {
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-1.5 px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-start">
           <p className="text-xs text-white/35">
             © {new Date().getFullYear()} Palestinian Forum Malaysia. {t("footer.rights")}
-            <span className="mx-2 hidden sm:inline">·</span>
-            <span className="block sm:inline">{t("footer.registration")}</span>
           </p>
           <p className="text-xs font-semibold text-white/60">
             {t("footer.standing")} 🇵🇸
