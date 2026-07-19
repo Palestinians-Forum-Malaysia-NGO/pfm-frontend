@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { MdEmail, MdPhone, MdLocationOn, MdLanguage } from "react-icons/md";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
 import ContactForm from "components/public/contact/ContactForm";
 import useInView from "hooks/useInView";
@@ -28,6 +28,7 @@ export default function Contact() {
     { icon: <MdEmail className="h-5 w-5" />,      label: t("contact.email"),   value: "palforummy@gmail.com",   href: "mailto:palforummy@gmail.com" },
     { icon: <MdPhone className="h-5 w-5" />,      label: t("contact.phone"),   value: "+603-4032 8482",         href: "tel:+60340328482" },
     { icon: <FaWhatsapp className="h-5 w-5" />,   label: t("contact.whatsapp"),value: "+60 11-5656 3044",       href: "https://wa.me/601156563044" },
+    { icon: <MdLanguage className="h-5 w-5" />,   label: t("contact.website"), value: "www.pfmy.org",           href: "https://www.pfmy.org/" },
   ];
 
   return (
