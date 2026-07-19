@@ -21,7 +21,6 @@ const Footer = () => {
         { label: t("footer.about"),    to: "/about" },
         { label: t("footer.team"),     to: "/about#team" },
         { label: t("footer.partners"), to: "/about#partners" },
-        { label: t("footer.reports"),  to: "/about#reports" },
         { label: t("footer.contact"),  to: "/contact" },
       ],
     },
@@ -50,7 +49,6 @@ const Footer = () => {
       links: [
         { label: t("footer.news"),      to: "/news" },
         { label: t("footer.gallery"),   to: "/gallery" },
-        { label: t("footer.downloads"), to: "/about#reports" },
         { label: t("footer.privacy"),   to: "/privacy" },
         { label: t("footer.terms"),     to: "/terms" },
       ],

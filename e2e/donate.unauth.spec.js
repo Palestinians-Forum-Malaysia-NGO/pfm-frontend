@@ -6,15 +6,12 @@ test.describe("Donate page — public", () => {
 
     await expect(page.getByRole("heading", { name: "Donate to PFM", level: 1 })).toBeVisible();
 
-    // Placeholder-data disclaimer must be visible so nobody mistakes sample data for real
-    await expect(page.getByText(/sample placeholders/i)).toBeVisible();
-
-    // QR section
+    // QR section — no real QR image exists yet, so this note is expected
     await expect(page.getByText("QR code coming soon")).toBeVisible();
 
-    // Bank details section — sample values, obviously fake
-    await expect(page.getByText("Sample Bank Berhad")).toBeVisible();
-    await expect(page.getByText("0000 0000 0000")).toBeVisible();
+    // Bank details section — real account info, no more placeholder/sample values
+    await expect(page.getByText("Maybank")).toBeVisible();
+    await expect(page.getByText("5642 2165 2333")).toBeVisible();
 
     // FAQ section
     await expect(page.getByRole("heading", { name: "Frequently Asked Questions" })).toBeVisible();
@@ -28,7 +25,7 @@ test.describe("Donate page — public", () => {
     await expect(page.getByText("Copied!")).toBeVisible();
 
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    expect(clipboardText).toBe("000000000000");
+    expect(clipboardText).toBe("564221652333");
   });
 
   test("FAQ accordion opens one item at a time", async ({ page }) => {
