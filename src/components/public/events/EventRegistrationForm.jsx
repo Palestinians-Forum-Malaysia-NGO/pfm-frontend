@@ -1,41 +1,26 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdSend, MdCheckCircle } from "react-icons/md";
+import { MdSend, MdCheckCircle, MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
-import { InputField, validate } from "components/form";
 import { useCreateEventRegistration } from "components/features/eventRegistrations/hooks";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { hasApplied, markApplied } from "utils/eventApplications";
 
-const RULES = {
-  full_name: [{ required: true }, { maxLength: 255 }],
-  email:     [{ required: true }, { email: true }],
-  phone:     [{ required: true }, { maxLength: 30 }],
-};
-
-const EMPTY = { full_name: "", email: "", phone: "" };
-
-const EventRegistrationForm = ({ eventId }) => {
+const EventRegistrationForm = ({ eventId, basePath = "/events" }) => {
   const { t } = useTranslation();
-  const [form, setForm]           = useState(EMPTY);
-  const [errors, setErrors]       = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const { user } = useAuth();
+  const [submitted, setSubmitted] = useState(() => hasApplied(user?.id, eventId));
   const { execute: submitRegistration, loading: sending, error } = useCreateEventRegistration();
 
-  const updateForm = (field, value) => setForm((p) => ({ ...p, [field]: value }));
-
-  const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    Object.entries(RULES).forEach(([field, rules]) => {
-      const err = validate(form[field], rules);
-      if (err) newErrors[field] = err;
-    });
-    if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
-    setErrors({});
-
+  const handleApply = async () => {
     try {
-      await submitRegistration(eventId, form);
+      await submitRegistration(eventId, {
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone_number,
+      });
+      markApplied(user.id, eventId);
       setSubmitted(true);
     } catch {
       // error state is surfaced via the hook's `error` below
@@ -50,12 +35,12 @@ const EventRegistrationForm = ({ eventId }) => {
         </div>
         <h3 className="mt-4 text-xl font-bold text-slate-900">{t("eventsPublic.success_title")}</h3>
         <p className="mt-1 max-w-xs text-sm text-slate-400">{t("eventsPublic.success_body")}</p>
-        <button
-          onClick={() => { setSubmitted(false); setForm(EMPTY); setErrors({}); }}
+        <Link
+          to={basePath}
           className="mt-4 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
         >
-          {t("eventsPublic.register_another")}
-        </button>
+          {t("eventsPublic.back_to_events")}
+        </Link>
       </div>
     );
   }
@@ -67,35 +52,34 @@ const EventRegistrationForm = ({ eventId }) => {
 
       <AlertBanner message={error} className="mt-4 rounded-xl border px-4 py-3" />
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col" noValidate>
-        <InputField
-          label={t("eventsPublic.full_name")} field="full_name" placeholder="Ahmad Faris"
-          formData={form} errors={errors} updateFormData={updateForm} rules={RULES.full_name}
-        />
-        <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-          <InputField
-            label={t("eventsPublic.email")} field="email" type="email" placeholder="ahmad@email.com"
-            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.email}
-          />
-          <InputField
-            label={t("eventsPublic.phone")} field="phone" placeholder="+60 12-345 6789"
-            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.phone}
-          />
+      <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("eventsPublic.applying_as")}</p>
+        <div className="flex items-center gap-2.5 text-sm text-slate-700">
+          <MdPerson className="h-4 w-4 shrink-0 text-slate-400" /> {user.full_name}
         </div>
+        <div className="flex items-center gap-2.5 text-sm text-slate-700">
+          <MdEmail className="h-4 w-4 shrink-0 text-slate-400" /> {user.email}
+        </div>
+        {user.phone_number && (
+          <div className="flex items-center gap-2.5 text-sm text-slate-700">
+            <MdPhone className="h-4 w-4 shrink-0 text-slate-400" /> {user.phone_number}
+          </div>
+        )}
+      </div>
 
-        <button
-          type="submit"
-          disabled={sending || !canSubmit}
-          className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {sending ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            <MdSend className="h-4 w-4" />
-          )}
-          {sending ? t("eventsPublic.sending") : t("eventsPublic.register_btn")}
-        </button>
-      </form>
+      <button
+        type="button"
+        onClick={handleApply}
+        disabled={sending}
+        className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {sending ? (
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+        ) : (
+          <MdSend className="h-4 w-4" />
+        )}
+        {sending ? t("eventsPublic.sending") : t("eventsPublic.register_btn")}
+      </button>
     </div>
   );
 };

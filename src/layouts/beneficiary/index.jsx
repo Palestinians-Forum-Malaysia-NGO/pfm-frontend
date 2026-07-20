@@ -7,6 +7,7 @@ import Footer  from "components/footer/FooterAuthDefault";
 import routes  from "routes.js";
 import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
+import BeneficiaryEventDetail from "views/beneficiary/events/EventDetail";
 
 export default function BeneficiaryLayout() {
   const location = useLocation();
@@ -23,6 +24,7 @@ export default function BeneficiaryLayout() {
   }, []);
 
   React.useEffect(() => {
+    if (location.pathname.match(/\/events\/[^/]+$/)) { setCurrentRouteName("Event Detail"); return; }
     const active = routes.find(
       (r) => r.layout === "/beneficiary" && location.pathname.includes(r.path)
     );
@@ -62,6 +64,7 @@ export default function BeneficiaryLayout() {
           <PageTransition>
             <Routes>
               {getRoutes()}
+              <Route path="/events/:slug" element={<BeneficiaryEventDetail />} />
               <Route path="/" element={<Navigate to="/beneficiary/default" replace />} />
             </Routes>
           </PageTransition>

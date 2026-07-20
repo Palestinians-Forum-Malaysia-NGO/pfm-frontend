@@ -1,18 +1,23 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdGroups, MdSchedule, MdCheckCircle, MdCancel, MdDeleteOutline } from "react-icons/md";
+import { MdGroups, MdSchedule, MdCheckCircle, MdCancel, MdDeleteOutline, MdPerson } from "react-icons/md";
 import { useEventRegistrationList } from "components/features/eventRegistrations/hooks";
 import EventRegistrationDeleteModal from "./EventRegistrationDeleteModal";
 import FormHeader from "components/ui/form/FormHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import useAuth from "components/features/auth/hooks/useAuth";
+import useLayoutBase from "hooks/useLayoutBase";
+import { useGetBeneficiaries } from "components/features/beneficiaries/hooks";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 export default function EventRegistrationsSection({ eventId }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const base = useLayoutBase();
   const {
     registrations, loading, error, stats,
     statusFilter, setStatusFilter,
@@ -23,6 +28,11 @@ export default function EventRegistrationsSection({ eventId }) {
   } = useEventRegistrationList(eventId);
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const { beneficiaries } = useGetBeneficiaries();
+  const beneficiaryByUserId = useMemo(
+    () => new Map(beneficiaries.map((b) => [b.user?.id, b])),
+    [beneficiaries]
+  );
 
   const STATUS_OPTIONS = [
     { value: "pending",  label: t("eventRegistrations.status_pending") },
@@ -104,9 +114,19 @@ export default function EventRegistrationsSection({ eventId }) {
                   </td>
                   <td className="py-3 pr-4 text-sm text-slate-500">{fmtDate(r.registered_at)}</td>
                   <td className="py-3">
-                    {isAdmin && (
-                      <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("eventRegistrations.delete")} onClick={() => setToDelete(r)} variant="danger" />
-                    )}
+                    <div className="flex items-center gap-0.5">
+                      {beneficiaryByUserId.has(r.user) && (
+                        <RowIconButton
+                          icon={<MdPerson className="h-4 w-4" />}
+                          title={t("eventRegistrations.view_beneficiary")}
+                          onClick={() => navigate(`${base}/beneficiaries/${beneficiaryByUserId.get(r.user).id}`)}
+                          variant="primary"
+                        />
+                      )}
+                      {isAdmin && (
+                        <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("eventRegistrations.delete")} onClick={() => setToDelete(r)} variant="danger" />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

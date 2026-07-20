@@ -32,6 +32,7 @@ import BeneficiaryDashboard  from "views/beneficiary/default";
 import BeneficiaryRequests   from "views/beneficiary/requests";
 import BeneficiaryProfile    from "views/beneficiary/profile";
 import BeneficiarySettings   from "views/beneficiary/settings";
+import BeneficiaryEvents     from "views/beneficiary/events";
 import Home from "views/public/home";
 import About from "views/public/about";
 import PublicEvents from "views/public/events";
@@ -493,6 +494,14 @@ const routes = [
     path: "requests",
     icon: <MdAssignment className="h-5 w-5" />,
     component: <BeneficiaryRequests />,
+    section: "MAIN",
+  },
+  {
+    name: "Events",
+    layout: "/beneficiary",
+    path: "events",
+    icon: <MdEvent className="h-5 w-5" />,
+    component: <BeneficiaryEvents />,
     section: "MAIN",
   },
   {

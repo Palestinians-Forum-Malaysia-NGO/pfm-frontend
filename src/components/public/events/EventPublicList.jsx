@@ -1,19 +1,48 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdSearch, MdClose, MdEvent, MdCalendarToday, MdLocationOn, MdGroups } from "react-icons/md";
+import { MdSearch, MdClose, MdEvent, MdCalendarToday, MdLocationOn, MdGroups, MdSend, MdCheckCircle } from "react-icons/md";
 import { useGetEvents } from "components/features/events/hooks";
+import { useCreateEventRegistration } from "components/features/eventRegistrations/hooks";
 import StorageImage from "components/ui/StorageImage";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { ROLES } from "components/features/auth/types";
+import { hasApplied, markApplied } from "utils/eventApplications";
 
 const fmtDate = (d) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
-function EventCard({ event, onClick }) {
+function EventCard({ event, onClick, isBeneficiary, user }) {
   const { t } = useTranslation();
+  const filled = event.capacity ? event.capacity - (event.spots_left ?? event.capacity) : 0;
+  const filledPct = event.capacity ? Math.min(100, Math.max(0, (filled / event.capacity) * 100)) : 0;
+  const canRegister = event.is_active && !event.is_full;
+
+  const [applied, setApplied] = useState(() => isBeneficiary && hasApplied(user?.id, event.id));
+  const { execute: submitRegistration, loading: applying, error } = useCreateEventRegistration();
+
+  const handleApply = async (e) => {
+    e.stopPropagation();
+    try {
+      await submitRegistration(event.id, {
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone_number,
+      });
+      markApplied(user.id, event.id);
+      setApplied(true);
+    } catch {
+      // error surfaced via the hook's `error` below
+    }
+  };
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-green/30 hover:shadow-md active:scale-[0.99]"
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick(); }}
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-green/30 hover:shadow-md active:scale-[0.99]"
     >
       <div className="relative h-44 w-full shrink-0 overflow-hidden bg-slate-100">
         {event.cover_image ? (
@@ -48,20 +77,54 @@ function EventCard({ event, onClick }) {
             <span className="flex items-center gap-1"><MdLocationOn className="h-3.5 w-3.5" /> {event.location}</span>
           )}
         </div>
-        <div className="mt-auto flex items-center justify-between text-xs text-slate-400">
-          {event.capacity ? (
-            <span className="flex items-center gap-1"><MdGroups className="h-3.5 w-3.5" /> {t("eventsPublic.spots_left", { count: Math.max(0, event.spots_left ?? 0) })}</span>
-          ) : <span />}
-        </div>
+        {event.capacity ? (
+          <div className="mb-3">
+            <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
+              <span className="flex items-center gap-1"><MdGroups className="h-3.5 w-3.5" /> {t("eventsPublic.spots_left", { count: Math.max(0, event.spots_left ?? 0) })}</span>
+              <span className="font-semibold text-green">{filledPct.toFixed(0)}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${filledPct}%` }} />
+            </div>
+          </div>
+        ) : null}
+
+        {isBeneficiary && canRegister && (
+          <div className="mt-auto pt-1">
+            {applied ? (
+              <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-green/10 py-2 text-xs font-bold text-green">
+                <MdCheckCircle className="h-4 w-4" /> {t("eventsPublic.already_applied")}
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={handleApply}
+                disabled={applying}
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-green py-2 text-xs font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {applying ? (
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <MdSend className="h-3.5 w-3.5" />
+                )}
+                {applying ? t("eventsPublic.sending") : t("eventsPublic.register_btn")}
+              </button>
+            )}
+            {error && <p className="mt-1.5 text-center text-xs text-red-500">{error}</p>}
+          </div>
+        )}
+        {!isBeneficiary || !canRegister ? <div className="mt-auto" /> : null}
       </div>
-    </button>
+    </div>
   );
 }
 
-export default function EventPublicList() {
+export default function EventPublicList({ basePath = "/events" }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { events: allEvents, loading } = useGetEvents();
+  const { user, isAuthenticated } = useAuth();
+  const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 
   const [search, setSearch] = useState("");
 
@@ -131,7 +194,13 @@ export default function EventPublicList() {
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {events.map((e) => (
-              <EventCard key={e.id} event={e} onClick={() => navigate(`/events/${e.slug}`)} />
+              <EventCard
+                key={e.id}
+                event={e}
+                onClick={() => navigate(`${basePath}/${e.slug}`)}
+                isBeneficiary={isBeneficiary}
+                user={user}
+              />
             ))}
           </div>
         )}
