@@ -8,6 +8,7 @@ import {
   useCreateGalleryPhoto, useUpdateGalleryPhoto, useDeleteGalleryPhoto,
 } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function GallerySection({ projectId, initialGallery = [] }) {
   const { t } = useTranslation();
@@ -28,6 +29,8 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
   const { execute: updatePhoto, loading: saving   } = useUpdateGalleryPhoto();
   const { execute: deletePhoto, loading: deleting } = useDeleteGalleryPhoto();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const resetAddForm = () => { setAddOpen(false); setNewImageKey(null); setNewCaption(""); };
 
@@ -160,14 +163,16 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
                   >
                     <MdEdit className="h-3.5 w-3.5" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(p.id)}
-                    disabled={deleting}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/90 text-white backdrop-blur-sm transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <MdDeleteOutline className="h-3.5 w-3.5" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(p.id)}
+                      disabled={deleting}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/90 text-white backdrop-blur-sm transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <MdDeleteOutline className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             )

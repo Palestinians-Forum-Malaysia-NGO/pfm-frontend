@@ -6,6 +6,7 @@ import EventRegistrationDeleteModal from "./EventRegistrationDeleteModal";
 import FormHeader from "components/ui/form/FormHeader";
 import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -20,6 +21,8 @@ export default function EventRegistrationsSection({ eventId }) {
     handleStatusChange,
     handleDeleteConfirm,
   } = useEventRegistrationList(eventId);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const STATUS_OPTIONS = [
     { value: "pending",  label: t("eventRegistrations.status_pending") },
@@ -101,7 +104,9 @@ export default function EventRegistrationsSection({ eventId }) {
                   </td>
                   <td className="py-3 pr-4 text-sm text-slate-500">{fmtDate(r.registered_at)}</td>
                   <td className="py-3">
-                    <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("eventRegistrations.delete")} onClick={() => setToDelete(r)} variant="danger" />
+                    {isAdmin && (
+                      <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("eventRegistrations.delete")} onClick={() => setToDelete(r)} variant="danger" />
+                    )}
                   </td>
                 </tr>
               ))}

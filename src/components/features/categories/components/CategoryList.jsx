@@ -15,6 +15,7 @@ import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function CategoryList() {
   const { t } = useTranslation();
@@ -45,6 +46,8 @@ export default function CategoryList() {
     deleteLoading,
     handleDeleteConfirm,
   } = useCategoryList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const STATUS_OPTIONS = [
     { value: "all",      label: t("categories.status_all") },
@@ -144,7 +147,9 @@ export default function CategoryList() {
         <div className="flex items-center justify-end gap-0.5">
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("categories.actions")} onClick={() => navigate(`${base}/categories/${c.id}`)}      variant="primary" />
           <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("categories.edit_category")}   onClick={() => navigate(`${base}/categories/${c.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("categories.delete_category")} onClick={() => setToDelete(c)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("categories.delete_category")} onClick={() => setToDelete(c)} variant="danger" />
+          )}
         </div>
       ),
     },

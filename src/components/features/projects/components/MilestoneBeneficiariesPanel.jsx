@@ -10,6 +10,7 @@ import {
 import { useGetBeneficiaries } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -24,6 +25,8 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
   const { execute: updateRecord, loading: saving }   = useUpdateMilestoneBeneficiary();
   const { execute: deleteRecord, loading: deleting } = useDeleteMilestoneBeneficiary();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [addOpen, setAddOpen] = useState(false);
   const [newBeneficiaryId, setNewBeneficiaryId] = useState("");
@@ -182,9 +185,11 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
                     <button onClick={() => startEdit(r)} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700">
                       <MdEdit className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => handleDelete(r.id)} disabled={deleting} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
-                      <MdDeleteOutline className="h-3.5 w-3.5" />
-                    </button>
+                    {isAdmin && (
+                      <button onClick={() => handleDelete(r.id)} disabled={deleting} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
+                        <MdDeleteOutline className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

@@ -15,6 +15,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import useLayoutBase from "hooks/useLayoutBase";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) => d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 const fmtTime = (t) => {
@@ -41,6 +42,8 @@ export default function EventList() {
     handleDeleteConfirm,
     handleToggleActive,
   } = useEventList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const STATUS_OPTIONS = [
     { value: "all",      label: t("events.status_all") },
@@ -141,7 +144,9 @@ export default function EventList() {
             onClick={() => handleToggleActive(e)}
             disabled={toggleLoading}
           />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("events.delete")} onClick={() => setToDelete(e)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("events.delete")} onClick={() => setToDelete(e)} variant="danger" />
+          )}
         </div>
       ),
     },

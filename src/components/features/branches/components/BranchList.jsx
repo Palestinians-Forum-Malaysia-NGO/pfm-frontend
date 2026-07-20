@@ -13,6 +13,7 @@ import PageHeader     from "components/ui/PageHeader";
 import RowIconButton  from "components/ui/buttons/RowIconButton";
 import SearchInput    from "components/form/SearchInput";
 import DataTable      from "components/ui/DataTable";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function BranchList() {
   const { t } = useTranslation();
@@ -26,6 +27,8 @@ export default function BranchList() {
     deleteLoading,
     handleDeleteConfirm,
   } = useBranchList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const hasFilters = search !== "" || statusFilter !== "all";
   const clearFilters = () => { setSearch(""); setStatusFilter("all"); };
@@ -94,7 +97,9 @@ export default function BranchList() {
         <div className="flex items-center justify-end gap-0.5">
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("branches.view")}   onClick={() => navigate(`${base}/branches/${b.id}`)}      variant="primary" />
           <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("branches.edit")}   onClick={() => navigate(`${base}/branches/${b.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("branches.delete")} onClick={() => setToDelete(b)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("branches.delete")} onClick={() => setToDelete(b)} variant="danger" />
+          )}
         </div>
       ),
     },

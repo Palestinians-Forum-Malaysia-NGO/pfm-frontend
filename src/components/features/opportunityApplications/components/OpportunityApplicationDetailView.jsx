@@ -21,6 +21,7 @@ import {
 } from "components/features/opportunityApplications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (iso) => {
   if (!iso) return "—";
@@ -49,6 +50,8 @@ export default function OpportunityApplicationDetailView() {
   const { execute: rejectApplication, loading: rejecting } = useRejectOpportunityApplication();
   const { execute: deleteApplication, loading: deleteLoading, error: deleteError } = useDeleteOpportunityApplication();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [note, setNote] = useState("");
@@ -106,7 +109,9 @@ export default function OpportunityApplicationDetailView() {
         actions={
           <>
             <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("opportunityApplications.back")} onClick={() => navigate(`${base}/opportunities/${opportunityId}`)} />
-            <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("opportunityApplications.delete")} onClick={() => setDeleteOpen(true)} />
+            {isAdmin && (
+              <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("opportunityApplications.delete")} onClick={() => setDeleteOpen(true)} />
+            )}
           </>
         }
       />

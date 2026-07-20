@@ -17,6 +17,7 @@ import PartnershipDeleteModal from "./PartnershipDeleteModal";
 import { useGetPartnership, useDeletePartnership, useRestorePartnership } from "components/features/partnerships/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -34,6 +35,8 @@ export default function PartnershipDetailView() {
   const { execute: restorePartnership, loading: restoreLoading } = useRestorePartnership();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => { fetchPartnership(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -75,10 +78,15 @@ export default function PartnershipDetailView() {
               label={t("partnerships.actions")}
               items={[
                 { label: t("partnerships.edit"), icon: <MdEdit className="h-4 w-4" />, onClick: () => navigate(`${base}/partnerships/${id}/edit`) },
-                { divider: true },
-                partnership.is_active
-                  ? { label: t("partnerships.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" }
-                  : { label: t("partnerships.restore"), icon: <MdRestore className="h-4 w-4" />, onClick: handleRestore, disabled: restoreLoading },
+                ...(partnership.is_active
+                  ? (isAdmin ? [
+                      { divider: true },
+                      { label: t("partnerships.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                    ] : [])
+                  : [
+                      { divider: true },
+                      { label: t("partnerships.restore"), icon: <MdRestore className="h-4 w-4" />, onClick: handleRestore, disabled: restoreLoading },
+                    ]),
               ]}
             />
           </>

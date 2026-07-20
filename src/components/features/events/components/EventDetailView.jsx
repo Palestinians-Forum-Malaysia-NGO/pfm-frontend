@@ -19,6 +19,7 @@ import EventDeleteModal from "./EventDeleteModal";
 import EventRegistrationsSection from "components/features/eventRegistrations/components/EventRegistrationsSection";
 import { useGetEvent, useDeleteEvent, useUpdateEvent } from "components/features/events/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) => d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
 const fmtDateTime = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
@@ -42,6 +43,8 @@ export default function EventDetailView() {
   const { execute: updateEvent, loading: toggling }      = useUpdateEvent();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => { fetchEvent(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -91,8 +94,10 @@ export default function EventDetailView() {
                   icon: event.is_active ? <MdToggleOff className="h-4 w-4" /> : <MdToggleOn className="h-4 w-4" />,
                   onClick: handleToggleActive,
                 },
-                { divider: true },
-                { label: t("events.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("events.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

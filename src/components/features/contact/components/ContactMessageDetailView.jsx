@@ -16,6 +16,7 @@ import { SelectField } from "components/form";
 import ContactMessageDeleteModal from "./ContactMessageDeleteModal";
 import { useGetContactMessage, useUpdateContactStatus, useDeleteContactMessage } from "components/features/contact/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (iso) => {
   if (!iso) return "—";
@@ -32,6 +33,8 @@ export default function ContactMessageDetailView() {
   const { execute: updateStatus, loading: saving } = useUpdateContactStatus();
   const { execute: deleteMessage, loading: deleteLoading, error: deleteError } = useDeleteContactMessage();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [statusForm, setStatusForm] = useState({ status: "pending" });
@@ -80,7 +83,9 @@ export default function ContactMessageDetailView() {
         actions={
           <>
             <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("contactMessages.back")} onClick={() => navigate(`${base}/contact-messages`)} />
-            <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("contactMessages.delete")} onClick={() => setDeleteOpen(true)} />
+            {isAdmin && (
+              <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("contactMessages.delete")} onClick={() => setDeleteOpen(true)} />
+            )}
           </>
         }
       />

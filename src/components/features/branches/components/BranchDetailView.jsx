@@ -16,6 +16,7 @@ import Loading        from "components/loading/Loading";
 import BranchDeleteModal from "./BranchDeleteModal";
 import { useGetBranch, useDeleteBranch } from "components/features/branches/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -32,6 +33,8 @@ export default function BranchDetailView() {
   const { execute: deleteBranch, loading: deleteLoading, error: deleteError } = useDeleteBranch();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => { fetchBranch(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -63,8 +66,10 @@ export default function BranchDetailView() {
               label={t("branches.actions")}
               items={[
                 { label: t("branches.edit"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/branches/${id}/edit`) },
-                { divider: true },
-                { label: t("branches.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("branches.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

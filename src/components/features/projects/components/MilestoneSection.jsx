@@ -10,6 +10,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import MilestoneBeneficiariesPanel from "./MilestoneBeneficiariesPanel";
 import { useCreateMilestone, useUpdateMilestone, useDeleteMilestone } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const EMPTY_FORM = { title: "", description: "", target_date: "", is_completed: false };
 
@@ -28,6 +29,8 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
   const { execute: updateMilestone, loading: updating } = useUpdateMilestone();
   const { execute: deleteMilestone, loading: deleting } = useDeleteMilestone();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const setA = (f, v) => setAddForm((p)  => ({ ...p, [f]: v }));
   const setE = (f, v) => setEditForm((p) => ({ ...p, [f]: v }));
@@ -177,7 +180,9 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">
                     <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(m)} />
-                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(m.id)} variant="danger" disabled={deleting} />
+                    {isAdmin && (
+                      <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(m.id)} variant="danger" disabled={deleting} />
+                    )}
                   </div>
                 </div>
                 {expandedId === m.id && (

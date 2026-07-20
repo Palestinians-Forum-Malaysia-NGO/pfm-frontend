@@ -22,6 +22,7 @@ import {
 } from "components/features/feedback/hooks";
 import { useGetProjects } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (iso) => {
   if (!iso) return "—";
@@ -48,6 +49,8 @@ export default function FeedbackDetailView() {
   const { success, error: toastError } = useToast();
   const { projects } = useGetProjects();
   const projectTitleById = Object.fromEntries(projects.map((p) => [p.id, p.title]));
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm]     = useState({ full_name: "", message: "", rating: 0 });
@@ -121,7 +124,9 @@ export default function FeedbackDetailView() {
         actions={
           <>
             <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("feedbackMessages.back")} onClick={() => navigate(`${base}/feedback`)} />
-            <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("feedbackMessages.delete")} onClick={() => setDeleteOpen(true)} />
+            {isAdmin && (
+              <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("feedbackMessages.delete")} onClick={() => setDeleteOpen(true)} />
+            )}
           </>
         }
       />

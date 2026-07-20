@@ -19,6 +19,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import StorageImage from "components/ui/StorageImage";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -38,6 +39,8 @@ export default function BeneficiaryList() {
     deleteLoading,
     handleDeleteConfirm,
   } = useBeneficiaryList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const ACCOUNT_STATUS_OPTIONS = [
     { value: "all",       label: t("beneficiaries.account_status_all") },
@@ -174,7 +177,9 @@ export default function BeneficiaryList() {
         <div className="flex items-center justify-end gap-0.5">
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("beneficiaries.view")}   onClick={() => navigate(`${base}/beneficiaries/${b.id}`)}      variant="primary" />
           <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("beneficiaries.edit")}   onClick={() => navigate(`${base}/beneficiaries/${b.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("beneficiaries.delete")} onClick={() => setToDelete(b)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("beneficiaries.delete")} onClick={() => setToDelete(b)} variant="danger" />
+          )}
         </div>
       ),
     },

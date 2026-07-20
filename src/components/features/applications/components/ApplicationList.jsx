@@ -16,6 +16,7 @@ import RowIconButton  from "components/ui/buttons/RowIconButton";
 import SearchInput    from "components/form/SearchInput";
 import DataTable      from "components/ui/DataTable";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function ApplicationList() {
   const { t } = useTranslation();
@@ -34,6 +35,8 @@ export default function ApplicationList() {
   const { execute: approveApplication, loading: approveLoading } = useApproveApplication();
   const { execute: rejectApplication, loading: rejectLoading } = useRejectApplication();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [actioning, setActioning] = useState(null); // { action: "approve"|"reject", application }
 
   const hasFilters = search !== "" || statusFilter !== "all";
@@ -138,7 +141,9 @@ export default function ApplicationList() {
               <RowIconButton icon={<MdCancel className="h-4 w-4" />}      title={t("applications.reject_btn")}  onClick={() => setActioning({ action: "reject", application: a })} variant="danger" />
             </>
           )}
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("applications.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("applications.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          )}
         </div>
       ),
     },

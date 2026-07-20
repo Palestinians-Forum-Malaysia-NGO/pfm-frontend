@@ -14,6 +14,7 @@ import RowIconButton  from "components/ui/buttons/RowIconButton";
 import SearchInput    from "components/form/SearchInput";
 import FilterSelect   from "components/ui/FilterSelect";
 import DataTable      from "components/ui/DataTable";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const STATUS_BADGE = {
   pending:  "bg-amber-50 text-amber-600 border border-amber-200",
@@ -37,6 +38,8 @@ export default function OpportunityApplicationsSection({ opportunityId }) {
     handleDeleteConfirm,
     handleQuickApprove,
   } = useOpportunityApplicationList(opportunityId);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const STATUS_LABEL = {
     pending:  t("opportunityApplications.status_pending"),
@@ -102,7 +105,9 @@ export default function OpportunityApplicationsSection({ opportunityId }) {
             <RowIconButton icon={<MdCheckCircle className="h-4 w-4" />} title={t("opportunityApplications.approve")} onClick={() => handleQuickApprove(a)} variant="primary" />
           )}
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("opportunityApplications.view")}   onClick={() => navigate(`${base}/opportunities/${opportunityId}/applications/${a.id}`)} variant="primary" />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("opportunityApplications.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("opportunityApplications.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          )}
         </div>
       ),
     },

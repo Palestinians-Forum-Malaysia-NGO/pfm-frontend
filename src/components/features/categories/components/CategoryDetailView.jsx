@@ -18,6 +18,7 @@ import Loading from "components/loading/Loading";
 import CategoryDeleteModal from "./CategoryDeleteModal";
 import { useGetCategory, useDeleteCategory } from "components/features/categories/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function CategoryDetailView() {
   const { t } = useTranslation();
@@ -36,6 +37,8 @@ export default function CategoryDetailView() {
   const { execute: deleteCategory, loading: deleteLoading, error: deleteError } = useDeleteCategory();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => { fetchCategory(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -67,8 +70,10 @@ export default function CategoryDetailView() {
               label={t("categories.actions")}
               items={[
                 { label: t("categories.edit_category"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/categories/${id}/edit`) },
-                { divider: true },
-                { label: t("categories.delete_category"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("categories.delete_category"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

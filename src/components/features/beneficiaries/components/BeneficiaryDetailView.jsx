@@ -23,6 +23,7 @@ import { useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary } from "c
 import { ACCOUNT_STATUS_BADGE } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -40,6 +41,8 @@ export default function BeneficiaryDetailView() {
   const { execute: deleteBeneficiary, loading: deleteLoading, error: deleteError } = useDeleteBeneficiary();
   const { execute: updateBeneficiary, loading: statusSaving } = useUpdateBeneficiary();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [deleteOpen,     setDeleteOpen]     = useState(false);
   const [editingStatus,  setEditingStatus]  = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -105,8 +108,10 @@ export default function BeneficiaryDetailView() {
               label={t("beneficiaries.actions")}
               items={[
                 { label: t("beneficiaries.edit_beneficiary"),   icon: <MdEdit className="h-4 w-4" />,          onClick: () => navigate(`${base}/beneficiaries/${id}/edit`) },
-                { divider: true },
-                { label: t("beneficiaries.delete_beneficiary"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("beneficiaries.delete_beneficiary"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

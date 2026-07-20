@@ -17,6 +17,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -38,6 +39,8 @@ export default function ProjectList() {
   } = useProjectList();
   const { execute: exportProjects, loading: exporting } = useExportProjects();
   const { error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const handleExport = async () => {
     try {
@@ -152,7 +155,9 @@ export default function ProjectList() {
             onClick={() => handleTogglePublish(p)}
             disabled={publishLoading}
           />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("projects.delete_project")} onClick={() => setToDelete(p)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("projects.delete_project")} onClick={() => setToDelete(p)} variant="danger" />
+          )}
         </div>
       ),
     },

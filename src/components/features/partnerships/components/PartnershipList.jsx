@@ -16,6 +16,7 @@ import RowIconButton  from "components/ui/buttons/RowIconButton";
 import SearchInput    from "components/form/SearchInput";
 import FilterSelect   from "components/ui/FilterSelect";
 import DataTable      from "components/ui/DataTable";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 export default function PartnershipList() {
   const { t } = useTranslation();
@@ -32,6 +33,8 @@ export default function PartnershipList() {
     restoreLoading,
     handleRestore,
   } = usePartnershipList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const TYPE_LABEL = Object.fromEntries(PARTNERSHIP_TYPES.map((v) => [v, t(`partnerships.type_${v}`)]));
 
@@ -127,7 +130,9 @@ export default function PartnershipList() {
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("partnerships.view")}   onClick={() => navigate(`${base}/partnerships/${p.id}`)}      variant="primary" />
           <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("partnerships.edit")}   onClick={() => navigate(`${base}/partnerships/${p.id}/edit`)} />
           {p.is_active ? (
-            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("partnerships.delete")} onClick={() => setToDelete(p)} variant="danger" />
+            isAdmin && (
+              <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("partnerships.delete")} onClick={() => setToDelete(p)} variant="danger" />
+            )
           ) : (
             <RowIconButton icon={<MdRestore className="h-4 w-4" />} title={t("partnerships.restore")} onClick={() => handleRestore(p)} disabled={restoreLoading} />
           )}

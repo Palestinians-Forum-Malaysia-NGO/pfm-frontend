@@ -21,6 +21,7 @@ import {
   useApproveApplication, useRejectApplication, useUpdateApplication,
 } from "components/features/applications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -39,6 +40,8 @@ export default function ApplicationDetailView() {
   const { execute: rejectApplication, loading: rejectLoading } = useRejectApplication();
   const { execute: updateApplication, loading: noteLoading } = useUpdateApplication();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [action, setAction] = useState(null); // "approve" | "reject"
@@ -104,9 +107,11 @@ export default function ApplicationDetailView() {
                 ...(isPending ? [
                   { label: t("applications.approve_btn"), icon: <MdCheckCircle className="h-4 w-4" />, onClick: () => setAction("approve") },
                   { label: t("applications.reject_btn"),  icon: <MdCancel className="h-4 w-4" />,      onClick: () => setAction("reject"), variant: "danger" },
-                  { divider: true },
                 ] : []),
-                { label: t("applications.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  ...(isPending ? [{ divider: true }] : []),
+                  { label: t("applications.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

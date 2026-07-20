@@ -29,6 +29,7 @@ import {
 import { useGetStaffs } from "components/features/staff/hooks";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
@@ -55,6 +56,8 @@ export default function ProjectDetailView() {
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const staffLookup = useMemo(
     () => new Map(staffs.map((s) => [`${s.user?.full_name} (${s.user?.email})`, s.user?.id])),
@@ -141,8 +144,10 @@ export default function ProjectDetailView() {
                   icon: project.is_published ? <MdPublicOff className="h-4 w-4" /> : <MdPublic className="h-4 w-4" />,
                   onClick: handleTogglePublish,
                 },
-                { divider: true },
-                { label: t("projects.delete_project"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("projects.delete_project"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

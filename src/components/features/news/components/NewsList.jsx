@@ -15,6 +15,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import useLayoutBase from "hooks/useLayoutBase";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -33,6 +34,8 @@ export default function NewsList() {
     handleDeleteConfirm,
     handleTogglePublish,
   } = useNewsList();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const PUBLISH_OPTIONS = [
     { value: "all",         label: t("news.publish_all") },
@@ -136,7 +139,9 @@ export default function NewsList() {
             onClick={() => handleTogglePublish(a)}
             disabled={publishLoading}
           />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("news.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("news.delete")} onClick={() => setToDelete(a)} variant="danger" />
+          )}
         </div>
       ),
     },

@@ -12,6 +12,7 @@ import {
   useCreateProjectUpdate, useUpdateProjectUpdate, useDeleteProjectUpdate,
 } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -36,6 +37,8 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
   const { execute: patchUpdate,  loading: saving   } = useUpdateProjectUpdate();
   const { execute: deleteUpdate, loading: deleting } = useDeleteProjectUpdate();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   /* ── Create ── */
   const handleAdd = async (e) => {
@@ -192,7 +195,9 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                   </div>
                   <div className="flex shrink-0 items-center gap-0.5">
                     <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(u)} />
-                    <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
+                    {isAdmin && (
+                      <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(u.id)} variant="danger" disabled={deleting} />
+                    )}
                   </div>
                 </div>
               )}

@@ -16,6 +16,7 @@ import RowIconButton  from "components/ui/buttons/RowIconButton";
 import SearchInput    from "components/form/SearchInput";
 import FilterSelect   from "components/ui/FilterSelect";
 import DataTable      from "components/ui/DataTable";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const STATUS_BADGE = {
   pending:  "bg-amber-50 text-amber-600 border border-amber-200",
@@ -41,6 +42,8 @@ export default function FeedbackList() {
   } = useFeedbackList();
   const { projects } = useGetProjects();
   const projectTitleById = Object.fromEntries(projects.map((p) => [p.id, p.title]));
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const STATUS_LABEL = {
     pending:  t("feedbackMessages.status_pending"),
@@ -112,7 +115,9 @@ export default function FeedbackList() {
             <RowIconButton icon={<MdCheckCircle className="h-4 w-4" />} title={t("feedbackMessages.approve")} onClick={() => handleQuickApprove(f)} variant="primary" />
           )}
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("feedbackMessages.view")}   onClick={() => navigate(`${base}/feedback/${f.id}`)} variant="primary" />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("feedbackMessages.delete")} onClick={() => setToDelete(f)} variant="danger" />
+          {isAdmin && (
+            <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("feedbackMessages.delete")} onClick={() => setToDelete(f)} variant="danger" />
+          )}
         </div>
       ),
     },

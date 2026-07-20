@@ -18,6 +18,7 @@ import StorageImage from "components/ui/StorageImage";
 import NewsDeleteModal from "./NewsDeleteModal";
 import { useGetNewsArticle, useDeleteNews, useUpdateNews } from "components/features/news/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
@@ -33,6 +34,8 @@ export default function NewsDetailView() {
   const { execute: updateNews, loading: publishing }    = useUpdateNews();
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => { fetchArticle(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -86,8 +89,10 @@ export default function NewsDetailView() {
                   icon: article.is_published ? <MdPublicOff className="h-4 w-4" /> : <MdPublic className="h-4 w-4" />,
                   onClick: handleTogglePublish,
                 },
-                { divider: true },
-                { label: t("news.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ...(isAdmin ? [
+                  { divider: true },
+                  { label: t("news.delete"), icon: <MdDeleteOutline className="h-4 w-4" />, onClick: () => setDeleteOpen(true), variant: "danger" },
+                ] : []),
               ]}
             />
           </>

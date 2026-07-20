@@ -17,6 +17,7 @@ import OpportunityDeleteModal from "./OpportunityDeleteModal";
 import OpportunityApplicationsSection from "components/features/opportunityApplications/components/OpportunityApplicationsSection";
 import { useGetOpportunity, useDeleteOpportunity } from "components/features/opportunities/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (iso) => {
   if (!iso) return "—";
@@ -32,6 +33,8 @@ export default function OpportunityDetailView() {
   const { opportunity, execute: fetchOpportunity, loading, error } = useGetOpportunity();
   const { execute: deleteOpportunity, loading: deleteLoading, error: deleteError } = useDeleteOpportunity();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -62,7 +65,9 @@ export default function OpportunityDetailView() {
           <>
             <Button variant="ghost" icon={<MdArrowBack className="h-4 w-4" />} text={t("opportunities.back")} onClick={() => navigate(`${base}/opportunities`)} />
             <Button variant="ghost" icon={<MdEdit className="h-4 w-4" />} text={t("opportunities.edit")} onClick={() => navigate(`${base}/opportunities/${id}/edit`)} />
-            <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("opportunities.delete")} onClick={() => setDeleteOpen(true)} />
+            {isAdmin && (
+              <Button variant="danger" icon={<MdDeleteOutline className="h-4 w-4" />} text={t("opportunities.delete")} onClick={() => setDeleteOpen(true)} />
+            )}
           </>
         }
       />
