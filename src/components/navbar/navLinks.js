@@ -10,9 +10,9 @@ const getNavLinks = (t) => [
   {
     label: t("nav.projects"), to: "/projects",
     children: [
-      { label: t("nav.all_projects"),    to: "/projects", desc: t("nav.projects_desc"),        icon: <MdFolderSpecial className="h-4 w-4" />, bg: "bg-green/10 text-green" },
-      { label: t("nav.active_projects"), to: "/projects", desc: t("nav.active_projects_desc"), icon: <MdCheckCircle className="h-4 w-4" />,   bg: "bg-blue-50 text-blue-500" },
-      { label: t("nav.completed"),       to: "/projects", desc: t("nav.completed_desc"),       icon: <MdFlag className="h-4 w-4" />,          bg: "bg-slate-100 text-slate-500" },
+      { label: t("nav.all_projects"),    to: "/projects",                 desc: t("nav.projects_desc"),        icon: <MdFolderSpecial className="h-4 w-4" />, bg: "bg-green/10 text-green" },
+      { label: t("nav.active_projects"), to: "/projects?status=active",   desc: t("nav.active_projects_desc"), icon: <MdCheckCircle className="h-4 w-4" />,   bg: "bg-blue-50 text-blue-500" },
+      { label: t("nav.completed"),       to: "/projects?status=completed", desc: t("nav.completed_desc"),      icon: <MdFlag className="h-4 w-4" />,          bg: "bg-slate-100 text-slate-500" },
     ],
   },
   {

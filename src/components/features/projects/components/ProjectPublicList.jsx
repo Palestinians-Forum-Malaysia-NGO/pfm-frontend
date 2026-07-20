@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdSearch, MdClose, MdAssignment, MdCalendarToday, MdCategory, MdTrendingUp } from "react-icons/md";
 import { useGetProjects } from "components/features/projects/hooks";
@@ -91,6 +91,7 @@ export default function ProjectPublicList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { projects: allProjects, loading } = useGetProjects();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const statusLabels = {
     active:    t("projects.status_active"),
@@ -101,15 +102,23 @@ export default function ProjectPublicList() {
 
   const [search, setSearch] = useState("");
 
+  const statusParam = searchParams.get("status");
+  const statusFilter = ["active", "completed"].includes(statusParam) ? statusParam : null;
+  const clearStatusFilter = () => setSearchParams((prev) => { prev.delete("status"); return prev; });
+
   const projects = useMemo(() => {
-    if (!search.trim()) return allProjects;
-    const q = search.toLowerCase();
-    return allProjects.filter((p) =>
-      p.title?.toLowerCase().includes(q) ||
-      p.summary?.toLowerCase().includes(q) ||
-      p.category?.name?.toLowerCase().includes(q)
-    );
-  }, [allProjects, search]);
+    let list = allProjects;
+    if (statusFilter) list = list.filter((p) => p.status === statusFilter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter((p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.summary?.toLowerCase().includes(q) ||
+        p.category?.name?.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [allProjects, search, statusFilter]);
 
   const hasSearch = search !== "";
 
@@ -159,6 +168,18 @@ export default function ProjectPublicList() {
         )}
       </div>
 
+      {/* Active status filter chip */}
+      {statusFilter && (
+        <div className="mb-8 -mt-4 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
+            {statusLabels[statusFilter]}
+            <button onClick={clearStatusFilter} aria-label={t("projects.clear")}>
+              <MdClose className="h-3.5 w-3.5" />
+            </button>
+          </span>
+        </div>
+      )}
+
       {/* Grid */}
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -170,8 +191,13 @@ export default function ProjectPublicList() {
         <div className="py-20 text-center">
           <MdAssignment className="mx-auto mb-3 h-12 w-12 text-slate-300" />
           <p className="text-slate-500">{hasSearch ? t("projects.public_no_match") : t("projects.public_no_projects")}</p>
-          {hasSearch && (
-            <button onClick={() => setSearch("")} className="mt-4 text-sm font-medium text-green hover:underline">{t("projects.clear")}</button>
+          {(hasSearch || statusFilter) && (
+            <button
+              onClick={() => { setSearch(""); clearStatusFilter(); }}
+              className="mt-4 text-sm font-medium text-green hover:underline"
+            >
+              {t("projects.clear")}
+            </button>
           )}
         </div>
       ) : (
