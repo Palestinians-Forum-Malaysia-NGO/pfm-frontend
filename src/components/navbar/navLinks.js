@@ -18,9 +18,9 @@ const getNavLinks = (t) => [
   {
     label: t("nav.events"), to: "/events",
     children: [
-      { label: t("nav.all_events"),  to: "/events", desc: t("nav.all_events_desc"),  icon: <MdEvent className="h-4 w-4" />,   bg: "bg-green/10 text-green" },
-      { label: t("nav.upcoming"),    to: "/events", desc: t("nav.upcoming_desc"),    icon: <MdUpdate className="h-4 w-4" />,  bg: "bg-blue-50 text-blue-500" },
-      { label: t("nav.past_events"), to: "/events", desc: t("nav.past_events_desc"), icon: <MdHistory className="h-4 w-4" />, bg: "bg-slate-100 text-slate-500" },
+      { label: t("nav.all_events"),  to: "/events",               desc: t("nav.all_events_desc"),  icon: <MdEvent className="h-4 w-4" />,   bg: "bg-green/10 text-green" },
+      { label: t("nav.upcoming"),    to: "/events?when=upcoming", desc: t("nav.upcoming_desc"),    icon: <MdUpdate className="h-4 w-4" />,  bg: "bg-blue-50 text-blue-500" },
+      { label: t("nav.past_events"), to: "/events?when=past",     desc: t("nav.past_events_desc"), icon: <MdHistory className="h-4 w-4" />, bg: "bg-slate-100 text-slate-500" },
     ],
   },
   { label: t("nav.news"), to: "/news" },

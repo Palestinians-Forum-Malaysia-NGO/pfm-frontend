@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdSearch, MdClose, MdEvent, MdCalendarToday, MdLocationOn, MdGroups, MdSend, MdCheckCircle } from "react-icons/md";
 import { useGetEvents } from "components/features/events/hooks";
@@ -125,17 +125,33 @@ export default function EventPublicList({ basePath = "/events", enableApply = fa
   const { events: allEvents, loading } = useGetEvents();
   const { user, isAuthenticated } = useAuth();
   const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [search, setSearch] = useState("");
 
+  const whenParam = searchParams.get("when");
+  const whenFilter = ["upcoming", "past"].includes(whenParam) ? whenParam : null;
+  const clearWhenFilter = () => setSearchParams((prev) => { prev.delete("when"); return prev; });
+
   const events = useMemo(() => {
-    if (!search.trim()) return allEvents;
-    const q = search.toLowerCase();
-    return allEvents.filter((e) =>
-      e.title?.toLowerCase().includes(q) ||
-      (e.location ?? "").toLowerCase().includes(q)
-    );
-  }, [allEvents, search]);
+    let list = allEvents;
+    if (whenFilter) {
+      const now = new Date();
+      list = list.filter((e) => {
+        if (!e.event_date) return false;
+        const isPast = new Date(e.event_date) < now;
+        return whenFilter === "past" ? isPast : !isPast;
+      });
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter((e) =>
+        e.title?.toLowerCase().includes(q) ||
+        (e.location ?? "").toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [allEvents, search, whenFilter]);
 
   const hasSearch = search !== "";
 
@@ -179,6 +195,18 @@ export default function EventPublicList({ basePath = "/events", enableApply = fa
           )}
         </div>
 
+        {/* Active when filter chip */}
+        {whenFilter && (
+          <div className="mb-8 -mt-4 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
+              {whenFilter === "upcoming" ? t("nav.upcoming") : t("nav.past_events")}
+              <button onClick={clearWhenFilter} aria-label={t("eventsPublic.clear")}>
+                <MdClose className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
+
         {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -190,6 +218,14 @@ export default function EventPublicList({ basePath = "/events", enableApply = fa
           <div className="py-20 text-center">
             <MdEvent className="mx-auto mb-3 h-12 w-12 text-slate-300" />
             <p className="text-slate-500">{hasSearch ? t("eventsPublic.no_match") : t("eventsPublic.no_events")}</p>
+            {(hasSearch || whenFilter) && (
+              <button
+                onClick={() => { setSearch(""); clearWhenFilter(); }}
+                className="mt-4 text-sm font-medium text-green hover:underline"
+              >
+                {t("eventsPublic.clear")}
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
