@@ -13,7 +13,9 @@ import { useGetCategories } from "components/features/categories/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  title: [{ required: true }, { maxLength: 255 }],
+  title:    [{ required: true }, { maxLength: 255 }],
+  category: [{ required: true }],
+  content:  [{ required: true }],
 };
 
 export default function NewsCreateForm() {
@@ -21,7 +23,7 @@ export default function NewsCreateForm() {
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createNews, loading, error } = useCreateNews();
-  const { categories } = useGetCategories({ module: "blogs" });
+  const { categories } = useGetCategories({ module: "posts" });
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
@@ -106,7 +108,7 @@ export default function NewsCreateForm() {
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
           <SelectField label={t("news.category_label")} field="category" options={CATEGORY_OPTIONS}
-            formData={form} errors={errors} updateFormData={set} required={false} />
+            formData={form} errors={errors} updateFormData={set} rules={RULES.category} />
 
           <TextareaField label={t("news.excerpt_en")} field="excerpt" rows={2}
             placeholder={t("news.excerpt_en_placeholder")}
@@ -120,7 +122,7 @@ export default function NewsCreateForm() {
           <FormHeader icon={<MdArticle className="h-5 w-5" />} title={t("news.content_section")} subtitle={t("news.content_subtitle")} />
           <TextareaField label={t("news.content_en")} field="content" rows={8}
             placeholder={t("news.content_en_placeholder")}
-            required={false} formData={form} errors={errors} updateFormData={set} />
+            formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
         </div>
 
         {/* ── Publishing ── */}
@@ -133,7 +135,7 @@ export default function NewsCreateForm() {
         <div className="flex gap-3">
           <Button variant="ghost" text={t("news.cancel")} onClick={() => navigate(`${base}/news`)} className="flex-1" />
           <Button type="submit" variant="primary" text={t("news.create_btn")} icon={<MdAdd className="h-4 w-4" />}
-            loading={loading} disabled={!form.title.trim() || loading} className="flex-1" />
+            loading={loading} disabled={!form.title.trim() || !form.category || !form.content.trim() || loading} className="flex-1" />
         </div>
 
       </form>

@@ -15,7 +15,9 @@ import { useGetCategories } from "components/features/categories/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  title: [{ required: true }, { maxLength: 255 }],
+  title:    [{ required: true }, { maxLength: 255 }],
+  category: [{ required: true }],
+  content:  [{ required: true }],
 };
 
 export default function NewsEditForm() {
@@ -26,7 +28,7 @@ export default function NewsEditForm() {
 
   const { article, execute: fetchArticle, loading, error: loadError } = useGetNewsArticle();
   const { execute: updateNews, loading: saving, error: saveError }    = useUpdateNews();
-  const { categories } = useGetCategories({ module: "blogs" });
+  const { categories } = useGetCategories({ module: "posts" });
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
@@ -139,7 +141,7 @@ export default function NewsEditForm() {
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
           <SelectField label={t("news.category_label")} field="category" options={CATEGORY_OPTIONS}
-            formData={form} errors={errors} updateFormData={set} required={false} />
+            formData={form} errors={errors} updateFormData={set} rules={RULES.category} />
 
           {article?.slug && (
             <div className="mb-3 mt-1">
@@ -160,7 +162,7 @@ export default function NewsEditForm() {
           <FormHeader icon={<MdArticle className="h-5 w-5" />} title={t("news.content_section")} subtitle={t("news.content_subtitle")} />
           <TextareaField label={t("news.content_en")} field="content" rows={8}
             placeholder={t("news.content_en_placeholder")}
-            required={false} formData={form} errors={errors} updateFormData={set} />
+            formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
         </div>
 
         {/* ── Publishing ── */}
