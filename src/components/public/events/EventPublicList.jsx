@@ -12,7 +12,7 @@ import { hasApplied, markApplied } from "utils/eventApplications";
 const fmtDate = (d) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
-function EventCard({ event, onClick, isBeneficiary, user }) {
+function EventCard({ event, onClick, isBeneficiary, user, enableApply }) {
   const { t } = useTranslation();
   const filled = event.capacity ? event.capacity - (event.spots_left ?? event.capacity) : 0;
   const filledPct = event.capacity ? Math.min(100, Math.max(0, (filled / event.capacity) * 100)) : 0;
@@ -89,7 +89,7 @@ function EventCard({ event, onClick, isBeneficiary, user }) {
           </div>
         ) : null}
 
-        {isBeneficiary && canRegister && (
+        {enableApply && isBeneficiary && canRegister && (
           <div className="mt-auto pt-1">
             {applied ? (
               <span className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-green/10 py-2 text-xs font-bold text-green">
@@ -113,13 +113,13 @@ function EventCard({ event, onClick, isBeneficiary, user }) {
             {error && <p className="mt-1.5 text-center text-xs text-red-500">{error}</p>}
           </div>
         )}
-        {!isBeneficiary || !canRegister ? <div className="mt-auto" /> : null}
+        {!(enableApply && isBeneficiary && canRegister) ? <div className="mt-auto" /> : null}
       </div>
     </div>
   );
 }
 
-export default function EventPublicList({ basePath = "/events" }) {
+export default function EventPublicList({ basePath = "/events", enableApply = false }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { events: allEvents, loading } = useGetEvents();
@@ -200,6 +200,7 @@ export default function EventPublicList({ basePath = "/events" }) {
                 onClick={() => navigate(`${basePath}/${e.slug}`)}
                 isBeneficiary={isBeneficiary}
                 user={user}
+                enableApply={enableApply}
               />
             ))}
           </div>

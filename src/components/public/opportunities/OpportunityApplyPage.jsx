@@ -22,7 +22,7 @@ export default function OpportunityApplyPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 border border-slate-200">
+      <div className="mx-auto my-5 max-w-3xl px-4 py-12 sm:px-6 border border-slate-200 rounded-2xl shadow-sm bg-white">
         <OpportunityApplicationForm opportunities={opportunities} />
       </div>
     </div>

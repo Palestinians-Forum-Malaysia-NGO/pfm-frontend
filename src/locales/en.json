@@ -1738,6 +1738,7 @@
   "eventsPublic": {
     "hero_title": "Upcoming Events",
     "hero_subtitle": "Join us at our upcoming events and gatherings.",
+    "more_events": "More Events",
     "search_placeholder": "Search events…",
     "clear": "Clear",
     "no_events": "No events available yet.",

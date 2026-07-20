@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdEvent, MdCalendarToday, MdLocationOn, MdGroups, MdLogin } from "react-icons/md";
-import { useGetEvent } from "components/features/events/hooks";
+import { useGetEvent, useGetEvents } from "components/features/events/hooks";
 import StorageImage from "components/ui/StorageImage";
 import Loading from "components/loading/Loading";
 import EventRegistrationForm from "./EventRegistrationForm";
@@ -21,12 +21,13 @@ const fmtTime = (t) => {
   return `${hour12}:${m} ${suffix}`;
 };
 
-export default function EventPublicDetail({ basePath = "/events" }) {
+export default function EventPublicDetail({ basePath = "/events", enableApply = false }) {
   const { t } = useTranslation();
   const { slug } = useParams();
   const navigate  = useNavigate();
 
   const { event, execute: fetchEvent, loading, error } = useGetEvent();
+  const { events: allEvents } = useGetEvents();
   const { user, isAuthenticated } = useAuth();
   const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 
@@ -48,6 +49,10 @@ export default function EventPublicDetail({ basePath = "/events" }) {
   }
 
   const canRegister = event.is_active && !event.is_full;
+  const moreEvents = allEvents
+    .filter((e) => e.slug !== event.slug && e.is_active)
+    .sort((a, b) => new Date(a.event_date ?? 0) - new Date(b.event_date ?? 0))
+    .slice(0, 3);
 
   return (
     <div className="bg-white">
@@ -103,7 +108,7 @@ export default function EventPublicDetail({ basePath = "/events" }) {
           <p className="mb-10 text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{event.description}</p>
         )}
 
-        {(!canRegister || isBeneficiary || !isAuthenticated) && (
+        {enableApply && (!canRegister || isBeneficiary || !isAuthenticated) && (
           <div className="rounded-3xl border border-slate-200 p-6 sm:p-8">
             {!canRegister ? (
               <p className="py-6 text-center text-sm text-slate-500">
@@ -128,6 +133,46 @@ export default function EventPublicDetail({ basePath = "/events" }) {
           </div>
         )}
       </div>
+
+      {/* ── More Events ── */}
+      {moreEvents.length > 0 && (
+        <div className="border-t border-slate-100 bg-slate-50 py-14">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-8 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
+              <MdEvent className="h-5 w-5 text-green" /> {t("eventsPublic.more_events")}
+            </h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {moreEvents.map((e) => (
+                <button
+                  key={e.id}
+                  onClick={() => navigate(`${basePath}/${e.slug}`)}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md"
+                >
+                  <div className="h-40 w-full shrink-0 overflow-hidden bg-slate-100">
+                    {e.cover_image ? (
+                      <StorageImage
+                        fileKey={e.cover_image}
+                        alt={e.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <MdEvent className="h-10 w-10 text-slate-300" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col p-4">
+                    <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
+                      {e.title}
+                    </h3>
+                    {e.event_date && <p className="mt-auto text-xs text-slate-400">{fmtDate(e.event_date)}</p>}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

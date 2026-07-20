@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdGroups, MdSchedule, MdCheckCircle, MdCancel, MdDeleteOutline, MdPerson } from "react-icons/md";
+import { MdGroups, MdSchedule, MdCheckCircle, MdCancel, MdDeleteOutline } from "react-icons/md";
 import { useEventRegistrationList } from "components/features/eventRegistrations/hooks";
 import EventRegistrationDeleteModal from "./EventRegistrationDeleteModal";
 import FormHeader from "components/ui/form/FormHeader";
@@ -97,39 +97,37 @@ export default function EventRegistrationsSection({ eventId }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {registrations.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/60">
-                  <td className="py-3 pr-4">
-                    <p className="text-sm font-semibold text-slate-900">{r.full_name}</p>
-                    <p className="text-xs text-slate-400">{r.email}</p>
-                  </td>
-                  <td className="py-3 pr-4 text-sm text-slate-600">{r.phone || "—"}</td>
-                  <td className="py-3 pr-4">
-                    <FilterSelect
-                      value={r.status}
-                      onChange={(v) => handleStatusChange(r, v)}
-                      options={STATUS_OPTIONS}
-                      className="min-w-[130px]"
-                    />
-                  </td>
-                  <td className="py-3 pr-4 text-sm text-slate-500">{fmtDate(r.registered_at)}</td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-0.5">
-                      {beneficiaryByUserId.has(r.user) && (
-                        <RowIconButton
-                          icon={<MdPerson className="h-4 w-4" />}
-                          title={t("eventRegistrations.view_beneficiary")}
-                          onClick={() => navigate(`${base}/beneficiaries/${beneficiaryByUserId.get(r.user).id}`)}
-                          variant="primary"
-                        />
-                      )}
+              {registrations.map((r) => {
+                const beneficiary = beneficiaryByUserId.get(r.user);
+                return (
+                  <tr
+                    key={r.id}
+                    onClick={beneficiary ? () => navigate(`${base}/beneficiaries/${beneficiary.id}`) : undefined}
+                    className={beneficiary ? "cursor-pointer hover:bg-slate-50/60" : "hover:bg-slate-50/60"}
+                    title={beneficiary ? t("eventRegistrations.view_beneficiary") : undefined}
+                  >
+                    <td className="py-3 pr-4">
+                      <p className="text-sm font-semibold text-slate-900">{r.full_name}</p>
+                      <p className="text-xs text-slate-400">{r.email}</p>
+                    </td>
+                    <td className="py-3 pr-4 text-sm text-slate-600">{r.phone || "—"}</td>
+                    <td className="py-3 pr-4" onClick={(e) => e.stopPropagation()}>
+                      <FilterSelect
+                        value={r.status}
+                        onChange={(v) => handleStatusChange(r, v)}
+                        options={STATUS_OPTIONS}
+                        className="min-w-[130px]"
+                      />
+                    </td>
+                    <td className="py-3 pr-4 text-sm text-slate-500">{fmtDate(r.registered_at)}</td>
+                    <td className="py-3" onClick={(e) => e.stopPropagation()}>
                       {isAdmin && (
                         <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("eventRegistrations.delete")} onClick={() => setToDelete(r)} variant="danger" />
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
