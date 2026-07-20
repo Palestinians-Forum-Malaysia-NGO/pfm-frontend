@@ -56,7 +56,7 @@ export const isTokenExpired = (token) => {
 export const extractError = (err, fallback = "Something went wrong. Please try again.") => {
   const res = err?.response?.data;
   if (!res) return err?.message ?? fallback;
-  if (typeof res === "string")            return res;
+  if (typeof res === "string")            return /^\s*<(!doctype html|html)/i.test(res) ? fallback : res;
   if (res.detail)                         return res.detail;
   if (res.non_field_errors?.[0])          return res.non_field_errors[0];
   // First field-level error
