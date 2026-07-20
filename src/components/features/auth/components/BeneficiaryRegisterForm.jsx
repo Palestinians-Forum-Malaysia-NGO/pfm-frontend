@@ -3,19 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdPersonAdd, MdArrowForward, MdArrowBack, MdEmail, MdCheck,
-  MdDescription, MdCardTravel, MdPeople, MdCheckCircle,
+  MdDescription, MdCardTravel, MdPeople, MdCheckCircle, MdFamilyRestroom,
 } from "react-icons/md";
 import InputField           from "components/form/InputField";
 import SelectField          from "components/form/SelectField";
 import TextareaField        from "components/form/TextareaField";
 import ToggleInput          from "components/form/ToggleInput";
 import StorageDocumentField from "components/form/upload/StorageDocumentField";
+import { StorageImageField } from "components/form";
 import AlertBanner          from "components/ui/AlertBanner";
 import { validate }         from "components/form/utils/validation";
-import { useRegister, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
+import { useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { setTokens }        from "components/features/auth/utils";
 import { OTP_PURPOSE }      from "components/features/auth/types";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
+import { useCreateBeneficiary } from "components/features/beneficiaries/hooks";
 
 /* ─────────────────────────────────────────────────
    Step config
@@ -24,8 +26,9 @@ const useSteps = () => {
   const { t } = useTranslation();
   return [
     { n: 1, label: t("apply.step_account"),   icon: <MdPersonAdd className="h-4 w-4" /> },
-    { n: 2, label: t("apply.step_documents"), icon: <MdDescription className="h-4 w-4" /> },
-    { n: 3, label: t("apply.step_status"),    icon: <MdCardTravel className="h-4 w-4" /> },
+    { n: 2, label: t("apply.step_family"),    icon: <MdFamilyRestroom className="h-4 w-4" /> },
+    { n: 3, label: t("apply.step_documents"), icon: <MdDescription className="h-4 w-4" /> },
+    { n: 4, label: t("apply.step_status"),    icon: <MdCardTravel className="h-4 w-4" /> },
   ];
 };
 
@@ -132,6 +135,14 @@ const AccountStep = ({ data, onChange, onNext }) => {
       </div>
 
       <div className="flex flex-col gap-3">
+        <StorageImageField
+          label={t("common.profile_photo")}
+          folder="beneficiaries/photos"
+          onUpload={(key) => set("profile_photo", key)}
+          onRemove={() => set("profile_photo", null)}
+          errors={errors}
+          field="profile_photo"
+        />
         <InputField label={t("apply.full_name")} field="full_name" placeholder="Ahmad Faris bin Abdullah"
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
         <InputField label={t("apply.email")} field="email" type="email" placeholder="you@example.com"
@@ -229,7 +240,90 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
 };
 
 /* ─────────────────────────────────────────────────
-   Step 3 — Status, Country & Terms
+   Step 3 — Family Information
+───────────────────────────────────────────────── */
+const EMPTY_CHILD = {
+  child_name: "", child_name_arabic: "", child_date_of_birth: "",
+  passport_copy: null, entrance_stump: null,
+};
+
+const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext }) => {
+  const { t } = useTranslation();
+  const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+  const setChild = (i, f, v) =>
+    onChildrenChange((prev) => prev.map((c, idx) => idx === i ? { ...c, [f]: v } : c));
+
+  return (
+    <>
+      <div className="mb-6 flex items-start gap-4">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
+          <MdFamilyRestroom className="h-5 w-5 text-green" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-navy-700">{t("beneficiaries.section_family")}</h2>
+          <p className="mt-0.5 text-sm text-slate-400">{t("beneficiaries.section_family_sub")}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={data} errors={{}} updateFormData={set} />
+        <InputField label={t("beneficiaries.spouse_name")}        field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={data} errors={{}} updateFormData={set} />
+        <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
+        <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={data} errors={{}} updateFormData={set} />
+        <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" placeholder="0" required={false} formData={data} errors={{}} updateFormData={set} />
+
+        {children.length > 0 && (
+          <div className="flex flex-col gap-4">
+            {children.map((child, i) => (
+              <div key={i} className="rounded-xl border border-slate-200 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_label", { num: i + 1 })}</p>
+                  <button type="button" onClick={() => onChildrenChange((p) => p.filter((_, idx) => idx !== i))}
+                    className="text-xs font-medium text-red-400 transition-colors hover:text-red-600">
+                    {t("beneficiaries.child_remove")}
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                  <InputField label={t("beneficiaries.child_name")}        field="child_name"        placeholder="Ahmad Jr." formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                  <InputField label={t("beneficiaries.child_name_ar_label")} field="child_name_arabic" placeholder="أحمد"     formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                </div>
+                <InputField label={t("beneficiaries.child_dob")} field="child_date_of_birth" type="date" formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                  <StorageDocumentField label={t("beneficiaries.passport_copy")}  folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                    onUpload={(key) => setChild(i, "passport_copy",  key)}
+                    onRemove={() => setChild(i, "passport_copy",  null)} field={`passport_copy_${i}`} errors={{}} />
+                  <StorageDocumentField label={t("beneficiaries.entrance_stamp")} folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                    onUpload={(key) => setChild(i, "entrance_stump", key)}
+                    onRemove={() => setChild(i, "entrance_stump", null)} field={`entrance_stump_${i}`} errors={{}} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => onChildrenChange((p) => [...p, { ...EMPTY_CHILD }])}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-green transition-colors hover:text-green-600"
+        >
+          {t("beneficiaries.add_child")}
+        </button>
+      </div>
+
+      <div className="mt-6 flex gap-3">
+        <button type="button" onClick={onBack} className={btnBack}>
+          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
+        </button>
+        <button type="button" onClick={onNext} className={btnNext}>
+          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
+        </button>
+      </div>
+    </>
+  );
+};
+
+/* ─────────────────────────────────────────────────
+   Step 4 — Status, Country & Terms
 ───────────────────────────────────────────────── */
 const REQUIRED = [{ required: true }];
 
@@ -351,6 +445,8 @@ const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }
           <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
             formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         )}
+        <InputField label={t("beneficiaries.address")} field="address" placeholder="No. 1, Jalan…"
+          required={false} formData={visaData} errors={visaErrors} updateFormData={setV} />
 
         {/* Terms */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -468,43 +564,65 @@ export default function BeneficiaryRegisterForm() {
   const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
-  const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "" });
+  const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
   const [documents, setDocuments] = useState({ background: "" });
   const [idDoc, setIdDoc] = useState(null);
+  const [family, setFamily] = useState({
+    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "",
+    spouse_job: "", number_of_children: "",
+  });
+  const [children, setChildren] = useState([]);
   const [visa,  setVisa]  = useState({
     has_visa: "", visa_type: "", situation: "", unhcr_number: "",
-    country: "", palestine_region: "", terms_accepted: false,
+    country: "", palestine_region: "", address: "", terms_accepted: false,
   });
 
-  const { execute: register, loading, error } = useRegister();
+  const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
 
   const handleSubmit = async () => {
     const hasVisaBool = visa.has_visa === "true" ? true : visa.has_visa === "false" ? false : undefined;
     try {
       const payload = {
-        full_name:        account.full_name    || undefined,
-        email:            account.email        || undefined,
-        phone_number:     account.phone_number || undefined,
-        background:       documents.background || undefined,
-        id_document:      idDoc                || undefined,
-        terms_accepted:   visa.terms_accepted,
+        full_name:         account.full_name     || undefined,
+        email:             account.email         || undefined,
+        phone_number:      account.phone_number  || undefined,
+        profile_photo:     account.profile_photo || undefined,
+        background:        documents.background  || undefined,
+        id_document:       idDoc                  || undefined,
+        terms_accepted:    visa.terms_accepted,
 
-        has_visa:         hasVisaBool,
-        visa_type:        hasVisaBool === true  ? (visa.visa_type || undefined) : undefined,
-        situation:        hasVisaBool === false ? (visa.situation || undefined) : undefined,
-        unhcr_number:     (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
-        country:          visa.country || undefined,
-        palestine_region: visa.country === "PS" ? (visa.palestine_region || undefined) : undefined,
+        has_visa:          hasVisaBool,
+        visa_type:         hasVisaBool === true  ? (visa.visa_type || undefined) : undefined,
+        situation:         hasVisaBool === false ? (visa.situation || undefined) : undefined,
+        unhcr_number:      (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
+        country_of_origin: visa.country || undefined,
+        palestine_region:  visa.country === "PS" ? (visa.palestine_region || undefined) : undefined,
+        address:           visa.address || undefined,
+
+        family_information: {
+          family_in_malaysia:  family.family_in_malaysia,
+          spouse_name:         family.spouse_name        || null,
+          spouse_name_arabic:  family.spouse_name_arabic || null,
+          spouse_job:          family.spouse_job         || null,
+          number_of_children:  family.number_of_children !== "" ? Number(family.number_of_children) : null,
+          children_information: children.map((c) => ({
+            child_name:          c.child_name         || undefined,
+            child_name_arabic:   c.child_name_arabic  || undefined,
+            child_date_of_birth: c.child_date_of_birth || undefined,
+            passport_copy:       c.passport_copy      || undefined,
+            entrance_stump:      c.entrance_stump     || undefined,
+          })),
+        },
       };
-      const data = await register(payload);
+      const data = await createBeneficiary(payload);
       setOtpMeta({ email: account.email, channel: data.channel ?? "email" });
-      setStep(4);
-    } catch { /* error shown by useRegister */ }
+      setStep(5);
+    } catch { /* error shown by useCreateBeneficiary */ }
   };
 
   return (
     <div>
-      <Hero step={step <= 3 ? step : 4} />
+      <Hero step={step <= 4 ? step : 5} />
 
       <section className="bg-slate-50 px-4 py-12">
         <div className="mx-auto max-w-2xl">
@@ -513,20 +631,27 @@ export default function BeneficiaryRegisterForm() {
               <AccountStep data={account} onChange={setAccount} onNext={() => setStep(2)} />
             )}
             {step === 2 && (
-              <DocumentsStep
-                data={documents} onChange={setDocuments}
-                idDoc={idDoc} onIdDocChange={setIdDoc}
+              <FamilyStep
+                data={family} onChange={setFamily}
+                children={children} onChildrenChange={setChildren}
                 onBack={() => setStep(1)} onNext={() => setStep(3)}
               />
             )}
             {step === 3 && (
-              <StatusStep
-                visaData={visa} onVisaChange={setVisa}
-                onBack={() => setStep(2)} onSubmit={handleSubmit}
-                loading={loading} error={error}
+              <DocumentsStep
+                data={documents} onChange={setDocuments}
+                idDoc={idDoc} onIdDocChange={setIdDoc}
+                onBack={() => setStep(2)} onNext={() => setStep(4)}
               />
             )}
             {step === 4 && (
+              <StatusStep
+                visaData={visa} onVisaChange={setVisa}
+                onBack={() => setStep(3)} onSubmit={handleSubmit}
+                loading={loading} error={error}
+              />
+            )}
+            {step === 5 && (
               <OtpStep email={otpMeta.email} channel={otpMeta.channel} onBack={() => setStep(1)} />
             )}
           </div>
