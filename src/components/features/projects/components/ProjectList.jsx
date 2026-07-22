@@ -174,7 +174,9 @@ export default function ProjectList() {
         subtitle={t("projects.subtitle")}
         actions={
           <>
-            <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("projects.export_report")} loading={exporting} onClick={handleExport} />
+            {isAdmin && (
+              <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("projects.export_report")} loading={exporting} onClick={handleExport} />
+            )}
             <Button icon={<MdAdd className="h-4 w-4" />} text={t("projects.new_project")} onClick={() => navigate(`${base}/projects/create`)} />
           </>
         }
