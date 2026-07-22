@@ -15,7 +15,7 @@ const useCreateUser = () => {
     } catch (err) {
       const msg = extractError(err, "Failed to create user.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

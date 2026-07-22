@@ -20,7 +20,7 @@ const useForgotPassword = () => {
     } catch (err) {
       const msg = extractError(err, "Could not send reset email. Please try again.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

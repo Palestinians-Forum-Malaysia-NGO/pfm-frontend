@@ -14,7 +14,7 @@ const useDeleteUser = () => {
     } catch (err) {
       const msg = extractError(err, "Failed to delete user.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

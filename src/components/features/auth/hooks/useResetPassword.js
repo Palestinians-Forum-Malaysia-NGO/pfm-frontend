@@ -20,7 +20,7 @@ const useResetPassword = () => {
     } catch (err) {
       const msg = extractError(err, "Reset failed. Check your code and try again.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

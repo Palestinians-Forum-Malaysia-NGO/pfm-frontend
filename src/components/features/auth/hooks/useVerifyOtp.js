@@ -23,7 +23,7 @@ const useVerifyOtp = () => {
     } catch (err) {
       const msg = extractError(err, "Invalid or expired code. Please try again.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

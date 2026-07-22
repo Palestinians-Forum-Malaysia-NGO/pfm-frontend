@@ -15,7 +15,7 @@ const useUpdateUser = () => {
     } catch (err) {
       const msg = extractError(err, "Failed to update user.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

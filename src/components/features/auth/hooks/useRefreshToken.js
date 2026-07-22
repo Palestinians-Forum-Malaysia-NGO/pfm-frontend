@@ -17,7 +17,7 @@ const useRefreshToken = () => {
     } catch (err) {
       const msg = extractError(err, "Session expired. Please sign in again.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

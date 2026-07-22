@@ -15,8 +15,9 @@ export function useGetBranch() {
       setBranch(data);
       return data;
     } catch (err) {
-      setError(extractError(err));
-      throw err;
+      const msg = extractError(err);
+      setError(msg);
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

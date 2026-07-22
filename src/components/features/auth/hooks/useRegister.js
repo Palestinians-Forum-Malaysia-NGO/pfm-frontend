@@ -22,7 +22,7 @@ const useRegister = () => {
     } catch (err) {
       const msg = extractError(err, "Registration failed. Please try again.");
       setError(msg);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }
