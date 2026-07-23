@@ -30,19 +30,30 @@ const OpportunityApplicationForm = ({ opportunities }) => {
   const [form, setForm]           = useState(EMPTY);
   const [errors, setErrors]       = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [coverLetterMode, setCoverLetterMode] = useState("text"); // "text" | "file"
   const { execute: submitApplication, loading: sending, error } = useSubmitOpportunityApplication();
 
   const updateForm = (field, value) => setForm((p) => ({ ...p, [field]: value }));
 
+  const switchCoverLetterMode = (mode) => {
+    setCoverLetterMode(mode);
+    updateForm("applicant_cover_letter", "");
+  };
+
   const OPPORTUNITY_OPTIONS = opportunities.map((o) => ({ value: o.id, label: o.title }));
   const selectedOpportunity = opportunities.find((o) => o.id === form.opportunity_id) ?? null;
 
-  const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules));
+  const activeRules = {
+    ...RULES,
+    applicant_cover_letter: coverLetterMode === "text" ? RULES.applicant_cover_letter : [{ required: true }],
+  };
+
+  const canSubmit = !Object.entries(activeRules).some(([field, rules]) => !!validate(form[field], rules));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    Object.entries(RULES).forEach(([field, rules]) => {
+    Object.entries(activeRules).forEach(([field, rules]) => {
       const err = validate(form[field], rules);
       if (err) newErrors[field] = err;
     });
@@ -70,7 +81,7 @@ const OpportunityApplicationForm = ({ opportunities }) => {
         <h3 className="mt-4 text-xl font-bold text-slate-900">{t("opportunityApply.success_title")}</h3>
         <p className="mt-1 max-w-xs text-sm text-slate-400">{t("opportunityApply.success_body")}</p>
         <button
-          onClick={() => { setSubmitted(false); setForm(EMPTY); setErrors({}); }}
+          onClick={() => { setSubmitted(false); setForm(EMPTY); setErrors({}); setCoverLetterMode("text"); }}
           className="mt-4 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
         >
           {t("opportunityApply.send_another")}
@@ -146,10 +157,44 @@ const OpportunityApplicationForm = ({ opportunities }) => {
           errors={errors}
         />
 
-        <TextareaField
-          label={t("opportunityApply.cover_letter")} field="applicant_cover_letter" rows={5} placeholder={t("opportunityApply.cover_letter_placeholder")}
-          formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_cover_letter}
-        />
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-sm font-medium text-slate-700">
+            {t("opportunityApply.cover_letter")} <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => switchCoverLetterMode("text")}
+              className={`rounded-full px-3 py-1 transition-colors ${coverLetterMode === "text" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+            >
+              {t("opportunityApply.cover_letter_mode_text")}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchCoverLetterMode("file")}
+              className={`rounded-full px-3 py-1 transition-colors ${coverLetterMode === "file" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+            >
+              {t("opportunityApply.cover_letter_mode_file")}
+            </button>
+          </div>
+        </div>
+
+        {coverLetterMode === "text" ? (
+          <TextareaField
+            field="applicant_cover_letter" rows={5} placeholder={t("opportunityApply.cover_letter_placeholder")}
+            formData={form} errors={errors} updateFormData={updateForm} rules={activeRules.applicant_cover_letter}
+          />
+        ) : (
+          <StorageDocumentField
+            publicEndpoint="opportunityApplication"
+            accept=".pdf,.doc,.docx"
+            required
+            onUpload={(key) => updateForm("applicant_cover_letter", key)}
+            onRemove={() => updateForm("applicant_cover_letter", "")}
+            field="applicant_cover_letter"
+            errors={errors}
+          />
+        )}
 
         <button
           type="submit"

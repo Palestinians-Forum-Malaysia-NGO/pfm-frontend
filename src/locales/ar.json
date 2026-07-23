@@ -133,6 +133,8 @@
     "city": "المدينة الحالية",
     "resume": "السيرة الذاتية",
     "cover_letter": "خطاب التقديم",
+    "cover_letter_mode_text": "اكتبه",
+    "cover_letter_mode_file": "رفع ملف",
     "cover_letter_placeholder": "أخبرنا لماذا أنت مناسب لهذه الفرصة...",
     "send": "إرسال الطلب",
     "sending": "جاري الإرسال...",

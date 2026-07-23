@@ -133,6 +133,8 @@
     "city": "Current City",
     "resume": "Resume / CV",
     "cover_letter": "Cover Letter",
+    "cover_letter_mode_text": "Type it",
+    "cover_letter_mode_file": "Upload a file",
     "cover_letter_placeholder": "Tell us why you're a great fit for this opportunity...",
     "send": "Submit Application",
     "sending": "Submitting...",
