@@ -5,11 +5,11 @@ import useFileUpload from "components/features/storage/hooks/useFileUpload";
  * Manages local file state and auto-uploads to DigitalOcean Spaces when
  * the user selects a file. Pairs with StorageImageField / StorageDocumentField.
  *
- * @param {{ fileType: string, folder: string, onUpload?: (key: string|null) => void }} opts
+ * @param {{ fileType: string, folder: string, publicEndpoint?: string, onUpload?: (key: string|null) => void }} opts
  */
-const useStorageUpload = ({ fileType, folder, onUpload }) => {
+const useStorageUpload = ({ fileType, folder, publicEndpoint, onUpload }) => {
   const [file, setFile] = useState(null);
-  const { upload, loading, error, progress, reset } = useFileUpload({ fileType, folder });
+  const { upload, loading, error, progress, reset } = useFileUpload({ fileType, folder, publicEndpoint });
 
   // Keep the latest onUpload in a ref so callbacks don't need it as a dep.
   // This prevents handleFileChange / handleRemove from being recreated on

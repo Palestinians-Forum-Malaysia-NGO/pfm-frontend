@@ -10,7 +10,9 @@ import useStorageUpload from "./useStorageUpload";
  * Props:
  *   label                  – field label
  *   fileType               – "image" | "thumbnail"  (default: "image")
- *   folder                 – Spaces folder, e.g. "profiles", "projects"
+ *   folder                 – Spaces folder, e.g. "profiles", "projects" (ignored when publicEndpoint is set)
+ *   publicEndpoint         – "register" | "opportunityApplication" — use a no-auth upload-url
+ *                            endpoint instead of the staff/admin-only generic one
  *   currentUrl             – URL of the currently stored image (shown when no local file is staged)
  *   onUpload               – (fileKey: string | null) => void — called after upload OR removal
  *   onRemove               – () => void — called when the existing image is removed
@@ -24,6 +26,7 @@ const StorageImageField = ({
   label,
   fileType = "image",
   folder,
+  publicEndpoint,
   currentUrl,
   onUpload,
   onRemove,
@@ -34,7 +37,7 @@ const StorageImageField = ({
   recommendedDimensions = "300×300",
 }) => {
   const { file, isUploading, progress, error, handleFileChange, handleRemove } =
-    useStorageUpload({ fileType, folder, onUpload });
+    useStorageUpload({ fileType, folder, publicEndpoint, onUpload });
 
   // Use a Fragment — ImageUploadField already owns its mb-4 wrapper spacing.
   // The error message shows naturally after it with no negative-margin hacks.

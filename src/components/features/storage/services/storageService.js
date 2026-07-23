@@ -6,6 +6,19 @@ export const storageService = {
     return data;
   },
 
+  // Public (no-auth) upload-url endpoints — used by unauthenticated flows
+  // (beneficiary registration, opportunity applications) where the generic
+  // /storage/presigned-upload-urls endpoint would 401.
+  async getRegisterUploadUrl({ file_name, content_type, file_type }) {
+    const { data } = await api.post("/auth/register/upload-url", { file_name, content_type, file_type });
+    return data;
+  },
+
+  async getOpportunityApplicationUploadUrl({ file_name, content_type, file_type }) {
+    const { data } = await api.post("/opportunities/applications/upload-url", { file_name, content_type, file_type });
+    return data;
+  },
+
   async uploadToSpaces(uploadUrl, fields, file) {
     const formData = new FormData();
     Object.entries(fields).forEach(([key, value]) => formData.append(key, value));

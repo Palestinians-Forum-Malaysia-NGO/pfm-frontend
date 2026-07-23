@@ -137,7 +137,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
       <div className="flex flex-col gap-3">
         <StorageImageField
           label={t("common.profile_photo")}
-          folder="beneficiaries/photos"
+          publicEndpoint="register"
           onUpload={(key) => set("profile_photo", key)}
           onRemove={() => set("profile_photo", null)}
           errors={errors}
@@ -217,7 +217,7 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
           formData={data} errors={errors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
         <StorageDocumentField
           label={t("apply.id_document")}
-          folder="beneficiaries/documents"
+          publicEndpoint="register"
           accept=".pdf,.jpg,.jpeg,.png"
           required
           onUpload={(key) => { onIdDocChange(key); setIdDocError(null); }}
@@ -289,10 +289,10 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
                 </div>
                 <InputField label={t("beneficiaries.child_dob")} field="child_date_of_birth" type="date" formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                  <StorageDocumentField label={t("beneficiaries.passport_copy")}  folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                  <StorageDocumentField label={t("beneficiaries.passport_copy")}  publicEndpoint="register" accept=".pdf,.jpg,.jpeg,.png"
                     onUpload={(key) => setChild(i, "passport_copy",  key)}
                     onRemove={() => setChild(i, "passport_copy",  null)} field={`passport_copy_${i}`} errors={{}} />
-                  <StorageDocumentField label={t("beneficiaries.entrance_stamp")} folder="beneficiaries/children" accept=".pdf,.jpg,.jpeg,.png"
+                  <StorageDocumentField label={t("beneficiaries.entrance_stamp")} publicEndpoint="register" accept=".pdf,.jpg,.jpeg,.png"
                     onUpload={(key) => setChild(i, "entrance_stump", key)}
                     onRemove={() => setChild(i, "entrance_stump", null)} field={`entrance_stump_${i}`} errors={{}} />
                 </div>

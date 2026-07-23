@@ -27,7 +27,9 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
  * Props:
  *   label        – field label
  *   fileType     – "document" | "pdf" | "file"  (default: "document")
- *   folder       – Spaces folder, e.g. "cvs", "projects"
+ *   folder       – Spaces folder, e.g. "cvs", "projects" (ignored when publicEndpoint is set)
+ *   publicEndpoint – "register" | "opportunityApplication" — use a no-auth upload-url
+ *                    endpoint instead of the staff/admin-only generic one
  *   accept       – input accept string (default: ".pdf,.doc,.docx")
  *   currentName  – display name for the existing file (e.g. "resume.pdf")
  *   currentUrl   – public URL of the current file (for an "Open" link)
@@ -41,6 +43,7 @@ const StorageDocumentField = ({
   label,
   fileType = "document",
   folder,
+  publicEndpoint,
   accept = ".pdf,.doc,.docx",
   currentName,
   currentUrl,
@@ -52,7 +55,7 @@ const StorageDocumentField = ({
 }) => {
   const { t } = useTranslation();
   const { file, isUploading, progress, error, handleFileChange, handleRemove } =
-    useStorageUpload({ fileType, folder, onUpload });
+    useStorageUpload({ fileType, folder, publicEndpoint, onUpload });
 
   const [fileError, setFileError] = useState("");
 

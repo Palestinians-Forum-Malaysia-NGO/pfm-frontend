@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdSend, MdCheckCircle, MdInfoOutline, MdLocationOn } from "react-icons/md";
+import { MdSend, MdCheckCircle, MdLocationOn } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import { InputField, TextareaField, SelectField, validate } from "components/form";
+import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { useSubmitOpportunityApplication } from "components/features/opportunityApplications/hooks";
 import { NATIONALITIES } from "constants/lists";
 
@@ -20,6 +21,7 @@ const EMPTY = {
   opportunity_id: "",
   applicant_full_name: "", applicant_email: "", applicant_phone: "",
   applicant_date_of_birth: "", applicant_gender: "", applicant_nationality: "", applicant_current_city: "",
+  applicant_resume: null,
   applicant_cover_letter: "",
 };
 
@@ -49,6 +51,7 @@ const OpportunityApplicationForm = ({ opportunities }) => {
 
     const { opportunity_id, ...payload } = form;
     if (!payload.applicant_date_of_birth) delete payload.applicant_date_of_birth;
+    if (!payload.applicant_resume) delete payload.applicant_resume;
 
     try {
       await submitApplication(opportunity_id, payload);
@@ -132,10 +135,16 @@ const OpportunityApplicationForm = ({ opportunities }) => {
           formData={form} errors={errors} updateFormData={updateForm}
         />
 
-        <div className="mb-4 flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
-          <MdInfoOutline className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-          <p>{t("opportunityApply.documents_coming_soon")}</p>
-        </div>
+        <StorageDocumentField
+          label={t("opportunityApply.resume")}
+          publicEndpoint="opportunityApplication"
+          accept=".pdf,.doc,.docx"
+          required={false}
+          onUpload={(key) => updateForm("applicant_resume", key)}
+          onRemove={() => updateForm("applicant_resume", null)}
+          field="applicant_resume"
+          errors={errors}
+        />
 
         <TextareaField
           label={t("opportunityApply.cover_letter")} field="applicant_cover_letter" rows={5} placeholder={t("opportunityApply.cover_letter_placeholder")}
