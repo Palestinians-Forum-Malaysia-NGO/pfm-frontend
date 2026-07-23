@@ -7,6 +7,7 @@ import PublicNavbar from "components/navbar/PublicNavbar";
 import Footer from "components/footer/Footer";
 import ProjectDetail from "views/public/projects/ProjectDetail";
 import NewsDetail from "views/public/news/NewsDetail";
+import BlogDetail from "views/public/blogs/BlogDetail";
 import EventDetail from "views/public/events/EventDetail";
 import NewsletterUnsubscribe from "views/public/newsletter/Unsubscribe";
 
@@ -33,6 +34,7 @@ export default function PublicLayout() {
           {getRoutes()}
           <Route path="/projects/:slug" element={<ProjectDetail />} />
           <Route path="/news/:slug" element={<NewsDetail />} />
+          <Route path="/blogs/:slug" element={<BlogDetail />} />
           <Route path="/events/:slug" element={<EventDetail />} />
           <Route path="/newsletter/unsubscribe/:token" element={<NewsletterUnsubscribe />} />
         </Routes>

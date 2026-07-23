@@ -11,6 +11,7 @@ import ContactMessagesPage   from "views/admin/contactMessages";
 import FeedbackPage          from "views/admin/feedback";
 import OpportunitiesPage     from "views/admin/opportunities";
 import NewsPage              from "views/admin/news";
+import BlogsPage             from "views/admin/blogs";
 import EventsPage            from "views/admin/events";
 import SubscribersPage       from "views/admin/newsletter/Subscribers";
 import NotificationsPage     from "views/admin/newsletter/Notifications";
@@ -42,6 +43,7 @@ import PublicProjectsPage from "views/public/projects";
 import RegisterPage from "views/public/register";
 import PublicOpportunitiesPage from "views/public/opportunities";
 import PublicNewsListPage from "views/public/news";
+import PublicBlogsListPage from "views/public/blogs";
 
 // Icon Imports
 import {
@@ -185,6 +187,18 @@ const routes = [
     children: [
       { name: "All News",     path: "news" },
       { name: "New Article",  path: "news/create" },
+    ],
+  },
+  {
+    name: "Blogs",
+    layout: "/admin",
+    path: "blogs",
+    icon: <MdFeed className="h-5 w-5" />,
+    component: <BlogsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Blogs",  path: "blogs" },
+      { name: "New Blog",   path: "blogs/create" },
     ],
   },
   {
@@ -410,6 +424,18 @@ const routes = [
     ],
   },
   {
+    name: "Blogs",
+    layout: "/staff",
+    path: "blogs",
+    icon: <MdFeed className="h-5 w-5" />,
+    component: <BlogsPage />,
+    section: "COMMUNITY",
+    children: [
+      { name: "All Blogs", path: "blogs" },
+      { name: "New Blog",  path: "blogs/create" },
+    ],
+  },
+  {
     name: "Events",
     layout: "/staff",
     path: "events",
@@ -531,6 +557,7 @@ const routes = [
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
   { name: "Opportunities", layout: "/", path: "/opportunities", component: <PublicOpportunitiesPage /> },
   { name: "News",          layout: "/", path: "/news",          component: <PublicNewsListPage /> },
+  { name: "Blogs",         layout: "/", path: "/blogs",         component: <PublicBlogsListPage /> },
   { name: "Apply",    layout: "/", path: "/apply",    component: <RegisterPage /> },
 
   // ── AUTH (hidden from sidebar) ───────────────────────────────────────────────
