@@ -57,6 +57,7 @@ export default function BeneficiaryEditForm() {
   const [bankForm, setBankForm] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
   const [finForm,  setFinForm]  = useState({ job_title: "", salary: "", payment_frequency: "" });
   const [idDoc, setIdDoc] = useState(null);
+  const { url: currentIdDocUrl } = useStorageUrl(idDoc);
 
   const [initialUser,     setInitialUser]     = useState(null);
   const [initialClass,    setInitialClass]    = useState(null);
@@ -326,6 +327,7 @@ export default function BeneficiaryEditForm() {
             folder="beneficiaries/documents"
             accept=".pdf,.jpg,.jpeg,.png"
             currentName={idDoc ? "Current document" : undefined}
+            currentUrl={currentIdDocUrl}
             onUpload={(key) => setIdDoc(key)}
             onRemove={() => setIdDoc(null)}
             errors={errors}

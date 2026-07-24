@@ -8,6 +8,7 @@ import Button from "components/ui/buttons/Button";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import { StorageCoverField } from "components/form";
 import StorageImage from "components/ui/StorageImage";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import {
   useCreateProjectUpdate, useUpdateProjectUpdate, useDeleteProjectUpdate,
 } from "components/features/projects/hooks";
@@ -30,7 +31,8 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
   const [editingId,         setEditingId]         = useState(null);
   const [editBody,          setEditBody]          = useState("");
   const [editPhotoKey,      setEditPhotoKey]      = useState(null);
-  const [editCurrentUrl,    setEditCurrentUrl]    = useState(null);
+  const [editExistingKey,   setEditExistingKey]   = useState(null);
+  const { url: editCurrentUrl } = useStorageUrl(editExistingKey);
   const [showPhotoInCreate, setShowPhotoInCreate] = useState(false);
 
   const { execute: createUpdate, loading: creating } = useCreateProjectUpdate();
@@ -64,14 +66,14 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
     setEditingId(u.id);
     setEditBody(u.body);
     setEditPhotoKey(null);
-    setEditCurrentUrl(u.photo || null);
+    setEditExistingKey(u.photo || null);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditBody("");
     setEditPhotoKey(null);
-    setEditCurrentUrl(null);
+    setEditExistingKey(null);
   };
 
   const handleSave = async (updateId) => {
@@ -169,8 +171,8 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                     label={t("projects.update_photo_label")}
                     folder="projects/updates"
                     currentUrl={editCurrentUrl}
-                    onUpload={(key) => { setEditPhotoKey(key); setEditCurrentUrl(null); }}
-                    onRemove={() => { setEditPhotoKey(""); setEditCurrentUrl(null); }}
+                    onUpload={(key) => { setEditPhotoKey(key); setEditExistingKey(null); }}
+                    onRemove={() => { setEditPhotoKey(""); setEditExistingKey(null); }}
                   />
                   <div className="flex gap-2">
                     <Button variant="ghost" text={t("projects.cancel")} type="button" onClick={cancelEdit} icon={<MdClose className="h-3.5 w-3.5" />} className="flex-1" />

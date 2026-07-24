@@ -185,7 +185,7 @@ export default function ProjectPublicDetail() {
                     {project.updates.map((u) => (
                       <div key={u.id}>
                         {u.photo && (
-                          <img src={u.photo} alt={t("projects.update_alt")} className="mb-3 max-h-[420px] w-full rounded-2xl object-cover" />
+                          <StorageImage fileKey={u.photo} alt={t("projects.update_alt")} className="mb-3 max-h-[420px] w-full rounded-2xl object-cover" />
                         )}
                         <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{u.body}</p>
                         {(u.posted_by || u.created_at) && (

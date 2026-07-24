@@ -14,6 +14,7 @@ import InfoRow       from "components/ui/InfoRow";
 import AlertBanner   from "components/ui/AlertBanner";
 import Loading       from "components/loading/Loading";
 import { TextareaField } from "components/form";
+import StorageFileLink from "components/ui/StorageFileLink";
 import OpportunityApplicationDeleteModal from "./OpportunityApplicationDeleteModal";
 import {
   useGetOpportunityApplication, useDeleteOpportunityApplication,
@@ -32,6 +33,11 @@ const fmtDateTime = (iso) => {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-MY", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
 };
+
+// Uploaded documents are stored as a bare Spaces file_key (e.g.
+// "documents/opportunities/<uuid>-name.pdf") — no spaces, slash-delimited —
+// which lets us tell a file-mode cover letter apart from typed free text.
+const isFileKey = (v) => typeof v === "string" && /^[\w-]+(\/[\w.-]+)+$/.test(v);
 
 const STATUS_BADGE = {
   pending:  "bg-amber-50 text-amber-600 border border-amber-200",
@@ -145,8 +151,8 @@ export default function OpportunityApplicationDetailView() {
         <FormHeader icon={<MdDescription className="h-5 w-5" />} title={t("opportunityApplications.section_documents")} subtitle={t("opportunityApplications.section_documents_sub")} />
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_resume")} value={
-            isSafeUrl(application.applicant_resume)
-              ? <a href={application.applicant_resume} target="_blank" rel="noreferrer" className="text-green hover:underline">{t("opportunityApplications.view_link")}</a>
+            application.applicant_resume
+              ? <StorageFileLink fileKey={application.applicant_resume} className="text-green hover:underline">{t("opportunityApplications.view_link")}</StorageFileLink>
               : "—"
           } />
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_portfolio")} value={
@@ -158,9 +164,15 @@ export default function OpportunityApplicationDetailView() {
         {application.applicant_cover_letter && (
           <div>
             <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t("opportunityApplications.info_cover_letter")}</p>
-            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{application.applicant_cover_letter}</p>
-            </div>
+            {isFileKey(application.applicant_cover_letter) ? (
+              <StorageFileLink fileKey={application.applicant_cover_letter} className="inline-flex items-center gap-1 text-sm text-green hover:underline">
+                <MdLink className="h-4 w-4" /> {t("opportunityApplications.view_link")}
+              </StorageFileLink>
+            ) : (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{application.applicant_cover_letter}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
