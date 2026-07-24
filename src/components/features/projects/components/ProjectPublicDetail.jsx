@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdAssignment, MdCalendarToday, MdCategory,
   MdAttachMoney, MdTrendingUp, MdPeople, MdFlag,
-  MdRadioButtonUnchecked, MdCheck, MdPerson, MdCampaign, MdRateReview, MdLogin,
+  MdRadioButtonUnchecked, MdCheck, MdCampaign, MdRateReview, MdLogin, MdPhotoLibrary,
 } from "react-icons/md";
 import { useGetProject, useGetProjects } from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
@@ -196,6 +196,33 @@ export default function ProjectPublicDetail() {
                           </p>
                         )}
                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Gallery (read-only) — photo grid */}
+              {project.gallery?.length > 0 && (
+                <div className="mb-12">
+                  <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
+                    <MdPhotoLibrary className="h-5 w-5 text-green" /> {t("projects.gallery_title")}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {project.gallery.map((p) => p.image?.public_url && (
+                      <a
+                        key={p.id}
+                        href={p.image.public_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group block overflow-hidden rounded-xl bg-slate-100"
+                        title={p.caption || ""}
+                      >
+                        <img
+                          src={p.image.public_url}
+                          alt={p.caption || t("projects.gallery_title")}
+                          className="h-32 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-36"
+                        />
+                      </a>
                     ))}
                   </div>
                 </div>
