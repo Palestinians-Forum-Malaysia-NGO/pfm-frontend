@@ -207,7 +207,7 @@ export default function ProjectPublicDetail() {
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
                     <MdPhotoLibrary className="h-5 w-5 text-green" /> {t("projects.gallery_title")}
                   </h2>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {project.gallery.map((p) => p.image?.public_url && (
                       <a
                         key={p.id}
@@ -220,7 +220,7 @@ export default function ProjectPublicDetail() {
                         <img
                           src={p.image.public_url}
                           alt={p.caption || t("projects.gallery_title")}
-                          className="h-32 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-36"
+                          className="h-40 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-52"
                         />
                       </a>
                     ))}
