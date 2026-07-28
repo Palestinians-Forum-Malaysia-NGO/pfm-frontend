@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdLock, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
+import Button        from "components/ui/buttons/Button";
 import { validate }  from "components/form/utils/validation";
 import { usePasswordChange } from "components/features/auth/hooks";
 
@@ -48,12 +49,12 @@ export default function ChangePassword() {
         </div>
         <h1 className="mt-5 text-xl font-bold text-navy-700">{t("auth.change_done_title")}</h1>
         <p className="mt-2 text-sm text-slate-400">{t("auth.change_done_body")}</p>
-        <button
+        <Button
           onClick={() => { setDone(false); setFormData({ old_password: "", new_password: "" }); }}
-          className="mt-7 flex h-11 w-full items-center justify-center rounded-full border border-slate-200 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]"
-        >
-          {t("auth.change_again")}
-        </button>
+          variant="ghost"
+          text={t("auth.change_again")}
+          className="mt-7 h-11 w-full"
+        />
       </div>
     );
   }
@@ -74,10 +75,12 @@ export default function ChangePassword() {
         <PasswordField label={t("auth.current_password")} field="old_password" placeholder={t("auth.current_password_placeholder")} formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.old_password} />
         <PasswordField label={t("auth.new_password")} field="new_password" placeholder={t("auth.min_chars")} formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.new_password} />
 
-        <button type="submit" disabled={loading}
-          className="mt-4 flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60">
-          {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : t("auth.update_password")}
-        </button>
+        <Button
+          type="submit"
+          loading={loading}
+          text={t("auth.update_password")}
+          className="mt-4 h-12 w-full"
+        />
       </form>
     </div>
   );

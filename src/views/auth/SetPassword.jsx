@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdMarkEmailRead, MdArrowForward } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
+import Button from "components/ui/buttons/Button";
 import { useForgotPassword } from "components/features/auth/hooks";
 
 export default function SetPassword() {
@@ -56,17 +57,13 @@ export default function SetPassword() {
       )}
 
       <div className="mt-6 flex flex-col gap-3">
-        <button
+        <Button
           onClick={handleResend}
-          disabled={loading}
-          className="flex h-11 w-full items-center justify-center rounded-full border border-slate-200 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50 active:scale-[0.98] disabled:opacity-50"
-        >
-          {loading ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
-          ) : (
-            t("auth.resend_link")
-          )}
-        </button>
+          loading={loading}
+          variant="ghost"
+          text={t("auth.resend_link")}
+          className="h-11 w-full"
+        />
 
         <Link
           to="/auth/sign-in"

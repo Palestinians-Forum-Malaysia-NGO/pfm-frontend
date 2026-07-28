@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdLockReset, MdArrowBack } from "react-icons/md";
 import InputField  from "components/form/InputField";
 import AlertBanner from "components/ui/AlertBanner";
+import Button       from "components/ui/buttons/Button";
 import { validate } from "components/form/utils/validation";
 import { useForgotPassword } from "components/features/auth/hooks";
 
@@ -48,12 +49,11 @@ export default function ForgotPassword() {
           <span className="font-semibold text-slate-700">{formData.email}</span>.{" "}
           {t("auth.check_email_body2")}
         </p>
-        <button
+        <Button
           onClick={() => navigate("/auth/reset-password")}
-          className="mt-7 flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98]"
-        >
-          {t("auth.enter_reset_token")}
-        </button>
+          text={t("auth.enter_reset_token")}
+          className="mt-7 h-11 w-full"
+        />
         <button
           onClick={() => setSent(false)}
           className="mt-3 w-full text-center text-sm text-slate-400 transition-colors hover:text-slate-700"
@@ -94,16 +94,12 @@ export default function ForgotPassword() {
           updateFormData={updateFormData} rules={EMAIL_RULES}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="mt-4 flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.send_reset_link")
-          }
-        </button>
+          loading={loading}
+          text={t("auth.send_reset_link")}
+          className="mt-4 h-12 w-full"
+        />
       </form>
     </div>
   );

@@ -5,6 +5,7 @@ import { MdEmail, MdArrowBack, MdArrowForward } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
+import Button        from "components/ui/buttons/Button";
 import { validate }  from "components/form/utils/validation";
 import Checkbox      from "components/checkbox";
 import { useAuth, useLogin, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
@@ -85,16 +86,12 @@ const LoginStep = ({ onOtpRequired }) => {
           </a>
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:bg-[#005629] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.sign_in")
-          }
-        </button>
+          loading={loading}
+          text={t("auth.sign_in")}
+          className="h-12 w-full"
+        />
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">
@@ -186,16 +183,13 @@ const OtpStep = ({ email, channel, onBack }) => {
           </p>
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading || !isReady}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.verify_sign_in")
-          }
-        </button>
+          disabled={!isReady}
+          loading={loading}
+          text={t("auth.verify_sign_in")}
+          className="h-12 w-full"
+        />
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdLockReset, MdArrowBack, MdCheckCircle } from "react-icons/md";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
+import Button        from "components/ui/buttons/Button";
 import { validate }  from "components/form/utils/validation";
 import { useResetPassword } from "components/features/auth/hooks";
 
@@ -110,16 +111,12 @@ export default function ResetPassword() {
           updateFormData={updateFormData} rules={PASSWORD_RULES}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.reset_btn")
-          }
-        </button>
+          loading={loading}
+          text={t("auth.reset_btn")}
+          className="h-12 w-full"
+        />
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-400">

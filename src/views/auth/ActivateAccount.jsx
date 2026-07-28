@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdEmail, MdArrowBack, MdMarkEmailRead } from "react-icons/md";
 import InputField  from "components/form/InputField";
 import AlertBanner from "components/ui/AlertBanner";
+import Button       from "components/ui/buttons/Button";
 import { validate } from "components/form/utils/validation";
 import { useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { setTokens } from "components/features/auth/utils";
@@ -61,16 +62,12 @@ const EmailStep = ({ onSent }) => {
           updateFormData={updateFormData} rules={EMAIL_RULES}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={loading}
-          className="mt-3 flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.send_activation")
-          }
-        </button>
+          loading={loading}
+          text={t("auth.send_activation")}
+          className="mt-3 h-12 w-full"
+        />
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">
@@ -157,16 +154,13 @@ const OtpStep = ({ email, onBack }) => {
           <p className="mt-1.5 text-center text-xs text-slate-400">{code.length}/6 {t("auth.digits_entered")}</p>
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={loading || !isReady}
-          className="flex h-12 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("auth.verify_continue")
-          }
-        </button>
+          disabled={!isReady}
+          loading={loading}
+          text={t("auth.verify_continue")}
+          className="h-12 w-full"
+        />
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-400">
