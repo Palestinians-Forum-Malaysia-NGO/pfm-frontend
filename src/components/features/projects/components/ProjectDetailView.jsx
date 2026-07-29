@@ -20,6 +20,7 @@ import ProjectDeleteModal from "./ProjectDeleteModal";
 import AssignStaffModal from "./AssignStaffModal";
 import MilestoneSection from "./MilestoneSection";
 import ProjectBeneficiariesSection from "./ProjectBeneficiariesSection";
+import ProjectApplicationsSection from "./ProjectApplicationsSection";
 import UpdatesSection from "./UpdatesSection";
 import GallerySection from "./GallerySection";
 import {
@@ -316,6 +317,9 @@ export default function ProjectDetailView() {
 
       {/* ── Beneficiaries Helped (aggregate across milestones) ── */}
       <ProjectBeneficiariesSection projectId={id} />
+
+      {/* ── Applications (beneficiaries applying for assistance) ── */}
+      <ProjectApplicationsSection projectId={id} />
 
       {/* ── Updates ── */}
       <UpdatesSection projectId={id} initialUpdates={project.updates ?? []} />

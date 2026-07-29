@@ -4,15 +4,23 @@ import { useGetApplications } from "./useGetApplications";
 import { useDeleteApplication } from "./useDeleteApplication";
 import { useToast } from "components/ui/toast/ToastContext";
 
-export function useApplicationList() {
+export function useApplicationList(projectId) {
   const { t } = useTranslation();
-  const { applications: all, loading, error, refetch } = useGetApplications();
+  const { applications: fetched, loading, error, refetch } = useGetApplications();
   const { execute: deleteApplication, loading: deleteLoading } = useDeleteApplication();
   const { success, error: toastError } = useToast();
 
   const [search, setSearch]             = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [toDelete, setToDelete]         = useState(null);
+
+  // The backend doesn't support filtering /applications by project server-side,
+  // so when a projectId is given (e.g. the project detail page), narrow the
+  // already-authorized full list down to that project client-side.
+  const all = useMemo(
+    () => (projectId ? fetched.filter((a) => a.project?.id === projectId) : fetched),
+    [fetched, projectId]
+  );
 
   const applications = useMemo(() => {
     let list = all;
