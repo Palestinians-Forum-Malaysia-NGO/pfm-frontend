@@ -111,7 +111,7 @@ export default function FeedbackList() {
       stopPropagation: true,
       render: (f) => (
         <div className="flex items-center justify-end gap-0.5">
-          {f.status === "pending" && (
+          {isAdmin && f.status === "pending" && (
             <RowIconButton icon={<MdCheckCircle className="h-4 w-4" />} title={t("feedbackMessages.approve")} onClick={() => handleQuickApprove(f)} variant="primary" />
           )}
           <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("feedbackMessages.view")}   onClick={() => navigate(`${base}/feedback/${f.id}`)} variant="primary" />

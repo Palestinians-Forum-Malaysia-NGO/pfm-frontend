@@ -15,7 +15,7 @@ const InfoRow = ({ icon, label, value }) => (
     </div>
     <div className="min-w-0">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-      <p className="truncate text-sm font-semibold text-slate-800">{value}</p>
+      <div className="truncate text-sm font-semibold text-slate-800">{value}</div>
     </div>
   </div>
 );

@@ -144,29 +144,33 @@ export default function FeedbackDetailView() {
         </div>
       </div>
 
-      {/* ── Editable content ── */}
+      {/* ── Message content — editable for admin, read-only for staff ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader icon={<MdRateReview className="h-5 w-5" />} title={t("feedbackMessages.section_message")} subtitle={t("feedbackMessages.section_message_sub")} />
-        <div className="flex flex-col gap-4">
-          <InputField
-            label={t("feedbackMessages.info_name")} field="full_name" required={false}
-            formData={editForm} errors={errors} updateFormData={updateEditForm}
-          />
-          <div>
-            <p className="mb-1.5 text-sm font-medium text-slate-700">{t("feedbackMessages.info_rating")}</p>
-            <StarRating value={editForm.rating} onChange={(v) => updateEditForm("rating", v)} />
+        {isAdmin ? (
+          <div className="flex flex-col gap-4">
+            <InputField
+              label={t("feedbackMessages.info_name")} field="full_name" required={false}
+              formData={editForm} errors={errors} updateFormData={updateEditForm}
+            />
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-slate-700">{t("feedbackMessages.info_rating")}</p>
+              <StarRating value={editForm.rating} onChange={(v) => updateEditForm("rating", v)} />
+            </div>
+            <TextareaField
+              label={t("feedbackMessages.info_message")} field="message" rows={5} required={false}
+              formData={editForm} errors={errors} updateFormData={updateEditForm}
+            />
+            <div>
+              <Button variant="primary" text={t("feedbackMessages.save_changes")} loading={saving} onClick={handleSave} />
+            </div>
           </div>
-          <TextareaField
-            label={t("feedbackMessages.info_message")} field="message" rows={5} required={false}
-            formData={editForm} errors={errors} updateFormData={updateEditForm}
-          />
-          <div>
-            <Button variant="primary" text={t("feedbackMessages.save_changes")} loading={saving} onClick={handleSave} />
-          </div>
-        </div>
+        ) : (
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{feedback.message}</p>
+        )}
       </div>
 
-      {/* ── Moderation ── */}
+      {/* ── Moderation — admin only ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader
           icon={<MdCheckCircle className="h-5 w-5" />}
@@ -178,20 +182,22 @@ export default function FeedbackDetailView() {
             </span>
           }
         />
-        <div className="flex gap-2">
-          <Button
-            variant="primary" icon={<MdCheckCircle className="h-4 w-4" />}
-            text={t("feedbackMessages.approve")} loading={approving}
-            disabled={feedback.status === "approved"}
-            onClick={handleApprove}
-          />
-          <Button
-            variant="danger" icon={<MdCancel className="h-4 w-4" />}
-            text={t("feedbackMessages.reject")} loading={rejecting}
-            disabled={feedback.status === "rejected"}
-            onClick={handleReject}
-          />
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button
+              variant="primary" icon={<MdCheckCircle className="h-4 w-4" />}
+              text={t("feedbackMessages.approve")} loading={approving}
+              disabled={feedback.status === "approved"}
+              onClick={handleApprove}
+            />
+            <Button
+              variant="danger" icon={<MdCancel className="h-4 w-4" />}
+              text={t("feedbackMessages.reject")} loading={rejecting}
+              disabled={feedback.status === "rejected"}
+              onClick={handleReject}
+            />
+          </div>
+        )}
       </div>
 
       <FeedbackDeleteModal
