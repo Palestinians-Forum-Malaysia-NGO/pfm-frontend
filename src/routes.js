@@ -34,6 +34,7 @@ import BeneficiaryRequests   from "views/beneficiary/requests";
 import BeneficiaryProfile    from "views/beneficiary/profile";
 import BeneficiarySettings   from "views/beneficiary/settings";
 import BeneficiaryEvents     from "views/beneficiary/events";
+import BeneficiaryProjects   from "views/beneficiary/projects";
 import Home from "views/public/home";
 import About from "views/public/about";
 import PublicEvents from "views/public/events";
@@ -528,6 +529,14 @@ const routes = [
     path: "events",
     icon: <MdEvent className="h-5 w-5" />,
     component: <BeneficiaryEvents />,
+    section: "MAIN",
+  },
+  {
+    name: "Projects",
+    layout: "/beneficiary",
+    path: "projects",
+    icon: <MdFolderSpecial className="h-5 w-5" />,
+    component: <BeneficiaryProjects />,
     section: "MAIN",
   },
   {

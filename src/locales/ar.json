@@ -991,6 +991,11 @@
     "toast_staff_unassign_failed": "فشل إلغاء تعيين الموظف",
     "gallery_title": "معرض الصور",
     "gallery_subtitle": "صور توضح هذا المشروع",
+    "apply_title": "بحاجة إلى مساعدة؟",
+    "apply_body": "إذا كنت مؤهلاً، يمكنك التقدم للحصول على مساعدة من هذا المشروع.",
+    "apply_button": "التقدم للمساعدة",
+    "applied_title": "تم إرسال الطلب",
+    "applied_body": "تقدمت بطلبك في {{date}}.",
     "no_photos": "لا توجد صور بعد",
     "photo_add_btn": "إضافة صورة",
     "photo_image_label": "الصورة",
@@ -2295,6 +2300,7 @@
     "col_status": "الحالة",
     "requests_page_title": "طلبات المساعدة الخاصة بي",
     "requests_page_desc": "إرسال وتتبع وإدارة طلبات المساعدة الإنسانية الخاصة بك.",
+    "browse_projects_btn": "تصفح المشاريع",
     "settings_page_desc": "إدارة تفضيلات حسابك والإشعارات."
   },
   "admin_dashboard": {

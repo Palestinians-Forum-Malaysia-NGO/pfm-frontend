@@ -5,7 +5,6 @@ import {
 
 import StatCard    from "views/admin/default/components/StatCard";
 import RecentAid   from "./components/RecentAid";
-import NewRequest  from "./components/NewRequest";
 import { useGetStats } from "components/features/stats/hooks";
 
 const BeneficiaryDashboard = () => {
@@ -62,11 +61,6 @@ const BeneficiaryDashboard = () => {
         {/* Left — recent applications */}
         <div className="lg:col-span-2">
           <RecentAid applications={applications.recent ?? []} loading={loading} />
-        </div>
-
-        {/* Right — new request widget */}
-        <div className="lg:col-span-1">
-          <NewRequest />
         </div>
 
       </div>

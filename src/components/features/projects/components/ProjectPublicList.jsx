@@ -87,7 +87,7 @@ function ProjectCard({ project, onClick, statusLabels }) {
   );
 }
 
-export default function ProjectPublicList() {
+export default function ProjectPublicList({ basePath = "/projects" } = {}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { projects: allProjects, loading } = useGetProjects();
@@ -207,7 +207,7 @@ export default function ProjectPublicList() {
               key={p.id}
               project={p}
               statusLabels={statusLabels}
-              onClick={() => navigate(`/projects/${p.slug}`)}
+              onClick={() => navigate(`${basePath}/${p.slug}`)}
             />
           ))}
         </div>

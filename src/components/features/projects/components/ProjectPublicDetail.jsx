@@ -11,6 +11,7 @@ import StorageImage from "components/ui/StorageImage";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Loading from "components/loading/Loading";
 import FeedbackForm from "components/public/projects/FeedbackForm";
+import ProjectApplySection from "./ProjectApplySection";
 import useAuth from "components/features/auth/hooks/useAuth";
 import { ROLES } from "components/features/auth/types";
 
@@ -26,7 +27,7 @@ const fmtMYR = (val) => {
   return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
-export default function ProjectPublicDetail() {
+export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
   const { t } = useTranslation();
   const { slug } = useParams();
   const navigate  = useNavigate();
@@ -53,7 +54,7 @@ export default function ProjectPublicDetail() {
         <MdAssignment className="mx-auto mb-4 h-16 w-16 text-slate-200" />
         <h2 className="mb-2 text-xl font-bold text-slate-700">{t("projects.public_not_found_title")}</h2>
         <p className="mb-6 text-sm text-slate-400">{t("projects.public_not_found_body")}</p>
-        <button onClick={() => navigate("/projects")} className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90">
+        <button onClick={() => navigate(basePath)} className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90">
           <MdArrowBack className="h-4 w-4" /> {t("projects.public_back_to_projects")}
         </button>
       </div>
@@ -77,7 +78,7 @@ export default function ProjectPublicDetail() {
       {/* ── Header block ── */}
       <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
         <button
-          onClick={() => navigate("/projects")}
+          onClick={() => navigate(basePath)}
           className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors duration-150 hover:text-green"
         >
           <MdArrowBack className="h-4 w-4" /> {t("projects.public_breadcrumb")}
@@ -228,6 +229,13 @@ export default function ProjectPublicDetail() {
                 </div>
               )}
 
+              {/* Apply for assistance — beneficiaries only */}
+              {isBeneficiary && (
+                <div className="mb-12">
+                  <ProjectApplySection projectId={project.id} />
+                </div>
+              )}
+
               {/* Feedback — beneficiaries only */}
               {(isBeneficiary || !isAuthenticated) && (
                 <div>
@@ -315,7 +323,7 @@ export default function ProjectPublicDetail() {
               {moreProjects.map((p) => (
                 <button
                   key={p.id}
-                  onClick={() => navigate(`/projects/${p.slug}`)}
+                  onClick={() => navigate(`${basePath}/${p.slug}`)}
                   className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md"
                 >
                   <div className="h-40 w-full shrink-0 overflow-hidden bg-slate-100">

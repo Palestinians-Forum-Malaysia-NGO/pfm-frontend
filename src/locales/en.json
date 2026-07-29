@@ -991,6 +991,11 @@
     "toast_staff_unassign_failed": "Failed to unassign staff",
     "gallery_title": "Gallery",
     "gallery_subtitle": "Photos showcasing this project",
+    "apply_title": "Need Assistance?",
+    "apply_body": "If you qualify, you can apply to receive help from this project.",
+    "apply_button": "Apply for Assistance",
+    "applied_title": "Application Submitted",
+    "applied_body": "You applied on {{date}}.",
     "no_photos": "No photos yet",
     "photo_add_btn": "Add Photo",
     "photo_image_label": "Photo",
@@ -2295,6 +2300,7 @@
     "col_status": "Status",
     "requests_page_title": "My Aid Requests",
     "requests_page_desc": "Submit, track, and manage your humanitarian aid requests.",
+    "browse_projects_btn": "Browse Projects",
     "settings_page_desc": "Manage your account preferences and notifications."
   },
   "admin_dashboard": {
