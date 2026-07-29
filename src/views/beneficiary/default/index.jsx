@@ -4,7 +4,6 @@ import { MdFactCheck, MdPending, MdCheckCircle, MdCancel, MdWavingHand, MdFolder
 
 import PageHeader from "components/ui/PageHeader";
 import ApplicationPipelineCard from "components/ui/dashboard/ApplicationPipelineCard";
-import PendingTasksList from "components/ui/dashboard/PendingTasksList";
 import NotificationsFeed from "components/ui/dashboard/NotificationsFeed";
 import QuickActionsGrid from "components/ui/dashboard/QuickActionsGrid";
 import StatCard    from "views/admin/default/components/StatCard";
@@ -52,16 +51,6 @@ const BeneficiaryDashboard = () => {
       iconColor: "text-red-500",
     },
   ];
-
-  const tasks = useMemo(() => (
-    myApplications
-      .filter((a) => a.status === "pending")
-      .map((a) => ({
-        id: a.id,
-        label: t("beneficiary_dashboard.task_application_pending", { project: a.project?.title ?? "—" }),
-        to: a.project?.slug ? `/beneficiary/projects/${a.project.slug}` : undefined,
-      }))
-  ), [myApplications, t]);
 
   // No reliable timestamp on this endpoint (see GET /applications), so this
   // lists recent status changes rather than claiming true time-based recency.
@@ -121,10 +110,7 @@ const BeneficiaryDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <p className="mb-4 text-sm font-bold text-slate-900">{t("beneficiary_dashboard.pending_tasks_title")}</p>
-          <PendingTasksList tasks={tasks} loading={appsLoading} emptyText={t("beneficiary_dashboard.no_pending_tasks")} />
-        </div>
+        
         <div className="rounded-2xl bg-white p-5 shadow-sm">
           <p className="mb-4 text-sm font-bold text-slate-900">{t("beneficiary_dashboard.notifications_title")}</p>
           <NotificationsFeed items={notifications} loading={appsLoading} emptyText={t("beneficiary_dashboard.no_notifications")} />
