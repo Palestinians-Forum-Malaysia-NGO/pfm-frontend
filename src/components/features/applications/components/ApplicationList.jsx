@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdAdd, MdFactCheck, MdPending, MdCheckCircle, MdCancel,
@@ -18,10 +18,13 @@ import DataTable      from "components/ui/DataTable";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
 
+const VALID_STATUSES = ["pending", "approved", "rejected"];
+
 export default function ApplicationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
+  const [searchParams] = useSearchParams();
   const {
     applications, loading, error, stats,
     search, setSearch,
@@ -31,6 +34,13 @@ export default function ApplicationList() {
     handleDeleteConfirm,
     refetch,
   } = useApplicationList();
+
+  // Support deep-linking from the dashboard's Application Pipeline chips
+  // (e.g. /admin/applications?status=pending) — apply once on mount.
+  React.useEffect(() => {
+    const status = searchParams.get("status");
+    if (VALID_STATUSES.includes(status)) setStatusFilter(status);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { execute: approveApplication, loading: approveLoading } = useApproveApplication();
   const { execute: rejectApplication, loading: rejectLoading } = useRejectApplication();

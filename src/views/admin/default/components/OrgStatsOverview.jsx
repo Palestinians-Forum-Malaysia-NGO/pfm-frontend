@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { MdBadge, MdFolderSpecial, MdFactCheck, MdPeople } from "react-icons/md";
-import { useGetStats } from "components/features/stats/hooks";
 import StatCard from "./StatCard";
 
 const fmtMYR = (val) => {
@@ -10,9 +9,8 @@ const fmtMYR = (val) => {
   return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
-export default function OrgStatsOverview() {
+export default function OrgStatsOverview({ stats, loading }) {
   const { t } = useTranslation();
-  const { stats, loading } = useGetStats();
 
   const staffTotal   = stats?.staff?.total ?? 0;
   const projects     = stats?.projects ?? {};
@@ -25,8 +23,7 @@ export default function OrgStatsOverview() {
     { label: t("admin_dashboard.stat_beneficiaries_helped"), value: loading ? "—" : (projects.total_beneficiaries_helped ?? 0), icon: MdPeople,      iconBg: "bg-pfmRed-50", iconColor: "text-pfmRed-500" },
   ];
 
-  const projectStatusEntries     = Object.entries(projects.by_status ?? {});
-  const applicationStatusEntries = Object.entries(applications.by_status ?? {});
+  const projectStatusEntries = Object.entries(projects.by_status ?? {});
 
   const target = parseFloat(projects.total_target) || 0;
   const spent  = parseFloat(projects.total_amount_spent) || 0;
@@ -39,25 +36,13 @@ export default function OrgStatsOverview() {
       </div>
 
       {!loading && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-2xl bg-white p-5 shadow-sm">
             <p className="mb-3 text-xs font-semibold text-slate-500">{t("admin_dashboard.projects_by_status")}</p>
             <div className="flex flex-col gap-2">
               {projectStatusEntries.map(([status, count]) => (
                 <div key={status} className="flex items-center justify-between text-sm">
                   <span className="text-slate-500">{t(`stats.status_${status}`, { defaultValue: status })}</span>
-                  <span className="font-bold text-navy-700">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="mb-3 text-xs font-semibold text-slate-500">{t("admin_dashboard.applications_by_status")}</p>
-            <div className="flex flex-col gap-2">
-              {applicationStatusEntries.map(([status, count]) => (
-                <div key={status} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">{t(`applications.status_${status}`, { defaultValue: status })}</span>
                   <span className="font-bold text-navy-700">{count}</span>
                 </div>
               ))}

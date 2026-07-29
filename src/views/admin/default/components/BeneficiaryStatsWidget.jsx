@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import ReactApexChart from "react-apexcharts";
 import { MdPeople, MdArrowForward } from "react-icons/md";
 import { useGetBeneficiaryStats } from "components/features/beneficiaries/hooks";
+import { donutOpts, barOpts, GENDER_COLORS } from "components/charts/apexConfig";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse rounded-xl bg-slate-100 ${className}`} />
@@ -12,46 +13,7 @@ const Skeleton = ({ className }) => (
 const STATUS_COLORS  = ["#007A3D", "#F59E0B", "#F97316", "#EF4444"];
 const STATUS_KEYS    = ["active", "pending", "suspended", "rejected"];
 
-const GENDER_COLORS  = ["#3B82F6", "#EC4899", "#94A3B8"];
 const GENDER_KEYS    = ["male", "female",];
-
-const donutOpts = (labels, colors) => ({
-  chart:       { type: "donut", toolbar: { show: false }, sparkline: { enabled: false } },
-  labels,
-  colors,
-  legend:      { show: false },
-  dataLabels:  { enabled: false },
-  stroke:      { width: 0 },
-  plotOptions: { pie: { donut: { size: "70%", labels: { show: false } }, expandOnClick: false } },
-  tooltip:     { theme: "dark", style: { fontSize: "12px" } },
-  states:      { hover: { filter: { type: "lighten", value: 0.05 } } },
-});
-
-const barOpts = (categories) => ({
-  chart:      { type: "bar", toolbar: { show: false } },
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      borderRadius: 6,
-      barHeight: "55%",
-      distributed: true,
-    },
-  },
-  colors:      ["#007A3D", "#00a351", "#00c45f", "#34d578", "#6ee7a0"],
-  dataLabels:  { enabled: false },
-  legend:      { show: false },
-  grid:        { show: false },
-  xaxis: {
-    categories,
-    labels: { style: { colors: "#94A3B8", fontSize: "11px" } },
-    axisBorder: { show: false },
-    axisTicks:  { show: false },
-  },
-  yaxis: {
-    labels: { style: { colors: "#64748B", fontSize: "12px", fontWeight: 500 } },
-  },
-  tooltip: { theme: "dark", style: { fontSize: "12px" } },
-});
 
 export default function BeneficiaryStatsWidget() {
   const { t } = useTranslation();
