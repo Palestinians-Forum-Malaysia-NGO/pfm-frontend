@@ -6,6 +6,7 @@ import { FiAlignJustify } from "react-icons/fi";
 import { MdNotificationsNone } from "react-icons/md";
 import { AuthContext } from "components/features/auth/context/AuthContext";
 import LanguageSwitcher from "components/navbar/LanguageSwitcher";
+import StorageImage from "components/ui/StorageImage";
 
 const ROLE_PROFILE = {
   admin:       "/admin/profile",
@@ -83,10 +84,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
         <Dropdown
           button={
             <button className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-green/10 ring-2 ring-green/20 transition hover:ring-green/50 text-sm font-bold text-green">
-              {user?.profile_photo
-                ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" />
-                : initials
-              }
+              <StorageImage fileKey={user?.profile_photo} alt={user?.full_name} className="h-full w-full object-cover" fallback={initials} />
             </button>
           }
           animation="origin-top-right transition-all duration-200 ease-in-out"
@@ -95,10 +93,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
             <div className="w-52 rounded-2xl bg-white shadow-xl shadow-shadow-500">
               <div className="flex items-center gap-3 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green/10 text-sm font-bold text-green">
-                  {user?.profile_photo
-                    ? <img src={user.profile_photo} alt={user.full_name} className="h-full w-full rounded-full object-cover" />
-                    : initials
-                  }
+                  <StorageImage fileKey={user?.profile_photo} alt={user?.full_name} className="h-full w-full rounded-full object-cover" fallback={initials} />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-navy-700">{user?.full_name || "—"}</p>
