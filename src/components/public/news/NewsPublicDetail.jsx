@@ -2,30 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdArticle, MdCalendarToday, MdCategory, MdShare, MdStar } from "react-icons/md";
-import { useGetNewsArticle, useShareNews } from "components/features/news/hooks";
+import { useGetNewsArticle, useGetNewsArticles, useShareNews } from "components/features/news/hooks";
 import StorageImage from "components/ui/StorageImage";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/ui/toast/ToastContext";
+import NewsCard from "./NewsCard";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
 
 export default function NewsPublicDetail() {
   const { t } = useTranslation();
-  const { slug } = useParams();
+  const { id } = useParams();
   const navigate  = useNavigate();
   const { success } = useToast();
 
   const { article, execute: fetchArticle, loading, error } = useGetNewsArticle();
+  const { articles: allArticles } = useGetNewsArticles();
   const { execute: shareArticle } = useShareNews();
   const [shareCount, setShareCount] = useState(0);
 
-  useEffect(() => { fetchArticle(slug); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchArticle(id).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (article) setShareCount(article.share_count ?? 0); }, [article]);
 
   const handleShare = async () => {
     setShareCount((c) => c + 1);
-    shareArticle(slug).catch(() => {});
+    shareArticle(id).catch(() => {});
 
     const url = window.location.href;
     if (navigator.share) {
@@ -43,6 +45,10 @@ export default function NewsPublicDetail() {
       // clipboard unavailable — silently ignore
     }
   };
+
+  const moreArticles = allArticles
+    .filter((a) => a.id !== id)
+    .slice(0, 3);
 
   if (loading) return <Loading text={t("newsPublic.loading")} />;
 
@@ -118,6 +124,22 @@ export default function NewsPublicDetail() {
           <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{article.content}</p>
         )}
       </div>
+
+      {/* ── More News ── */}
+      {moreArticles.length > 0 && (
+        <div className="border-t border-slate-100 bg-slate-50 py-14">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-8 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
+              <MdArticle className="h-5 w-5 text-green" /> {t("newsPublic.more_news")}
+            </h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {moreArticles.map((a) => (
+                <NewsCard key={a.id} article={a} onClick={() => navigate(`/news/${a.id}`)} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

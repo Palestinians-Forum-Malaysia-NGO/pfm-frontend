@@ -1719,7 +1719,8 @@
     "not_found_body": "ربما تمت إزالة هذا المقال أو لم يعد متاحاً.",
     "back_to_news": "رجوع للأخبار",
     "share": "مشاركة",
-    "link_copied": "تم نسخ الرابط"
+    "link_copied": "تم نسخ الرابط",
+    "more_news": "المزيد من الأخبار"
   },
   "blogsPublic": {
     "hero_title": "مدونتنا",

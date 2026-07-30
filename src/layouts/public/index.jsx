@@ -33,7 +33,7 @@ export default function PublicLayout() {
         <Routes>
           {getRoutes()}
           <Route path="/projects/:slug" element={<ProjectDetail />} />
-          <Route path="/news/:slug" element={<NewsDetail />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blogs/:slug" element={<BlogDetail />} />
           <Route path="/events/:slug" element={<EventDetail />} />
           <Route path="/newsletter/unsubscribe/:token" element={<NewsletterUnsubscribe />} />
