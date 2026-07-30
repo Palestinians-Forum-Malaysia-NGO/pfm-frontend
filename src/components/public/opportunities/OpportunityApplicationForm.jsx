@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { MdSend, MdCheckCircle, MdLocationOn } from "react-icons/md";
+import { MdSend, MdCheckCircle, MdLocationOn, MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import { InputField, TextareaField, SelectField, validate } from "components/form";
 import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { useSubmitOpportunityApplication } from "components/features/opportunityApplications/hooks";
 import { NATIONALITIES } from "constants/lists";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { ROLES } from "components/features/auth/types";
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.label }));
 
@@ -17,21 +19,43 @@ const RULES = {
   applicant_cover_letter: [{ required: true }, { minLength: 20 }, { maxLength: 5000 }],
 };
 
-const EMPTY = {
-  opportunity_id: "",
+const emptyForm = (opportunityId) => ({
+  opportunity_id: opportunityId || "",
   applicant_full_name: "", applicant_email: "", applicant_phone: "",
   applicant_date_of_birth: "", applicant_gender: "", applicant_nationality: "", applicant_current_city: "",
   applicant_resume: null,
   applicant_cover_letter: "",
-};
+});
 
-const OpportunityApplicationForm = ({ opportunities }) => {
+/**
+ * opportunityId — when given, the form applies to that one opportunity only
+ * and hides the picker (used when embedded on a single opportunity's detail
+ * page). Omit it to show the dropdown (used on the combined apply page).
+ */
+const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
   const { t } = useTranslation();
-  const [form, setForm]           = useState(EMPTY);
+  const singleMode = !!opportunityId;
+  const { user, isAuthenticated } = useAuth();
+  const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
+  const [form, setForm]           = useState(() => emptyForm(opportunityId));
   const [errors, setErrors]       = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [coverLetterMode, setCoverLetterMode] = useState("text"); // "text" | "file"
   const { execute: submitApplication, loading: sending, error } = useSubmitOpportunityApplication();
+
+  // Beneficiaries already have full_name/email/phone on their account —
+  // fill those in from the account instead of asking them to retype them.
+  // Everything else (dob/gender/nationality/city/resume/cover letter) isn't
+  // available anywhere for us to pre-fill, so those stay as fields to fill in.
+  useEffect(() => {
+    if (!isBeneficiary || !user) return;
+    setForm((p) => ({
+      ...p,
+      applicant_full_name: user.full_name ?? "",
+      applicant_email: user.email ?? "",
+      applicant_phone: user.phone_number ?? "",
+    }));
+  }, [isBeneficiary, user]);
 
   const updateForm = (field, value) => setForm((p) => ({ ...p, [field]: value }));
 
@@ -40,11 +64,21 @@ const OpportunityApplicationForm = ({ opportunities }) => {
     updateForm("applicant_cover_letter", "");
   };
 
+  const GENDER_OPTIONS = [
+    { value: "male",   label: t("opportunityApply.gender_male") },
+    { value: "female", label: t("opportunityApply.gender_female") },
+  ];
+
   const OPPORTUNITY_OPTIONS = opportunities.map((o) => ({ value: o.id, label: o.title }));
-  const selectedOpportunity = opportunities.find((o) => o.id === form.opportunity_id) ?? null;
+  const selectedOpportunity = opportunities.find((o) => o.id === (singleMode ? opportunityId : form.opportunity_id)) ?? null;
 
   const activeRules = {
     ...RULES,
+    // Locked-from-account fields for beneficiaries: full_name/email are
+    // required on every account so they're always present; phone is
+    // optional on the account, so don't block submission over a field the
+    // beneficiary has no way to edit from this form.
+    ...(isBeneficiary ? { applicant_phone: [{ maxLength: 30 }] } : {}),
     applicant_cover_letter: coverLetterMode === "text" ? RULES.applicant_cover_letter : [{ required: true }],
   };
 
@@ -81,7 +115,7 @@ const OpportunityApplicationForm = ({ opportunities }) => {
         <h3 className="mt-4 text-xl font-bold text-slate-900">{t("opportunityApply.success_title")}</h3>
         <p className="mt-1 max-w-xs text-sm text-slate-400">{t("opportunityApply.success_body")}</p>
         <button
-          onClick={() => { setSubmitted(false); setForm(EMPTY); setErrors({}); setCoverLetterMode("text"); }}
+          onClick={() => { setSubmitted(false); setForm(emptyForm(opportunityId)); setErrors({}); setCoverLetterMode("text"); }}
           className="mt-4 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
         >
           {t("opportunityApply.send_another")}
@@ -98,11 +132,13 @@ const OpportunityApplicationForm = ({ opportunities }) => {
       <AlertBanner message={error} className="mt-4 rounded-xl border px-4 py-3" />
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col" noValidate>
-        <SelectField
-          label={t("opportunityApply.opportunity")} field="opportunity_id"
-          options={OPPORTUNITY_OPTIONS}
-          formData={form} errors={errors} updateFormData={updateForm} rules={RULES.opportunity_id}
-        />
+        {!singleMode && (
+          <SelectField
+            label={t("opportunityApply.opportunity")} field="opportunity_id"
+            options={OPPORTUNITY_OPTIONS}
+            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.opportunity_id}
+          />
+        )}
         {selectedOpportunity && (
           <p className="-mt-3 mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
             <span>{t(`opportunities.type_${selectedOpportunity.type}`, { defaultValue: selectedOpportunity.type })}</span>
@@ -110,29 +146,47 @@ const OpportunityApplicationForm = ({ opportunities }) => {
           </p>
         )}
 
+        {isBeneficiary ? (
+          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t("opportunityApply.applying_as")}</p>
+            <div className="flex items-center gap-2.5 text-sm text-slate-700">
+              <MdPerson className="h-4 w-4 shrink-0 text-slate-400" /> {form.applicant_full_name}
+            </div>
+            <div className="flex items-center gap-2.5 text-sm text-slate-700">
+              <MdEmail className="h-4 w-4 shrink-0 text-slate-400" /> {form.applicant_email}
+            </div>
+            {form.applicant_phone && (
+              <div className="flex items-center gap-2.5 text-sm text-slate-700">
+                <MdPhone className="h-4 w-4 shrink-0 text-slate-400" /> {form.applicant_phone}
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField
+                label={t("opportunityApply.full_name")} field="applicant_full_name" placeholder="Ahmad Faris"
+                formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_full_name}
+              />
+              <InputField
+                label={t("opportunityApply.email")} field="applicant_email" type="email" placeholder="ahmad@email.com"
+                formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_email}
+              />
+            </div>
+            <InputField
+              label={t("opportunityApply.phone")} field="applicant_phone" placeholder="+60 12-345 6789"
+              formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_phone}
+            />
+          </>
+        )}
+        <InputField
+          label={t("opportunityApply.dob")} field="applicant_date_of_birth" type="date" required={false}
+          formData={form} errors={errors} updateFormData={updateForm}
+        />
         <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-          <InputField
-            label={t("opportunityApply.full_name")} field="applicant_full_name" placeholder="Ahmad Faris"
-            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_full_name}
-          />
-          <InputField
-            label={t("opportunityApply.email")} field="applicant_email" type="email" placeholder="ahmad@email.com"
-            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_email}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-          <InputField
-            label={t("opportunityApply.phone")} field="applicant_phone" placeholder="+60 12-345 6789"
-            formData={form} errors={errors} updateFormData={updateForm} rules={RULES.applicant_phone}
-          />
-          <InputField
-            label={t("opportunityApply.dob")} field="applicant_date_of_birth" type="date" required={false}
-            formData={form} errors={errors} updateFormData={updateForm}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-          <InputField
-            label={t("opportunityApply.gender")} field="applicant_gender" required={false} placeholder={t("opportunityApply.gender_placeholder")}
+          <SelectField
+            label={t("opportunityApply.gender")} field="applicant_gender" required={false}
+            options={GENDER_OPTIONS}
             formData={form} errors={errors} updateFormData={updateForm}
           />
           <SelectField

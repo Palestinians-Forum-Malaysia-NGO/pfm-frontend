@@ -9,6 +9,7 @@ import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
 import BeneficiaryEventDetail from "views/beneficiary/events/EventDetail";
 import BeneficiaryProjectDetail from "views/beneficiary/projects/ProjectDetail";
+import BeneficiaryOpportunityDetail from "views/beneficiary/opportunities/OpportunityDetail";
 
 export default function BeneficiaryLayout() {
   const location = useLocation();
@@ -27,6 +28,7 @@ export default function BeneficiaryLayout() {
   React.useEffect(() => {
     if (location.pathname.match(/\/events\/[^/]+$/)) { setCurrentRouteName("Event Detail"); return; }
     if (location.pathname.match(/\/projects\/[^/]+$/)) { setCurrentRouteName("Project Detail"); return; }
+    if (location.pathname.match(/\/opportunities\/[^/]+$/)) { setCurrentRouteName("Opportunity Detail"); return; }
     const active = routes.find(
       (r) => r.layout === "/beneficiary" && location.pathname.includes(r.path)
     );
@@ -68,6 +70,7 @@ export default function BeneficiaryLayout() {
               {getRoutes()}
               <Route path="/events/:slug" element={<BeneficiaryEventDetail />} />
               <Route path="/projects/:slug" element={<BeneficiaryProjectDetail />} />
+              <Route path="/opportunities/:id" element={<BeneficiaryOpportunityDetail />} />
               <Route path="/" element={<Navigate to="/beneficiary/default" replace />} />
             </Routes>
           </PageTransition>

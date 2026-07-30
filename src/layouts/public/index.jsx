@@ -9,6 +9,7 @@ import ProjectDetail from "views/public/projects/ProjectDetail";
 import NewsDetail from "views/public/news/NewsDetail";
 import BlogDetail from "views/public/blogs/BlogDetail";
 import EventDetail from "views/public/events/EventDetail";
+import OpportunityDetail from "views/public/opportunities/OpportunityDetail";
 import NewsletterUnsubscribe from "views/public/newsletter/Unsubscribe";
 
 export default function PublicLayout() {
@@ -36,6 +37,7 @@ export default function PublicLayout() {
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blogs/:slug" element={<BlogDetail />} />
           <Route path="/events/:slug" element={<EventDetail />} />
+          <Route path="/opportunities/:id" element={<OpportunityDetail />} />
           <Route path="/newsletter/unsubscribe/:token" element={<NewsletterUnsubscribe />} />
         </Routes>
       </main>
