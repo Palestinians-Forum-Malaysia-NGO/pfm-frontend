@@ -84,15 +84,6 @@ const routes = [
     section: "MAIN",
   },
   {
-    name: "News & Updates",
-    layout: "/admin",
-    path: "news",
-    icon: <MdFeed className="h-5 w-5" />,
-    component: <Placeholder pageName="News & Updates" />,
-    section: "MAIN",
-    hidden: true,
-  },
-  {
     name: "Events",
     layout: "/admin",
     path: "events",
