@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MdSend, MdCheckCircle, MdLocationOn, MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
-import { InputField, TextareaField, SelectField, validate } from "components/form";
+import { InputField, SelectField, validate } from "components/form";
 import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { useSubmitOpportunityApplication } from "components/features/opportunityApplications/hooks";
 import { NATIONALITIES } from "constants/lists";
@@ -16,7 +16,7 @@ const RULES = {
   applicant_full_name:    [{ required: true }, { maxLength: 255 }],
   applicant_email:        [{ required: true }, { email: true }],
   applicant_phone:        [{ required: true }, { maxLength: 30 }],
-  applicant_cover_letter: [{ required: true }, { minLength: 20 }, { maxLength: 5000 }],
+  applicant_cover_letter: [{ required: true }],
 };
 
 const emptyForm = (opportunityId) => ({
@@ -40,29 +40,31 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
   const [form, setForm]           = useState(() => emptyForm(opportunityId));
   const [errors, setErrors]       = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [coverLetterMode, setCoverLetterMode] = useState("text"); // "text" | "file"
   const { execute: submitApplication, loading: sending, error } = useSubmitOpportunityApplication();
 
-  // Beneficiaries already have full_name/email/phone on their account —
-  // fill those in from the account instead of asking them to retype them.
-  // Everything else (dob/gender/nationality/city/resume/cover letter) isn't
-  // available anywhere for us to pre-fill, so those stay as fields to fill in.
+  // Beneficiaries already have this info on their account (name/email/phone
+  // at the top level, dob/gender/city on their beneficiary profile) — fill
+  // those in instead of asking them to retype them. Nationality has no
+  // reliable source (the profile only stores an ISO country code, a
+  // different value space than this form's demonym list), and resume/cover
+  // letter/nationality aren't available anywhere, so those stay as fields
+  // to fill in. Pre-filled fields stay editable in case circumstances
+  // (e.g. current city) changed since the beneficiary last updated their profile.
   useEffect(() => {
     if (!isBeneficiary || !user) return;
-    setForm((p) => ({
-      ...p,
+    const p = user.profile ?? {};
+    setForm((prev) => ({
+      ...prev,
       applicant_full_name: user.full_name ?? "",
       applicant_email: user.email ?? "",
       applicant_phone: user.phone_number ?? "",
+      applicant_date_of_birth: p.date_of_birth ? p.date_of_birth.slice(0, 10) : prev.applicant_date_of_birth,
+      applicant_gender: p.gender ?? prev.applicant_gender,
+      applicant_current_city: p.current_city ?? prev.applicant_current_city,
     }));
   }, [isBeneficiary, user]);
 
   const updateForm = (field, value) => setForm((p) => ({ ...p, [field]: value }));
-
-  const switchCoverLetterMode = (mode) => {
-    setCoverLetterMode(mode);
-    updateForm("applicant_cover_letter", "");
-  };
 
   const GENDER_OPTIONS = [
     { value: "male",   label: t("opportunityApply.gender_male") },
@@ -79,7 +81,6 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
     // optional on the account, so don't block submission over a field the
     // beneficiary has no way to edit from this form.
     ...(isBeneficiary ? { applicant_phone: [{ maxLength: 30 }] } : {}),
-    applicant_cover_letter: coverLetterMode === "text" ? RULES.applicant_cover_letter : [{ required: true }],
   };
 
   const canSubmit = !Object.entries(activeRules).some(([field, rules]) => !!validate(form[field], rules));
@@ -115,7 +116,7 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
         <h3 className="mt-4 text-xl font-bold text-slate-900">{t("opportunityApply.success_title")}</h3>
         <p className="mt-1 max-w-xs text-sm text-slate-400">{t("opportunityApply.success_body")}</p>
         <button
-          onClick={() => { setSubmitted(false); setForm(emptyForm(opportunityId)); setErrors({}); setCoverLetterMode("text"); }}
+          onClick={() => { setSubmitted(false); setForm(emptyForm(opportunityId)); setErrors({}); }}
           className="mt-4 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
         >
           {t("opportunityApply.send_another")}
@@ -211,44 +212,16 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
           errors={errors}
         />
 
-        <div className="mb-1.5 flex items-center justify-between">
-          <label className="block text-sm font-medium text-slate-700">
-            {t("opportunityApply.cover_letter")} <span className="text-red-500">*</span>
-          </label>
-          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => switchCoverLetterMode("text")}
-              className={`rounded-full px-3 py-1 transition-colors ${coverLetterMode === "text" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-            >
-              {t("opportunityApply.cover_letter_mode_text")}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchCoverLetterMode("file")}
-              className={`rounded-full px-3 py-1 transition-colors ${coverLetterMode === "file" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-            >
-              {t("opportunityApply.cover_letter_mode_file")}
-            </button>
-          </div>
-        </div>
-
-        {coverLetterMode === "text" ? (
-          <TextareaField
-            field="applicant_cover_letter" rows={5} placeholder={t("opportunityApply.cover_letter_placeholder")}
-            formData={form} errors={errors} updateFormData={updateForm} rules={activeRules.applicant_cover_letter}
-          />
-        ) : (
-          <StorageDocumentField
-            publicEndpoint="opportunityApplication"
-            accept=".pdf,.doc,.docx"
-            required
-            onUpload={(key) => updateForm("applicant_cover_letter", key)}
-            onRemove={() => updateForm("applicant_cover_letter", "")}
-            field="applicant_cover_letter"
-            errors={errors}
-          />
-        )}
+        <StorageDocumentField
+          label={t("opportunityApply.cover_letter")}
+          publicEndpoint="opportunityApplication"
+          accept=".pdf,.doc,.docx"
+          required
+          onUpload={(key) => updateForm("applicant_cover_letter", key)}
+          onRemove={() => updateForm("applicant_cover_letter", "")}
+          field="applicant_cover_letter"
+          errors={errors}
+        />
 
         <button
           type="submit"
