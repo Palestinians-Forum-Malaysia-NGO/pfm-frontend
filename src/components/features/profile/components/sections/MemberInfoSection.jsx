@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MdPerson, MdLocationOn, MdCalendarToday, MdTranslate,
   MdFamilyRestroom, MdAccountBalance, MdFolder, MdOpenInNew,
-  MdCategory,
+  MdCategory, MdEdit,
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
+import Button from "components/ui/buttons/Button";
 import StorageFileLink from "components/ui/StorageFileLink";
-import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
+import { InputField, SelectField, ToggleInput } from "components/form";
+import { useUpdateProfile } from "components/features/profile/hooks";
+import { useToast } from "components/ui/toast/ToastContext";
+import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
 const STATUS_BADGE   = {
   pending:   "bg-amber-50 text-amber-600 border border-amber-200",
@@ -19,16 +23,68 @@ const STATUS_BADGE   = {
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
 
-const SectionCard = ({ icon, title, subtitle, children }) => (
+const SectionCard = ({ icon, title, subtitle, actions, children }) => (
   <div className="rounded-2xl border border-slate-200 bg-white p-6">
-    <FormHeader icon={icon} title={title} subtitle={subtitle} />
+    <FormHeader icon={icon} title={title} subtitle={subtitle} actions={actions} />
     {children}
   </div>
 );
 
-const MemberInfoSection = ({ profile }) => {
+const emptyForm = (profile) => {
+  const p  = profile?.profile ?? {};
+  const fi = p.family_information ?? {};
+  const bi = profile?.banking_information ?? {};
+  return {
+    gender:                   p.gender                   ?? "",
+    date_of_birth:            p.date_of_birth             ? p.date_of_birth.slice(0, 10) : "",
+    marital_status:           p.marital_status            ?? "",
+    country_of_origin:        p.country_of_origin         ?? "",
+    date_arrived_in_malaysia: p.date_arrived_in_malaysia  ? p.date_arrived_in_malaysia.slice(0, 10) : "",
+    current_city:             p.current_city              ?? "",
+    address:                  p.address                   ?? "",
+    family_in_malaysia:       fi.family_in_malaysia        ?? false,
+    spouse_name:              fi.spouse_name               ?? "",
+    spouse_name_arabic:       fi.spouse_name_ar            ?? "",
+    spouse_job:               fi.spouse_job                ?? "",
+    number_of_children:       fi.number_of_children        ?? "",
+    bank_name:                bi.bank_name                 ?? "",
+    account_number:           bi.account_number            ?? "",
+    account_holder_name:      bi.account_holder_name       ?? "",
+  };
+};
+
+const MemberInfoSection = ({ profile, onSaved }) => {
   const { t } = useTranslation();
+  const { execute: updateProfile, loading: saving } = useUpdateProfile();
+  const { success, error: toastError } = useToast();
+
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [snapshot, setSnapshot] = useState(null);
+
   const p = profile?.profile;
+
+  useEffect(() => {
+    if (!profile) return;
+    const initial = emptyForm(profile);
+    setFormData(initial);
+    setSnapshot(initial);
+  }, [profile]);
+
+  const updateFormData = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
+
+  const isDirty = snapshot && JSON.stringify(formData) !== JSON.stringify(snapshot);
+
+  const GENDER_OPTIONS_T = [
+    { value: "male",   label: t("beneficiaries.gender_male") },
+    { value: "female", label: t("beneficiaries.gender_female") },
+  ];
+  const MARITAL_OPTIONS_T = [
+    { value: "single",   label: t("beneficiaries.marital_single") },
+    { value: "married",  label: t("beneficiaries.marital_married") },
+    { value: "divorced", label: t("beneficiaries.marital_divorced") },
+    { value: "widowed",  label: t("beneficiaries.marital_widowed") },
+  ];
 
   const GENDER_LABELS = { male: t("beneficiaries.gender_male"), female: t("beneficiaries.gender_female") };
   const MARITAL_LABELS = {
@@ -40,38 +96,98 @@ const MemberInfoSection = ({ profile }) => {
     suspended: t("beneficiaries.account_status_suspended"), rejected: t("beneficiaries.account_status_rejected"),
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const hasBanking = profile.banking_information || formData.bank_name || formData.account_number || formData.account_holder_name;
+      await updateProfile({
+        profile: {
+          gender:                   formData.gender                   || undefined,
+          date_of_birth:            formData.date_of_birth            || undefined,
+          marital_status:           formData.marital_status           || undefined,
+          country_of_origin:        formData.country_of_origin        || undefined,
+          date_arrived_in_malaysia: formData.date_arrived_in_malaysia || undefined,
+          current_city:             formData.current_city             || undefined,
+          address:                  formData.address                  || undefined,
+          family_information: {
+            family_in_malaysia: formData.family_in_malaysia,
+            spouse_name:        formData.spouse_name        || null,
+            spouse_name_ar:     formData.spouse_name_arabic || null,
+            spouse_job:         formData.spouse_job         || null,
+            number_of_children: formData.number_of_children !== "" ? Number(formData.number_of_children) : null,
+          },
+        },
+        ...(hasBanking ? {
+          banking_information: {
+            bank_name:           formData.bank_name           || undefined,
+            account_number:      formData.account_number      || undefined,
+            account_holder_name: formData.account_holder_name || undefined,
+          },
+        } : {}),
+      });
+      success(t("profile.toast_profile_updated"), t("profile.toast_profile_updated_sub"));
+      setEditMode(false);
+      onSaved?.();
+    } catch (err) {
+      toastError(t("profile.toast_profile_update_failed"), err?.message);
+    }
+  };
+
+  const handleCancel = () => {
+    if (snapshot) setFormData(snapshot);
+    setEditMode(false);
+  };
+
   if (!p) return null;
 
+  const editAction = !editMode && (
+    <Button variant="ghost" icon={<MdEdit className="h-4 w-4" />} text={t("profile.edit_btn")} onClick={() => setEditMode(true)} />
+  );
+
   return (
-    <>
+    <form onSubmit={handleSubmit}>
       {/* ── Personal Info ── */}
       <SectionCard
         icon={<MdPerson className="h-5 w-5" />}
         title={t("beneficiaries.section_personal")}
         subtitle={t("profile.personal_sub")}
+        actions={editAction}
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {profile.full_name_ar && (
-            <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={profile.full_name_ar} />
-          )}
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_passport")}      value={p.passport_number || "—"} />
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.gender")}            value={GENDER_LABELS[p.gender] ?? p.gender ?? "—"} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.date_of_birth")}     value={fmtDate(p.date_of_birth)} />
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.marital_status")}    value={MARITAL_LABELS[p.marital_status] ?? p.marital_status ?? "—"} />
-          <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.country_of_origin")} value={COUNTRY_NAME_BY_CODE[p.country_of_origin] || p.country_of_origin || "—"} />
-          <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("profile.arrived_in_malaysia")} value={fmtDate(p.date_arrived_in_malaysia)} />
-          <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.current_city")}      value={p.current_city || "—"} />
-          <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.address")}           value={p.address || "—"} />
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">{t("beneficiaries.account_status_label")}</span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_BADGE[p.account_status] ?? "bg-slate-100 text-slate-500"}`}>
-              {ACCOUNT_STATUS_LABELS[p.account_status] ?? p.account_status ?? "—"}
-            </span>
+        {editMode ? (
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_passport")} value={p.passport_number || "—"} />
+            <SelectField label={t("beneficiaries.gender")} field="gender" options={GENDER_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date" required={false} formData={formData} updateFormData={updateFormData} />
+            <SelectField label={t("beneficiaries.marital_status")} field="marital_status" options={MARITAL_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            <SelectField label={t("beneficiaries.country_of_origin")} field="country_of_origin" options={COUNTRY_OPTIONS} required={false} formData={formData} updateFormData={updateFormData} />
+            <InputField  label={t("beneficiaries.date_arrived")} field="date_arrived_in_malaysia" type="date" required={false} formData={formData} updateFormData={updateFormData} />
+            <InputField  label={t("beneficiaries.current_city")} field="current_city" required={false} formData={formData} updateFormData={updateFormData} />
+            <InputField  label={t("beneficiaries.address")} field="address" required={false} formData={formData} updateFormData={updateFormData} />
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {profile.full_name_ar && (
+              <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={profile.full_name_ar} />
+            )}
+            <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_passport")}      value={p.passport_number || "—"} />
+            <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.gender")}            value={GENDER_LABELS[p.gender] ?? p.gender ?? "—"} />
+            <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.date_of_birth")}     value={fmtDate(p.date_of_birth)} />
+            <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.marital_status")}    value={MARITAL_LABELS[p.marital_status] ?? p.marital_status ?? "—"} />
+            <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.country_of_origin")} value={COUNTRY_NAME_BY_CODE[p.country_of_origin] || p.country_of_origin || "—"} />
+            <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("profile.arrived_in_malaysia")} value={fmtDate(p.date_arrived_in_malaysia)} />
+            <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.current_city")}      value={p.current_city || "—"} />
+            <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.address")}           value={p.address || "—"} />
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">{t("beneficiaries.account_status_label")}</span>
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_BADGE[p.account_status] ?? "bg-slate-100 text-slate-500"}`}>
+                {ACCOUNT_STATUS_LABELS[p.account_status] ?? p.account_status ?? "—"}
+              </span>
+            </div>
+          </div>
+        )}
       </SectionCard>
 
-      {/* ── Classification ── */}
+      {/* ── Classification (always read-only — staff-assigned) ── */}
       {p.classification_details && (
         <SectionCard
           icon={<MdCategory className="h-5 w-5" />}
@@ -88,61 +204,83 @@ const MemberInfoSection = ({ profile }) => {
       )}
 
       {/* ── Family Information ── */}
-      {p.family_information && (
+      {(p.family_information || editMode) && (
         <SectionCard
           icon={<MdFamilyRestroom className="h-5 w-5" />}
           title={t("beneficiaries.section_family_info")}
           subtitle={t("profile.family_sub")}
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")} value={p.family_information.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
-            {p.family_information.spouse_name && (
-              <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}         value={p.family_information.spouse_name} />
-            )}
-            {p.family_information.spouse_name_ar && (
-              <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={p.family_information.spouse_name_ar} />
-            )}
-            {p.family_information.spouse_job && (
-              <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}   value={p.family_information.spouse_job} />
-            )}
-            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_children_count")}  value={p.family_information.number_of_children ?? "—"} />
-          </div>
-
-          {p.family_information.children_information?.length > 0 && (
-            <div className="mt-4">
-              <p className="mb-2 text-xs font-semibold text-slate-500">{t("beneficiaries.section_children")}</p>
-              <div className="flex flex-col gap-2">
-                {p.family_information.children_information.map((child, i) => (
-                  <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <p className="text-sm font-medium text-slate-900">{child.child_name || t("beneficiaries.child_n", { n: i + 1 })}</p>
-                    {child.child_name_ar && <p className="text-xs text-slate-400">{child.child_name_ar}</p>}
-                    {child.child_date_of_birth && (
-                      <p className="mt-1 text-xs text-slate-400">{t("profile.dob_prefix")} {fmtDate(child.child_date_of_birth)}</p>
-                    )}
-                  </div>
-                ))}
+          {editMode ? (
+            <>
+              <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={formData} updateFormData={updateFormData} />
+              <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                <InputField label={t("beneficiaries.spouse_name")}          field="spouse_name"        required={false} formData={formData} updateFormData={updateFormData} />
+                <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" required={false} placeholder={t("beneficiaries.spouse_name_ar_placeholder")} formData={formData} updateFormData={updateFormData} />
               </div>
+              <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         required={false} formData={formData} updateFormData={updateFormData} />
+                <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" required={false} formData={formData} updateFormData={updateFormData} />
+              </div>
+            </>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")} value={p.family_information.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
+              {p.family_information.spouse_name && (
+                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}         value={p.family_information.spouse_name} />
+              )}
+              {p.family_information.spouse_name_ar && (
+                <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={p.family_information.spouse_name_ar} />
+              )}
+              {p.family_information.spouse_job && (
+                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}   value={p.family_information.spouse_job} />
+              )}
+              <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_children_count")}  value={p.family_information.number_of_children ?? "—"} />
+
+              {p.family_information.children_information?.length > 0 && (
+                <div className="col-span-full mt-2">
+                  <p className="mb-2 text-xs font-semibold text-slate-500">{t("beneficiaries.section_children")}</p>
+                  <div className="flex flex-col gap-2">
+                    {p.family_information.children_information.map((child, i) => (
+                      <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                        <p className="text-sm font-medium text-slate-900">{child.child_name || t("beneficiaries.child_n", { n: i + 1 })}</p>
+                        {child.child_name_ar && <p className="text-xs text-slate-400">{child.child_name_ar}</p>}
+                        {child.child_date_of_birth && (
+                          <p className="mt-1 text-xs text-slate-400">{t("profile.dob_prefix")} {fmtDate(child.child_date_of_birth)}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </SectionCard>
       )}
 
       {/* ── Banking Information ── */}
-      {p.banking_information && (
+      {(profile.banking_information || editMode) && (
         <SectionCard
           icon={<MdAccountBalance className="h-5 w-5" />}
           title={t("beneficiaries.section_banking_info")}
           subtitle={t("beneficiaries.section_banking_info_sub")}
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("beneficiaries.info_bank_name")}     value={p.banking_information.bank_name         || "—"} />
-            <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("beneficiaries.info_account_no")}   value={p.banking_information.account_number    || "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />}         label={t("beneficiaries.info_account_holder")} value={p.banking_information.account_holder_name || "—"} />
-          </div>
+          {editMode ? (
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <InputField label={t("beneficiaries.bank_name")}      field="bank_name"           required={false} formData={formData} updateFormData={updateFormData} />
+              <InputField label={t("beneficiaries.account_holder")} field="account_holder_name" required={false} formData={formData} updateFormData={updateFormData} />
+              <InputField label={t("beneficiaries.account_number")} field="account_number"      required={false} formData={formData} updateFormData={updateFormData} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("beneficiaries.info_bank_name")}     value={profile.banking_information.bank_name         || "—"} />
+              <InfoRow icon={<MdAccountBalance className="h-4 w-4" />} label={t("beneficiaries.info_account_no")}   value={profile.banking_information.account_number    || "—"} />
+              <InfoRow icon={<MdPerson className="h-4 w-4" />}         label={t("beneficiaries.info_account_holder")} value={profile.banking_information.account_holder_name || "—"} />
+            </div>
+          )}
         </SectionCard>
       )}
 
-      {/* ── Supporting Documents ── */}
+      {/* ── Supporting Documents (always read-only) ── */}
       {p.supporting_documents?.length > 0 && (
         <SectionCard
           icon={<MdFolder className="h-5 w-5" />}
@@ -169,7 +307,14 @@ const MemberInfoSection = ({ profile }) => {
           </div>
         </SectionCard>
       )}
-    </>
+
+      {editMode && (
+        <div className="mt-4 flex gap-3">
+          <Button variant="ghost" text={t("common.cancel")} onClick={handleCancel} className="flex-1" />
+          <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty} className="flex-1" />
+        </div>
+      )}
+    </form>
   );
 };
 

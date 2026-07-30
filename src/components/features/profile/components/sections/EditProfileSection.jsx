@@ -13,6 +13,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const { t } = useTranslation();
   const { execute: updateProfile, loading: saving } = useUpdateProfile();
   const { success, error: toastError } = useToast();
+  const isBeneficiary = profile?.role === "beneficiary";
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
@@ -105,12 +106,19 @@ const EditProfileSection = ({ profile, onSaved }) => {
             field="profile_photo"
           />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField
-              label={t("users.full_name")} field="full_name" required
-              placeholder={t("profile.full_name_placeholder")}
-              formData={formData} errors={formErrors} updateFormData={updateFormData}
-              rules={[{ required: true }]}
-            />
+            {isBeneficiary ? (
+              <div>
+                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("users.full_name")} value={formData.full_name || "—"} />
+                <p className="mt-1 text-xs text-slate-400">{t("profile.name_locked_note")}</p>
+              </div>
+            ) : (
+              <InputField
+                label={t("users.full_name")} field="full_name" required
+                placeholder={t("profile.full_name_placeholder")}
+                formData={formData} errors={formErrors} updateFormData={updateFormData}
+                rules={[{ required: true }]}
+              />
+            )}
             <InputField
               label={t("users.phone")} field="phone_number" required={false}
               placeholder="+60 12 345 6789"

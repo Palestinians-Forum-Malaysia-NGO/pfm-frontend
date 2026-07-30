@@ -2258,6 +2258,7 @@
     "edit_btn": "Edit",
     "full_name_required": "Full name is required",
     "full_name_placeholder": "Your full name",
+    "name_locked_note": "Contact an administrator to change your name.",
     "whatsapp_enabled": "WhatsApp Enabled",
     "two_factor_auth": "Two-Factor Authentication",
     "save_changes": "Save Changes",

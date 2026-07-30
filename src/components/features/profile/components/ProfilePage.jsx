@@ -26,7 +26,7 @@ const ProfilePage = () => {
         subtitle={t("profile.my_profile_sub")}
       />
 
-      <UserProfileCard user={profile} showId />
+      <UserProfileCard user={profile} />
 
       {profile.role === "beneficiary" && <MemberInfoSection profile={profile} />}
 

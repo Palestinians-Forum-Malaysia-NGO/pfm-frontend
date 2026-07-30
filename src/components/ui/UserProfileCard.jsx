@@ -21,7 +21,7 @@ const getInitials = (name = "") =>
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
 
-const UserProfileCard = ({ user, showId = false }) => {
+const UserProfileCard = ({ user }) => {
   const { t } = useTranslation();
 
   const ROLE_LABELS = {
@@ -111,9 +111,6 @@ const UserProfileCard = ({ user, showId = false }) => {
           {statusKnown && <InfoRow icon={<MdVerified className="h-4 w-4" />}      label={t("users.info_status")}  value={isActive ? t("users.status_active") : t("users.status_inactive")} />}
           <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (is2faVerified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
           {updatedAt && <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(updatedAt)} />}
-          {showId && (
-            <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label={t("users.info_user_id")} value={user.id} />
-          )}
         </div>
       </div>
 

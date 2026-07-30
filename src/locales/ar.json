@@ -2258,6 +2258,7 @@
     "edit_btn": "تعديل",
     "full_name_required": "الاسم الكامل مطلوب",
     "full_name_placeholder": "اسمك الكامل",
+    "name_locked_note": "تواصل مع المسؤول لتغيير اسمك.",
     "whatsapp_enabled": "تفعيل واتساب",
     "two_factor_auth": "المصادقة الثنائية",
     "save_changes": "حفظ التغييرات",
