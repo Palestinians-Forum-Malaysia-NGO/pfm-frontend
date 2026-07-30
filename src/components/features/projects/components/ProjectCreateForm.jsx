@@ -21,7 +21,7 @@ export default function ProjectCreateForm() {
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createProject, loading, error } = useCreateProject();
-  const { categories } = useGetCategories();
+  const { categories } = useGetCategories({ module: "projects" });
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({

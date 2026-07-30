@@ -26,7 +26,7 @@ export default function ProjectEditForm() {
 
   const { project, execute: fetchProject, loading, error: loadError } = useGetProject();
   const { execute: updateProject, loading: saving, error: saveError }  = useUpdateProject();
-  const { categories } = useGetCategories();
+  const { categories } = useGetCategories({ module: "projects" });
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
