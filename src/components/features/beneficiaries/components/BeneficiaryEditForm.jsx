@@ -57,7 +57,7 @@ export default function BeneficiaryEditForm() {
   const [bankForm, setBankForm] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
   const [finForm,  setFinForm]  = useState({ job_title: "", salary: "", payment_frequency: "" });
   const [idDoc, setIdDoc] = useState(null);
-  const { url: currentIdDocUrl } = useStorageUrl(idDoc);
+  const { url: currentIdDocUrl } = useStorageUrl(idDoc, { forcePresigned: true });
 
   const [initialUser,     setInitialUser]     = useState(null);
   const [initialClass,    setInitialClass]    = useState(null);

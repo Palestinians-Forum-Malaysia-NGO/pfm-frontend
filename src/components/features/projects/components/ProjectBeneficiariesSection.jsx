@@ -20,7 +20,7 @@ const fmtDate = (d) =>
 
 function ProofCell({ fileKey }) {
   const { t } = useTranslation();
-  const { url } = useStorageUrl(fileKey);
+  const { url } = useStorageUrl(fileKey, { forcePresigned: true });
   if (!fileKey) return <span className="text-slate-300">—</span>;
   if (!url) return <span className="text-xs text-slate-400">{t("projects.beneficiaries_loading_proof")}</span>;
   if (!isSafeUrl(url)) return <span className="text-slate-300">—</span>;

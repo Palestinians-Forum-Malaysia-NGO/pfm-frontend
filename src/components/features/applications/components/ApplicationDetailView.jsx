@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdDeleteOutline, MdFactCheck, MdCheckCircle, MdCancel,
-  MdPerson, MdFolderSpecial, MdCalendarToday, MdOpenInNew, MdEdit, MdSave, MdClose,
+  MdPerson, MdFolderSpecial, MdCalendarToday, MdOpenInNew, MdEdit, MdSave, MdClose, MdBadge,
 } from "react-icons/md";
 import Button         from "components/ui/buttons/Button";
 import PageHeader     from "components/ui/PageHeader";
 import FormHeader     from "components/ui/form/FormHeader";
 import InfoRow        from "components/ui/InfoRow";
 import AlertBanner    from "components/ui/AlertBanner";
+import StorageFileLink from "components/ui/StorageFileLink";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading        from "components/loading/Loading";
 import ApplicationDeleteModal from "./ApplicationDeleteModal";
@@ -174,7 +175,40 @@ export default function ApplicationDetailView() {
             ))}
           </div>
         )}
+        {beneficiary?.id_document && (
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
+            <MdBadge className="h-5 w-5 shrink-0 text-green" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-400">{t("beneficiaries.info_id_doc")}</p>
+              <StorageFileLink fileKey={beneficiary.id_document} className="text-sm font-medium text-green hover:underline">
+                {t("beneficiaries.view_doc")}
+              </StorageFileLink>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* ── Supporting Documents ── */}
+      {beneficiary?.supporting_documents?.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_documents")} subtitle={t("beneficiaries.section_documents_sub")} />
+          <div className="flex flex-col gap-2">
+            {beneficiary.supporting_documents.map((doc) => (
+              <div key={doc.id} className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{doc.document_name}</p>
+                  <p className="text-xs text-slate-400">{doc.document_type}</p>
+                </div>
+                {doc.document_file && (
+                  <StorageFileLink fileKey={doc.document_file} className="text-xs font-medium text-green hover:underline">
+                    {t("beneficiaries.doc_view")}
+                  </StorageFileLink>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Application details ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">

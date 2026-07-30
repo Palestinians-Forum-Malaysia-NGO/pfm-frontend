@@ -7,7 +7,7 @@ import { isSafeUrl } from "utils/url";
  * Renders nothing while the URL is resolving or if resolution fails.
  */
 const StorageFileLink = ({ fileKey, children, className }) => {
-  const { url } = useStorageUrl(fileKey);
+  const { url } = useStorageUrl(fileKey, { forcePresigned: true });
   if (!isSafeUrl(url)) return null;
   return (
     <a href={url} target="_blank" rel="noreferrer" className={className}>
