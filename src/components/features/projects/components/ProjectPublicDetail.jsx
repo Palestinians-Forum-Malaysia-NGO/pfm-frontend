@@ -44,7 +44,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
     cancelled: t("projects.status_cancelled"),
   };
 
-  useEffect(() => { fetchProject(slug); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchProject(slug).catch(() => {}); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <Loading text={t("projects.public_loading")} />;
 

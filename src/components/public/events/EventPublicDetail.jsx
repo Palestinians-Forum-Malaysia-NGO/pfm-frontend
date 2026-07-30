@@ -31,7 +31,7 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
   const { user, isAuthenticated } = useAuth();
   const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 
-  useEffect(() => { fetchEvent(slug); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchEvent(slug).catch(() => {}); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <Loading text={t("eventsPublic.loading")} />;
 

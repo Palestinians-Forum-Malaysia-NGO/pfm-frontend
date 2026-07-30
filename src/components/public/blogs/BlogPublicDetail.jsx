@@ -16,7 +16,7 @@ export default function BlogPublicDetail() {
 
   const { blog, execute: fetchBlog, loading, error } = useGetBlog();
 
-  useEffect(() => { fetchBlog(slug); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchBlog(slug).catch(() => {}); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <Loading text={t("blogsPublic.loading")} />;
 
