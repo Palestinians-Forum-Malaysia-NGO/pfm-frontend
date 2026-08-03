@@ -53,15 +53,35 @@ export const isTokenExpired = (token) => {
  * Extracts a human-readable error message from any Axios/DRF error.
  * Handles: detail string, non_field_errors, field-level errors, plain strings.
  */
+const NETWORK_ERROR_MESSAGE = "Unable to connect. Check your internet connection and try again.";
+const TIMEOUT_ERROR_MESSAGE = "The request timed out. Please try again.";
+const SERVER_ERROR_MESSAGE  = "Something went wrong on our end. Please try again in a moment.";
+
 export const extractError = (err, fallback = "Something went wrong. Please try again.") => {
-  const res = err?.response?.data;
+  // Request never reached the server at all — offline, DNS failure, CORS block, server down.
+  if (err?.code === "ERR_NETWORK" || (err?.request && !err?.response)) {
+    return NETWORK_ERROR_MESSAGE;
+  }
+  // Client gave up waiting for a response.
+  if (err?.code === "ECONNABORTED") {
+    return TIMEOUT_ERROR_MESSAGE;
+  }
+
+  const res    = err?.response?.data;
+  const status = err?.response?.status;
+
   if (!res) return err?.message ?? fallback;
-  if (typeof res === "string")            return /^\s*<(!doctype html|html)/i.test(res) ? fallback : res;
+  if (typeof res === "string") {
+    if (!/^\s*<(!doctype html|html)/i.test(res)) return res;
+    // An HTML error page (e.g. a gateway/proxy error) slipped through instead of JSON.
+    return status >= 500 ? SERVER_ERROR_MESSAGE : fallback;
+  }
   if (res.detail)                         return res.detail;
   if (res.non_field_errors?.[0])          return res.non_field_errors[0];
   // First field-level error
   const firstField = Object.values(res)[0];
   if (Array.isArray(firstField))          return firstField[0];
   if (typeof firstField === "string")     return firstField;
+  if (status >= 500)                      return SERVER_ERROR_MESSAGE;
   return fallback;
 };

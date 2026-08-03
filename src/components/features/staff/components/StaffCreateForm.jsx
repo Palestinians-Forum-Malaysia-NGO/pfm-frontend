@@ -85,8 +85,8 @@ export default function StaffCreateForm() {
         `${form.full_name} ${t("staff.toast_created_sub")} ${form.email}.`,
       );
       navigate(`${base}/staff/${created.id}`);
-    } catch {
-      toastError(t("staff.toast_create_failed"));
+    } catch (err) {
+      toastError(t("staff.toast_create_failed"), err?.message);
     }
   };
 

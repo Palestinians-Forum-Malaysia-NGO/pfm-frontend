@@ -38,15 +38,15 @@ export default function StaffDetailView() {
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  useEffect(() => { fetchStaff(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchStaff(id).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async () => {
     try {
       await deleteStaff(id);
       success(t("staff.toast_deleted"), `${staff?.user?.full_name} ${t("staff.toast_deleted_sub")}`);
       navigate(`${base}/staff`);
-    } catch {
-      toastError(t("staff.toast_delete_failed"));
+    } catch (err) {
+      toastError(t("staff.toast_delete_failed"), err?.message);
     }
   };
 

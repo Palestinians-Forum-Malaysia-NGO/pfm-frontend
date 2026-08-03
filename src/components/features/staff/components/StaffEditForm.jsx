@@ -200,8 +200,8 @@ export default function StaffEditForm() {
       await updateStaff(id, payload);
       success(t("staff.toast_updated"), `${userForm.full_name} ${t("staff.toast_updated_sub")}`);
       navigate(`${base}/staff/${id}`);
-    } catch {
-      toastError(t("staff.toast_update_failed"));
+    } catch (err) {
+      toastError(t("staff.toast_update_failed"), err?.message);
     }
   };
 

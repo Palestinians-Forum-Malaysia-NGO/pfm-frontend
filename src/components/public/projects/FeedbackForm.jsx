@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdSend, MdCheckCircle, MdVolunteerActivism } from "react-icons/md";
+import { MdSend, MdCheckCircle } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import StarRating   from "components/ui/StarRating";
 import { TextareaField, validate } from "components/form";
 import { useSubmitFeedback } from "components/features/feedback/hooks";
-import { useGetApplications } from "components/features/applications/hooks";
-import Loading from "components/loading/Loading";
 
 const RULES = {
   rating:  [{ min: 1 }, { max: 5 }],
@@ -21,27 +19,8 @@ const FeedbackForm = ({ projectId, fullName }) => {
   const [errors, setErrors]       = useState({});
   const [submitted, setSubmitted] = useState(false);
   const { execute: submitFeedback, loading: sending, error } = useSubmitFeedback();
-  const { applications, loading: loadingApplications } = useGetApplications();
 
   const updateForm = (field, value) => setForm((p) => ({ ...p, [field]: value }));
-
-  // Feedback is only for beneficiaries who actually received assistance
-  // through this specific project (an approved application for it) — show
-  // an explanatory message instead of a form they can't successfully submit.
-  const hasApprovedApplication = applications.some((a) => a.project?.id === projectId && a.status === "approved");
-
-  if (loadingApplications) return <Loading text={t("feedback.loading")} />;
-
-  if (!hasApprovedApplication && !submitted) {
-    return (
-      <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green">
-          <MdVolunteerActivism className="h-6 w-6" />
-        </div>
-        <p className="text-sm text-slate-600">{t("feedback.not_eligible")}</p>
-      </div>
-    );
-  }
 
   const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules));
 
