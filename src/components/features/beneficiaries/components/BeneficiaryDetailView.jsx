@@ -47,7 +47,7 @@ export default function BeneficiaryDetailView() {
   const [editingStatus,  setEditingStatus]  = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  useEffect(() => { fetchBeneficiary(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchBeneficiary(id).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleStatusEdit = () => {
     setSelectedStatus(beneficiary.account_status ?? "");
@@ -61,7 +61,7 @@ export default function BeneficiaryDetailView() {
         t("beneficiaries.toast_status_updated"),
         `${t("beneficiaries.toast_status_updated_sub")} ${t(`beneficiaries.account_status_${selectedStatus}`, { defaultValue: selectedStatus })}.`,
       );
-      fetchBeneficiary(id);
+      fetchBeneficiary(id).catch(() => {});
       setEditingStatus(false);
     } catch (err) {
       toastError(t("beneficiaries.toast_status_failed"), err?.message);

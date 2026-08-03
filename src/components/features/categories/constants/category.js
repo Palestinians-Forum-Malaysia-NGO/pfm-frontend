@@ -1,24 +1,18 @@
 export const MODULE_OPTIONS = [
-  { value: "beneficiaries", label: "Beneficiaries" },
-  { value: "projects",      label: "Projects" },
-  { value: "blogs",         label: "Blogs" },
-  { value: "donations",     label: "Donations" },
-  { value: "campaigns",     label: "Campaigns" },
+  { value: "projects", label: "Projects" },
+  { value: "posts",    label: "Posts" },
+  { value: "events",   label: "Events" },
 ];
 
 export const MODULE_FILTER_OPTIONS = [
-  { value: "all",           label: "All Modules" },
-  { value: "beneficiaries", label: "Beneficiaries" },
-  { value: "projects",      label: "Projects" },
-  { value: "blogs",         label: "Blogs" },
-  { value: "donations",     label: "Donations" },
-  { value: "campaigns",     label: "Campaigns" },
+  { value: "all",      label: "All Modules" },
+  { value: "projects", label: "Projects" },
+  { value: "posts",    label: "Posts" },
+  { value: "events",   label: "Events" },
 ];
 
 export const MODULE_LABELS = {
-  beneficiaries: "Beneficiaries",
-  projects:      "Projects",
-  blogs:         "Blogs",
-  donations:     "Donations",
-  campaigns:     "Campaigns",
+  projects: "Projects",
+  posts:    "Posts",
+  events:   "Events",
 };

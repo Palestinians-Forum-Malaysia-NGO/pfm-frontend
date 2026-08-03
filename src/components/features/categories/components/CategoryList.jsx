@@ -20,19 +20,15 @@ import useAuth from "components/features/auth/hooks/useAuth";
 export default function CategoryList() {
   const { t } = useTranslation();
   const MODULE_LABELS = {
-    beneficiaries: t("categories.module_beneficiaries"),
-    projects:      t("categories.module_projects"),
-    blogs:         t("categories.module_blogs"),
-    donations:     t("categories.module_donations"),
-    campaigns:     t("categories.module_campaigns"),
+    projects: t("categories.module_projects"),
+    posts:    t("categories.module_posts"),
+    events:   t("categories.module_events"),
   };
   const MODULE_FILTER_OPTIONS = [
-    { value: "all", label: t("categories.module_all") },
-    { value: "beneficiaries", label: MODULE_LABELS.beneficiaries },
-    { value: "projects",      label: MODULE_LABELS.projects },
-    { value: "blogs",         label: MODULE_LABELS.blogs },
-    { value: "donations",     label: MODULE_LABELS.donations },
-    { value: "campaigns",     label: MODULE_LABELS.campaigns },
+    { value: "all",      label: t("categories.module_all") },
+    { value: "projects", label: MODULE_LABELS.projects },
+    { value: "posts",    label: MODULE_LABELS.posts },
+    { value: "events",   label: MODULE_LABELS.events },
   ];
   const navigate = useNavigate();
   const base = useLayoutBase();

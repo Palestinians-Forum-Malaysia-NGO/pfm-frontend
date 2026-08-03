@@ -283,7 +283,6 @@ export default function BeneficiaryList() {
         emptyIcon={<MdPeople />}
         emptyTitle={t("beneficiaries.no_beneficiaries")}
         emptyDesc={hasFilters ? t("beneficiaries.adjust_filters") : t("beneficiaries.add_first")}
-        emptyAction={!hasFilters ? { label: t("beneficiaries.add_beneficiary"), onClick: () => navigate(`${base}/beneficiaries/create`) } : undefined}
       />
 
       <BeneficiaryDeleteModal

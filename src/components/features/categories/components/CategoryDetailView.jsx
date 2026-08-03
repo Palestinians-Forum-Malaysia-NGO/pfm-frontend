@@ -23,11 +23,9 @@ import useAuth from "components/features/auth/hooks/useAuth";
 export default function CategoryDetailView() {
   const { t } = useTranslation();
   const MODULE_LABELS = {
-    beneficiaries: t("categories.module_beneficiaries"),
-    projects:      t("categories.module_projects"),
-    blogs:         t("categories.module_blogs"),
-    donations:     t("categories.module_donations"),
-    campaigns:     t("categories.module_campaigns"),
+    projects: t("categories.module_projects"),
+    posts:    t("categories.module_posts"),
+    events:   t("categories.module_events"),
   };
   const { id }   = useParams();
   const navigate = useNavigate();

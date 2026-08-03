@@ -18,11 +18,9 @@ const RULES = {
 export default function CategoryCreateForm() {
   const { t, i18n } = useTranslation();
   const MODULE_OPTIONS = [
-    { value: "beneficiaries", label: t("categories.module_beneficiaries") },
-    { value: "projects",      label: t("categories.module_projects") },
-    { value: "blogs",         label: t("categories.module_blogs") },
-    { value: "donations",     label: t("categories.module_donations") },
-    { value: "campaigns",     label: t("categories.module_campaigns") },
+    { value: "projects", label: t("categories.module_projects") },
+    { value: "posts",    label: t("categories.module_posts") },
+    { value: "events",   label: t("categories.module_events") },
   ];
   const navigate = useNavigate();
   const base = useLayoutBase();
