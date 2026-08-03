@@ -18,7 +18,7 @@ const RULES = {
   name:             [{ required: true }, { maxLength: 200 }],
   logo:             [{ required: true }],
   partnership_type: [{ required: true }],
-  website_url:      [{ required: true }, { maxLength: 500 }, { url: true }],
+  website_url:      [{ maxLength: 500 }, { url: true }],
 };
 
 const EMPTY = {
@@ -80,7 +80,7 @@ export default function PartnershipEditForm() {
       name:             formData.name,
       logo:             formData.logo,
       partnership_type: formData.partnership_type,
-      website_url:      formData.website_url,
+      website_url:      formData.website_url || undefined,
       order:             formData.order !== "" ? Number(formData.order) : 0,
       is_active:         formData.is_active,
     };
@@ -139,7 +139,7 @@ export default function PartnershipEditForm() {
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
-              label={t("partnerships.info_website")} field="website_url" placeholder="https://example.org"
+              label={t("partnerships.info_website")} field="website_url" placeholder="https://example.org" required={false}
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.website_url}
             />
             <InputField
