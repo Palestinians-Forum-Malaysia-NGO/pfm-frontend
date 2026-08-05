@@ -1741,7 +1741,8 @@
     "loading": "Loading blog…",
     "not_found_title": "Blog not found",
     "not_found_body": "This blog post may have been removed or is no longer available.",
-    "back_to_blogs": "Back to Blogs"
+    "back_to_blogs": "Back to Blogs",
+    "more_blogs": "More Blogs"
   },
   "events": {
     "title": "Events",

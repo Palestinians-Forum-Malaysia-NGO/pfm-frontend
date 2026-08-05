@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdArticle, MdCalendarToday, MdCategory, MdStar } from "react-icons/md";
-import { useGetBlog } from "components/features/blogs/hooks";
+import { useGetBlog, useGetBlogs } from "components/features/blogs/hooks";
 import StorageImage from "components/ui/StorageImage";
 import Loading from "components/loading/Loading";
+import BlogCard from "./BlogCard";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
@@ -15,8 +16,13 @@ export default function BlogPublicDetail() {
   const navigate  = useNavigate();
 
   const { blog, execute: fetchBlog, loading, error } = useGetBlog();
+  const { blogs: allBlogs } = useGetBlogs();
 
   useEffect(() => { fetchBlog(slug).catch(() => {}); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const moreBlogs = allBlogs
+    .filter((b) => b.slug !== slug)
+    .slice(0, 3);
 
   if (loading) return <Loading text={t("blogsPublic.loading")} />;
 
@@ -84,6 +90,22 @@ export default function BlogPublicDetail() {
           <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{blog.content}</p>
         )}
       </div>
+
+      {/* ── More Blogs ── */}
+      {moreBlogs.length > 0 && (
+        <div className="border-t border-slate-100 bg-slate-50 py-14">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-8 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
+              <MdArticle className="h-5 w-5 text-green" /> {t("blogsPublic.more_blogs")}
+            </h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {moreBlogs.map((b) => (
+                <BlogCard key={b.id} blog={b} onClick={() => navigate(`/blogs/${b.slug}`)} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
