@@ -18,7 +18,7 @@ import { useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { setTokens }        from "components/features/auth/utils";
 import { OTP_PURPOSE }      from "components/features/auth/types";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
-import { useCreateBeneficiary } from "components/features/beneficiaries/hooks";
+import { useCreateBeneficiary, useGetStates } from "components/features/beneficiaries/hooks";
 
 /* ─────────────────────────────────────────────────
    Step config
@@ -94,9 +94,10 @@ const Hero = ({ step }) => {
    Step 1 — Account
 ───────────────────────────────────────────────── */
 const ACCOUNT_RULES = {
-  full_name:    [{ required: true }, { maxLength: 255 }],
-  email:        [{ required: true }, { email: true }],
-  phone_number: [{ required: true }, { maxLength: 30 }],
+  profile_photo: [{ required: true }],
+  full_name:     [{ required: true }, { maxLength: 255 }],
+  email:         [{ required: true }, { email: true }],
+  phone_number:  [{ required: true }, { maxLength: 30 }],
 };
 
 const AccountStep = ({ data, onChange, onNext }) => {
@@ -133,6 +134,7 @@ const AccountStep = ({ data, onChange, onNext }) => {
         <StorageImageField
           label={t("common.profile_photo")}
           publicEndpoint="register"
+          required
           onUpload={(key) => set("profile_photo", key)}
           onRemove={() => set("profile_photo", null)}
           errors={errors}
@@ -208,6 +210,8 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
       </div>
 
       <div className="flex flex-col gap-3">
+        <InputField label={t("apply.national_id")} field="national_id" placeholder="e.g. 900101-14-5678"
+          required={false} formData={data} errors={errors} updateFormData={set} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
           formData={data} errors={errors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
@@ -258,7 +262,7 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
       </div>
 
       <div className="flex flex-col gap-3">
-        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={data} errors={{}} updateFormData={set} />
+        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_name")}        field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={data} errors={{}} updateFormData={set} />
@@ -340,13 +344,22 @@ const validateStatusStep = (visaData) => {
     if (regionErr) errors.palestine_region = regionErr;
   }
 
+  const addressErr = validate(visaData.address, REQUIRED);
+  if (addressErr) errors.address = addressErr;
+
   return errors;
 };
 
 const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [visaErrors, setVisaErrors] = useState({});
   const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
+  const { states } = useGetStates();
+
+  const STATE_OPTIONS = states.map((s) => ({
+    value: s.code,
+    label: (s.label_ar && i18n.language === "ar") ? s.label_ar : s.label,
+  }));
 
   const HAS_VISA_OPTIONS_T = [
     { value: "",      label: t("beneficiaries.visa_status_unset") },
@@ -433,8 +446,10 @@ const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }
           <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
             formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         )}
+        <SelectField label={t("apply.state")} field="state" options={STATE_OPTIONS} required={false}
+          formData={visaData} errors={visaErrors} updateFormData={setV} />
         <InputField label={t("beneficiaries.address")} field="address" placeholder="No. 1, Jalan…"
-          required={false} formData={visaData} errors={visaErrors} updateFormData={setV} />
+          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
 
         {/* Terms */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -545,7 +560,7 @@ export default function BeneficiaryRegisterForm() {
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
   const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
-  const [documents, setDocuments] = useState({ background: "" });
+  const [documents, setDocuments] = useState({ background: "", national_id: "" });
   const [idDoc, setIdDoc] = useState(null);
   const [family, setFamily] = useState({
     family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "",
@@ -554,7 +569,7 @@ export default function BeneficiaryRegisterForm() {
   const [children, setChildren] = useState([]);
   const [visa,  setVisa]  = useState({
     has_visa: "", visa_type: "", situation: "", unhcr_number: "",
-    country: "", palestine_region: "", address: "", terms_accepted: false,
+    country: "", palestine_region: "", state: "", address: "", terms_accepted: false,
   });
 
   const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
@@ -567,6 +582,7 @@ export default function BeneficiaryRegisterForm() {
         email:             account.email         || undefined,
         phone_number:      account.phone_number  || undefined,
         profile_photo:     account.profile_photo || undefined,
+        national_id:       documents.national_id || undefined,
         background:        documents.background  || undefined,
         id_document:       idDoc                  || undefined,
         terms_accepted:    visa.terms_accepted,
@@ -577,6 +593,7 @@ export default function BeneficiaryRegisterForm() {
         unhcr_number:      (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
         country_of_origin: visa.country || undefined,
         palestine_region:  visa.country === "PS" ? (visa.palestine_region || undefined) : undefined,
+        state:             visa.state   || undefined,
         address:           visa.address || undefined,
 
         family_information: {
