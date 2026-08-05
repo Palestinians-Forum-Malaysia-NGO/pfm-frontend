@@ -168,7 +168,8 @@ const AccountStep = ({ data, onChange, onNext }) => {
    Step 2 — Documents & Background
 ───────────────────────────────────────────────── */
 const DOCUMENTS_RULES = {
-  background: [{ required: true }],
+  national_id: [{ required: true }],
+  background:  [{ required: true }],
 };
 
 const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
@@ -211,7 +212,7 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
 
       <div className="flex flex-col gap-3">
         <InputField label={t("apply.national_id")} field="national_id" placeholder="e.g. 900101-14-5678"
-          required={false} formData={data} errors={errors} updateFormData={set} />
+          formData={data} errors={errors} updateFormData={set} rules={DOCUMENTS_RULES.national_id} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
           formData={data} errors={errors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
