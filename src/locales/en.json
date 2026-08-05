@@ -5,6 +5,7 @@
     "projects": "Projects",
     "events": "Events",
     "news": "News",
+    "blogs": "Blogs",
     "donate": "Donate",
     "contact": "Contact",
     "sign_in": "Sign In",
@@ -69,7 +70,8 @@
     "all_projects": "All Projects",
     "active_projects": "Active Projects",
     "completed_projects": "Completed",
-    "news": "News & Blog",
+    "news": "News",
+    "blogs": "Blogs",
     "rights": "All Rights Reserved.",
     "standing": "Standing with Palestine"
   },

@@ -46,6 +46,7 @@ const Footer = () => {
       heading: t("footer.resources"),
       links: [
         { label: t("footer.news"), to: "/news" },
+        { label: t("footer.blogs"), to: "/blogs" },
       ],
     },
   ];

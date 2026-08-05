@@ -24,6 +24,7 @@ const getNavLinks = (t) => [
     ],
   },
   { label: t("nav.news"), to: "/news" },
+  { label: t("nav.blogs"), to: "/blogs" },
   { label: t("nav.donate"), to: "/donate" },
   {
     label: t("nav.contact"), to: "/contact",
