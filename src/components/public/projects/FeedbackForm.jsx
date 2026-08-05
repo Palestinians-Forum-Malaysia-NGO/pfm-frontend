@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdSend, MdCheckCircle } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
 import StarRating   from "components/ui/StarRating";
+import Button from "components/ui/buttons/Button";
 import { TextareaField, validate } from "components/form";
 import { useSubmitFeedback } from "components/features/feedback/hooks";
 
@@ -56,12 +57,12 @@ const FeedbackForm = ({ projectId, fullName }) => {
           </div>
           <h3 className="text-xl font-bold text-slate-900">{t("feedback.success_title")}</h3>
           <p className="max-w-xs text-sm text-slate-400">{t("feedback.success_body")}</p>
-          <button
+          <Button
+            variant="ghost"
+            text={t("feedback.send_another")}
             onClick={() => { setSubmitted(false); setForm(EMPTY); setErrors({}); }}
-            className="mt-2 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
-          >
-            {t("feedback.send_another")}
-          </button>
+            className="mt-2"
+          />
         </div>
       ) : (
         <>
@@ -84,18 +85,15 @@ const FeedbackForm = ({ projectId, fullName }) => {
               formData={form} errors={errors} updateFormData={updateForm} rules={RULES.message}
             />
 
-            <button
+            <Button
               type="submit"
-              disabled={sending || !canSubmit}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {sending ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <MdSend className="h-4 w-4" />
-              )}
-              {sending ? t("feedback.sending") : t("feedback.send")}
-            </button>
+              variant="primary"
+              icon={<MdSend className="h-4 w-4" />}
+              text={sending ? t("feedback.sending") : t("feedback.send")}
+              loading={sending}
+              disabled={!canSubmit}
+              className="mt-2"
+            />
           </form>
         </>
       )}

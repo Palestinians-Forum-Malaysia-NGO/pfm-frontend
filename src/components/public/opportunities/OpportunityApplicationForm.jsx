@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MdSend, MdCheckCircle, MdLocationOn, MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
+import Button from "components/ui/buttons/Button";
 import { InputField, SelectField, validate } from "components/form";
 import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { useSubmitOpportunityApplication } from "components/features/opportunityApplications/hooks";
@@ -115,12 +116,12 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
         </div>
         <h3 className="mt-4 text-xl font-bold text-slate-900">{t("opportunityApply.success_title")}</h3>
         <p className="mt-1 max-w-xs text-sm text-slate-400">{t("opportunityApply.success_body")}</p>
-        <button
+        <Button
+          variant="ghost"
+          text={t("opportunityApply.send_another")}
           onClick={() => { setSubmitted(false); setForm(emptyForm(opportunityId)); setErrors({}); }}
-          className="mt-4 rounded-full border border-slate-200 px-5 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50"
-        >
-          {t("opportunityApply.send_another")}
-        </button>
+          className="mt-4"
+        />
       </div>
     );
   }
@@ -223,18 +224,15 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
           errors={errors}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={sending || !canSubmit}
-          className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {sending ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            <MdSend className="h-4 w-4" />
-          )}
-          {sending ? t("opportunityApply.sending") : t("opportunityApply.send")}
-        </button>
+          variant="primary"
+          icon={<MdSend className="h-4 w-4" />}
+          text={sending ? t("opportunityApply.sending") : t("opportunityApply.send")}
+          loading={sending}
+          disabled={!canSubmit}
+          className="mt-2"
+        />
       </form>
     </div>
   );

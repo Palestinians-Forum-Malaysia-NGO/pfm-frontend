@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdVolunteerActivism, MdCheckCircle } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
+import Button from "components/ui/buttons/Button";
 import { useGetApplications, useCreateApplication } from "components/features/applications/hooks";
 import { APPLICATION_STATUS_BADGE } from "components/features/applications/constants/applications";
 
@@ -58,17 +59,11 @@ export default function ProjectApplySection({ projectId }) {
             <MdVolunteerActivism className="h-6 w-6" />
           </div>
           <p className="text-sm text-slate-600">{t("projects.apply_body")}</p>
-          <button
+          <Button
             onClick={handleApply}
-            disabled={applying}
-            className="inline-flex items-center gap-2 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {applying ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            ) : (
-              t("projects.apply_button")
-            )}
-          </button>
+            loading={applying}
+            text={applying ? t("projects.applying") : t("projects.apply_button")}
+          />
         </div>
       )}
     </div>

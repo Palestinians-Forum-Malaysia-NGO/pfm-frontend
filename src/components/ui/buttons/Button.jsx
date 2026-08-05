@@ -12,12 +12,19 @@ const Button = ({
   disabled,
   loading,
   icon,
+  iconPosition = "left",
   text,
   type = "button",
   variant = "primary",
   className = "",
 }) => {
   const isDisabled = disabled || loading;
+
+  const iconEl = loading ? (
+    <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
+  ) : (
+    icon && <span className="shrink-0 flex items-center">{icon}</span>
+  );
 
   return (
     <button
@@ -33,12 +40,9 @@ const Button = ({
         ${variants[variant]} ${className}
       `}
     >
-      {loading ? (
-        <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
-      ) : (
-        icon && <span className="shrink-0 flex items-center">{icon}</span>
-      )}
+      {iconPosition === "left" && iconEl}
       {text && <span className="truncate">{text}</span>}
+      {iconPosition === "right" && iconEl}
     </button>
   );
 };

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdSend, MdCheckCircle, MdPerson, MdEmail, MdPhone } from "react-icons/md";
 import AlertBanner from "components/ui/AlertBanner";
+import Button from "components/ui/buttons/Button";
 import { useCreateEventRegistration } from "components/features/eventRegistrations/hooks";
 import useAuth from "components/features/auth/hooks/useAuth";
 import { hasApplied, markApplied } from "utils/eventApplications";
@@ -67,19 +68,15 @@ const EventRegistrationForm = ({ eventId, basePath = "/events" }) => {
         )}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="primary"
         onClick={handleApply}
-        disabled={sending}
-        className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-green py-3 text-sm font-bold text-white transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {sending ? (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-        ) : (
-          <MdSend className="h-4 w-4" />
-        )}
-        {sending ? t("eventsPublic.sending") : t("eventsPublic.register_btn")}
-      </button>
+        icon={<MdSend className="h-4 w-4" />}
+        text={sending ? t("eventsPublic.sending") : t("eventsPublic.register_btn")}
+        loading={sending}
+        className="mt-6"
+      />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import ToggleInput          from "components/form/ToggleInput";
 import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { StorageImageField } from "components/form";
 import AlertBanner          from "components/ui/AlertBanner";
+import Button                from "components/ui/buttons/Button";
 import { validate }         from "components/form/utils/validation";
 import { useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
 import { setTokens }        from "components/features/auth/utils";
@@ -90,12 +91,6 @@ const Hero = ({ step }) => {
 };
 
 /* ─────────────────────────────────────────────────
-   Shared nav button classes
-───────────────────────────────────────────────── */
-const btnBack  = "flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-600 transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]";
-const btnNext  = "flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/30 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60";
-
-/* ─────────────────────────────────────────────────
    Step 1 — Account
 ───────────────────────────────────────────────── */
 const ACCOUNT_RULES = {
@@ -151,10 +146,11 @@ const AccountStep = ({ data, onChange, onNext }) => {
           formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.phone_number} />
       </div>
 
-      <button type="button" onClick={handleNext} disabled={!canProceed}
-        className={`mt-6 w-full ${btnNext}`}>
-        {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
-      </button>
+      <Button
+        type="button" onClick={handleNext} disabled={!canProceed}
+        text={t("apply.continue")} icon={<MdArrowForward className="h-4 w-4" />} iconPosition="right"
+        className="mt-6 h-11 w-full"
+      />
 
       <p className="mt-5 text-center text-sm text-slate-400">
         {t("apply.already_have")}{" "}
@@ -228,12 +224,8 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
       </div>
 
       <div className="mt-6 flex gap-3">
-        <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
-        </button>
-        <button type="button" onClick={handleNext} disabled={!canProceed} className={btnNext}>
-          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
-        </button>
+        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
+        <Button type="button" onClick={handleNext} disabled={!canProceed} text={t("apply.continue")} icon={<MdArrowForward className="h-4 w-4" />} iconPosition="right" className="h-11 flex-1" />
       </div>
     </>
   );
@@ -311,12 +303,8 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
       </div>
 
       <div className="mt-6 flex gap-3">
-        <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
-        </button>
-        <button type="button" onClick={onNext} className={btnNext}>
-          {t("apply.continue")} <MdArrowForward className="h-4 w-4" />
-        </button>
+        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
+        <Button type="button" onClick={onNext} text={t("apply.continue")} icon={<MdArrowForward className="h-4 w-4" />} iconPosition="right" className="h-11 flex-1" />
       </div>
     </>
   );
@@ -456,15 +444,12 @@ const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }
       </div>
 
       <div className="mt-6 flex gap-3">
-        <button type="button" onClick={onBack} className={btnBack}>
-          <MdArrowBack className="h-4 w-4" /> {t("apply.back")}
-        </button>
-        <button type="button" onClick={handleSubmitClick} disabled={loading || !canSubmit} className={btnNext}>
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : <><MdCheckCircle className="h-4 w-4" /> {t("apply.submit")}</>
-          }
-        </button>
+        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
+        <Button
+          type="button" onClick={handleSubmitClick} disabled={!canSubmit} loading={loading}
+          text={loading ? t("apply.submitting") : t("apply.submit")} icon={<MdCheckCircle className="h-4 w-4" />}
+          className="h-11 flex-1"
+        />
       </div>
     </>
   );
@@ -537,12 +522,7 @@ const OtpStep = ({ email, channel, onBack }) => {
           <p className="mt-1.5 text-center text-xs text-slate-400">{code.length}/6 {t("auth.digits_entered")}</p>
         </div>
 
-        <button type="submit" disabled={loading || !isReady} className={`w-full ${btnNext}`}>
-          {loading
-            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            : t("apply.verify")
-          }
-        </button>
+        <Button type="submit" loading={loading} disabled={!isReady} text={t("apply.verify")} className="h-11 w-full" />
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-400">
