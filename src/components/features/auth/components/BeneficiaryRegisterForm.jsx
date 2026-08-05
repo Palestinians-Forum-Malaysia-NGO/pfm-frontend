@@ -345,6 +345,9 @@ const validateStatusStep = (visaData) => {
     if (regionErr) errors.palestine_region = regionErr;
   }
 
+  const stateErr = validate(visaData.state, REQUIRED);
+  if (stateErr) errors.state = stateErr;
+
   const addressErr = validate(visaData.address, REQUIRED);
   if (addressErr) errors.address = addressErr;
 
@@ -447,8 +450,8 @@ const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }
           <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
             formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         )}
-        <SelectField label={t("apply.state")} field="state" options={STATE_OPTIONS} required={false}
-          formData={visaData} errors={visaErrors} updateFormData={setV} />
+        <SelectField label={t("apply.state")} field="state" options={STATE_OPTIONS}
+          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
         <InputField label={t("beneficiaries.address")} field="address" placeholder="No. 1, Jalan…"
           formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
 
