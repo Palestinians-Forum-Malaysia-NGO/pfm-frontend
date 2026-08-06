@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import ReactApexChart from "react-apexcharts";
 import { MdPeople, MdArrowForward } from "react-icons/md";
 import { useGetBeneficiaryStats } from "components/features/beneficiaries/hooks";
-import { donutOpts, barOpts, GENDER_COLORS } from "components/charts/apexConfig";
+import { donutOpts, GENDER_COLORS } from "components/charts/apexConfig";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse rounded-xl bg-slate-100 ${className}`} />
@@ -14,6 +14,7 @@ const STATUS_COLORS  = ["#007A3D", "#F59E0B", "#F97316", "#EF4444"];
 const STATUS_KEYS    = ["active", "pending", "suspended", "rejected"];
 
 const GENDER_KEYS    = ["male", "female",];
+const CITY_BAR_COLORS = ["#007A3D", "#00a351", "#00c45f", "#34d578", "#6ee7a0"];
 
 export default function BeneficiaryStatsWidget() {
   const { t } = useTranslation();
@@ -119,12 +120,26 @@ export default function BeneficiaryStatsWidget() {
           ) : byCity.length === 0 ? (
             <p className="pt-4 text-xs text-slate-400">{t("admin_dashboard.no_data_yet")}</p>
           ) : (
-            <ReactApexChart
-              type="bar"
-              series={[{ name: t("beneficiaries.title"), data: byCity.map((c) => c.count) }]}
-              options={barOpts(byCity.map((c) => c.city))}
-              height={byCity.length * 44 + 20}
-            />
+            <div className="flex flex-col gap-3 pt-2">
+              {byCity.map((c, i) => {
+                const max = byCity[0]?.count || 1;
+                const pct = Math.max(4, Math.round((c.count / max) * 100));
+                return (
+                  <div key={c.city} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="truncate font-medium text-slate-600">{c.city}</span>
+                      <span className="shrink-0 font-bold text-slate-700">{c.count}</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-200/70">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{ width: `${pct}%`, background: CITY_BAR_COLORS[i % CITY_BAR_COLORS.length] }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
 
