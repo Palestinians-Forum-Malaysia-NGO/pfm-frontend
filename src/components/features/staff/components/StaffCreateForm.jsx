@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
-import { MdArrowBack, MdPersonAdd, MdBadge, MdPerson } from "react-icons/md";
+import { MdArrowBack, MdPersonAdd, MdBadge, MdPerson, MdCardTravel } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, SelectField, StorageImageField, validate } from "components/form";
+import { InputField, SelectField, ToggleInput, StorageImageField, StorageDocumentField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -14,7 +14,6 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
   full_name:    [{ required: true }, { maxLength: 255 }],
-  full_name_ar: [{ required: true }, { maxLength: 255 }],
   email:        [{ required: true }, { email: true }],
   phone_number: [{ required: true }],
   profile_photo: [{ required: true }],
@@ -39,7 +38,6 @@ export default function StaffCreateForm() {
 
   const [form, setForm] = useState({
     full_name:    "",
-    full_name_ar: "",
     email:        "",
     phone_number: "",
     department:   "",
@@ -47,6 +45,11 @@ export default function StaffCreateForm() {
     branch:       "",
     joining_date: "",
     profile_photo: null,
+    id_document:  null,
+    has_visa:      false,
+    visa_type:     "",
+    visa_number:   "",
+    visa_expiry_date: "",
   });
   const [errors, setErrors] = useState({});
 
@@ -56,7 +59,8 @@ export default function StaffCreateForm() {
     if (activeBranches.length === 1) set("branch", activeBranches[0].name);
   }, [activeBranches.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules));
+  const visaTypeMissing = form.has_visa && !form.visa_type;
+  const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(form[field], rules)) && !visaTypeMissing;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,12 +69,12 @@ export default function StaffCreateForm() {
       const err = validate(form[field], rules);
       if (err) newErrors[field] = err;
     });
+    if (visaTypeMissing) newErrors.visa_type = t("validation.required");
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
 
     try {
       const payload = {
         full_name:    form.full_name,
-        full_name_ar: form.full_name_ar,
         email:        form.email,
         phone_number: form.phone_number,
         department:   form.department,
@@ -78,6 +82,11 @@ export default function StaffCreateForm() {
         branch:       form.branch,
         joining_date: form.joining_date,
         profile_photo: form.profile_photo,
+        id_document:  form.id_document || undefined,
+        has_visa:     form.has_visa,
+        visa_type:        form.has_visa ? form.visa_type : undefined,
+        visa_number:      form.has_visa ? (form.visa_number || undefined) : undefined,
+        visa_expiry_date: form.has_visa ? (form.visa_expiry_date || undefined) : undefined,
       };
       const created = await createStaff(payload);
       success(
@@ -119,10 +128,7 @@ export default function StaffCreateForm() {
             errors={errors}
             field="profile_photo"
           />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("users.full_name")} field="full_name" placeholder="Fatima Ali" formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
-            <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي" formData={form} errors={errors} updateFormData={set} rules={RULES.full_name_ar} />
-          </div>
+          <InputField label={t("users.full_name")} field="full_name" placeholder="Fatima Ali" formData={form} errors={errors} updateFormData={set} rules={RULES.full_name} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("users.email")} field="email" type="email" placeholder="fatima@pfm.org.my" formData={form} errors={errors} updateFormData={set} rules={RULES.email} />
             <InputField label={t("users.phone")} field="phone_number" placeholder="+60 19-876 5432" formData={form} errors={errors} updateFormData={set} rules={RULES.phone_number} />
@@ -142,6 +148,34 @@ export default function StaffCreateForm() {
             )}
             <InputField label={t("staff.info_joining")} field="joining_date" type="date"                   formData={form} errors={errors} updateFormData={set} rules={RULES.joining_date} />
           </div>
+        </div>
+
+        {/* ── Documents & Visa ── */}
+        <div className="border-b border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("staff.section_visa")} subtitle={t("staff.section_visa_sub")} />
+          <StorageDocumentField
+            label={t("staff.id_document")}
+            folder="staff/documents"
+            accept=".pdf,.jpg,.jpeg,.png"
+            required={false}
+            onUpload={(key) => set("id_document", key)}
+            onRemove={() => set("id_document", null)}
+            errors={errors}
+            field="id_document"
+          />
+          <ToggleInput label={t("staff.has_visa")} field="has_visa" formData={form} errors={errors} updateFormData={set} />
+          {form.has_visa && (
+            <>
+              <InputField label={t("staff.visa_type")} field="visa_type" placeholder="e.g. employment_pass"
+                formData={form} errors={errors} updateFormData={set} rules={[{ required: true }]} />
+              <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                <InputField label={t("staff.visa_number")} field="visa_number" placeholder="e.g. EP-1234567"
+                  required={false} formData={form} errors={errors} updateFormData={set} />
+                <InputField label={t("staff.visa_expiry_date")} field="visa_expiry_date" type="date"
+                  required={false} formData={form} errors={errors} updateFormData={set} />
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex gap-3 p-6">

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdHandshake } from "react-icons/md";
 import useInView from "hooks/useInView";
 import { useGetPartnerships } from "components/features/partnerships/hooks";
+import StorageImage from "components/ui/StorageImage";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -11,10 +12,12 @@ const Card = ({ p }) => (
   <div title={p.name} className="shrink-0 px-2" style={{ width: "180px" }}>
     <div className="flex h-full flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-5 text-center transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-green/20 hover:shadow-sm">
       <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-black text-green shadow-sm">
-        {p.logo?.public_url
-          ? <img src={p.logo.public_url} alt={p.name} className="h-full w-full object-contain p-1" />
-          : getInitials(p.name)
-        }
+        <StorageImage
+          fileKey={p.logo}
+          alt={p.name}
+          className="h-full w-full object-contain p-1"
+          fallback={getInitials(p.name)}
+        />
       </div>
       <p className="text-[10px] font-medium leading-tight text-slate-400">{p.name}</p>
     </div>

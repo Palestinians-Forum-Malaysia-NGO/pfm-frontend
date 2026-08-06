@@ -17,7 +17,6 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
   full_name:    [{ required: true }, { maxLength: 255 }],
-  full_name_ar: [{ required: true }, { maxLength: 255 }],
   email:        [{ required: true }, { email: true }],
   phone_number: [{ required: true }],
   profile_photo: [{ required: true }],
@@ -33,7 +32,7 @@ const RULES = {
 };
 
 const EMPTY = {
-  full_name: "", full_name_ar: "", email: "", phone_number: "", role: "admin", profile_photo: null,
+  full_name: "", email: "", phone_number: "", role: "admin", profile_photo: null,
   department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "monthly" },
@@ -85,7 +84,6 @@ export default function UserCreateForm() {
 
     const payload = {
       full_name:    formData.full_name,
-      full_name_ar: formData.full_name_ar,
       email:        formData.email,
       phone_number: formData.phone_number,
       role:         formData.role,
@@ -145,16 +143,10 @@ export default function UserCreateForm() {
             errors={errors}
             field="profile_photo"
           />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField
-              label={t("users.full_name")} field="full_name" placeholder="John Doe"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
-            />
-            <InputField
-              label={t("users.full_name_ar")} field="full_name_ar" placeholder="جون دو"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name_ar}
-            />
-          </div>
+          <InputField
+            label={t("users.full_name")} field="full_name" placeholder="John Doe"
+            formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.full_name}
+          />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField
               label={t("users.email")} field="email" type="email" placeholder="john@example.com"

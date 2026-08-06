@@ -7,6 +7,7 @@ import {
   MdEmail, MdPhone, MdShield, MdVerified, MdCalendarToday,
   MdWork, MdDomain, MdAccountBox, MdLocationCity, MdUpdate,
   MdAccountBalance, MdAttachMoney, MdPerson, MdFingerprint, MdWarning,
+  MdCardTravel, MdInsertDriveFile, MdFlight, MdNumbers,
 } from "react-icons/md";
 import Button        from "components/ui/buttons/Button";
 import PageHeader    from "components/ui/PageHeader";
@@ -17,6 +18,7 @@ import StaffDeleteModal from "./StaffDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading       from "components/loading/Loading";
 import StorageImage  from "components/ui/StorageImage";
+import StorageFileLink from "components/ui/StorageFileLink";
 import { useGetStaff, useDeleteStaff } from "components/features/staff/hooks";
 import { ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -178,6 +180,31 @@ export default function StaffDetailView() {
             {fi.job_title_ar      && <InfoRow icon={<MdWork className="h-4 w-4" />}          label={t("staff.job_title_ar_label")}  value={fi.job_title_ar} />}
             {fi.salary            && <InfoRow icon={<MdAttachMoney className="h-4 w-4" />}   label={t("staff.info_salary")}         value={`MYR ${fi.salary}`} />}
             {fi.payment_frequency && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.info_pay_freq")}  value={t(`staff.freq_${fi.payment_frequency}`, { defaultValue: fi.payment_frequency })} />}
+          </div>
+        </div>
+      )}
+
+      {/* ── Documents & Visa ── */}
+      {(staff.id_document || staff.has_visa) && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("staff.section_visa")} subtitle={t("staff.section_visa_sub")} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {staff.id_document && (
+              <InfoRow
+                icon={<MdInsertDriveFile className="h-4 w-4" />}
+                label={t("staff.id_document")}
+                value={<StorageFileLink fileKey={staff.id_document} className="text-green hover:underline">{t("common.open")}</StorageFileLink>}
+              />
+            )}
+            {staff.has_visa && staff.visa_type && (
+              <InfoRow icon={<MdFlight className="h-4 w-4" />} label={t("staff.visa_type")} value={staff.visa_type} />
+            )}
+            {staff.has_visa && staff.visa_number && (
+              <InfoRow icon={<MdNumbers className="h-4 w-4" />} label={t("staff.visa_number")} value={staff.visa_number} />
+            )}
+            {staff.has_visa && staff.visa_expiry_date && (
+              <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.visa_expiry_date")} value={fmtDate(staff.visa_expiry_date)} />
+            )}
           </div>
         </div>
       )}

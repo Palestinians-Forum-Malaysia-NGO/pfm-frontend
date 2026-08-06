@@ -8,12 +8,24 @@ import {
 } from "react-icons/md";
 import { useGetProject, useGetProjects } from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
+import { isSafeUrl } from "utils/url";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Loading from "components/loading/Loading";
 import FeedbackForm from "components/public/projects/FeedbackForm";
 import ProjectApplySection from "./ProjectApplySection";
 import useAuth from "components/features/auth/hooks/useAuth";
 import { ROLES } from "components/features/auth/types";
+
+const GalleryPhotoLink = ({ image, caption, title }) => {
+  const { url } = useStorageUrl(image);
+  if (!isSafeUrl(url)) return null;
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="group block overflow-hidden rounded-xl bg-slate-100" title={caption || ""}>
+      <img src={url} alt={caption || title} className="h-40 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-52" />
+    </a>
+  );
+};
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
@@ -209,21 +221,8 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                     <MdPhotoLibrary className="h-5 w-5 text-green" /> {t("projects.gallery_title")}
                   </h2>
                   <div className="grid grid-cols-2 gap-3">
-                    {project.gallery.map((p) => p.image?.public_url && (
-                      <a
-                        key={p.id}
-                        href={p.image.public_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group block overflow-hidden rounded-xl bg-slate-100"
-                        title={p.caption || ""}
-                      >
-                        <img
-                          src={p.image.public_url}
-                          alt={p.caption || t("projects.gallery_title")}
-                          className="h-40 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-52"
-                        />
-                      </a>
+                    {project.gallery.map((p) => (
+                      <GalleryPhotoLink key={p.id} image={p.image} caption={p.caption} title={t("projects.gallery_title")} />
                     ))}
                   </div>
                 </div>

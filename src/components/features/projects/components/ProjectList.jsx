@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
-  MdAdd, MdAssignment, MdCheckCircle, MdCancel,
+  MdAdd, MdAssignment, MdCheckCircle,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
-  MdPublic, MdPublicOff, MdFlag, MdFileDownload,
+  MdPublic, MdPublicOff, MdFlag,
 } from "react-icons/md";
-import { useProjectList, useExportProjects } from "components/features/projects/hooks";
+import { useProjectList } from "components/features/projects/hooks";
 import ProjectDeleteModal from "./ProjectDeleteModal";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Button from "components/ui/buttons/Button";
@@ -16,7 +16,6 @@ import FilterSelect from "components/ui/FilterSelect";
 import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
-import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -37,18 +36,8 @@ export default function ProjectList() {
     handleDeleteConfirm,
     handleTogglePublish,
   } = useProjectList();
-  const { execute: exportProjects, loading: exporting } = useExportProjects();
-  const { error: toastError } = useToast();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-
-  const handleExport = async () => {
-    try {
-      await exportProjects(statusFilter !== "all" ? { status: statusFilter } : {});
-    } catch (err) {
-      toastError(t("projects.export_failed"), err?.message);
-    }
-  };
 
   const STATUS_OPTIONS = [
     { value: "all",       label: t("projects.status_all") },
@@ -173,12 +162,7 @@ export default function ProjectList() {
         title={t("projects.title")}
         subtitle={t("projects.subtitle")}
         actions={
-          <>
-            {isAdmin && (
-              <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("projects.export_report")} loading={exporting} onClick={handleExport} />
-            )}
-            <Button icon={<MdAdd className="h-4 w-4" />} text={t("projects.new_project")} onClick={() => navigate(`${base}/projects/create`)} />
-          </>
+          <Button icon={<MdAdd className="h-4 w-4" />} text={t("projects.new_project")} onClick={() => navigate(`${base}/projects/create`)} />
         }
       />
 

@@ -13,6 +13,7 @@ import Loading      from "components/loading/Loading";
 import { useGetPartnership, useUpdatePartnership } from "components/features/partnerships/hooks";
 import { PARTNERSHIP_TYPES } from "components/features/partnerships/constants/partnershipTypes";
 import { useToast } from "components/ui/toast/ToastContext";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 
 const RULES = {
   name:             [{ required: true }, { maxLength: 200 }],
@@ -22,7 +23,7 @@ const RULES = {
 };
 
 const EMPTY = {
-  name: "", logo: null, logoUrl: null, partnership_type: "", website_url: "", order: "0", is_active: true,
+  name: "", logo: null, partnership_type: "", website_url: "", order: "0", is_active: true,
 };
 
 export default function PartnershipEditForm() {
@@ -38,6 +39,8 @@ export default function PartnershipEditForm() {
   const [formData, setFormData] = useState(EMPTY);
   const [initial, setInitial]   = useState(null);
   const [errors, setErrors]     = useState({});
+  const [logoObj, setLogoObj]   = useState(null);
+  const { url: currentLogoUrl } = useStorageUrl(logoObj);
 
   const updateFormData = (field, value) => setFormData((p) => ({ ...p, [field]: value }));
 
@@ -55,7 +58,6 @@ export default function PartnershipEditForm() {
       const snapshot = {
         name:             data.name             ?? "",
         logo:             data.logo?.file_key    ?? null,
-        logoUrl:          data.logo?.public_url  ?? null,
         partnership_type: data.partnership_type  ?? "",
         website_url:      data.website_url       ?? "",
         order:             data.order != null ? String(data.order) : "0",
@@ -63,6 +65,7 @@ export default function PartnershipEditForm() {
       };
       setFormData(snapshot);
       setInitial(snapshot);
+      setLogoObj(data.logo ?? null);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -120,9 +123,9 @@ export default function PartnershipEditForm() {
             label={t("partnerships.info_logo")}
             folder="partnerships/logos"
             required
-            currentUrl={formData.logoUrl}
-            onUpload={(key) => updateFormData("logo", key)}
-            onRemove={() => updateFormData("logo", null)}
+            currentUrl={currentLogoUrl}
+            onUpload={(key) => { updateFormData("logo", key); setLogoObj(null); }}
+            onRemove={() => { updateFormData("logo", null); setLogoObj(null); }}
             errors={errors}
             field="logo"
           />

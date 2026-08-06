@@ -4,11 +4,13 @@ import { MdPhotoLibrary, MdAdd, MdDeleteOutline, MdEdit, MdCheck, MdClose } from
 import FormHeader from "components/ui/form/FormHeader";
 import Button from "components/ui/buttons/Button";
 import { StorageCoverField } from "components/form";
+import StorageImage from "components/ui/StorageImage";
 import {
   useCreateGalleryPhoto, useUpdateGalleryPhoto, useDeleteGalleryPhoto,
 } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 
 export default function GallerySection({ projectId, initialGallery = [] }) {
   const { t } = useTranslation();
@@ -22,8 +24,9 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
   // Edit state
   const [editingId, setEditingId] = useState(null);
   const [editImageKey, setEditImageKey] = useState(null);
-  const [editCurrentUrl, setEditCurrentUrl] = useState(null);
+  const [editImageObj, setEditImageObj] = useState(null);
   const [editCaption, setEditCaption] = useState("");
+  const { url: editCurrentUrl } = useStorageUrl(editImageObj);
 
   const { execute: createPhoto, loading: creating } = useCreateGalleryPhoto();
   const { execute: updatePhoto, loading: saving   } = useUpdateGalleryPhoto();
@@ -50,14 +53,14 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
   const startEdit = (p) => {
     setEditingId(p.id);
     setEditImageKey(null);
-    setEditCurrentUrl(p.image?.public_url || null);
+    setEditImageObj(p.image || null);
     setEditCaption(p.caption || "");
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditImageKey(null);
-    setEditCurrentUrl(null);
+    setEditImageObj(null);
     setEditCaption("");
   };
 
@@ -130,8 +133,8 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
                   label={t("projects.photo_image_label")}
                   folder="projects/gallery"
                   currentUrl={editCurrentUrl}
-                  onUpload={(key) => { setEditImageKey(key); setEditCurrentUrl(null); }}
-                  onRemove={() => setEditCurrentUrl(null)}
+                  onUpload={(key) => { setEditImageKey(key); setEditImageObj(null); }}
+                  onRemove={() => setEditImageObj(null)}
                 />
                 <input
                   value={editCaption}
@@ -147,10 +150,12 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
             ) : (
               <div key={p.id} className="group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                 <div className="aspect-square w-full">
-                  {p.image?.public_url
-                    ? <img src={p.image.public_url} alt={p.caption || ""} className="h-full w-full object-cover" />
-                    : <div className="flex h-full w-full items-center justify-center text-slate-300"><MdPhotoLibrary className="h-8 w-8" /></div>
-                  }
+                  <StorageImage
+                    fileKey={p.image}
+                    alt={p.caption || ""}
+                    className="h-full w-full object-cover"
+                    fallback={<div className="flex h-full w-full items-center justify-center text-slate-300"><MdPhotoLibrary className="h-8 w-8" /></div>}
+                  />
                 </div>
                 {p.caption && (
                   <p className="truncate px-2 py-1.5 text-xs text-slate-600">{p.caption}</p>

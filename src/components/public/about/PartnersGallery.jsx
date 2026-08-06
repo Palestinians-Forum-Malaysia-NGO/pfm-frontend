@@ -5,6 +5,7 @@ import useInView from "hooks/useInView";
 import { useGetPartnerships } from "components/features/partnerships/hooks";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
+import StorageImage from "components/ui/StorageImage";
 
 const PAGE_SIZE = 4;
 
@@ -55,10 +56,12 @@ const PartnersGallery = () => {
                 }}
               >
                 <div className="flex h-16 w-full items-center justify-center">
-                  {p.logo?.public_url
-                    ? <img src={p.logo.public_url} alt={p.name} className="max-h-16 max-w-full object-contain transition-transform duration-200 ease-in-out group-hover:scale-105" />
-                    : <MdHandshake className="h-8 w-8 text-slate-300" />
-                  }
+                  <StorageImage
+                    fileKey={p.logo}
+                    alt={p.name}
+                    className="max-h-16 max-w-full object-contain transition-transform duration-200 ease-in-out group-hover:scale-105"
+                    fallback={<MdHandshake className="h-8 w-8 text-slate-300" />}
+                  />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-slate-900">{p.name}</p>

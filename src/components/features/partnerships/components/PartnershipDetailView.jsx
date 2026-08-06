@@ -17,6 +17,7 @@ import PartnershipDeleteModal from "./PartnershipDeleteModal";
 import { useGetPartnership, useDeletePartnership, useRestorePartnership } from "components/features/partnerships/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
+import StorageImage from "components/ui/StorageImage";
 import useAuth from "components/features/auth/hooks/useAuth";
 
 const formatDate = (iso) => {
@@ -103,10 +104,12 @@ export default function PartnershipDetailView() {
         <div className="px-6 pb-6">
           <div className="-mt-8 mb-4 flex items-end justify-between">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white ring-4 ring-white shadow-md">
-              {partnership.logo?.public_url
-                ? <img src={partnership.logo.public_url} alt={partnership.name} className="h-full w-full object-cover" />
-                : <MdHandshake className="h-8 w-8 text-slate-300" />
-              }
+              <StorageImage
+                fileKey={partnership.logo}
+                alt={partnership.name}
+                className="h-full w-full object-cover"
+                fallback={<MdHandshake className="h-8 w-8 text-slate-300" />}
+              />
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
               partnership.is_active ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"

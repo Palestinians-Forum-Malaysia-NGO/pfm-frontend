@@ -45,7 +45,6 @@ export default function UserList() {
 
   const [search, setSearch]         = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [roleFilter, setRoleFilter]   = useState("all");
 
   const STATUS_OPTIONS = [
     { value: "all",      label: t("users.status_all") },
@@ -53,18 +52,15 @@ export default function UserList() {
     { value: "inactive", label: t("users.status_inactive") },
   ];
 
-  const ROLE_OPTIONS = [
-    { value: "all",         label: t("users.role_all") },
-    { value: "admin",       label: t("users.role_admin") },
-    { value: "staff",       label: t("users.role_staff") },
-    { value: "beneficiary", label: t("users.role_beneficiary") },
-  ];
+  const hasFilters = search !== "" || statusFilter !== "all";
 
-  const hasFilters = search !== "" || statusFilter !== "all" || roleFilter !== "all";
+  const clearFilters = () => { setSearch(""); setStatusFilter("all"); };
 
-  const clearFilters = () => { setSearch(""); setStatusFilter("all"); setRoleFilter("all"); };
+  // This page manages admin (super administrator) accounts only — staff and
+  // beneficiaries have their own dedicated management pages.
+  const admins = useMemo(() => users.filter((u) => u.role === "admin"), [users]);
 
-  const filtered = useMemo(() => users.filter((u) => {
+  const filtered = useMemo(() => admins.filter((u) => {
     const q = search.toLowerCase();
     const matchSearch = !q
       || (u.full_name ?? "").toLowerCase().includes(q)
@@ -72,22 +68,21 @@ export default function UserList() {
       || (u.email ?? "").toLowerCase().includes(q);
     const matchStatus = statusFilter === "all"
       || (statusFilter === "active" ? u.is_active : !u.is_active);
-    const matchRole = roleFilter === "all" || u.role === roleFilter;
-    return matchSearch && matchStatus && matchRole;
-  }), [users, search, statusFilter, roleFilter]);
+    return matchSearch && matchStatus;
+  }), [admins, search, statusFilter]);
 
   const stats = useMemo(() => ({
-    total:    users.length,
-    active:   users.filter((u) =>  u.is_active).length,
-    inactive: users.filter((u) => !u.is_active).length,
-  }), [users]);
+    total:    admins.length,
+    active:   admins.filter((u) =>  u.is_active).length,
+    inactive: admins.filter((u) => !u.is_active).length,
+  }), [admins]);
 
   const statCards = [
     {
       key: "total", label: t("users.total_users"), value: stats.total,
       icon: <MdPeople className="h-5 w-5" />, color: "text-slate-600", bgColor: "bg-slate-100",
-      active: statusFilter === "all" && roleFilter === "all",
-      onClick: () => { setStatusFilter("all"); setRoleFilter("all"); },
+      active: statusFilter === "all",
+      onClick: () => setStatusFilter("all"),
     },
     {
       key: "active", label: t("users.status_active"), value: stats.active,
@@ -197,7 +192,6 @@ export default function UserList() {
       <div className="mb-4 flex items-center gap-2">
         <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("users.search_placeholder")} className="flex-1" />
         <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
-        <FilterSelect value={roleFilter}   onChange={setRoleFilter}   options={ROLE_OPTIONS}   icon={<MdVerified className="h-3.5 w-3.5" />} />
         {hasFilters && (
           <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("users.clear")} onClick={clearFilters} />
         )}

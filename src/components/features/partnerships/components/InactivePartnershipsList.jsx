@@ -6,6 +6,7 @@ import useLayoutBase from "hooks/useLayoutBase";
 import { useInactivePartnershipList } from "components/features/partnerships/hooks";
 import { PARTNERSHIP_TYPES } from "components/features/partnerships/constants/partnershipTypes";
 import { isSafeUrl } from "utils/url";
+import StorageImage from "components/ui/StorageImage";
 import Button        from "components/ui/buttons/Button";
 import PageHeader     from "components/ui/PageHeader";
 import RowIconButton  from "components/ui/buttons/RowIconButton";
@@ -43,10 +44,12 @@ export default function InactivePartnershipsList() {
       render: (p) => (
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
-            {p.logo?.public_url
-              ? <img src={p.logo.public_url} alt={p.name} className="h-full w-full object-cover" />
-              : <MdHandshake className="h-4 w-4 text-slate-400" />
-            }
+            <StorageImage
+              fileKey={p.logo}
+              alt={p.name}
+              className="h-full w-full object-cover"
+              fallback={<MdHandshake className="h-4 w-4 text-slate-400" />}
+            />
           </div>
           <div className="min-w-0 max-w-[220px] flex-1">
             <p className="truncate font-semibold text-slate-900">{p.name}</p>

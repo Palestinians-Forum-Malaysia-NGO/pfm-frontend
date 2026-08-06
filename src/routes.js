@@ -14,7 +14,6 @@ import NewsPage              from "views/admin/news";
 import BlogsPage             from "views/admin/blogs";
 import EventsPage            from "views/admin/events";
 import SubscribersPage       from "views/admin/newsletter/Subscribers";
-import NotificationsPage     from "views/admin/newsletter/Notifications";
 import PartnershipsPage      from "views/admin/partnerships";
 import BranchesPage          from "views/admin/branches";
 import ApplicationsPage      from "views/admin/applications";
@@ -303,7 +302,7 @@ const routes = [
     ],
   },
   {
-    name: "Users",
+    name: "Super Administrator",
     layout: "/admin",
     path: "users",
     icon: <MdManageAccounts className="h-5 w-5" />,
@@ -311,8 +310,8 @@ const routes = [
     section: "SYSTEM",
     roles: ["admin"],
     children: [
-      { name: "All Users", path: "users" },
-      { name: "Add User",  path: "users/create" },
+      { name: "All Super Administrators", path: "users" },
+      { name: "Add Super Administrator",  path: "users/create" },
     ],
   },
 

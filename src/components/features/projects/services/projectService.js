@@ -3,7 +3,6 @@ import api from "services/app";
 export const projectService = {
   // Projects
   async getAll(params = {})   { const { data } = await api.get("/projects", { params }); return data; },
-  async exportReport(params = {}) { const { data } = await api.get("/projects/export", { params, responseType: "blob" }); return data; },
   async getById(id)           { const { data } = await api.get(`/projects/${id}`); return data; },
   async create(payload)       { const { data } = await api.post("/projects", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/projects/${id}`, payload); return data; },

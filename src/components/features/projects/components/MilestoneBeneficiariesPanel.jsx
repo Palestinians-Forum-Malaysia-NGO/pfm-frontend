@@ -11,9 +11,20 @@ import { useGetBeneficiaries } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
 import useAuth from "components/features/auth/hooks/useAuth";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
+
+const MilestoneProofThumbnail = ({ proof, label }) => {
+  const { url } = useStorageUrl(proof);
+  if (!isSafeUrl(url)) return null;
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="mt-1.5 inline-block">
+      <img src={url} alt={label} className="h-16 w-16 rounded-lg border border-slate-200 object-cover" />
+    </a>
+  );
+};
 
 export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, onCountChange }) {
   const { t } = useTranslation();
@@ -35,8 +46,9 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
 
   const [editingId, setEditingId] = useState(null);
   const [editProofKey, setEditProofKey] = useState(null);
-  const [editCurrentUrl, setEditCurrentUrl] = useState(null);
+  const [editProofObj, setEditProofObj] = useState(null);
   const [editNote, setEditNote] = useState("");
+  const { url: editCurrentUrl } = useStorageUrl(editProofObj);
 
   useEffect(() => { fetchRecords(projectId, milestoneId); }, [projectId, milestoneId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -64,10 +76,10 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
   const startEdit = (r) => {
     setEditingId(r.id);
     setEditProofKey(null);
-    setEditCurrentUrl(r.proof?.public_url || null);
+    setEditProofObj(r.proof || null);
     setEditNote(r.note || "");
   };
-  const cancelEdit = () => { setEditingId(null); setEditProofKey(null); setEditCurrentUrl(null); setEditNote(""); };
+  const cancelEdit = () => { setEditingId(null); setEditProofKey(null); setEditProofObj(null); setEditNote(""); };
 
   const handleSave = async (id) => {
     try {
@@ -145,8 +157,8 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
                     label={t("projects.milestone_proof_label")}
                     folder="projects/milestones"
                     currentUrl={editCurrentUrl}
-                    onUpload={(key) => { setEditProofKey(key); setEditCurrentUrl(null); }}
-                    onRemove={() => setEditCurrentUrl(null)}
+                    onUpload={(key) => { setEditProofKey(key); setEditProofObj(null); }}
+                    onRemove={() => setEditProofObj(null)}
                   />
                   <input
                     value={editNote}
@@ -172,11 +184,7 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
                       ))}
                     </div>
                     {r.note && <p className="mt-0.5 text-sm text-slate-600">{r.note}</p>}
-                    {isSafeUrl(r.proof?.public_url) && (
-                      <a href={r.proof.public_url} target="_blank" rel="noreferrer" className="mt-1.5 inline-block">
-                        <img src={r.proof.public_url} alt={t("projects.milestone_proof_label")} className="h-16 w-16 rounded-lg border border-slate-200 object-cover" />
-                      </a>
-                    )}
+                    <MilestoneProofThumbnail proof={r.proof} label={t("projects.milestone_proof_label")} />
                     <p className="mt-1 text-xs text-slate-400">
                       {r.recorded_by ? `${r.recorded_by} · ` : ""}{fmtDate(r.created_at)}
                     </p>

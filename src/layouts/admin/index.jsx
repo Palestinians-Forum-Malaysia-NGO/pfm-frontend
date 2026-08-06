@@ -52,7 +52,7 @@ import NotificationsPage    from "views/admin/newsletter/Notifications";
 import NotificationDetail   from "views/admin/newsletter/NotificationDetail";
 
 const SUB_ROUTE_NAMES = {
-  "/users/create":      "New User",
+  "/users/create":      "New Super Administrator",
   "/staff/create":      "New Staff",
   "/categories/create":      "New Category",
   "/classifications/create": "New Classification",
@@ -87,7 +87,7 @@ export default function Admin(props) {
     const subMatch = Object.keys(SUB_ROUTE_NAMES).find((k) => path.endsWith(k));
     if (subMatch) { setCurrentRouteName(SUB_ROUTE_NAMES[subMatch]); return; }
     // Edit pages
-    if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRouteName("Edit User");   return; }
+    if (path.match(/\/users\/\d+\/edit$/))   { setCurrentRouteName("Edit Super Administrator");   return; }
     if (path.match(/\/beneficiaries\/[^/]+\/edit$/)) { setCurrentRouteName("Edit Beneficiary"); return; }
     if (path.match(/\/staff\/[^/]+\/edit$/))         { setCurrentRouteName("Edit Staff");      return; }
     if (path.match(/\/categories\/[^/]+\/edit$/))       { setCurrentRouteName("Edit Category");       return; }
@@ -100,7 +100,7 @@ export default function Admin(props) {
     if (path.match(/\/blogs\/[^/]+\/edit$/))           { setCurrentRouteName("Edit Blog");              return; }
     if (path.match(/\/events\/[^/]+\/edit$/))          { setCurrentRouteName("Edit Event");             return; }
     // Detail pages
-    if (path.match(/\/users\/\d+$/))                   { setCurrentRouteName("User Detail");          return; }
+    if (path.match(/\/users\/\d+$/))                   { setCurrentRouteName("Super Administrator Detail");          return; }
     if (path.match(/\/beneficiaries\/[^/]+$/))         { setCurrentRouteName("Beneficiary Detail");   return; }
     if (path.match(/\/staff\/[^/]+$/))                   { setCurrentRouteName("Staff Detail");         return; }
     if (path.match(/\/categories\/[^/]+$/))            { setCurrentRouteName("Category Detail");      return; }

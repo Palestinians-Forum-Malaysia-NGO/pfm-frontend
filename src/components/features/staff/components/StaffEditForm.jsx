@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdArrowBack, MdVerified, MdEdit, MdBadge, MdPerson,
-  MdAccountBalance, MdAttachMoney,
+  MdAccountBalance, MdAttachMoney, MdCardTravel,
 } from "react-icons/md";
 import PageHeader  from "components/ui/PageHeader";
-import { InputField, SelectField, ToggleInput, StorageImageField, validate } from "components/form";
+import { InputField, SelectField, ToggleInput, StorageImageField, StorageDocumentField, validate } from "components/form";
 import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -20,16 +20,13 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const USER_RULES = {
   full_name:    [{ required: true }, { maxLength: 255 }],
-  full_name_ar: [{ required: true }, { maxLength: 255 }],
   email:        [{ required: true }, { email: true }],
   phone_number: [{ required: true }],
   profile_photo: [{ required: true }],
 };
 const STAFF_RULES = {
   department:    [{ required: true }],
-  department_ar: [{ required: true }],
   position:      [{ required: true }],
-  position_ar:   [{ required: true }],
   branch:        [{ required: true }],
   joining_date:  [{ required: true }],
 };
@@ -40,7 +37,6 @@ const BANK_RULES = {
 };
 const FIN_RULES = {
   job_title:         [{ required: true }],
-  job_title_ar:      [{ required: true }],
   salary:            [{ required: true }],
   payment_frequency: [{ required: true }],
 };
@@ -51,10 +47,13 @@ const runRules = (data, rules) =>
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-const EMPTY_USER  = { full_name: "", full_name_ar: "", email: "", phone_number: "", is_active: true, profile_photo: null };
+const EMPTY_USER  = { full_name: "", email: "", phone_number: "", is_active: true, profile_photo: null };
 const EMPTY_BANK  = { bank_name: "", account_number: "", account_holder_name: "" };
-const EMPTY_FIN   = { job_title: "", job_title_ar: "", salary: "", payment_frequency: "" };
-const EMPTY_STAFF = { department: "", department_ar: "", position: "", position_ar: "", branch: "", joining_date: "" };
+const EMPTY_FIN   = { job_title: "", salary: "", payment_frequency: "" };
+const EMPTY_STAFF = {
+  department: "", position: "", branch: "", joining_date: "",
+  id_document: null, has_visa: false, visa_type: "", visa_number: "", visa_expiry_date: "",
+};
 
 export default function StaffEditForm() {
   const { id }   = useParams();
@@ -75,6 +74,7 @@ export default function StaffEditForm() {
   const [errors,    setErrors]    = useState({});
   const [photoKey,  setPhotoKey]  = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
+  const { url: currentIdDocUrl } = useStorageUrl(staffForm.id_document, { forcePresigned: true });
 
   const activeBranches = branches.filter((b) => b.is_active);
   const showBranchPicker = activeBranches.length !== 1;
@@ -102,7 +102,8 @@ export default function StaffEditForm() {
     runRules(userForm, USER_RULES) ||
     runRules(staffForm, STAFF_RULES) ||
     runRules(bankForm, BANK_RULES) ||
-    runRules(finForm, FIN_RULES);
+    runRules(finForm, FIN_RULES) ||
+    (staffForm.has_visa && !staffForm.visa_type);
 
   useEffect(() => {
     fetchStaff(id).then((data) => {
@@ -113,7 +114,6 @@ export default function StaffEditForm() {
 
       const userSnap  = {
         full_name:    u.full_name    ?? "",
-        full_name_ar: u.full_name_ar ?? "",
         email:        u.email        ?? "",
         phone_number: u.phone_number ?? "",
         is_active:    u.is_active    ?? true,
@@ -126,17 +126,19 @@ export default function StaffEditForm() {
       };
       const finSnap   = {
         job_title:         fi.job_title         ?? "",
-        job_title_ar:      fi.job_title_ar      ?? "",
         salary:            fi.salary            ?? "",
         payment_frequency: fi.payment_frequency ?? "",
       };
       const staffSnap = {
         department:   data.department   ?? "",
-        department_ar: data.department_ar ?? "",
         position:     data.position     ?? "",
-        position_ar:  data.position_ar  ?? "",
         branch:       data.branch       ?? "",
         joining_date: data.joining_date ? data.joining_date.slice(0, 10) : "",
+        id_document:  data.id_document  ?? null,
+        has_visa:     data.has_visa     ?? false,
+        visa_type:    data.visa_type    ?? "",
+        visa_number:  data.visa_number  ?? "",
+        visa_expiry_date: data.visa_expiry_date ? data.visa_expiry_date.slice(0, 10) : "",
       };
 
       setUserForm(userSnap);
@@ -166,6 +168,7 @@ export default function StaffEditForm() {
         if (err) newErrors[field] = err;
       });
     });
+    if (staffForm.has_visa && !staffForm.visa_type) newErrors.visa_type = t("validation.required");
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
     setErrors({});
 
@@ -173,7 +176,6 @@ export default function StaffEditForm() {
       const payload = {
         user: {
           full_name:    userForm.full_name,
-          full_name_ar: userForm.full_name_ar,
           email:        userForm.email,
           phone_number: userForm.phone_number,
           is_active:    userForm.is_active,
@@ -185,17 +187,19 @@ export default function StaffEditForm() {
           },
           financial_information: {
             job_title:         finForm.job_title,
-            job_title_ar:      finForm.job_title_ar,
             salary:            finForm.salary,
             payment_frequency: finForm.payment_frequency,
           },
         },
         department:    staffForm.department,
-        department_ar: staffForm.department_ar,
         position:      staffForm.position,
-        position_ar:   staffForm.position_ar,
         branch:        staffForm.branch,
         joining_date:  staffForm.joining_date,
+        id_document:   staffForm.id_document || undefined,
+        has_visa:      staffForm.has_visa,
+        visa_type:        staffForm.has_visa ? staffForm.visa_type : undefined,
+        visa_number:      staffForm.has_visa ? (staffForm.visa_number || undefined) : undefined,
+        visa_expiry_date: staffForm.has_visa ? (staffForm.visa_expiry_date || undefined) : undefined,
       };
       await updateStaff(id, payload);
       success(t("staff.toast_updated"), `${userForm.full_name} ${t("staff.toast_updated_sub")}`);
@@ -287,10 +291,7 @@ export default function StaffEditForm() {
               errors={errors}
               field="profile_photo"
             />
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-              <InputField label={t("users.full_name")}    field="full_name"    placeholder="Fatima Ali"        formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
-              <InputField label={t("staff.full_name_ar_label")} field="full_name_ar" placeholder="فاطمة علي"         formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name_ar} />
-            </div>
+            <InputField label={t("users.full_name")}    field="full_name"    placeholder="Fatima Ali"        formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.full_name} />
             <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
               <InputField label={t("users.email")} field="email"        type="email" placeholder="fatima@pfm.org.my" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.email} />
               <InputField label={t("users.phone")} field="phone_number" placeholder="+60 19-876 5432" formData={userForm} errors={errors} updateFormData={setU} rules={USER_RULES.phone_number} />
@@ -303,11 +304,7 @@ export default function StaffEditForm() {
             <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("staff.section_employment")} subtitle={t("staff.section_employment_sub")} />
             <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
               <InputField label={t("staff.info_department")}      field="department"    placeholder="Programs" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.department} />
-              <InputField label={t("staff.department_ar_label")}  field="department_ar" placeholder="البرامج"  formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.department_ar} />
-            </div>
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
               <InputField label={t("staff.info_position")}     field="position"    placeholder="Program Manager" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position} />
-              <InputField label={t("staff.position_ar_label")} field="position_ar" placeholder="مدير البرامج"    formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.position_ar} />
             </div>
             <div className={showBranchPicker ? "grid grid-cols-1 gap-x-5 sm:grid-cols-2" : ""}>
               {showBranchPicker && (
@@ -315,6 +312,35 @@ export default function StaffEditForm() {
               )}
               <InputField label={t("staff.info_joining")} field="joining_date" type="date" formData={staffForm} errors={errors} updateFormData={setS} rules={STAFF_RULES.joining_date} />
             </div>
+          </div>
+
+          {/* ── Documents & Visa ── */}
+          <div className="border-b border-slate-200 bg-white p-6">
+            <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("staff.section_visa")} subtitle={t("staff.section_visa_sub")} />
+            <StorageDocumentField
+              label={t("staff.id_document")}
+              folder="staff/documents"
+              accept=".pdf,.jpg,.jpeg,.png"
+              required={false}
+              currentUrl={currentIdDocUrl}
+              onUpload={(key) => setS("id_document", key)}
+              onRemove={() => setS("id_document", null)}
+              errors={errors}
+              field="id_document"
+            />
+            <ToggleInput label={t("staff.has_visa")} field="has_visa" formData={staffForm} errors={errors} updateFormData={setS} />
+            {staffForm.has_visa && (
+              <>
+                <InputField label={t("staff.visa_type")} field="visa_type" placeholder="e.g. employment_pass"
+                  formData={staffForm} errors={errors} updateFormData={setS} rules={[{ required: true }]} />
+                <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                  <InputField label={t("staff.visa_number")} field="visa_number" placeholder="e.g. EP-1234567"
+                    required={false} formData={staffForm} errors={errors} updateFormData={setS} />
+                  <InputField label={t("staff.visa_expiry_date")} field="visa_expiry_date" type="date"
+                    required={false} formData={staffForm} errors={errors} updateFormData={setS} />
+                </div>
+              </>
+            )}
           </div>
 
           {/* ── Banking Information ── */}
@@ -330,10 +356,7 @@ export default function StaffEditForm() {
           {/* ── Financial Information ── */}
           <div className="border-b border-slate-200 bg-white p-6">
             <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("staff.section_financial")} subtitle={t("staff.section_financial_sub")} />
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-              <InputField label={t("staff.info_job_title")}     field="job_title"    placeholder="e.g. Senior Officer"  formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.job_title} />
-              <InputField label={t("staff.job_title_ar_label")} field="job_title_ar" placeholder="مثلاً: كبير الموظفين" formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.job_title_ar} />
-            </div>
+            <InputField label={t("staff.info_job_title")}     field="job_title"    placeholder="e.g. Senior Officer"  formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.job_title} />
             <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
               <InputField  label={t("staff.info_salary")}       field="salary"            placeholder="e.g. 3500.00" formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.salary} />
               <SelectField label={t("staff.info_pay_freq")} field="payment_frequency" options={PAYMENT_FREQUENCY_OPTIONS} formData={finForm} errors={errors} updateFormData={setF} rules={FIN_RULES.payment_frequency} />
