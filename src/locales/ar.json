@@ -2314,6 +2314,7 @@
     "no_applications_yet": "لا توجد طلبات بعد.",
     "col_project": "المشروع",
     "col_date": "التاريخ",
+    "col_project_status": "حالة المشروع",
     "col_status": "الحالة",
     "requests_page_title": "طلبات المساعدة الخاصة بي",
     "requests_page_desc": "إرسال وتتبع وإدارة طلبات المساعدة الإنسانية الخاصة بك.",

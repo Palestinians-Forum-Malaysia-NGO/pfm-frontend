@@ -2314,6 +2314,7 @@
     "no_applications_yet": "No applications yet.",
     "col_project": "Project",
     "col_date": "Date",
+    "col_project_status": "Project Status",
     "col_status": "Status",
     "requests_page_title": "My Aid Requests",
     "requests_page_desc": "Submit, track, and manage your humanitarian aid requests.",

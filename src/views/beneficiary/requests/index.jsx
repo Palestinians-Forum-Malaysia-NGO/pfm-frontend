@@ -7,9 +7,7 @@ import AlertBanner from "components/ui/AlertBanner";
 import Button from "components/ui/buttons/Button";
 import { useGetApplications } from "components/features/applications/hooks";
 import { APPLICATION_STATUS_BADGE } from "components/features/applications/constants/applications";
-
-const fmtDate = (iso) =>
-  iso ? new Date(iso).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
+import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 
 const BeneficiaryRequests = () => {
   const { t } = useTranslation();
@@ -48,7 +46,7 @@ const BeneficiaryRequests = () => {
                 <tr className="border-b border-slate-100">
                   {[
                     t("beneficiary_dashboard.col_project"),
-                    t("beneficiary_dashboard.col_date"),
+                    t("beneficiary_dashboard.col_project_status"),
                     t("beneficiary_dashboard.col_status"),
                   ].map((col) => (
                     <th key={col} className="pb-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -65,7 +63,13 @@ const BeneficiaryRequests = () => {
                     className="cursor-pointer transition-colors duration-150 hover:bg-slate-50/60"
                   >
                     <td className="py-3.5 pr-4 text-sm font-medium text-slate-700">{app.project?.title ?? "—"}</td>
-                    <td className="py-3.5 pr-4 text-sm text-slate-400">{fmtDate(app.created_at)}</td>
+                    <td className="py-3.5 pr-4">
+                      {app.project?.status ? (
+                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${PROJECT_STATUS_BADGE[app.project.status] ?? "bg-slate-100 text-slate-500"}`}>
+                          {t(`projects.status_${app.project.status}`, { defaultValue: app.project.status })}
+                        </span>
+                      ) : "—"}
+                    </td>
                     <td className="py-3.5">
                       <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${APPLICATION_STATUS_BADGE[app.status] ?? "bg-slate-100 text-slate-500"}`}>
                         {t(`applications.status_${app.status}`, { defaultValue: app.status })}
