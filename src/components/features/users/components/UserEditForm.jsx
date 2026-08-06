@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdVerified, MdEdit, MdPerson,
-  MdBusiness, MdAccountBalance, MdAttachMoney,
+  MdAccountBalance, MdAttachMoney,
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
 import PageHeader  from "components/ui/PageHeader";
@@ -29,10 +29,6 @@ const RULES = {
   email:        [{ required: true }, { email: true }],
   phone_number: [{ required: true }],
   profile_photo: [{ required: true }],
-  department:   [{ required: true }],
-  job_title:    [{ required: true }],
-  branch:       [{ required: true }],
-  joining_date: [{ required: true }],
   "banking_information.bank_name":           [{ required: true }],
   "banking_information.account_holder_name": [{ required: true }],
   "banking_information.account_number":      [{ required: true }],
@@ -43,8 +39,9 @@ const RULES = {
 
 const EMPTY = {
   full_name: "", email: "", phone_number: "",
-  role: "admin", is_active: true, profile_photo: null,
-  department: "", job_title: "", branch: "", joining_date: "",
+  role: "admin", is_active: true,
+  is_2fa_enabled: false, is_2fa_verified: false,
+  profile_photo: null,
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "" },
 };
@@ -92,10 +89,6 @@ export default function UserEditForm() {
 
   const isDirty = !initial || JSON.stringify(formData) !== JSON.stringify(initial);
 
-  const hasErrors = Object.entries(RULES).some(
-    ([field, rules]) => !!validate(getNestedValue(formData, field), rules)
-  );
-
   useEffect(() => {
     fetchUser(id).then((data) => {
       if (!data) return;
@@ -105,11 +98,9 @@ export default function UserEditForm() {
         phone_number: data.phone_number ?? "",
         role:         data.role         ?? "admin",
         is_active:    data.is_active    ?? true,
+        is_2fa_enabled:  data.is_2fa_enabled  ?? false,
+        is_2fa_verified: data.is_2fa_verified ?? false,
         profile_photo: data.profile_photo ?? null,
-        department:   data.department   ?? "",
-        job_title:    data.job_title    ?? "",
-        branch:       data.branch       ?? "",
-        joining_date: data.joining_date ?? "",
         banking_information: {
           bank_name:           data.banking_information?.bank_name           ?? "",
           account_number:      data.banking_information?.account_number      ?? "",
@@ -146,11 +137,9 @@ export default function UserEditForm() {
       phone_number: formData.phone_number,
       role:         formData.role,
       is_active:    formData.is_active,
+      is_2fa_enabled:  formData.is_2fa_enabled,
+      is_2fa_verified: formData.is_2fa_verified,
       profile_photo: formData.profile_photo,
-      department:   formData.department,
-      job_title:    formData.job_title,
-      branch:       formData.branch,
-      joining_date: formData.joining_date,
       banking_information: {
         bank_name:           bi.bank_name,
         account_number:      bi.account_number,
@@ -194,7 +183,7 @@ export default function UserEditForm() {
         </div>
         <div className="px-6 pb-5">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[formData.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[formData.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
               {currentPhotoUrl ? (
                 <img src={currentPhotoUrl} alt={formData.full_name} className="h-full w-full object-cover" />
               ) : (
@@ -253,32 +242,8 @@ export default function UserEditForm() {
                 formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.phone_number}
               />
             </div>
-            <ToggleInput label={t("users.account_active")} field="is_active" formData={formData} errors={errors} updateFormData={updateFormData} />
-          </div>
-
-          {/* ── Employment Details ── */}
-          <div className="border-b border-slate-200 bg-white p-6">
-            <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.employment_sub")} />
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-              <InputField
-                label={t("users.department")} field="department" placeholder="e.g. Operations"
-                formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.department}
-              />
-              <InputField
-                label={t("users.job_title")} field="job_title" placeholder="e.g. Project Manager"
-                formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.job_title}
-              />
-            </div>
-            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-              <InputField
-                label={t("users.branch")} field="branch" placeholder="e.g. Kuala Lumpur"
-                formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.branch}
-              />
-              <InputField
-                label={t("users.joining_date")} field="joining_date" type="date"
-                formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.joining_date}
-              />
-            </div>
+            <ToggleInput label={t("users.2fa_enabled")} field="is_2fa_enabled" formData={formData} errors={errors} updateFormData={updateFormData} />
+            <ToggleInput label={t("users.2fa_verified")} field="is_2fa_verified" formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
 
           {/* ── Banking Information ── */}
@@ -325,7 +290,7 @@ export default function UserEditForm() {
             <Button
               type="submit" variant="primary" text={t("users.save_changes")}
               loading={saving}
-              disabled={hasErrors || !isDirty || saving}
+              disabled={!isDirty || saving}
               className="flex-1"
             />
           </div>

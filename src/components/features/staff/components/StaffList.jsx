@@ -78,7 +78,7 @@ export default function StaffList() {
       icon: <MdBadge className="h-3.5 w-3.5" />,
       render: (s) => (
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-50 text-xs font-bold text-blue-600">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-xs font-bold text-blue-600">
             {s.user?.profile_photo
               ? <StorageImage fileKey={s.user.profile_photo} alt={s.user?.full_name} className="h-full w-full object-cover" fallback={getInitials(s.user?.full_name)} />
               : getInitials(s.user?.full_name)

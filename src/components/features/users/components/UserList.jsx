@@ -105,7 +105,7 @@ export default function UserList() {
       icon: <MdPerson className="h-3.5 w-3.5" />,
       render: (user) => (
         <div className="flex items-center gap-3">
-          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl text-xs font-bold ${ROLE_AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
+          <div className={`relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-xs font-bold ${ROLE_AVATAR_BG[user.role] ?? "bg-slate-100 text-slate-500"}`}>
             {user.profile_photo
               ? <StorageImage fileKey={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" fallback={getInitials(user.full_name)} />
               : getInitials(user.full_name)

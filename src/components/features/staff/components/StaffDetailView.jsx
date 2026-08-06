@@ -97,9 +97,9 @@ export default function StaffDetailView() {
         </div>
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[u.role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[u.role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
               {u.profile_photo
-                ? <StorageImage fileKey={u.profile_photo} alt={u.full_name} className="h-full w-full rounded-2xl object-cover" fallback={getInitials(u.full_name)} />
+                ? <StorageImage fileKey={u.profile_photo} alt={u.full_name} className="h-full w-full rounded-full object-cover" fallback={getInitials(u.full_name)} />
                 : getInitials(u.full_name)
               }
             </div>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  MdArrowBack, MdPersonAdd, MdPerson, MdBusiness,
+  MdArrowBack, MdPersonAdd, MdPerson,
   MdAccountBalance, MdAttachMoney,
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
@@ -20,10 +20,6 @@ const RULES = {
   email:        [{ required: true }, { email: true }],
   phone_number: [{ required: true }],
   profile_photo: [{ required: true }],
-  department:   [{ required: true }],
-  job_title:    [{ required: true }],
-  branch:       [{ required: true }],
-  joining_date: [{ required: true }],
   "banking_information.bank_name":           [{ required: true }],
   "banking_information.account_holder_name": [{ required: true }],
   "banking_information.account_number":      [{ required: true }],
@@ -33,7 +29,6 @@ const RULES = {
 
 const EMPTY = {
   full_name: "", email: "", phone_number: "", role: "admin", profile_photo: null,
-  department: "", job_title: "", branch: "", joining_date: "",
   banking_information:  { bank_name: "", account_number: "", account_holder_name: "" },
   financial_information: { job_title: "", salary: "", payment_frequency: "monthly" },
 };
@@ -87,10 +82,6 @@ export default function UserCreateForm() {
       email:        formData.email,
       phone_number: formData.phone_number,
       role:         formData.role,
-      department:   formData.department,
-      job_title:    formData.job_title,
-      branch:       formData.branch,
-      joining_date: formData.joining_date,
       profile_photo: formData.profile_photo,
       banking_information: {
         bank_name:           bi.bank_name,
@@ -155,31 +146,6 @@ export default function UserCreateForm() {
             <InputField
               label={t("users.phone")} field="phone_number" type="tel" placeholder="+60 12-345 6789"
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.phone_number}
-            />
-          </div>
-        </div>
-
-        {/* ── Employment Details ── */}
-        <div className="border-b border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.employment_sub")} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField
-              label={t("users.department")} field="department" placeholder="e.g. Operations"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.department}
-            />
-            <InputField
-              label={t("users.job_title")} field="job_title" placeholder="e.g. Project Manager"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.job_title}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField
-              label={t("users.branch")} field="branch" placeholder="e.g. Kuala Lumpur"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.branch}
-            />
-            <InputField
-              label={t("users.joining_date")} field="joining_date" type="date"
-              formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.joining_date}
             />
           </div>
         </div>

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   MdEmail, MdPhone, MdShield, MdCalendarToday,
   MdVerified, MdSecurity, MdUpdate, MdFingerprint,
-  MdAccountBalance, MdAttachMoney, MdBusiness, MdWork,
+  MdAccountBalance, MdAttachMoney, MdWork,
   MdWarning,
 } from "react-icons/md";
 import { MdPerson } from "react-icons/md";
@@ -65,7 +65,7 @@ const UserProfileCard = ({ user }) => {
         </div>
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[user.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[user.role] ?? "from-slate-100 to-slate-50 text-slate-600"}`}>
               {user.profile_photo
                 ? <StorageImage fileKey={user.profile_photo} alt={user.full_name} className="h-full w-full object-cover" fallback={getInitials(user.full_name)} />
                 : getInitials(user.full_name)
@@ -113,19 +113,6 @@ const UserProfileCard = ({ user }) => {
           {updatedAt && <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(updatedAt)} />}
         </div>
       </div>
-
-      {/* ── Employment Details ── */}
-      {(user.department || user.job_title || user.branch || user.joining_date) && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBusiness className="h-5 w-5" />} title={t("users.employment_details")} subtitle={t("users.info_employment_sub")} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {user.department   && <InfoRow icon={<MdBusiness className="h-4 w-4" />}       label={t("users.department")}   value={user.department} />}
-            {user.job_title    && <InfoRow icon={<MdWork className="h-4 w-4" />}            label={t("users.job_title")}    value={user.job_title} />}
-            {user.branch       && <InfoRow icon={<MdBusiness className="h-4 w-4" />}        label={t("users.branch")}       value={user.branch} />}
-            {user.joining_date && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />}  label={t("users.joining_date")} value={fmtDate(user.joining_date)} />}
-          </div>
-        </div>
-      )}
 
       {/* ── Banking Information ── */}
       {hasBanking && (

@@ -41,9 +41,6 @@ const FIN_RULES = {
   payment_frequency: [{ required: true }],
 };
 
-const runRules = (data, rules) =>
-  Object.entries(rules).some(([field, r]) => !!validate(data[field], r));
-
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
@@ -97,13 +94,6 @@ export default function StaffEditForm() {
     JSON.stringify(finForm)   !== JSON.stringify(initial.fin)   ||
     JSON.stringify(staffForm) !== JSON.stringify(initial.staff)
   );
-
-  const hasErrors =
-    runRules(userForm, USER_RULES) ||
-    runRules(staffForm, STAFF_RULES) ||
-    runRules(bankForm, BANK_RULES) ||
-    runRules(finForm, FIN_RULES) ||
-    (staffForm.has_visa && !staffForm.visa_type);
 
   useEffect(() => {
     fetchStaff(id).then((data) => {
@@ -241,7 +231,7 @@ export default function StaffEditForm() {
         </div>
         <div className="px-6 pb-5">
           <div className="-mt-10 mb-4 flex items-end justify-between">
-            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
+            <div className={`flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br text-2xl font-black ring-4 ring-white shadow-md ${AVATAR_BG[role] ?? "from-blue-100 to-blue-50 text-blue-600"}`}>
               {currentPhotoUrl ? (
                 <img src={currentPhotoUrl} alt={userForm.full_name} className="h-full w-full object-cover" />
               ) : (
@@ -370,7 +360,7 @@ export default function StaffEditForm() {
               variant="primary"
               text={t("staff.save_changes")}
               loading={saving}
-              disabled={hasErrors || !isDirty || saving}
+              disabled={!isDirty || saving}
               className="flex-1"
             />
           </div>
