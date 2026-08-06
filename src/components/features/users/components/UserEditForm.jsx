@@ -72,10 +72,9 @@ export default function UserEditForm() {
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
 
   const PAYMENT_FREQUENCY_OPTIONS = [
-    { value: "monthly",   label: t("users.freq_monthly") },
-    { value: "weekly",    label: t("users.freq_weekly") },
-    { value: "bi-weekly", label: t("users.freq_biweekly") },
-    { value: "annually",  label: t("users.freq_annually") },
+    { value: "monthly",  label: t("users.freq_monthly") },
+    { value: "weekly",   label: t("users.freq_weekly") },
+    { value: "biweekly", label: t("users.freq_biweekly") },
   ];
 
   const updateFormData = (field, value) => {

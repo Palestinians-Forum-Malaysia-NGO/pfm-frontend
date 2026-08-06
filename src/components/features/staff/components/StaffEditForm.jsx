@@ -205,11 +205,10 @@ export default function StaffEditForm() {
   const role = staff?.user?.role ?? "stuff";
 
   const PAYMENT_FREQUENCY_OPTIONS = [
-    { value: "",           label: "—" },
-    { value: "monthly",   label: t("staff.freq_monthly") },
-    { value: "weekly",    label: t("staff.freq_weekly") },
-    { value: "bi-weekly", label: t("staff.freq_biweekly") },
-    { value: "annually",  label: t("staff.freq_annually") },
+    { value: "",          label: "—" },
+    { value: "monthly",  label: t("staff.freq_monthly") },
+    { value: "weekly",   label: t("staff.freq_weekly") },
+    { value: "biweekly", label: t("staff.freq_biweekly") },
   ];
 
   return (

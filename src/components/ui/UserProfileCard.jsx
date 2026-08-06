@@ -32,7 +32,7 @@ const UserProfileCard = ({ user }) => {
   const fmtFrequency = (f) => {
     const map = {
       monthly: t("users.freq_monthly"), weekly: t("users.freq_weekly"),
-      "bi-weekly": t("users.freq_biweekly"), annually: t("users.freq_annually"),
+      biweekly: t("users.freq_biweekly"),
     };
     return map[f] ?? f ?? "—";
   };
