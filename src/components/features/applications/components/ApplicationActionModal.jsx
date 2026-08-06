@@ -13,6 +13,7 @@ const ApplicationActionModal = ({ open, action, application, onClose, onConfirm,
 
   if (!application) return null;
   const isApprove = action === "approve";
+  const canConfirm = isApprove || note.trim().length >= 10;
 
   return (
     <Modal
@@ -32,6 +33,7 @@ const ApplicationActionModal = ({ open, action, application, onClose, onConfirm,
             variant={isApprove ? "primary" : "danger"}
             text={isApprove ? t("applications.approve_btn") : t("applications.reject_btn")}
             loading={loading}
+            disabled={!canConfirm}
             onClick={() => onConfirm(note)}
             className="flex-1"
           />
@@ -42,15 +44,16 @@ const ApplicationActionModal = ({ open, action, application, onClose, onConfirm,
         {isApprove ? t("applications.approve_confirm") : t("applications.reject_confirm")}
       </p>
       <TextareaField
-        label={t("applications.note_label")}
+        label={isApprove ? t("applications.note_label") : t("applications.reject_reason_label")}
         field="note"
-        required={false}
+        required={!isApprove}
         rows={3}
-        placeholder={t("applications.note_placeholder")}
+        placeholder={isApprove ? t("applications.note_placeholder") : t("applications.reject_reason_placeholder")}
         formData={{ note }}
         errors={{}}
         updateFormData={(_, value) => setNote(value)}
       />
+      {!isApprove && <p className="-mt-3 text-xs text-slate-400">{t("applications.reject_reason_hint")}</p>}
     </Modal>
   );
 };

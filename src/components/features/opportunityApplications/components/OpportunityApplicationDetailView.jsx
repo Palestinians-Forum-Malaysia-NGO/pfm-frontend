@@ -194,8 +194,10 @@ export default function OpportunityApplicationDetailView() {
         )}
         <TextareaField
           label={t("opportunityApplications.info_note")} field="note" rows={3} required={false}
-          formData={{ note }} errors={{}} updateFormData={(_field, value) => setNote(value)}
+          formData={{ note }} errors={{}}
+          updateFormData={(_field, value) => setNote(value)}
         />
+        <p className="-mt-3 mb-4 text-xs text-slate-400">{t("opportunityApplications.reject_reason_hint")}</p>
         <div className="mt-3 flex gap-2">
           <Button
             variant="primary" icon={<MdCheckCircle className="h-4 w-4" />}
@@ -206,7 +208,7 @@ export default function OpportunityApplicationDetailView() {
           <Button
             variant="danger" icon={<MdCancel className="h-4 w-4" />}
             text={t("opportunityApplications.reject")} loading={rejecting}
-            disabled={application.status === "rejected"}
+            disabled={application.status === "rejected" || note.trim().length < 10}
             onClick={handleReject}
           />
         </div>
