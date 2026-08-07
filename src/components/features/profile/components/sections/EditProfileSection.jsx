@@ -15,6 +15,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const { execute: updatePhoto, loading: savingPhoto } = useUpdateProfile();
   const { success, error: toastError } = useToast();
   const isBeneficiary = profile?.role === "beneficiary";
+  const canEdit2FA = profile?.role === "admin";
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",  label: t("users.freq_monthly") },
@@ -74,8 +75,12 @@ const EditProfileSection = ({ profile, onSaved }) => {
         full_name:        formData.full_name,
         phone_number:     formData.phone_number,
         whatsapp_enabled: formData.whatsapp_enabled,
-        is_2fa_enabled:   isBeneficiary ? false : formData.is_2fa_enabled,
       };
+      if (isBeneficiary) {
+        payload.is_2fa_enabled = false;
+      } else if (canEdit2FA) {
+        payload.is_2fa_enabled = formData.is_2fa_enabled;
+      }
       if (!isBeneficiary) {
         payload.banking_information = { ...formData.banking_information };
         payload.financial_information = { ...formData.financial_information };
@@ -161,7 +166,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
               label={t("profile.whatsapp_enabled")} field="whatsapp_enabled"
               formData={formData} updateFormData={updateFormData} errors={formErrors}
             />
-            {!isBeneficiary && (
+            {canEdit2FA && (
               <ToggleInput
                 label={t("profile.two_factor_auth")} field="is_2fa_enabled"
                 formData={formData} updateFormData={updateFormData} errors={formErrors}

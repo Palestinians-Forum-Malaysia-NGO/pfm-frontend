@@ -20,6 +20,7 @@ import { useGetBeneficiary, useUpdateBeneficiary, useGetClassifications } from "
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const RULES = {
   full_name: [{ required: true }, { maxLength: 255 }],
@@ -36,6 +37,8 @@ export default function BeneficiaryEditForm() {
   const { execute: updateBeneficiary, loading: saving, error: saveError } = useUpdateBeneficiary();
   const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [userForm, setUserForm] = useState({ full_name: "", email: "", phone_number: "", is_active: true, profile_photo: null });
   const [photoKey, setPhotoKey] = useState(null);
@@ -297,7 +300,9 @@ export default function BeneficiaryEditForm() {
             <InputField label={t("beneficiaries.email")}     field="email"     type="email" placeholder="ahmad@email.com" formData={userForm} errors={errors} updateFormData={setU} rules={RULES.email} />
           </div>
           <InputField  label={t("beneficiaries.phone")} field="phone_number" placeholder="+60 12-345 6789" required={false} formData={userForm} errors={errors} updateFormData={setU} />
-          <ToggleInput label={t("beneficiaries.account_active")} field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
+          {isAdmin && (
+            <ToggleInput label={t("beneficiaries.account_active")} field="is_active" formData={userForm} errors={errors} updateFormData={setU} />
+          )}
         </div>
 
         {/* ── Classification ── */}
