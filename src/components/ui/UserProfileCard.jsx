@@ -109,7 +109,9 @@ const UserProfileCard = ({ user }) => {
           <InfoRow icon={<MdPhone className="h-4 w-4" />}         label={t("users.info_phone")}   value={user.phone_number || "—"} />
           {createdAt && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("users.info_joined")}  value={fmtDate(createdAt)} />}
           {statusKnown && <InfoRow icon={<MdVerified className="h-4 w-4" />}      label={t("users.info_status")}  value={isActive ? t("users.status_active") : t("users.status_inactive")} />}
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />}      label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (is2faVerified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
+          {user.role !== "beneficiary" && (
+            <InfoRow icon={<MdSecurity className="h-4 w-4" />}    label={t("users.info_2fa")}     value={user.is_2fa_enabled ? (is2faVerified ? t("users.info_2fa_enabled_verified") : t("common.enabled")) : t("common.disabled")} />
+          )}
           {updatedAt && <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("users.info_updated")} value={fmtDate(updatedAt)} />}
         </div>
       </div>

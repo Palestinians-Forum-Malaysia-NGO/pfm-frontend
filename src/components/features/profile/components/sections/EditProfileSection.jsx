@@ -74,7 +74,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
         full_name:        formData.full_name,
         phone_number:     formData.phone_number,
         whatsapp_enabled: formData.whatsapp_enabled,
-        is_2fa_enabled:   formData.is_2fa_enabled,
+        is_2fa_enabled:   isBeneficiary ? false : formData.is_2fa_enabled,
       };
       if (!isBeneficiary) {
         payload.banking_information = { ...formData.banking_information };
@@ -161,10 +161,12 @@ const EditProfileSection = ({ profile, onSaved }) => {
               label={t("profile.whatsapp_enabled")} field="whatsapp_enabled"
               formData={formData} updateFormData={updateFormData} errors={formErrors}
             />
-            <ToggleInput
-              label={t("profile.two_factor_auth")} field="is_2fa_enabled"
-              formData={formData} updateFormData={updateFormData} errors={formErrors}
-            />
+            {!isBeneficiary && (
+              <ToggleInput
+                label={t("profile.two_factor_auth")} field="is_2fa_enabled"
+                formData={formData} updateFormData={updateFormData} errors={formErrors}
+              />
+            )}
           </div>
 
           {!isBeneficiary && (
@@ -221,7 +223,9 @@ const EditProfileSection = ({ profile, onSaved }) => {
           <InfoRow icon={<MdPerson className="h-4 w-4" />}   label={t("users.full_name")}    value={profile.full_name    || "—"} />
           <InfoRow icon={<MdPhone className="h-4 w-4" />}    label={t("users.phone")} value={profile.phone_number || "—"} />
           <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("contact.whatsapp")}     value={profile.whatsapp_enabled ? t("common.enabled") : t("common.disabled")} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")}          value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
+          {!isBeneficiary && (
+            <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")} value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
+          )}
         </div>
       )}
     </div>
