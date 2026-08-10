@@ -9,14 +9,18 @@ import EditProfileSection from "./sections/EditProfileSection";
 import SecuritySection from "./sections/SecuritySection";
 import MemberInfoSection from "./sections/MemberInfoSection";
 import { useProfile } from "components/features/profile/hooks";
+import useAuth from "components/features/auth/hooks/useAuth";
 
 const ProfilePage = () => {
   const { t } = useTranslation();
   const { profile, loading, error, refetch } = useProfile();
+  const { refreshUser } = useAuth();
 
   if (loading) return <Loading text={t("profile.loading_profile")} />;
   if (error)   return <AlertBanner message={error} />;
   if (!profile) return null;
+
+  const handleSaved = () => { refetch(); refreshUser(); };
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -30,7 +34,7 @@ const ProfilePage = () => {
 
       {profile.role === "beneficiary" && <MemberInfoSection profile={profile} />}
 
-      <EditProfileSection profile={profile} onSaved={refetch} />
+      <EditProfileSection profile={profile} onSaved={handleSaved} />
 
       <SecuritySection />
     </div>

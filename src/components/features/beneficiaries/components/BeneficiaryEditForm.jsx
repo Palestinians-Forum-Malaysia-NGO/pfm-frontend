@@ -45,14 +45,14 @@ export default function BeneficiaryEditForm() {
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
   const [classForm, setClassForm] = useState({ classifications: [] });
   const [personalForm, setPersonalForm] = useState({
-    full_name_arabic: "", passport_number: "", date_of_birth: "", gender: "",
+    full_name_ar: "", passport_number: "", date_of_birth: "", gender: "",
     marital_status: "", account_status: "", background: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
   });
   const [familyForm, setFamilyForm] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "", spouse_job: "", number_of_children: "",
+    family_in_malaysia: false, spouse_name: "", spouse_name_ar: "", spouse_job: "", number_of_children: "",
   });
   const [visaForm, setVisaForm] = useState({
     has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
@@ -157,7 +157,7 @@ export default function BeneficiaryEditForm() {
       const uSnap = { full_name: u.full_name ?? "", email: u.email ?? "", phone_number: u.phone_number ?? "", is_active: u.is_active ?? true, profile_photo: u.profile_photo ?? null };
       const cSnap = { classifications: (data.classifications ?? []).map((c) => c.id) };
       const pSnap = {
-        full_name_arabic: data.full_name_ar       ?? "",
+        full_name_ar:     data.full_name_ar       ?? "",
         passport_number:  data.passport_number    ?? "",
         date_of_birth:    data.date_of_birth      ? data.date_of_birth.slice(0, 10) : "",
         gender:           data.gender             ?? "",
@@ -174,7 +174,7 @@ export default function BeneficiaryEditForm() {
       const faSnap = {
         family_in_malaysia: fi.family_in_malaysia  ?? false,
         spouse_name:        fi.spouse_name         ?? "",
-        spouse_name_arabic: fi.spouse_name_ar      ?? "",
+        spouse_name_ar:     fi.spouse_name_ar      ?? "",
         spouse_job:         fi.spouse_job          ?? "",
         number_of_children: fi.number_of_children  ?? "",
       };
@@ -231,7 +231,7 @@ export default function BeneficiaryEditForm() {
           },
         },
         classifications:            classForm.classifications,
-        full_name_arabic:           personalForm.full_name_arabic        || undefined,
+        full_name_ar:               personalForm.full_name_ar            || undefined,
         passport_number:            personalForm.passport_number         || undefined,
         date_of_birth:              personalForm.date_of_birth           || undefined,
         gender:                     personalForm.gender                  || undefined,
@@ -251,7 +251,7 @@ export default function BeneficiaryEditForm() {
         family_information: {
           family_in_malaysia:  familyForm.family_in_malaysia,
           spouse_name:         familyForm.spouse_name        || null,
-          spouse_name_arabic:  familyForm.spouse_name_arabic || null,
+          spouse_name_ar:      familyForm.spouse_name_ar || null,
           spouse_job:          familyForm.spouse_job         || null,
           number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
         },
@@ -315,7 +315,7 @@ export default function BeneficiaryEditForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_personal")} subtitle={t("beneficiaries.section_personal_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField  label={t("beneficiaries.full_name_ar_label")} field="full_name_arabic" placeholder={t("beneficiaries.full_name_ar_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+            <InputField  label={t("beneficiaries.full_name_ar_label")} field="full_name_ar" placeholder={t("beneficiaries.full_name_ar_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
             <InputField  label={t("beneficiaries.passport_number")}    field="passport_number"  placeholder="A12345678" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
@@ -398,7 +398,7 @@ export default function BeneficiaryEditForm() {
           <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("beneficiaries.spouse_name")}          field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+            <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_ar" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={familyForm} errors={errors} updateFormData={setFa} />

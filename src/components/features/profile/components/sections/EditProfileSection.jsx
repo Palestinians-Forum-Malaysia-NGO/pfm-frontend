@@ -15,7 +15,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const { execute: updatePhoto, loading: savingPhoto } = useUpdateProfile();
   const { success, error: toastError } = useToast();
   const isBeneficiary = profile?.role === "beneficiary";
-  const canEdit2FA = profile?.role === "admin";
+  const isAdmin = profile?.role === "admin";
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",  label: t("users.freq_monthly") },
@@ -69,6 +69,17 @@ const EditProfileSection = ({ profile, onSaved }) => {
     e.preventDefault();
     const newErrors = {};
     if (!formData.full_name.trim()) newErrors.full_name = t("profile.full_name_required");
+    if (isAdmin) {
+      if (!formData.phone_number?.trim()) newErrors.phone_number = t("validation.required");
+      const bi = formData.banking_information;
+      if (!bi.bank_name?.trim())           newErrors.banking_information = { ...newErrors.banking_information, bank_name: t("validation.required") };
+      if (!bi.account_holder_name?.trim()) newErrors.banking_information = { ...newErrors.banking_information, account_holder_name: t("validation.required") };
+      if (!bi.account_number?.trim())      newErrors.banking_information = { ...newErrors.banking_information, account_number: t("validation.required") };
+      const fi = formData.financial_information;
+      if (!fi.job_title?.trim())         newErrors.financial_information = { ...newErrors.financial_information, job_title: t("validation.required") };
+      if (!String(fi.salary ?? "").trim()) newErrors.financial_information = { ...newErrors.financial_information, salary: t("validation.required") };
+      if (!fi.payment_frequency)         newErrors.financial_information = { ...newErrors.financial_information, payment_frequency: t("validation.required") };
+    }
     if (Object.keys(newErrors).length) { setFormErrors(newErrors); return; }
     try {
       const payload = {
@@ -78,7 +89,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
       };
       if (isBeneficiary) {
         payload.is_2fa_enabled = false;
-      } else if (canEdit2FA) {
+      } else if (isAdmin) {
         payload.is_2fa_enabled = formData.is_2fa_enabled;
       }
       if (!isBeneficiary) {
@@ -158,15 +169,16 @@ const EditProfileSection = ({ profile, onSaved }) => {
               />
             )}
             <InputField
-              label={t("users.phone")} field="phone_number" required={false}
+              label={t("users.phone")} field="phone_number" required={isAdmin}
               placeholder="+60 12 345 6789"
               formData={formData} errors={formErrors} updateFormData={updateFormData}
+              rules={isAdmin ? [{ required: true }] : []}
             />
             <ToggleInput
               label={t("profile.whatsapp_enabled")} field="whatsapp_enabled"
               formData={formData} updateFormData={updateFormData} errors={formErrors}
             />
-            {canEdit2FA && (
+            {isAdmin && (
               <ToggleInput
                 label={t("profile.two_factor_auth")} field="is_2fa_enabled"
                 formData={formData} updateFormData={updateFormData} errors={formErrors}
@@ -179,40 +191,46 @@ const EditProfileSection = ({ profile, onSaved }) => {
               <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("users.banking_info")} subtitle={t("users.banking_sub")} />
               <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                 <InputField
-                  label={t("users.bank_name")} field="banking_information.bank_name" required={false}
+                  label={t("users.bank_name")} field="banking_information.bank_name" required={isAdmin}
                   placeholder="e.g. Maybank"
                   formData={formData} errors={formErrors} updateFormData={updateFormData}
+                  rules={isAdmin ? [{ required: true }] : []}
                 />
                 <InputField
-                  label={t("users.account_holder")} field="banking_information.account_holder_name" required={false}
+                  label={t("users.account_holder")} field="banking_information.account_holder_name" required={isAdmin}
                   placeholder="As per bank records"
                   formData={formData} errors={formErrors} updateFormData={updateFormData}
+                  rules={isAdmin ? [{ required: true }] : []}
                 />
               </div>
               <InputField
-                label={t("users.account_number")} field="banking_information.account_number" required={false}
+                label={t("users.account_number")} field="banking_information.account_number" required={isAdmin}
                 placeholder="e.g. 1234567890"
                 formData={formData} errors={formErrors} updateFormData={updateFormData}
+                rules={isAdmin ? [{ required: true }] : []}
               />
 
               <div className="mt-5">
                 <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("users.financial_info")} subtitle={t("users.financial_sub")} />
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                   <InputField
-                    label={t("users.job_title")} field="financial_information.job_title" required={false}
+                    label={t("users.job_title")} field="financial_information.job_title" required={isAdmin}
                     placeholder="e.g. Program Manager"
                     formData={formData} errors={formErrors} updateFormData={updateFormData}
+                    rules={isAdmin ? [{ required: true }] : []}
                   />
                   <InputField
-                    label={t("users.salary")} field="financial_information.salary" required={false}
+                    label={t("users.salary")} field="financial_information.salary" required={isAdmin}
                     placeholder="e.g. 3500.00"
                     formData={formData} errors={formErrors} updateFormData={updateFormData}
+                    rules={isAdmin ? [{ required: true }] : []}
                   />
                 </div>
                 <SelectField
-                  label={t("users.payment_frequency")} field="financial_information.payment_frequency" required={false}
+                  label={t("users.payment_frequency")} field="financial_information.payment_frequency" required={isAdmin}
                   options={PAYMENT_FREQUENCY_OPTIONS}
                   formData={formData} errors={formErrors} updateFormData={updateFormData}
+                  rules={isAdmin ? [{ required: true }] : []}
                 />
               </div>
             </div>

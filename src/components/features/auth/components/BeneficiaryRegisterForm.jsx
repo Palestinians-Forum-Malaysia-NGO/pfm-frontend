@@ -240,7 +240,7 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
    Step 3 — Family Information
 ───────────────────────────────────────────────── */
 const EMPTY_CHILD = {
-  child_name: "", child_name_arabic: "", child_date_of_birth: "",
+  child_name: "", child_name_ar: "", child_date_of_birth: "",
   passport_copy: null, entrance_stump: null,
 };
 
@@ -265,7 +265,7 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
       <div className="flex flex-col gap-3">
         <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_name")}        field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={data} errors={{}} updateFormData={set} />
-        <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
+        <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_ar" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" placeholder="0" required={false} formData={data} errors={{}} updateFormData={set} />
 
@@ -282,7 +282,7 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
                 </div>
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                   <InputField label={t("beneficiaries.child_name")}        field="child_name"        placeholder="Ahmad Jr." formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
-                  <InputField label={t("beneficiaries.child_name_ar_label")} field="child_name_arabic" placeholder="أحمد"     formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
+                  <InputField label={t("beneficiaries.child_name_ar_label")} field="child_name_ar" placeholder="أحمد"     formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
                 </div>
                 <InputField label={t("beneficiaries.child_dob")} field="child_date_of_birth" type="date" formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
@@ -567,7 +567,7 @@ export default function BeneficiaryRegisterForm() {
   const [documents, setDocuments] = useState({ background: "", national_id: "" });
   const [idDoc, setIdDoc] = useState(null);
   const [family, setFamily] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_arabic: "",
+    family_in_malaysia: false, spouse_name: "", spouse_name_ar: "",
     spouse_job: "", number_of_children: "",
   });
   const [children, setChildren] = useState([]);
@@ -603,12 +603,12 @@ export default function BeneficiaryRegisterForm() {
         family_information: {
           family_in_malaysia:  family.family_in_malaysia,
           spouse_name:         family.spouse_name        || null,
-          spouse_name_arabic:  family.spouse_name_arabic || null,
+          spouse_name_ar:      family.spouse_name_ar     || null,
           spouse_job:          family.spouse_job         || null,
           number_of_children:  family.number_of_children !== "" ? Number(family.number_of_children) : null,
           children_information: children.map((c) => ({
             child_name:          c.child_name         || undefined,
-            child_name_arabic:   c.child_name_arabic  || undefined,
+            child_name_ar:       c.child_name_ar      || undefined,
             child_date_of_birth: c.child_date_of_birth || undefined,
             passport_copy:       c.passport_copy      || undefined,
             entrance_stump:      c.entrance_stump     || undefined,

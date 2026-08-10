@@ -59,6 +59,13 @@ export const AuthProvider = ({ children }) => {
     return completeLogin();
   }, [completeLogin]);
 
+  /* ── Refresh user (e.g. after self-profile edits) — keeps navbar/sidebar in sync ── */
+  const refreshUser = useCallback(async () => {
+    const me = await authService.getMe();
+    setUser(me);
+    return me;
+  }, []);
+
   /* ── Logout ── */
   const logout = useCallback(() => {
     clearTokens();
@@ -80,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       user, loading, error,
-      login, completeLogin, verifyOtp, loginDirect, logout, handleLogout,
+      login, completeLogin, verifyOtp, loginDirect, logout, handleLogout, refreshUser,
       isAuthenticated: !!user,
     }}>
       {children}
