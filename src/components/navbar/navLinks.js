@@ -2,6 +2,7 @@ import React from "react";
 import {
   MdPeople, MdMail, MdFolderSpecial,
   MdCheckCircle, MdFlag, MdEvent, MdUpdate, MdHistory,
+  MdArticle, MdFeed,
 } from "react-icons/md";
 
 const getNavLinks = (t) => [
@@ -23,8 +24,13 @@ const getNavLinks = (t) => [
       { label: t("nav.past_events"), to: "/events?when=past",     desc: t("nav.past_events_desc"), icon: <MdHistory className="h-4 w-4" />, bg: "bg-slate-100 text-slate-500" },
     ],
   },
-  { label: t("nav.news"), to: "/news" },
-  { label: t("nav.blogs"), to: "/blogs" },
+  {
+    label: t("nav.news_blog"), to: "/news",
+    children: [
+      { label: t("nav.all_news"),  to: "/news",  desc: t("nav.all_news_desc"),  icon: <MdArticle className="h-4 w-4" />, bg: "bg-green/10 text-green" },
+      { label: t("nav.all_blogs"), to: "/blogs", desc: t("nav.all_blogs_desc"), icon: <MdFeed className="h-4 w-4" />,    bg: "bg-blue-50 text-blue-500" },
+    ],
+  },
   { label: t("nav.donate"), to: "/donate" },
   {
     label: t("nav.contact"), to: "/contact",

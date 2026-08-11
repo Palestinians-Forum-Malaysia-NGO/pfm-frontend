@@ -3,14 +3,15 @@ import { useTranslation } from "react-i18next";
 import {
   MdPerson, MdLocationOn, MdCalendarToday, MdTranslate,
   MdFamilyRestroom, MdAccountBalance, MdFolder, MdOpenInNew,
-  MdCategory, MdEdit,
+  MdCategory, MdEdit, MdCardTravel, MdBadge,
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
 import StorageFileLink from "components/ui/StorageFileLink";
-import { InputField, SelectField, ToggleInput } from "components/form";
+import { InputField, SelectField, ToggleInput, TextareaField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
+import { useGetStates } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
@@ -41,7 +42,14 @@ const emptyForm = (profile) => {
     country_of_origin:        p.country_of_origin         ?? "",
     date_arrived_in_malaysia: p.date_arrived_in_malaysia  ? p.date_arrived_in_malaysia.slice(0, 10) : "",
     current_city:             p.current_city              ?? "",
+    state:                    p.state                     ?? "",
     address:                  p.address                   ?? "",
+    background:               p.background                ?? "",
+    has_visa:                 p.has_visa === true ? "true" : p.has_visa === false ? "false" : "",
+    visa_type:                p.visa_type                 ?? "",
+    situation:                p.situation                 ?? "",
+    unhcr_number:             p.unhcr_number              ?? "",
+    palestine_region:         p.palestine_region          ?? "",
     family_in_malaysia:       fi.family_in_malaysia        ?? false,
     spouse_name:              fi.spouse_name               ?? "",
     spouse_name_arabic:       fi.spouse_name_ar            ?? "",
@@ -54,9 +62,10 @@ const emptyForm = (profile) => {
 };
 
 const MemberInfoSection = ({ profile, onSaved }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { execute: updateProfile, loading: saving } = useUpdateProfile();
   const { success, error: toastError } = useToast();
+  const { states } = useGetStates();
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
@@ -96,10 +105,44 @@ const MemberInfoSection = ({ profile, onSaved }) => {
     suspended: t("beneficiaries.account_status_suspended"), rejected: t("beneficiaries.account_status_rejected"),
   };
 
+  const STATE_OPTIONS = states.map((s) => ({
+    value: s.code,
+    label: (s.label_ar && i18n.language === "ar") ? s.label_ar : s.label,
+  }));
+  const STATE_LABELS = Object.fromEntries(STATE_OPTIONS.map((s) => [s.value, s.label]));
+  const HAS_VISA_OPTIONS_T = [
+    { value: "",      label: t("beneficiaries.visa_status_unset") },
+    { value: "true",  label: t("beneficiaries.visa_status_yes") },
+    { value: "false", label: t("beneficiaries.visa_status_no") },
+  ];
+  const VISA_TYPE_OPTIONS_T = [
+    { value: "student",      label: t("beneficiaries.visa_type_student") },
+    { value: "work",         label: t("beneficiaries.visa_type_work") },
+    { value: "dependent",    label: t("beneficiaries.visa_type_dependent") },
+    { value: "social_visit", label: t("beneficiaries.visa_type_social_visit") },
+    { value: "refugee_pass", label: t("beneficiaries.visa_type_refugee_pass") },
+    { value: "other",        label: t("beneficiaries.visa_type_other") },
+  ];
+  const SITUATION_OPTIONS_T = [
+    { value: "refugee",       label: t("beneficiaries.situation_refugee") },
+    { value: "asylum_seeker", label: t("beneficiaries.situation_asylum_seeker") },
+    { value: "undocumented",  label: t("beneficiaries.situation_undocumented") },
+    { value: "overstayed",    label: t("beneficiaries.situation_overstayed") },
+  ];
+  const PALESTINE_REGION_OPTIONS_T = [
+    { value: "gaza",            label: t("beneficiaries.region_gaza") },
+    { value: "west_bank",       label: t("beneficiaries.region_west_bank") },
+    { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
+  ];
+  const VISA_TYPE_LABELS = Object.fromEntries(VISA_TYPE_OPTIONS_T.map((o) => [o.value, o.label]));
+  const SITUATION_LABELS = Object.fromEntries(SITUATION_OPTIONS_T.map((o) => [o.value, o.label]));
+  const PALESTINE_REGION_LABELS = Object.fromEntries(PALESTINE_REGION_OPTIONS_T.map((o) => [o.value, o.label]));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const hasBanking = profile.banking_information || formData.bank_name || formData.account_number || formData.account_holder_name;
+      const hasVisaBool = formData.has_visa === "true" ? true : formData.has_visa === "false" ? false : undefined;
       await updateProfile({
         profile: {
           gender:                   formData.gender                   || undefined,
@@ -108,7 +151,14 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           country_of_origin:        formData.country_of_origin        || undefined,
           date_arrived_in_malaysia: formData.date_arrived_in_malaysia || undefined,
           current_city:             formData.current_city             || undefined,
+          state:                    formData.state                    || undefined,
           address:                  formData.address                  || undefined,
+          background:               formData.background               || undefined,
+          has_visa:                 hasVisaBool,
+          visa_type:                hasVisaBool === true  ? (formData.visa_type || undefined) : undefined,
+          situation:                hasVisaBool === false ? (formData.situation || undefined) : undefined,
+          unhcr_number:             (hasVisaBool === false && formData.situation === "refugee") ? (formData.unhcr_number || undefined) : undefined,
+          palestine_region:         formData.country_of_origin === "PS" ? (formData.palestine_region || undefined) : undefined,
           family_information: {
             family_in_malaysia: formData.family_in_malaysia,
             spouse_name:        formData.spouse_name        || null,
@@ -155,6 +205,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
       >
         {editMode ? (
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <InfoRow icon={<MdBadge className="h-4 w-4" />}   label={t("apply.national_id")} value={p.national_id || "—"} />
             <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_passport")} value={p.passport_number || "—"} />
             <SelectField label={t("beneficiaries.gender")} field="gender" options={GENDER_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date" required={false} formData={formData} updateFormData={updateFormData} />
@@ -162,13 +213,18 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             <SelectField label={t("beneficiaries.country_of_origin")} field="country_of_origin" options={COUNTRY_OPTIONS} required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.date_arrived")} field="date_arrived_in_malaysia" type="date" required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.current_city")} field="current_city" required={false} formData={formData} updateFormData={updateFormData} />
+            <SelectField label={t("apply.state")} field="state" options={STATE_OPTIONS} required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.address")} field="address" required={false} formData={formData} updateFormData={updateFormData} />
+            <div className="sm:col-span-2">
+              <TextareaField label={t("apply.background")} field="background" required={false} formData={formData} updateFormData={updateFormData} />
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {profile.full_name_ar && (
               <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={profile.full_name_ar} />
             )}
+            <InfoRow icon={<MdBadge className="h-4 w-4" />}         label={t("apply.national_id")}                value={p.national_id || "—"} />
             <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_passport")}      value={p.passport_number || "—"} />
             <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.gender")}            value={GENDER_LABELS[p.gender] ?? p.gender ?? "—"} />
             <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.date_of_birth")}     value={fmtDate(p.date_of_birth)} />
@@ -176,13 +232,72 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.country_of_origin")} value={COUNTRY_NAME_BY_CODE[p.country_of_origin] || p.country_of_origin || "—"} />
             <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("profile.arrived_in_malaysia")} value={fmtDate(p.date_arrived_in_malaysia)} />
             <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.current_city")}      value={p.current_city || "—"} />
+            <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("apply.state")}                      value={STATE_LABELS[p.state] || p.state || "—"} />
             <InfoRow icon={<MdLocationOn className="h-4 w-4" />}    label={t("beneficiaries.address")}           value={p.address || "—"} />
+            {p.background && (
+              <div className="sm:col-span-2">
+                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("apply.background")} value={p.background} />
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-400">{t("beneficiaries.account_status_label")}</span>
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_BADGE[p.account_status] ?? "bg-slate-100 text-slate-500"}`}>
                 {ACCOUNT_STATUS_LABELS[p.account_status] ?? p.account_status ?? "—"}
               </span>
             </div>
+          </div>
+        )}
+      </SectionCard>
+
+      {/* ── Visa & Immigration Status ── */}
+      <SectionCard
+        icon={<MdCardTravel className="h-5 w-5" />}
+        title={t("apply.immigration_status")}
+        subtitle={t("profile.visa_status_sub")}
+      >
+        {editMode ? (
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            {formData.has_visa === "true" && (
+              <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            )}
+            {formData.has_visa === "false" && (
+              <>
+                <SelectField label={t("apply.situation")} field="situation" options={SITUATION_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+                {formData.situation === "refugee" && (
+                  <InputField label={t("apply.unhcr")} field="unhcr_number" required={false} formData={formData} updateFormData={updateFormData} />
+                )}
+              </>
+            )}
+            {formData.country_of_origin === "PS" && (
+              <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.visa_status")} value={p.has_visa == null ? "—" : p.has_visa ? t("beneficiaries.visa_status_yes") : t("beneficiaries.visa_status_no")} />
+            {p.has_visa && (
+              <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.visa_type")} value={VISA_TYPE_LABELS[p.visa_type] ?? p.visa_type ?? "—"} />
+            )}
+            {p.has_visa === false && (
+              <>
+                <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.situation")} value={SITUATION_LABELS[p.situation] ?? p.situation ?? "—"} />
+                {p.situation === "refugee" && (
+                  <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("apply.unhcr")} value={p.unhcr_number || "—"} />
+                )}
+              </>
+            )}
+            {p.country_of_origin === "PS" && (
+              <InfoRow icon={<MdLocationOn className="h-4 w-4" />} label={t("apply.palestine_region")} value={PALESTINE_REGION_LABELS[p.palestine_region] ?? p.palestine_region ?? "—"} />
+            )}
+            {p.id_document && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400">{t("apply.id_document")}</span>
+                <StorageFileLink fileKey={p.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
+                  {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
+                </StorageFileLink>
+              </div>
+            )}
           </div>
         )}
       </SectionCard>

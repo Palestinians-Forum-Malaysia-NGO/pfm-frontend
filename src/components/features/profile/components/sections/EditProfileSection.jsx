@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { MdEdit, MdPhone, MdSecurity, MdPerson, MdAccountBalance, MdAttachMoney } from "react-icons/md";
+import { MdEdit, MdPhone, MdSecurity, MdPerson, MdAccountBalance, MdAttachMoney, MdBusiness, MdWork, MdLocationCity } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
@@ -15,7 +15,9 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const { execute: updatePhoto, loading: savingPhoto } = useUpdateProfile();
   const { success, error: toastError } = useToast();
   const isBeneficiary = profile?.role === "beneficiary";
+  const isStaff = profile?.role === "staff";
   const isAdmin = profile?.role === "admin";
+  const staffProfile = profile?.profile;
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",  label: t("users.freq_monthly") },
@@ -248,6 +250,13 @@ const EditProfileSection = ({ profile, onSaved }) => {
           <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("contact.whatsapp")}     value={profile.whatsapp_enabled ? t("common.enabled") : t("common.disabled")} />
           {!isBeneficiary && (
             <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")} value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
+          )}
+          {isStaff && staffProfile && (
+            <>
+              <InfoRow icon={<MdBusiness className="h-4 w-4" />}     label={t("staff.info_department")} value={staffProfile.department || "—"} />
+              <InfoRow icon={<MdWork className="h-4 w-4" />}         label={t("staff.info_position")}   value={staffProfile.position   || "—"} />
+              <InfoRow icon={<MdLocationCity className="h-4 w-4" />} label={t("staff.info_branch")}     value={staffProfile.branch     || "—"} />
+            </>
           )}
         </div>
       )}
