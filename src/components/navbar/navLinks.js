@@ -31,7 +31,6 @@ const getNavLinks = (t) => [
       { label: t("nav.all_blogs"), to: "/blogs", desc: t("nav.all_blogs_desc"), icon: <MdFeed className="h-4 w-4" />,    bg: "bg-blue-50 text-blue-500" },
     ],
   },
-  { label: t("nav.donate"), to: "/donate" },
   {
     label: t("nav.contact"), to: "/contact",
     children: [
