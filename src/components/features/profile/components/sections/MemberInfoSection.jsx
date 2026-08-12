@@ -15,6 +15,7 @@ import { useGetStates } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
+import { DOCUMENT_TYPE_VALUES } from "components/ui/constants/documentTypes";
 
 const STATUS_BADGE   = {
   pending:   "bg-amber-50 text-amber-600 border border-amber-200",
@@ -46,11 +47,12 @@ const emptyForm = (profile) => {
     state:                    p.state                     ?? "",
     address:                  p.address                   ?? "",
     background:               p.background                ?? "",
-    id_document:              p.id_document?.file_key ?? p.id_document ?? null,
+    passport_number:          p.passport_number           ?? "",
+    id_document:              p.id_document?.file_key ?? p.id_document ?? "",
     id_document_type:         p.id_document_type          ?? "",
     has_visa:                 p.has_visa === true ? "true" : p.has_visa === false ? "false" : "",
     visa_type:                p.visa_type                 ?? "",
-    visa_document:            p.visa_document?.file_key ?? p.visa_document ?? null,
+    visa_document:            p.visa_document?.file_key ?? p.visa_document ?? "",
     situation:                p.situation                 ?? "",
     unhcr_number:             p.unhcr_number              ?? "",
     palestine_region:         p.palestine_region          ?? "",
@@ -150,6 +152,9 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const VISA_TYPE_LABELS = Object.fromEntries(VISA_TYPE_OPTIONS_T.map((o) => [o.value, o.label]));
   const SITUATION_LABELS = Object.fromEntries(SITUATION_OPTIONS_T.map((o) => [o.value, o.label]));
   const PALESTINE_REGION_LABELS = Object.fromEntries(PALESTINE_REGION_OPTIONS_T.map((o) => [o.value, o.label]));
+  const SUPPORTING_DOC_TYPE_LABELS = Object.fromEntries(
+    DOCUMENT_TYPE_VALUES.map((value) => [value, t(`documents.type_${value}`)])
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -167,11 +172,14 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           state:                    formData.state                    || undefined,
           address:                  formData.address                  || undefined,
           background:               formData.background               || undefined,
-          id_document:              formData.id_document              || undefined,
+          passport_number:          formData.passport_number          || undefined,
+          // id_document is sent as-is (never omitted) so removing it (empty
+          // string) actually persists — the API 500s on null but accepts "".
+          id_document:              formData.id_document,
           id_document_type:         formData.id_document_type         || undefined,
           has_visa:                 hasVisaBool,
           visa_type:                hasVisaBool === true  ? (formData.visa_type || undefined) : undefined,
-          visa_document:            hasVisaBool === true  ? (formData.visa_document || undefined) : undefined,
+          visa_document:            hasVisaBool === true  ? formData.visa_document : undefined,
           situation:                hasVisaBool === false ? (formData.situation || undefined) : undefined,
           unhcr_number:             (hasVisaBool === false && formData.situation === "refugee") ? (formData.unhcr_number || undefined) : undefined,
           palestine_region:         formData.country_of_origin === "PS" ? (formData.palestine_region || undefined) : undefined,
@@ -222,7 +230,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
         {editMode ? (
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InfoRow icon={<MdBadge className="h-4 w-4" />}   label={t("apply.national_id")} value={p.national_id || "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_passport")} value={p.passport_number || "—"} />
+            <InputField label={t("beneficiaries.info_passport")} field="passport_number" required={false} formData={formData} updateFormData={updateFormData} />
             <SelectField label={t("beneficiaries.gender")} field="gender" options={GENDER_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date" required={false} formData={formData} updateFormData={updateFormData} />
             <SelectField label={t("beneficiaries.marital_status")} field="marital_status" options={MARITAL_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
@@ -241,7 +249,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
                 folder="beneficiaries/documents"
                 currentUrl={currentIdDocUrl}
                 onUpload={(key) => updateFormData("id_document", key)}
-                onRemove={() => updateFormData("id_document", null)}
+                onRemove={() => updateFormData("id_document", "")}
               />
             </div>
           </div>
@@ -304,7 +312,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
                     folder="beneficiaries/documents"
                     currentUrl={currentVisaDocUrl}
                     onUpload={(key) => updateFormData("visa_document", key)}
-                    onRemove={() => updateFormData("visa_document", null)}
+                    onRemove={() => updateFormData("visa_document", "")}
                   />
                 </div>
               </>
@@ -454,7 +462,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             {p.supporting_documents.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">{doc.document_name || doc.document_type}</p>
+                  <p className="text-sm font-medium text-slate-900">{doc.document_name || SUPPORTING_DOC_TYPE_LABELS[doc.document_type] || doc.document_type}</p>
                   {doc.remarks && <p className="mt-0.5 text-xs text-slate-400">{doc.remarks}</p>}
                 </div>
                 {doc.document_file && (

@@ -4,7 +4,8 @@ import { MdFolder, MdAdd, MdDeleteOutline, MdEdit, MdCheck, MdClose, MdOpenInNew
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import StorageFileLink from "components/ui/StorageFileLink";
-import { InputField, StorageDocumentField } from "components/form";
+import { InputField, SelectField, StorageDocumentField } from "components/form";
+import { DOCUMENT_TYPE_VALUES } from "components/ui/constants/documentTypes";
 
 const EMPTY = { document_type: "", document_name: "", remarks: "" };
 
@@ -24,6 +25,8 @@ const EMPTY = { document_type: "", document_name: "", remarks: "" };
  */
 const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDelete, loading }) => {
   const { t } = useTranslation();
+  const DOCUMENT_TYPE_OPTIONS = DOCUMENT_TYPE_VALUES.map((value) => ({ value, label: t(`documents.type_${value}`) }));
+  const DOCUMENT_TYPE_LABELS = Object.fromEntries(DOCUMENT_TYPE_OPTIONS.map((o) => [o.value, o.label]));
   const [addOpen, setAddOpen] = useState(false);
   const [newDoc, setNewDoc] = useState(EMPTY);
   const [newFileKey, setNewFileKey] = useState(null);
@@ -101,7 +104,7 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField label={t("documents.name_label")} field="document_name" placeholder={t("documents.name_placeholder")}
               formData={newDoc} errors={{}} updateFormData={setN} rules={[{ required: true }]} />
-            <InputField label={t("documents.type_label")} field="document_type" placeholder={t("documents.type_placeholder")}
+            <SelectField label={t("documents.type_label")} field="document_type" options={DOCUMENT_TYPE_OPTIONS}
               required={false} formData={newDoc} errors={{}} updateFormData={setN} />
           </div>
           <InputField label={t("documents.remarks_label")} field="remarks" required={false} formData={newDoc} errors={{}} updateFormData={setN} />
@@ -132,7 +135,7 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
                 <div className="flex flex-col gap-3 rounded-xl border border-green/20 bg-green/5 p-4">
                   <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <InputField label={t("documents.name_label")} field="document_name" formData={editDoc} errors={{}} updateFormData={setE} rules={[{ required: true }]} />
-                    <InputField label={t("documents.type_label")} field="document_type" required={false} formData={editDoc} errors={{}} updateFormData={setE} />
+                    <SelectField label={t("documents.type_label")} field="document_type" options={DOCUMENT_TYPE_OPTIONS} required={false} formData={editDoc} errors={{}} updateFormData={setE} />
                   </div>
                   <InputField label={t("documents.remarks_label")} field="remarks" required={false} formData={editDoc} errors={{}} updateFormData={setE} />
                   <StorageDocumentField
@@ -152,9 +155,9 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
               ) : (
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-900">{doc.document_name || doc.document_type}</p>
+                    <p className="truncate text-sm font-medium text-slate-900">{doc.document_name || DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}</p>
                     <p className="truncate text-xs text-slate-400">
-                      {doc.document_type}{doc.remarks ? ` · ${doc.remarks}` : ""}
+                      {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}{doc.remarks ? ` · ${doc.remarks}` : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">

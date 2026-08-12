@@ -111,13 +111,13 @@ const EditProfileSection = ({ profile, onSaved }) => {
           payment_frequency: profile.financial_information?.payment_frequency ?? "",
         },
         ...(isAdmin ? {
-          id_document:      adminProfile?.id_document?.file_key ?? adminProfile?.id_document ?? null,
+          id_document:      adminProfile?.id_document?.file_key ?? adminProfile?.id_document ?? "",
           id_document_type: adminProfile?.id_document_type      ?? "",
           has_visa:         adminProfile?.has_visa               ?? false,
           visa_type:        adminProfile?.visa_type               ?? "",
           visa_number:      adminProfile?.visa_number             ?? "",
           visa_expiry_date: adminProfile?.visa_expiry_date ? adminProfile.visa_expiry_date.slice(0, 10) : "",
-          visa_document:    adminProfile?.visa_document?.file_key ?? adminProfile?.visa_document ?? null,
+          visa_document:    adminProfile?.visa_document?.file_key ?? adminProfile?.visa_document ?? "",
         } : {}),
       };
       setFormData(initial);
@@ -171,13 +171,16 @@ const EditProfileSection = ({ profile, onSaved }) => {
       }
       if (isAdmin) {
         payload.profile = {
-          id_document:      formData.id_document      || undefined,
+          // id_document/visa_document are sent as-is (never omitted) so
+          // removing one (empty string) actually persists — the API 500s on
+          // null but accepts "".
+          id_document:      formData.id_document,
           id_document_type: formData.id_document_type || undefined,
           has_visa:         formData.has_visa,
           visa_type:        formData.has_visa ? formData.visa_type : undefined,
           visa_number:      formData.has_visa ? (formData.visa_number || undefined) : undefined,
           visa_expiry_date: formData.has_visa ? (formData.visa_expiry_date || undefined) : undefined,
-          visa_document:    formData.has_visa ? (formData.visa_document || undefined) : undefined,
+          visa_document:    formData.has_visa ? formData.visa_document : undefined,
         };
       }
       await updateProfile(payload);
@@ -330,7 +333,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
                 required={false}
                 currentUrl={currentIdDocUrl}
                 onUpload={(key) => updateFormData("id_document", key)}
-                onRemove={() => updateFormData("id_document", null)}
+                onRemove={() => updateFormData("id_document", "")}
               />
               <SelectField
                 label={t("staff.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
@@ -360,7 +363,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
                     required={false}
                     currentUrl={currentVisaDocUrl}
                     onUpload={(key) => updateFormData("visa_document", key)}
-                    onRemove={() => updateFormData("visa_document", null)}
+                    onRemove={() => updateFormData("visa_document", "")}
                   />
                 </>
               )}

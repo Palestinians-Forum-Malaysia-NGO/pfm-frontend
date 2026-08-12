@@ -138,13 +138,13 @@ export default function StaffEditForm() {
         position:     data.position     ?? "",
         branch:       data.branch       ?? "",
         joining_date: data.joining_date ? data.joining_date.slice(0, 10) : "",
-        id_document:  data.id_document  ?? null,
+        id_document:  data.id_document  ?? "",
         id_document_type: data.id_document_type ?? "",
         has_visa:     data.has_visa     ?? false,
         visa_type:    data.visa_type    ?? "",
         visa_number:  data.visa_number  ?? "",
         visa_expiry_date: data.visa_expiry_date ? data.visa_expiry_date.slice(0, 10) : "",
-        visa_document: data.visa_document ?? null,
+        visa_document: data.visa_document ?? "",
       };
 
       setUserForm(userSnap);
@@ -201,13 +201,16 @@ export default function StaffEditForm() {
         position:      staffForm.position,
         branch:        staffForm.branch,
         joining_date:  staffForm.joining_date,
-        id_document:   staffForm.id_document || undefined,
+        // id_document/visa_document are sent as-is (never omitted) so
+        // removing one (empty string) actually persists — the API 500s on
+        // null but accepts "".
+        id_document:   staffForm.id_document,
         id_document_type: staffForm.id_document_type || undefined,
         has_visa:      staffForm.has_visa,
         visa_type:        staffForm.has_visa ? staffForm.visa_type : undefined,
         visa_number:      staffForm.has_visa ? (staffForm.visa_number || undefined) : undefined,
         visa_expiry_date: staffForm.has_visa ? (staffForm.visa_expiry_date || undefined) : undefined,
-        visa_document:    staffForm.has_visa ? (staffForm.visa_document || undefined) : undefined,
+        visa_document:    staffForm.has_visa ? staffForm.visa_document : undefined,
       };
       await updateStaff(id, payload);
       success(t("staff.toast_updated"), `${userForm.full_name} ${t("staff.toast_updated_sub")}`);
@@ -331,7 +334,7 @@ export default function StaffEditForm() {
               required={false}
               currentUrl={currentIdDocUrl}
               onUpload={(key) => setS("id_document", key)}
-              onRemove={() => setS("id_document", null)}
+              onRemove={() => setS("id_document", "")}
               errors={errors}
               field="id_document"
             />
@@ -355,7 +358,7 @@ export default function StaffEditForm() {
                   required={false}
                   currentUrl={currentVisaDocUrl}
                   onUpload={(key) => setS("visa_document", key)}
-                  onRemove={() => setS("visa_document", null)}
+                  onRemove={() => setS("visa_document", "")}
                 />
               </>
             )}
