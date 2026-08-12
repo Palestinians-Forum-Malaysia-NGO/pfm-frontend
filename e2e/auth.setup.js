@@ -8,48 +8,33 @@ const ACCOUNTS = [
     role: "admin",
     email: "pfmy.it@gmail.com",
     password: "Admin123!@#",
+    requiresOtp: true,
     homePattern: "**/admin/**",
     authFile: path.join(__dirname, ".auth/admin.json"),
   },
   {
-    role: "staff",
+    role: "beneficiary",
     email: "adnanmadi417@gmail.com",
     password: "Admin123!@#",
-    homePattern: "**/staff/**",
-    authFile: path.join(__dirname, ".auth/staff.json"),
-  },
-  {
-    role: "beneficiary",
-    email: "adnan.madi@student.aiu.edu.my",
-    password: "Admin123!@#",
+    requiresOtp: false,
     homePattern: "**/beneficiary/**",
     authFile: path.join(__dirname, ".auth/beneficiary.json"),
   },
+  // No real staff credential available yet — re-add here (with role: "staff",
+  // homePattern: "**/staff/**", authFile: .auth/staff.json) once one exists.
 ];
 
 setup.setTimeout(30_000);
 
 for (const account of ACCOUNTS) {
   setup(`authenticate as ${account.role}`, async ({ page, request }) => {
-    // ── Step 1: Login (triggers OTP to email if 2FA is enabled) ────────────────
-    const loginRes = await request.post(`${API}/auth/login`, {
-      data: { email: account.email, password: account.password },
-    });
-    const loginData = await loginRes.json();
-
+    const otp = process.env.PLAYWRIGHT_OTP;
     let access, refresh;
 
-    if (loginData.requires_otp) {
-      const otp = process.env.PLAYWRIGHT_OTP;
-      if (!otp) {
-        throw new Error(
-          `\n\n  OTP sent to ${account.email}.\n` +
-          "  Check your email, then re-run:\n\n" +
-          `    set PLAYWRIGHT_OTP=<code> && npx playwright test --project=setup\n`
-        );
-      }
-
-      // ── Step 2: Verify OTP ────────────────────────────────────────────────
+    if (account.requiresOtp && otp) {
+      // A code from a previous run's login is already in hand — verify it
+      // directly. Do NOT call /auth/login again first: that sends a fresh
+      // OTP and invalidates this one before we get to use it.
       const otpRes = await request.post(`${API}/auth/otp/verify`, {
         data: { email: account.email, code: otp.trim(), purpose: "login" },
       });
@@ -58,6 +43,19 @@ for (const account of ACCOUNTS) {
       access  = otpData.access;
       refresh = otpData.refresh;
     } else {
+      // ── Step 1: Login (triggers OTP to email if 2FA is enabled) ────────────
+      const loginRes = await request.post(`${API}/auth/login`, {
+        data: { email: account.email, password: account.password },
+      });
+      const loginData = await loginRes.json();
+
+      if (loginData.requires_otp) {
+        throw new Error(
+          `\n\n  OTP sent to ${account.email}.\n` +
+          "  Check your email, then re-run:\n\n" +
+          `    PLAYWRIGHT_OTP=<code> npx playwright test --project=setup\n`
+        );
+      }
       if (!loginData.access) throw new Error(`Login failed: ${JSON.stringify(loginData)}`);
       access  = loginData.access;
       refresh = loginData.refresh;

@@ -13,7 +13,11 @@ import Button      from "components/ui/buttons/Button";
 import FormHeader  from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading     from "components/loading/Loading";
-import { useGetUser, useUpdateUser } from "components/features/users/hooks";
+import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import {
+  useGetUser, useUpdateUser,
+  useGetAdminDocuments, useCreateAdminDocument, useUpdateAdminDocument, useDeleteAdminDocument,
+} from "components/features/users/hooks";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import {
   ROLE_BADGE_BORDER as ROLE_BADGE,
@@ -71,6 +75,11 @@ export default function UserEditForm() {
   const [photoKey, setPhotoKey] = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
 
+  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetAdminDocuments();
+  const { execute: createDocument } = useCreateAdminDocument();
+  const { execute: updateDocument } = useUpdateAdminDocument();
+  const { execute: deleteDocument } = useDeleteAdminDocument();
+
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",  label: t("users.freq_monthly") },
     { value: "weekly",   label: t("users.freq_weekly") },
@@ -116,6 +125,36 @@ export default function UserEditForm() {
       setPhotoKey(data.profile_photo ?? null);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { fetchDocuments(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAddDocument = async (payload) => {
+    try {
+      await createDocument(id, payload);
+      success(t("documents.toast_added"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_add_failed"), err?.message);
+    }
+  };
+  const handleUpdateDocument = async (docId, payload) => {
+    try {
+      await updateDocument(id, docId, payload);
+      success(t("documents.toast_saved"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_save_failed"), err?.message);
+    }
+  };
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await deleteDocument(id, docId);
+      success(t("documents.toast_deleted"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_delete_failed"), err?.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -295,6 +334,15 @@ export default function UserEditForm() {
           </div>
         </form>
       </div>
+
+      <DocumentManagerSection
+        documents={documents}
+        loading={docsLoading}
+        folder="users/documents"
+        onAdd={handleAddDocument}
+        onUpdate={handleUpdateDocument}
+        onDelete={handleDeleteDocument}
+      />
     </div>
   );
 }

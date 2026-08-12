@@ -46,7 +46,7 @@ export default function BeneficiaryEditForm() {
   const [classForm, setClassForm] = useState({ classifications: [] });
   const [personalForm, setPersonalForm] = useState({
     full_name_ar: "", passport_number: "", date_of_birth: "", gender: "",
-    marital_status: "", account_status: "", background: "",
+    marital_status: "", account_status: "", background: "", id_document_type: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
@@ -61,6 +61,8 @@ export default function BeneficiaryEditForm() {
   const [finForm,  setFinForm]  = useState({ job_title: "", salary: "", payment_frequency: "" });
   const [idDoc, setIdDoc] = useState(null);
   const { url: currentIdDocUrl } = useStorageUrl(idDoc, { forcePresigned: true });
+  const [visaDoc, setVisaDoc] = useState(null);
+  const { url: currentVisaDocUrl } = useStorageUrl(visaDoc, { forcePresigned: true });
 
   const [initialUser,     setInitialUser]     = useState(null);
   const [initialClass,    setInitialClass]    = useState(null);
@@ -71,6 +73,7 @@ export default function BeneficiaryEditForm() {
   const [initialBank,     setInitialBank]     = useState(null);
   const [initialFin,      setInitialFin]      = useState(null);
   const [initialIdDoc,    setInitialIdDoc]    = useState(undefined);
+  const [initialVisaDoc,  setInitialVisaDoc]  = useState(undefined);
   const [errors, setErrors] = useState({});
 
   const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
@@ -112,6 +115,12 @@ export default function BeneficiaryEditForm() {
     { value: "false", label: t("beneficiaries.visa_status_no") },
   ];
 
+  const ID_DOCUMENT_TYPE_OPTIONS_T = [
+    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
+    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
+    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
+  ];
+
   const VISA_TYPE_OPTIONS_T = [
     { value: "student",      label: t("beneficiaries.visa_type_student") },
     { value: "work",         label: t("beneficiaries.visa_type_work") },
@@ -143,7 +152,8 @@ export default function BeneficiaryEditForm() {
     JSON.stringify(visaForm)     !== JSON.stringify(initialVisa)     ||
     JSON.stringify(bankForm)     !== JSON.stringify(initialBank)     ||
     JSON.stringify(finForm)      !== JSON.stringify(initialFin)      ||
-    idDoc !== initialIdDoc
+    idDoc !== initialIdDoc ||
+    visaDoc !== initialVisaDoc
   );
 
   useEffect(() => {
@@ -164,6 +174,7 @@ export default function BeneficiaryEditForm() {
         marital_status:   data.marital_status     ?? "",
         account_status:   data.account_status     ?? "",
         background:       data.background         ?? "",
+        id_document_type: data.id_document_type   ?? "",
       };
       const lSnap = {
         country_of_origin:        data.country_of_origin        ?? "",
@@ -188,15 +199,17 @@ export default function BeneficiaryEditForm() {
       const bSnap  = { bank_name: bi.bank_name ?? "", account_number: bi.account_number ?? "", account_holder_name: bi.account_holder_name ?? "" };
       const fiSnap = { job_title: fi2.job_title ?? "", salary: fi2.salary ?? "", payment_frequency: fi2.payment_frequency ?? "" };
       const docSnap = data.id_document ?? null;
+      const visaDocSnap = data.visa_document ?? null;
 
       setUserForm(uSnap);    setClassForm(cSnap);    setPersonalForm(pSnap);
       setLocationForm(lSnap); setFamilyForm(faSnap); setVisaForm(vSnap);
       setBankForm(bSnap);    setFinForm(fiSnap);     setIdDoc(docSnap);
-      setPhotoKey(u.profile_photo ?? null);
+      setPhotoKey(u.profile_photo ?? null); setVisaDoc(visaDocSnap);
 
       setInitialUser(uSnap);    setInitialClass(cSnap);    setInitialPersonal(pSnap);
       setInitialLocation(lSnap); setInitialFamily(faSnap); setInitialVisa(vSnap);
       setInitialBank(bSnap);    setInitialFin(fiSnap);     setInitialIdDoc(docSnap);
+      setInitialVisaDoc(visaDocSnap);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -239,8 +252,10 @@ export default function BeneficiaryEditForm() {
         account_status:             personalForm.account_status          || undefined,
         background:                 personalForm.background              || undefined,
         id_document:                idDoc                                ?? undefined,
+        id_document_type:           personalForm.id_document_type        || undefined,
         has_visa:                   hasVisaBool,
         visa_type:                  hasVisaBool === true  ? (visaForm.visa_type    || undefined) : undefined,
+        visa_document:              hasVisaBool === true  ? (visaDoc ?? undefined) : undefined,
         situation:                  hasVisaBool === false ? (visaForm.situation    || undefined) : undefined,
         unhcr_number:               (hasVisaBool === false && visaForm.situation === "refugee") ? (visaForm.unhcr_number || undefined) : undefined,
         palestine_region:           locationForm.country_of_origin === "PS" ? (visaForm.palestine_region || undefined) : undefined,
@@ -327,6 +342,7 @@ export default function BeneficiaryEditForm() {
             <SelectField label={t("beneficiaries.account_status_label")} field="account_status" options={ACCOUNT_STATUS_FORM_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <TextareaField label={t("beneficiaries.background")} field="background" rows={3} placeholder={t("beneficiaries.background_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
+          <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           <StorageDocumentField
             label={t("beneficiaries.id_document")}
             folder="beneficiaries/documents"
@@ -358,7 +374,18 @@ export default function BeneficiaryEditForm() {
           <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("beneficiaries.section_visa")} subtitle={t("beneficiaries.section_visa_sub")} />
           <SelectField label={t("beneficiaries.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
           {visaForm.has_visa === "true" && (
-            <SelectField label={t("beneficiaries.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+            <>
+              <SelectField label={t("beneficiaries.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
+              <StorageDocumentField
+                label={t("beneficiaries.visa_document_label")}
+                folder="beneficiaries/documents"
+                accept=".pdf,.jpg,.jpeg,.png"
+                currentName={visaDoc ? "Current document" : undefined}
+                currentUrl={currentVisaDocUrl}
+                onUpload={(key) => setVisaDoc(key)}
+                onRemove={() => setVisaDoc(null)}
+              />
+            </>
           )}
           {visaForm.has_visa === "false" && (
             <>

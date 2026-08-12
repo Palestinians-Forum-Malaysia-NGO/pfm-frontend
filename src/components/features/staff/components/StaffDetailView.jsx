@@ -19,7 +19,11 @@ import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading       from "components/loading/Loading";
 import StorageImage  from "components/ui/StorageImage";
 import StorageFileLink from "components/ui/StorageFileLink";
-import { useGetStaff, useDeleteStaff } from "components/features/staff/hooks";
+import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import {
+  useGetStaff, useDeleteStaff,
+  useGetStaffDocuments, useCreateStaffDocument, useUpdateStaffDocument, useDeleteStaffDocument,
+} from "components/features/staff/hooks";
 import { ROLE_BADGE_BORDER as ROLE_BADGE, ROLE_AVATAR_GRADIENT as AVATAR_BG } from "components/features/users/constants/roles";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -40,7 +44,53 @@ export default function StaffDetailView() {
   const { success, error: toastError } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetStaffDocuments();
+  const { execute: createDocument } = useCreateStaffDocument();
+  const { execute: updateDocument } = useUpdateStaffDocument();
+  const { execute: deleteDocument } = useDeleteStaffDocument();
+
   useEffect(() => { fetchStaff(id).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchDocuments(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAddDocument = async (payload) => {
+    try {
+      await createDocument(id, payload);
+      success(t("documents.toast_added"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_add_failed"), err?.message);
+    }
+  };
+  const handleUpdateDocument = async (docId, payload) => {
+    try {
+      await updateDocument(id, docId, payload);
+      success(t("documents.toast_saved"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_save_failed"), err?.message);
+    }
+  };
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await deleteDocument(id, docId);
+      success(t("documents.toast_deleted"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_delete_failed"), err?.message);
+    }
+  };
+
+  const ID_DOCUMENT_TYPE_LABELS = {
+    passport: t("staff.id_doc_type_passport"),
+    national_id: t("staff.id_doc_type_national_id"),
+    other: t("staff.id_doc_type_other"),
+  };
+  const VISA_TYPE_LABELS = {
+    employment_pass: t("staff.visa_type_employment_pass"),
+    professional_visit_pass: t("staff.visa_type_professional_visit_pass"),
+    dependent_pass: t("staff.visa_type_dependent_pass"),
+    other: t("staff.visa_type_other"),
+  };
 
   const handleDelete = async () => {
     try {
@@ -196,8 +246,11 @@ export default function StaffDetailView() {
                 value={<StorageFileLink fileKey={staff.id_document} className="text-green hover:underline">{t("common.open")}</StorageFileLink>}
               />
             )}
+            {staff.id_document_type && (
+              <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("staff.id_doc_type_label")} value={ID_DOCUMENT_TYPE_LABELS[staff.id_document_type] ?? staff.id_document_type} />
+            )}
             {staff.has_visa && staff.visa_type && (
-              <InfoRow icon={<MdFlight className="h-4 w-4" />} label={t("staff.visa_type")} value={staff.visa_type} />
+              <InfoRow icon={<MdFlight className="h-4 w-4" />} label={t("staff.visa_type")} value={VISA_TYPE_LABELS[staff.visa_type] ?? staff.visa_type} />
             )}
             {staff.has_visa && staff.visa_number && (
               <InfoRow icon={<MdNumbers className="h-4 w-4" />} label={t("staff.visa_number")} value={staff.visa_number} />
@@ -205,9 +258,25 @@ export default function StaffDetailView() {
             {staff.has_visa && staff.visa_expiry_date && (
               <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("staff.visa_expiry_date")} value={fmtDate(staff.visa_expiry_date)} />
             )}
+            {staff.has_visa && staff.visa_document && (
+              <InfoRow
+                icon={<MdInsertDriveFile className="h-4 w-4" />}
+                label={t("staff.visa_document_label")}
+                value={<StorageFileLink fileKey={staff.visa_document} className="text-green hover:underline">{t("common.open")}</StorageFileLink>}
+              />
+            )}
           </div>
         </div>
       )}
+
+      <DocumentManagerSection
+        documents={documents}
+        loading={docsLoading}
+        folder="staff/documents"
+        onAdd={handleAddDocument}
+        onUpdate={handleUpdateDocument}
+        onDelete={handleDeleteDocument}
+      />
 
       <StaffDeleteModal
         open={deleteOpen}

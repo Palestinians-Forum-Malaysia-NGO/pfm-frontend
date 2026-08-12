@@ -4,3 +4,7 @@ export { default as useCreateStaff } from "./useCreateStaff";
 export { default as useUpdateStaff } from "./useUpdateStaff";
 export { default as useDeleteStaff } from "./useDeleteStaff";
 export { default as useStaffList }  from "./useStaffList";
+export { default as useGetStaffDocuments }    from "./useGetStaffDocuments";
+export { default as useCreateStaffDocument }  from "./useCreateStaffDocument";
+export { default as useUpdateStaffDocument }  from "./useUpdateStaffDocument";
+export { default as useDeleteStaffDocument }  from "./useDeleteStaffDocument";

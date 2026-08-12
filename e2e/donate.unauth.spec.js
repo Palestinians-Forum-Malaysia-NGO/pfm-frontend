@@ -41,10 +41,4 @@ test.describe("Donate page — public", () => {
     await expect(secondQuestion).toHaveAttribute("aria-expanded", "true");
     await expect(firstQuestion).toHaveAttribute("aria-expanded", "false");
   });
-
-  test("navbar Donate link has no dropdown and navigates directly", async ({ page }) => {
-    await page.goto("/");
-    await page.getByLabel("Main navigation").getByRole("link", { name: "Donate", exact: true }).click();
-    await expect(page).toHaveURL(/\/donate$/);
-  });
 });

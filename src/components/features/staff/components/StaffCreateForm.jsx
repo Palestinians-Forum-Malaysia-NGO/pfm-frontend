@@ -46,12 +46,26 @@ export default function StaffCreateForm() {
     joining_date: "",
     profile_photo: null,
     id_document:  null,
+    id_document_type: "",
     has_visa:      false,
     visa_type:     "",
     visa_number:   "",
     visa_expiry_date: "",
+    visa_document: null,
   });
   const [errors, setErrors] = useState({});
+
+  const ID_DOCUMENT_TYPE_OPTIONS = [
+    { value: "passport",    label: t("staff.id_doc_type_passport") },
+    { value: "national_id", label: t("staff.id_doc_type_national_id") },
+    { value: "other",       label: t("staff.id_doc_type_other") },
+  ];
+  const VISA_TYPE_OPTIONS = [
+    { value: "employment_pass",         label: t("staff.visa_type_employment_pass") },
+    { value: "professional_visit_pass", label: t("staff.visa_type_professional_visit_pass") },
+    { value: "dependent_pass",          label: t("staff.visa_type_dependent_pass") },
+    { value: "other",                   label: t("staff.visa_type_other") },
+  ];
 
   const set = (field, value) => setForm((p) => ({ ...p, [field]: value }));
 
@@ -83,10 +97,12 @@ export default function StaffCreateForm() {
         joining_date: form.joining_date,
         profile_photo: form.profile_photo,
         id_document:  form.id_document || undefined,
+        id_document_type: form.id_document_type || undefined,
         has_visa:     form.has_visa,
         visa_type:        form.has_visa ? form.visa_type : undefined,
         visa_number:      form.has_visa ? (form.visa_number || undefined) : undefined,
         visa_expiry_date: form.has_visa ? (form.visa_expiry_date || undefined) : undefined,
+        visa_document:    form.has_visa ? (form.visa_document || undefined) : undefined,
       };
       const created = await createStaff(payload);
       success(
@@ -163,10 +179,12 @@ export default function StaffCreateForm() {
             errors={errors}
             field="id_document"
           />
+          <SelectField label={t("staff.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
+            required={false} formData={form} errors={errors} updateFormData={set} />
           <ToggleInput label={t("staff.has_visa")} field="has_visa" formData={form} errors={errors} updateFormData={set} />
           {form.has_visa && (
             <>
-              <InputField label={t("staff.visa_type")} field="visa_type" placeholder="e.g. employment_pass"
+              <SelectField label={t("staff.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS}
                 formData={form} errors={errors} updateFormData={set} rules={[{ required: true }]} />
               <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                 <InputField label={t("staff.visa_number")} field="visa_number" placeholder="e.g. EP-1234567"
@@ -174,6 +192,14 @@ export default function StaffCreateForm() {
                 <InputField label={t("staff.visa_expiry_date")} field="visa_expiry_date" type="date"
                   required={false} formData={form} errors={errors} updateFormData={set} />
               </div>
+              <StorageDocumentField
+                label={t("staff.visa_document_label")}
+                folder="staff/documents"
+                accept=".pdf,.jpg,.jpeg,.png"
+                required={false}
+                onUpload={(key) => set("visa_document", key)}
+                onRemove={() => set("visa_document", null)}
+              />
             </>
           )}
         </div>

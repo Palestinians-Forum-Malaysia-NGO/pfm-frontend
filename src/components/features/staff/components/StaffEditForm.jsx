@@ -49,7 +49,8 @@ const EMPTY_BANK  = { bank_name: "", account_number: "", account_holder_name: ""
 const EMPTY_FIN   = { job_title: "", salary: "", payment_frequency: "" };
 const EMPTY_STAFF = {
   department: "", position: "", branch: "", joining_date: "",
-  id_document: null, has_visa: false, visa_type: "", visa_number: "", visa_expiry_date: "",
+  id_document: null, id_document_type: "",
+  has_visa: false, visa_type: "", visa_number: "", visa_expiry_date: "", visa_document: null,
 };
 
 export default function StaffEditForm() {
@@ -71,7 +72,8 @@ export default function StaffEditForm() {
   const [errors,    setErrors]    = useState({});
   const [photoKey,  setPhotoKey]  = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
-  const { url: currentIdDocUrl } = useStorageUrl(staffForm.id_document, { forcePresigned: true });
+  const { url: currentIdDocUrl }   = useStorageUrl(staffForm.id_document,   { forcePresigned: true });
+  const { url: currentVisaDocUrl } = useStorageUrl(staffForm.visa_document, { forcePresigned: true });
 
   const activeBranches = branches.filter((b) => b.is_active);
   const showBranchPicker = activeBranches.length !== 1;
@@ -82,6 +84,18 @@ export default function StaffEditForm() {
     }
     return active;
   }, [activeBranches, staffForm.branch, t]);
+
+  const ID_DOCUMENT_TYPE_OPTIONS = [
+    { value: "passport",    label: t("staff.id_doc_type_passport") },
+    { value: "national_id", label: t("staff.id_doc_type_national_id") },
+    { value: "other",       label: t("staff.id_doc_type_other") },
+  ];
+  const VISA_TYPE_OPTIONS = [
+    { value: "employment_pass",         label: t("staff.visa_type_employment_pass") },
+    { value: "professional_visit_pass", label: t("staff.visa_type_professional_visit_pass") },
+    { value: "dependent_pass",          label: t("staff.visa_type_dependent_pass") },
+    { value: "other",                   label: t("staff.visa_type_other") },
+  ];
 
   const setU = (f, v) => setUserForm((p)  => ({ ...p, [f]: v }));
   const setB = (f, v) => setBankForm((p)  => ({ ...p, [f]: v }));
@@ -125,10 +139,12 @@ export default function StaffEditForm() {
         branch:       data.branch       ?? "",
         joining_date: data.joining_date ? data.joining_date.slice(0, 10) : "",
         id_document:  data.id_document  ?? null,
+        id_document_type: data.id_document_type ?? "",
         has_visa:     data.has_visa     ?? false,
         visa_type:    data.visa_type    ?? "",
         visa_number:  data.visa_number  ?? "",
         visa_expiry_date: data.visa_expiry_date ? data.visa_expiry_date.slice(0, 10) : "",
+        visa_document: data.visa_document ?? null,
       };
 
       setUserForm(userSnap);
@@ -186,10 +202,12 @@ export default function StaffEditForm() {
         branch:        staffForm.branch,
         joining_date:  staffForm.joining_date,
         id_document:   staffForm.id_document || undefined,
+        id_document_type: staffForm.id_document_type || undefined,
         has_visa:      staffForm.has_visa,
         visa_type:        staffForm.has_visa ? staffForm.visa_type : undefined,
         visa_number:      staffForm.has_visa ? (staffForm.visa_number || undefined) : undefined,
         visa_expiry_date: staffForm.has_visa ? (staffForm.visa_expiry_date || undefined) : undefined,
+        visa_document:    staffForm.has_visa ? (staffForm.visa_document || undefined) : undefined,
       };
       await updateStaff(id, payload);
       success(t("staff.toast_updated"), `${userForm.full_name} ${t("staff.toast_updated_sub")}`);
@@ -317,10 +335,12 @@ export default function StaffEditForm() {
               errors={errors}
               field="id_document"
             />
+            <SelectField label={t("staff.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
+              required={false} formData={staffForm} errors={errors} updateFormData={setS} />
             <ToggleInput label={t("staff.has_visa")} field="has_visa" formData={staffForm} errors={errors} updateFormData={setS} />
             {staffForm.has_visa && (
               <>
-                <InputField label={t("staff.visa_type")} field="visa_type" placeholder="e.g. employment_pass"
+                <SelectField label={t("staff.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS}
                   formData={staffForm} errors={errors} updateFormData={setS} rules={[{ required: true }]} />
                 <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                   <InputField label={t("staff.visa_number")} field="visa_number" placeholder="e.g. EP-1234567"
@@ -328,6 +348,15 @@ export default function StaffEditForm() {
                   <InputField label={t("staff.visa_expiry_date")} field="visa_expiry_date" type="date"
                     required={false} formData={staffForm} errors={errors} updateFormData={setS} />
                 </div>
+                <StorageDocumentField
+                  label={t("staff.visa_document_label")}
+                  folder="staff/documents"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  required={false}
+                  currentUrl={currentVisaDocUrl}
+                  onUpload={(key) => setS("visa_document", key)}
+                  onRemove={() => setS("visa_document", null)}
+                />
               </>
             )}
           </div>

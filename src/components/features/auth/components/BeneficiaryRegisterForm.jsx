@@ -178,6 +178,12 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
   const [idDocError, setIdDocError] = useState(null);
   const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
 
+  const ID_DOCUMENT_TYPE_OPTIONS = [
+    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
+    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
+    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
+  ];
+
   const canProceed =
     !Object.entries(DOCUMENTS_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc;
 
@@ -226,6 +232,8 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
           currentName={idDoc ? t("common.uploaded_file") : undefined}
           field="id_document" errors={{ id_document: idDocError }}
         />
+        <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
+          required={false} formData={data} errors={errors} updateFormData={set} />
       </div>
 
       <div className="mt-6 flex gap-3">
@@ -354,7 +362,7 @@ const validateStatusStep = (visaData) => {
   return errors;
 };
 
-const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }) => {
+const StatusStep = ({ visaData, onVisaChange, visaDoc, onVisaDocChange, onBack, onSubmit, loading, error }) => {
   const { t, i18n } = useTranslation();
   const [visaErrors, setVisaErrors] = useState({});
   const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
@@ -428,8 +436,18 @@ const StatusStep = ({ visaData, onVisaChange, onBack, onSubmit, loading, error }
           <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T}
             formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
           {visaData.has_visa === "true" && (
-            <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T}
-              formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+            <>
+              <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T}
+                formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+              <StorageDocumentField
+                label={t("beneficiaries.visa_document_label")}
+                publicEndpoint="register"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onUpload={(key) => onVisaDocChange(key)}
+                onRemove={() => onVisaDocChange(null)}
+                currentName={visaDoc ? t("common.uploaded_file") : undefined}
+              />
+            </>
           )}
           {visaData.has_visa === "false" && (
             <>
@@ -564,8 +582,9 @@ export default function BeneficiaryRegisterForm() {
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
 
   const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
-  const [documents, setDocuments] = useState({ background: "", national_id: "" });
+  const [documents, setDocuments] = useState({ background: "", national_id: "", id_document_type: "" });
   const [idDoc, setIdDoc] = useState(null);
+  const [visaDoc, setVisaDoc] = useState(null);
   const [family, setFamily] = useState({
     family_in_malaysia: false, spouse_name: "", spouse_name_ar: "",
     spouse_job: "", number_of_children: "",
@@ -589,10 +608,12 @@ export default function BeneficiaryRegisterForm() {
         national_id:       documents.national_id || undefined,
         background:        documents.background  || undefined,
         id_document:       idDoc                  || undefined,
+        id_document_type:  documents.id_document_type || undefined,
         terms_accepted:    visa.terms_accepted,
 
         has_visa:          hasVisaBool,
         visa_type:         hasVisaBool === true  ? (visa.visa_type || undefined) : undefined,
+        visa_document:     hasVisaBool === true  ? (visaDoc || undefined) : undefined,
         situation:         hasVisaBool === false ? (visa.situation || undefined) : undefined,
         unhcr_number:      (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
         country_of_origin: visa.country || undefined,
@@ -648,6 +669,7 @@ export default function BeneficiaryRegisterForm() {
             {step === 4 && (
               <StatusStep
                 visaData={visa} onVisaChange={setVisa}
+                visaDoc={visaDoc} onVisaDocChange={setVisaDoc}
                 onBack={() => setStep(3)} onSubmit={handleSubmit}
                 loading={loading} error={error}
               />

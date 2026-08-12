@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { MdEdit, MdPhone, MdSecurity, MdPerson, MdAccountBalance, MdAttachMoney, MdBusiness, MdWork, MdLocationCity } from "react-icons/md";
+import {
+  MdEdit, MdPhone, MdSecurity, MdPerson, MdAccountBalance, MdAttachMoney,
+  MdBusiness, MdWork, MdLocationCity, MdCardTravel, MdBadge, MdOpenInNew,
+} from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
-import { InputField, SelectField, ToggleInput, StorageImageField } from "components/form";
+import StorageFileLink from "components/ui/StorageFileLink";
+import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import { InputField, SelectField, ToggleInput, StorageImageField, StorageDocumentField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
+import {
+  useGetAdminDocuments, useCreateAdminDocument, useUpdateAdminDocument, useDeleteAdminDocument,
+} from "components/features/users/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 
@@ -18,12 +26,63 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const isStaff = profile?.role === "staff";
   const isAdmin = profile?.role === "admin";
   const staffProfile = profile?.profile;
+  const adminProfile = isAdmin ? profile?.profile : null;
+
+  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetAdminDocuments();
+  const { execute: createDocument } = useCreateAdminDocument();
+  const { execute: updateDocument } = useUpdateAdminDocument();
+  const { execute: deleteDocument } = useDeleteAdminDocument();
+
+  useEffect(() => {
+    if (isAdmin && profile?.id) fetchDocuments(profile.id);
+  }, [isAdmin, profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAddDocument = async (payload) => {
+    try {
+      await createDocument(profile.id, payload);
+      success(t("documents.toast_added"));
+      fetchDocuments(profile.id);
+    } catch (err) {
+      toastError(t("documents.toast_add_failed"), err?.message);
+    }
+  };
+  const handleUpdateDocument = async (docId, payload) => {
+    try {
+      await updateDocument(profile.id, docId, payload);
+      success(t("documents.toast_saved"));
+      fetchDocuments(profile.id);
+    } catch (err) {
+      toastError(t("documents.toast_save_failed"), err?.message);
+    }
+  };
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await deleteDocument(profile.id, docId);
+      success(t("documents.toast_deleted"));
+      fetchDocuments(profile.id);
+    } catch (err) {
+      toastError(t("documents.toast_delete_failed"), err?.message);
+    }
+  };
 
   const PAYMENT_FREQUENCY_OPTIONS = [
     { value: "monthly",  label: t("users.freq_monthly") },
     { value: "weekly",   label: t("users.freq_weekly") },
     { value: "biweekly", label: t("users.freq_biweekly") },
   ];
+  const ID_DOCUMENT_TYPE_OPTIONS = [
+    { value: "passport",    label: t("staff.id_doc_type_passport") },
+    { value: "national_id", label: t("staff.id_doc_type_national_id") },
+    { value: "other",       label: t("staff.id_doc_type_other") },
+  ];
+  const VISA_TYPE_OPTIONS = [
+    { value: "employment_pass",         label: t("staff.visa_type_employment_pass") },
+    { value: "professional_visit_pass", label: t("staff.visa_type_professional_visit_pass") },
+    { value: "dependent_pass",          label: t("staff.visa_type_dependent_pass") },
+    { value: "other",                   label: t("staff.visa_type_other") },
+  ];
+  const ID_DOCUMENT_TYPE_LABELS = Object.fromEntries(ID_DOCUMENT_TYPE_OPTIONS.map((o) => [o.value, o.label]));
+  const VISA_TYPE_LABELS = Object.fromEntries(VISA_TYPE_OPTIONS.map((o) => [o.value, o.label]));
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
@@ -31,6 +90,8 @@ const EditProfileSection = ({ profile, onSaved }) => {
   const [formErrors, setFormErrors] = useState({});
   const [photoKey, setPhotoKey] = useState(null);
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
+  const { url: currentIdDocUrl }   = useStorageUrl(formData.id_document,   { forcePresigned: true });
+  const { url: currentVisaDocUrl } = useStorageUrl(formData.visa_document, { forcePresigned: true });
 
   useEffect(() => {
     if (profile) {
@@ -49,12 +110,21 @@ const EditProfileSection = ({ profile, onSaved }) => {
           salary:            profile.financial_information?.salary            ?? "",
           payment_frequency: profile.financial_information?.payment_frequency ?? "",
         },
+        ...(isAdmin ? {
+          id_document:      adminProfile?.id_document?.file_key ?? adminProfile?.id_document ?? null,
+          id_document_type: adminProfile?.id_document_type      ?? "",
+          has_visa:         adminProfile?.has_visa               ?? false,
+          visa_type:        adminProfile?.visa_type               ?? "",
+          visa_number:      adminProfile?.visa_number             ?? "",
+          visa_expiry_date: adminProfile?.visa_expiry_date ? adminProfile.visa_expiry_date.slice(0, 10) : "",
+          visa_document:    adminProfile?.visa_document?.file_key ?? adminProfile?.visa_document ?? null,
+        } : {}),
       };
       setFormData(initial);
       setSnapshot(initial);
       setPhotoKey(profile.profile_photo ?? null);
     }
-  }, [profile]);
+  }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateFormData = (field, value) => {
     if (field.includes(".")) {
@@ -81,6 +151,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
       if (!fi.job_title?.trim())         newErrors.financial_information = { ...newErrors.financial_information, job_title: t("validation.required") };
       if (!String(fi.salary ?? "").trim()) newErrors.financial_information = { ...newErrors.financial_information, salary: t("validation.required") };
       if (!fi.payment_frequency)         newErrors.financial_information = { ...newErrors.financial_information, payment_frequency: t("validation.required") };
+      if (formData.has_visa && !formData.visa_type) newErrors.visa_type = t("validation.required");
     }
     if (Object.keys(newErrors).length) { setFormErrors(newErrors); return; }
     try {
@@ -97,6 +168,17 @@ const EditProfileSection = ({ profile, onSaved }) => {
       if (!isBeneficiary) {
         payload.banking_information = { ...formData.banking_information };
         payload.financial_information = { ...formData.financial_information };
+      }
+      if (isAdmin) {
+        payload.profile = {
+          id_document:      formData.id_document      || undefined,
+          id_document_type: formData.id_document_type || undefined,
+          has_visa:         formData.has_visa,
+          visa_type:        formData.has_visa ? formData.visa_type : undefined,
+          visa_number:      formData.has_visa ? (formData.visa_number || undefined) : undefined,
+          visa_expiry_date: formData.has_visa ? (formData.visa_expiry_date || undefined) : undefined,
+          visa_document:    formData.has_visa ? (formData.visa_document || undefined) : undefined,
+        };
       }
       await updateProfile(payload);
       success(t("profile.toast_profile_updated"), t("profile.toast_profile_updated_sub"));
@@ -238,26 +320,123 @@ const EditProfileSection = ({ profile, onSaved }) => {
             </div>
           )}
 
+          {isAdmin && (
+            <div className="mt-5 border-t border-slate-200 pt-5">
+              <FormHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("staff.section_visa")} subtitle={t("staff.section_visa_sub")} />
+              <StorageDocumentField
+                label={t("staff.id_document")}
+                folder="users/documents"
+                accept=".pdf,.jpg,.jpeg,.png"
+                required={false}
+                currentUrl={currentIdDocUrl}
+                onUpload={(key) => updateFormData("id_document", key)}
+                onRemove={() => updateFormData("id_document", null)}
+              />
+              <SelectField
+                label={t("staff.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
+                required={false} formData={formData} errors={formErrors} updateFormData={updateFormData}
+              />
+              <ToggleInput label={t("staff.has_visa")} field="has_visa" formData={formData} errors={formErrors} updateFormData={updateFormData} />
+              {formData.has_visa && (
+                <>
+                  <SelectField
+                    label={t("staff.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS}
+                    formData={formData} errors={formErrors} updateFormData={updateFormData} rules={[{ required: true }]}
+                  />
+                  <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    <InputField
+                      label={t("staff.visa_number")} field="visa_number" placeholder="e.g. EP-1234567"
+                      required={false} formData={formData} errors={formErrors} updateFormData={updateFormData}
+                    />
+                    <InputField
+                      label={t("staff.visa_expiry_date")} field="visa_expiry_date" type="date"
+                      required={false} formData={formData} errors={formErrors} updateFormData={updateFormData}
+                    />
+                  </div>
+                  <StorageDocumentField
+                    label={t("staff.visa_document_label")}
+                    folder="users/documents"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required={false}
+                    currentUrl={currentVisaDocUrl}
+                    onUpload={(key) => updateFormData("visa_document", key)}
+                    onRemove={() => updateFormData("visa_document", null)}
+                  />
+                </>
+              )}
+            </div>
+          )}
+
           <div className="mt-4 flex gap-3">
             <Button variant="ghost" text={t("common.cancel")} onClick={handleCancel} className="flex-1" />
             <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty} className="flex-1" />
           </div>
         </form>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdPerson className="h-4 w-4" />}   label={t("users.full_name")}    value={profile.full_name    || "—"} />
-          <InfoRow icon={<MdPhone className="h-4 w-4" />}    label={t("users.phone")} value={profile.phone_number || "—"} />
-          <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("contact.whatsapp")}     value={profile.whatsapp_enabled ? t("common.enabled") : t("common.disabled")} />
-          {!isBeneficiary && (
-            <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")} value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
-          )}
-          {isStaff && staffProfile && (
-            <>
-              <InfoRow icon={<MdBusiness className="h-4 w-4" />}     label={t("staff.info_department")} value={staffProfile.department || "—"} />
-              <InfoRow icon={<MdWork className="h-4 w-4" />}         label={t("staff.info_position")}   value={staffProfile.position   || "—"} />
-              <InfoRow icon={<MdLocationCity className="h-4 w-4" />} label={t("staff.info_branch")}     value={staffProfile.branch     || "—"} />
-            </>
-          )}
+        <>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow icon={<MdPerson className="h-4 w-4" />}   label={t("users.full_name")}    value={profile.full_name    || "—"} />
+            <InfoRow icon={<MdPhone className="h-4 w-4" />}    label={t("users.phone")} value={profile.phone_number || "—"} />
+            <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("contact.whatsapp")}     value={profile.whatsapp_enabled ? t("common.enabled") : t("common.disabled")} />
+            {!isBeneficiary && (
+              <InfoRow icon={<MdSecurity className="h-4 w-4" />} label={t("users.info_2fa")} value={profile.is_2fa_enabled ? t("common.enabled") : t("common.disabled")} />
+            )}
+            {isStaff && staffProfile && (
+              <>
+                <InfoRow icon={<MdBusiness className="h-4 w-4" />}     label={t("staff.info_department")} value={staffProfile.department || "—"} />
+                <InfoRow icon={<MdWork className="h-4 w-4" />}         label={t("staff.info_position")}   value={staffProfile.position   || "—"} />
+                <InfoRow icon={<MdLocationCity className="h-4 w-4" />} label={t("staff.info_branch")}     value={staffProfile.branch     || "—"} />
+              </>
+            )}
+            {isAdmin && adminProfile && (
+              <>
+                {adminProfile.id_document_type && (
+                  <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("staff.id_doc_type_label")} value={ID_DOCUMENT_TYPE_LABELS[adminProfile.id_document_type] ?? adminProfile.id_document_type} />
+                )}
+                {adminProfile.id_document && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400">{t("staff.id_document")}</span>
+                    <StorageFileLink fileKey={adminProfile.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
+                      {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
+                    </StorageFileLink>
+                  </div>
+                )}
+                <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.has_visa")} value={adminProfile.has_visa ? t("common.enabled") : t("common.disabled")} />
+                {adminProfile.has_visa && (
+                  <>
+                    <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.visa_type")} value={VISA_TYPE_LABELS[adminProfile.visa_type] ?? adminProfile.visa_type ?? "—"} />
+                    {adminProfile.visa_number && (
+                      <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("staff.visa_number")} value={adminProfile.visa_number} />
+                    )}
+                    {adminProfile.visa_expiry_date && (
+                      <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.visa_expiry_date")} value={adminProfile.visa_expiry_date.slice(0, 10)} />
+                    )}
+                    {adminProfile.visa_document && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-400">{t("staff.visa_document_label")}</span>
+                        <StorageFileLink fileKey={adminProfile.visa_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
+                          {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
+                        </StorageFileLink>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
+
+      {isAdmin && (
+        <div className="mt-5 border-t border-slate-200 pt-5">
+          <DocumentManagerSection
+            documents={documents}
+            loading={docsLoading}
+            folder="users/documents"
+            onAdd={handleAddDocument}
+            onUpdate={handleUpdateDocument}
+            onDelete={handleDeleteDocument}
+          />
         </div>
       )}
     </div>

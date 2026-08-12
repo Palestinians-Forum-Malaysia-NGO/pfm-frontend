@@ -19,7 +19,11 @@ import DropdownButton from "components/ui/buttons/DropdownButton";
 import StorageImage from "components/ui/StorageImage";
 import StorageFileLink from "components/ui/StorageFileLink";
 import Loading from "components/loading/Loading";
-import { useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary } from "components/features/beneficiaries/hooks";
+import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import {
+  useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary,
+  useGetBeneficiaryDocuments, useCreateBeneficiaryDocument, useUpdateBeneficiaryDocument, useDeleteBeneficiaryDocument,
+} from "components/features/beneficiaries/hooks";
 import { ACCOUNT_STATUS_BADGE } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -47,7 +51,41 @@ export default function BeneficiaryDetailView() {
   const [editingStatus,  setEditingStatus]  = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
 
+  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetBeneficiaryDocuments();
+  const { execute: createDocument } = useCreateBeneficiaryDocument();
+  const { execute: updateDocument } = useUpdateBeneficiaryDocument();
+  const { execute: deleteDocument } = useDeleteBeneficiaryDocument();
+
   useEffect(() => { fetchBeneficiary(id).catch(() => {}); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchDocuments(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAddDocument = async (payload) => {
+    try {
+      await createDocument(id, payload);
+      success(t("documents.toast_added"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_add_failed"), err?.message);
+    }
+  };
+  const handleUpdateDocument = async (docId, payload) => {
+    try {
+      await updateDocument(id, docId, payload);
+      success(t("documents.toast_saved"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_save_failed"), err?.message);
+    }
+  };
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await deleteDocument(id, docId);
+      success(t("documents.toast_deleted"));
+      fetchDocuments(id);
+    } catch (err) {
+      toastError(t("documents.toast_delete_failed"), err?.message);
+    }
+  };
 
   const handleStatusEdit = () => {
     setSelectedStatus(beneficiary.account_status ?? "");
@@ -220,6 +258,10 @@ export default function BeneficiaryDetailView() {
             <p className="text-sm text-slate-700 leading-relaxed">{beneficiary.background}</p>
           </div>
         )}
+        {beneficiary.id_document_type && (
+          <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.id_doc_type_label")}
+            value={t(`beneficiaries.id_doc_type_${beneficiary.id_document_type}`, { defaultValue: beneficiary.id_document_type })} />
+        )}
         {beneficiary.id_document && (
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
             <MdBadge className="h-5 w-5 shrink-0 text-green" />
@@ -267,6 +309,10 @@ export default function BeneficiaryDetailView() {
             {beneficiary.palestine_region && (
               <InfoRow icon={<MdFlag className="h-4 w-4" />} label={t("beneficiaries.info_palestine_region")}
                 value={t(`beneficiaries.region_${beneficiary.palestine_region}`, { defaultValue: beneficiary.palestine_region })} />
+            )}
+            {beneficiary.has_visa && beneficiary.visa_document && (
+              <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.visa_document_label")}
+                value={<StorageFileLink fileKey={beneficiary.visa_document} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
             )}
           </div>
         </div>
@@ -353,26 +399,14 @@ export default function BeneficiaryDetailView() {
       )}
 
       {/* ── Supporting Documents ── */}
-      {beneficiary.supporting_documents?.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_documents")} subtitle={t("beneficiaries.section_documents_sub")} />
-          <div className="flex flex-col gap-2">
-            {beneficiary.supporting_documents.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{doc.document_name}</p>
-                  <p className="text-xs text-slate-400">{doc.document_type}</p>
-                </div>
-                {doc.document_file && (
-                  <StorageFileLink fileKey={doc.document_file} className="text-xs font-medium text-green hover:underline">
-                    {t("beneficiaries.doc_view")}
-                  </StorageFileLink>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <DocumentManagerSection
+        documents={documents}
+        loading={docsLoading}
+        folder="beneficiaries/documents"
+        onAdd={handleAddDocument}
+        onUpdate={handleUpdateDocument}
+        onDelete={handleDeleteDocument}
+      />
 
       <BeneficiaryDeleteModal
         open={deleteOpen}

@@ -24,4 +24,9 @@ export const userService = {
   async remove(id) {
     await api.delete(`/accounts/users/${id}`);
   },
+
+  async getDocuments(userId)            { const { data } = await api.get(`/accounts/users/${userId}/admin-documents`); return data; },
+  async createDocument(userId, payload) { const { data } = await api.post(`/accounts/users/${userId}/admin-documents`, payload); return data; },
+  async updateDocument(userId, id, payload) { const { data } = await api.put(`/accounts/users/${userId}/admin-documents/${id}`, payload); return data; },
+  async deleteDocument(userId, id)      { await api.delete(`/accounts/users/${userId}/admin-documents/${id}`); },
 };

@@ -7,3 +7,7 @@ export { default as useBeneficiaryList }       from "./useBeneficiaryList";
 export { default as useGetBeneficiaryStats }   from "./useGetBeneficiaryStats";
 export { default as useGetClassifications }    from "./useGetClassifications";
 export { default as useGetStates }             from "./useGetStates";
+export { default as useGetBeneficiaryDocuments }    from "./useGetBeneficiaryDocuments";
+export { default as useCreateBeneficiaryDocument } from "./useCreateBeneficiaryDocument";
+export { default as useUpdateBeneficiaryDocument } from "./useUpdateBeneficiaryDocument";
+export { default as useDeleteBeneficiaryDocument } from "./useDeleteBeneficiaryDocument";

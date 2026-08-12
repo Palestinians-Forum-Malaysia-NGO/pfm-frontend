@@ -9,10 +9,11 @@ import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
 import StorageFileLink from "components/ui/StorageFileLink";
-import { InputField, SelectField, ToggleInput, TextareaField } from "components/form";
+import { InputField, SelectField, ToggleInput, TextareaField, StorageDocumentField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
 import { useGetStates } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 
 const STATUS_BADGE   = {
@@ -45,8 +46,11 @@ const emptyForm = (profile) => {
     state:                    p.state                     ?? "",
     address:                  p.address                   ?? "",
     background:               p.background                ?? "",
+    id_document:              p.id_document?.file_key ?? p.id_document ?? null,
+    id_document_type:         p.id_document_type          ?? "",
     has_visa:                 p.has_visa === true ? "true" : p.has_visa === false ? "false" : "",
     visa_type:                p.visa_type                 ?? "",
+    visa_document:            p.visa_document?.file_key ?? p.visa_document ?? null,
     situation:                p.situation                 ?? "",
     unhcr_number:             p.unhcr_number              ?? "",
     palestine_region:         p.palestine_region          ?? "",
@@ -72,6 +76,8 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const [snapshot, setSnapshot] = useState(null);
 
   const p = profile?.profile;
+  const { url: currentIdDocUrl }   = useStorageUrl(p?.id_document,   { forcePresigned: true });
+  const { url: currentVisaDocUrl } = useStorageUrl(p?.visa_document, { forcePresigned: true });
 
   useEffect(() => {
     if (!profile) return;
@@ -104,6 +110,13 @@ const MemberInfoSection = ({ profile, onSaved }) => {
     active: t("beneficiaries.account_status_active"), pending: t("beneficiaries.account_status_pending"),
     suspended: t("beneficiaries.account_status_suspended"), rejected: t("beneficiaries.account_status_rejected"),
   };
+
+  const ID_DOCUMENT_TYPE_OPTIONS_T = [
+    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
+    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
+    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
+  ];
+  const ID_DOCUMENT_TYPE_LABELS = Object.fromEntries(ID_DOCUMENT_TYPE_OPTIONS_T.map((o) => [o.value, o.label]));
 
   const STATE_OPTIONS = states.map((s) => ({
     value: s.code,
@@ -154,8 +167,11 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           state:                    formData.state                    || undefined,
           address:                  formData.address                  || undefined,
           background:               formData.background               || undefined,
+          id_document:              formData.id_document              || undefined,
+          id_document_type:         formData.id_document_type         || undefined,
           has_visa:                 hasVisaBool,
           visa_type:                hasVisaBool === true  ? (formData.visa_type || undefined) : undefined,
+          visa_document:            hasVisaBool === true  ? (formData.visa_document || undefined) : undefined,
           situation:                hasVisaBool === false ? (formData.situation || undefined) : undefined,
           unhcr_number:             (hasVisaBool === false && formData.situation === "refugee") ? (formData.unhcr_number || undefined) : undefined,
           palestine_region:         formData.country_of_origin === "PS" ? (formData.palestine_region || undefined) : undefined,
@@ -218,6 +234,16 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             <div className="sm:col-span-2">
               <TextareaField label={t("apply.background")} field="background" required={false} formData={formData} updateFormData={updateFormData} />
             </div>
+            <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+            <div className="sm:col-span-2">
+              <StorageDocumentField
+                label={t("apply.id_document")}
+                folder="beneficiaries/documents"
+                currentUrl={currentIdDocUrl}
+                onUpload={(key) => updateFormData("id_document", key)}
+                onRemove={() => updateFormData("id_document", null)}
+              />
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -237,6 +263,17 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             {p.background && (
               <div className="sm:col-span-2">
                 <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("apply.background")} value={p.background} />
+              </div>
+            )}
+            {p.id_document_type && (
+              <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.id_doc_type_label")} value={ID_DOCUMENT_TYPE_LABELS[p.id_document_type] ?? p.id_document_type} />
+            )}
+            {p.id_document && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400">{t("apply.id_document")}</span>
+                <StorageFileLink fileKey={p.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
+                  {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
+                </StorageFileLink>
               </div>
             )}
             <div className="flex items-center gap-2">
@@ -259,7 +296,18 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
             {formData.has_visa === "true" && (
-              <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+              <>
+                <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
+                <div className="sm:col-span-2">
+                  <StorageDocumentField
+                    label={t("beneficiaries.visa_document_label")}
+                    folder="beneficiaries/documents"
+                    currentUrl={currentVisaDocUrl}
+                    onUpload={(key) => updateFormData("visa_document", key)}
+                    onRemove={() => updateFormData("visa_document", null)}
+                  />
+                </div>
+              </>
             )}
             {formData.has_visa === "false" && (
               <>
@@ -290,10 +338,10 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             {p.country_of_origin === "PS" && (
               <InfoRow icon={<MdLocationOn className="h-4 w-4" />} label={t("apply.palestine_region")} value={PALESTINE_REGION_LABELS[p.palestine_region] ?? p.palestine_region ?? "—"} />
             )}
-            {p.id_document && (
+            {p.visa_document && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">{t("apply.id_document")}</span>
-                <StorageFileLink fileKey={p.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
+                <span className="text-xs text-slate-400">{t("beneficiaries.visa_document_label")}</span>
+                <StorageFileLink fileKey={p.visa_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
                   {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
                 </StorageFileLink>
               </div>
