@@ -5,9 +5,9 @@ import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdBadge, MdPeople, MdCheckCircle, MdCancel,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
-  MdWork, MdDomain,
+  MdWork, MdDomain, MdFileDownload,
 } from "react-icons/md";
-import { useStaffList } from "components/features/staff/hooks";
+import { useStaffList, useExportStaff } from "components/features/staff/hooks";
 import StaffDeleteModal from "./StaffDeleteModal";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -16,6 +16,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import StorageImage from "components/ui/StorageImage";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -34,6 +35,16 @@ export default function StaffList() {
     deleteLoading,
     handleDeleteConfirm,
   } = useStaffList();
+  const { execute: exportReport, loading: exporting } = useExportStaff();
+  const { error: toastError } = useToast();
+
+  const handleExport = async () => {
+    try {
+      await exportReport();
+    } catch (err) {
+      toastError(t("staff.toast_export_failed"), err?.message);
+    }
+  };
 
   const STATUS_OPTIONS = [
     { value: "all",      label: t("staff.status_all") },
@@ -150,7 +161,10 @@ export default function StaffList() {
         title={t("staff.title")}
         subtitle={t("staff.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text={t("staff.add_staff")} onClick={() => navigate(`${base}/staff/create`)} />
+          <>
+            <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("common.export")} loading={exporting} onClick={handleExport} />
+            <Button icon={<MdAdd className="h-4 w-4" />} text={t("staff.add_staff")} onClick={() => navigate(`${base}/staff/create`)} />
+          </>
         }
       />
 

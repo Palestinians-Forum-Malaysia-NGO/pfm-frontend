@@ -6,6 +6,7 @@ export const staffService = {
   async create(payload)       { const { data } = await api.post("/accounts/staff", payload); return data; },
   async update(id, payload)   { const { data } = await api.patch(`/accounts/staff/${id}`, payload); return data; },
   async remove(id)            { await api.delete(`/accounts/staff/${id}`); },
+  async exportReport()        { const { data } = await api.get("/accounts/staff/export", { responseType: "blob" }); return data; },
 
   async getDocuments(staffId)            { const { data } = await api.get(`/accounts/staff/${staffId}/documents`); return data; },
   async createDocument(staffId, payload) { const { data } = await api.post(`/accounts/staff/${staffId}/documents`, payload); return data; },

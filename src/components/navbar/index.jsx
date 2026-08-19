@@ -50,11 +50,11 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
           button={
             <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100">
               <MdNotificationsNone className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-pfmRed-500" />
+              <span className="absolute end-2 top-2 h-2 w-2 rounded-full bg-pfmRed-500" />
             </button>
           }
-          animation="origin-top-right transition-all duration-200 ease-in-out"
-          classNames="py-2 top-12 -right-2 w-max"
+          animation="ltr:origin-top-right rtl:origin-top-left transition-all duration-200 ease-in-out"
+          classNames="py-2 top-12 -end-2 w-max"
           children={
             <div className="w-[min(20rem,calc(100vw-2rem))] rounded-2xl bg-white p-4 shadow-xl shadow-shadow-500">
               <div className="mb-3 flex items-center justify-between">
@@ -87,8 +87,8 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
               <StorageImage fileKey={user?.profile_photo} alt={user?.full_name} className="h-full w-full object-cover" fallback={initials} />
             </button>
           }
-          animation="origin-top-right transition-all duration-200 ease-in-out"
-          classNames="py-2 top-12 -right-2 w-max"
+          animation="ltr:origin-top-right rtl:origin-top-left transition-all duration-200 ease-in-out"
+          classNames="py-2 top-12 -end-2 w-max"
           children={
             <div className="w-52 rounded-2xl bg-white shadow-xl shadow-shadow-500">
               <div className="flex items-center gap-3 p-4">

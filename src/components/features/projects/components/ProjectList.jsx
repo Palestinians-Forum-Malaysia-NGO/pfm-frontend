@@ -5,9 +5,9 @@ import useLayoutBase from "hooks/useLayoutBase";
 import {
   MdAdd, MdAssignment, MdCheckCircle,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
-  MdPublic, MdPublicOff, MdFlag,
+  MdPublic, MdPublicOff, MdFlag, MdFileDownload,
 } from "react-icons/md";
-import { useProjectList } from "components/features/projects/hooks";
+import { useProjectList, useExportProjects } from "components/features/projects/hooks";
 import ProjectDeleteModal from "./ProjectDeleteModal";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
 import Button from "components/ui/buttons/Button";
@@ -17,6 +17,7 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import useAuth from "components/features/auth/hooks/useAuth";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -38,6 +39,16 @@ export default function ProjectList() {
   } = useProjectList();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const { execute: exportReport, loading: exporting } = useExportProjects();
+  const { error: toastError } = useToast();
+
+  const handleExport = async () => {
+    try {
+      await exportReport(statusFilter !== "all" ? { status: statusFilter } : {});
+    } catch (err) {
+      toastError(t("projects.toast_export_failed"), err?.message);
+    }
+  };
 
   const STATUS_OPTIONS = [
     { value: "all",       label: t("projects.status_all") },
@@ -162,7 +173,10 @@ export default function ProjectList() {
         title={t("projects.title")}
         subtitle={t("projects.subtitle")}
         actions={
-          <Button icon={<MdAdd className="h-4 w-4" />} text={t("projects.new_project")} onClick={() => navigate(`${base}/projects/create`)} />
+          <>
+            <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("common.export")} loading={exporting} onClick={handleExport} />
+            <Button icon={<MdAdd className="h-4 w-4" />} text={t("projects.new_project")} onClick={() => navigate(`${base}/projects/create`)} />
+          </>
         }
       />
 

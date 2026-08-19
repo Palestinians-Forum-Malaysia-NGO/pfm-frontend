@@ -6,9 +6,9 @@ import {
   MdPeople, MdCheckCircle,
   MdEdit, MdDeleteOutline, MdOpenInNew, MdClose,
   MdGroups, MdHourglassEmpty, MdFlag,
-  MdPerson, MdBlock,
+  MdPerson, MdBlock, MdFileDownload,
 } from "react-icons/md";
-import { useBeneficiaryList } from "components/features/beneficiaries/hooks";
+import { useBeneficiaryList, useExportBeneficiaries } from "components/features/beneficiaries/hooks";
 import BeneficiaryDeleteModal from "./BeneficiaryDeleteModal";
 import { ACCOUNT_STATUS_BADGE } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
@@ -20,6 +20,7 @@ import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import StorageImage from "components/ui/StorageImage";
 import useAuth from "components/features/auth/hooks/useAuth";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
@@ -41,6 +42,16 @@ export default function BeneficiaryList() {
   } = useBeneficiaryList();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const { execute: exportReport, loading: exporting } = useExportBeneficiaries();
+  const { error: toastError } = useToast();
+
+  const handleExport = async () => {
+    try {
+      await exportReport();
+    } catch (err) {
+      toastError(t("beneficiaries.toast_export_failed"), err?.message);
+    }
+  };
 
   const ACCOUNT_STATUS_OPTIONS = [
     { value: "all",       label: t("beneficiaries.account_status_all") },
@@ -198,6 +209,9 @@ export default function BeneficiaryList() {
         icon={<MdPeople className="h-5 w-5" />}
         title={t("beneficiaries.title")}
         subtitle={t("beneficiaries.subtitle")}
+        actions={
+          <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("common.export")} loading={exporting} onClick={handleExport} />
+        }
       />
 
       {/* ── Stat cards ── */}

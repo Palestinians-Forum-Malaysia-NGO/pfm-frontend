@@ -359,7 +359,8 @@
     "upload_photo": "رفع صورة",
     "change_photo": "تغيير الصورة",
     "image_size_hint": "المقاس الموصى به {{dimensions}} بكسل، بحد أقصى {{size}} ميجابايت",
-    "file_too_large": "حجم الملف كبير جداً. الحد الأقصى {{size}} ميجابايت."
+    "file_too_large": "حجم الملف كبير جداً. الحد الأقصى {{size}} ميجابايت.",
+    "export": "تصدير"
   },
   "home": {
     "our_work": "أعمالنا",
@@ -705,7 +706,8 @@
     "toast_update_failed": "فشل في تحديث الموظف",
     "toast_deleted": "تمت إزالة الموظف",
     "toast_deleted_sub": "تمت إزالته.",
-    "toast_delete_failed": "فشل في إزالة الموظف"
+    "toast_delete_failed": "فشل في إزالة الموظف",
+    "toast_export_failed": "فشل تصدير التقرير."
   },
   "categories": {
     "title": "الفئات",
@@ -1034,7 +1036,8 @@
     "toast_photo_saved": "تم حفظ الصورة",
     "toast_photo_save_failed": "فشل حفظ الصورة",
     "toast_photo_removed": "تمت إزالة الصورة",
-    "toast_photo_remove_failed": "فشل إزالة الصورة"
+    "toast_photo_remove_failed": "فشل إزالة الصورة",
+    "toast_export_failed": "فشل تصدير التقرير."
   },
   "beneficiaries": {
     "title": "المستفيدون",
@@ -1257,7 +1260,8 @@
     "toast_status_updated": "تم تحديث الحالة",
     "toast_status_updated_sub": "تغيرت حالة الحساب إلى",
     "toast_status_failed": "فشل تحديث الحالة",
-    "loading": "جاري تحميل المستفيد…"
+    "loading": "جاري تحميل المستفيد…",
+    "toast_export_failed": "فشل تصدير التقرير."
   },
   "classifications": {
     "title": "التصنيفات",
@@ -2393,7 +2397,9 @@
     "notif_application": "طلب {{project}} أصبحت حالته {{status}}",
     "notif_feedback": "تقييم من {{name}} أصبحت حالته {{status}}",
     "activity_application": "طلب {{project}} {{status}}",
-    "activity_feedback": "تقييم جديد من {{name}}"
+    "activity_feedback": "تقييم جديد من {{name}}",
+    "export_report": "تصدير التقرير",
+    "toast_export_failed": "فشل تصدير التقرير."
   },
   "staff_dashboard": {
     "title": "لوحة تحكم الموظفين",
@@ -2424,7 +2430,9 @@
     "notif_application": "طلب {{project}} أصبحت حالته {{status}}",
     "notif_feedback": "تقييم من {{name}} أصبحت حالته {{status}}",
     "activity_application": "طلب {{project}} {{status}}",
-    "activity_feedback": "تقييم جديد من {{name}}"
+    "activity_feedback": "تقييم جديد من {{name}}",
+    "export_report": "تصدير التقرير",
+    "toast_export_failed": "فشل تصدير التقرير."
   },
   "stats": {
     "status_active": "نشط",

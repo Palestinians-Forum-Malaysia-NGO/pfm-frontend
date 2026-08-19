@@ -359,7 +359,8 @@
     "change_photo": "Change Photo",
     "image_size_hint": "Recommended {{dimensions}}px, up to {{size}} MB",
     "file_too_large": "File is too large. Maximum size is {{size}} MB.",
-    "current_image": "Current"
+    "current_image": "Current",
+    "export": "Export"
   },
   "home": {
     "our_work": "Our Work",
@@ -705,7 +706,8 @@
     "toast_update_failed": "Failed to update staff",
     "toast_deleted": "Staff removed",
     "toast_deleted_sub": "has been removed.",
-    "toast_delete_failed": "Failed to remove staff"
+    "toast_delete_failed": "Failed to remove staff",
+    "toast_export_failed": "Failed to export report."
   },
   "categories": {
     "title": "Categories",
@@ -1034,7 +1036,8 @@
     "toast_photo_saved": "Photo saved",
     "toast_photo_save_failed": "Failed to save photo",
     "toast_photo_removed": "Photo removed",
-    "toast_photo_remove_failed": "Failed to remove photo"
+    "toast_photo_remove_failed": "Failed to remove photo",
+    "toast_export_failed": "Failed to export report."
   },
   "beneficiaries": {
     "title": "Beneficiaries",
@@ -1257,7 +1260,8 @@
     "toast_status_updated": "Status updated",
     "toast_status_updated_sub": "Account status changed to",
     "toast_status_failed": "Failed to update status",
-    "loading": "Loading beneficiary…"
+    "loading": "Loading beneficiary…",
+    "toast_export_failed": "Failed to export report."
   },
   "classifications": {
     "title": "Classifications",
@@ -2393,7 +2397,9 @@
     "notif_application": "{{project}} application was {{status}}",
     "notif_feedback": "Feedback from {{name}} was {{status}}",
     "activity_application": "{{project}} application {{status}}",
-    "activity_feedback": "New feedback submitted by {{name}}"
+    "activity_feedback": "New feedback submitted by {{name}}",
+    "export_report": "Export Report",
+    "toast_export_failed": "Failed to export report."
   },
   "staff_dashboard": {
     "title": "Staff Dashboard",
@@ -2424,7 +2430,9 @@
     "notif_application": "{{project}} application was {{status}}",
     "notif_feedback": "Feedback from {{name}} was {{status}}",
     "activity_application": "{{project}} application {{status}}",
-    "activity_feedback": "New feedback submitted by {{name}}"
+    "activity_feedback": "New feedback submitted by {{name}}",
+    "export_report": "Export Report",
+    "toast_export_failed": "Failed to export report."
   },
   "stats": {
     "status_active": "Active",

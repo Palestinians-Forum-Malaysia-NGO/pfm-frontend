@@ -22,3 +22,4 @@ export { default as useCreateMilestoneBeneficiary } from "./useCreateMilestoneBe
 export { default as useUpdateMilestoneBeneficiary } from "./useUpdateMilestoneBeneficiary";
 export { default as useDeleteMilestoneBeneficiary } from "./useDeleteMilestoneBeneficiary";
 export { default as useProjectList       } from "./useProjectList";
+export { default as useExportProjects    } from "./useExportProjects";

@@ -11,6 +11,7 @@ export const projectService = {
   async unpublish(id)         { const { data } = await api.post(`/projects/${id}/unpublish`); return data; },
   async assignStaff(id, userIds)   { const { data } = await api.post(`/projects/${id}/assign-staff`, { user_ids: userIds }); return data; },
   async unassignStaff(id, userIds) { const { data } = await api.post(`/projects/${id}/unassign-staff`, { user_ids: userIds }); return data; },
+  async exportReport(params = {}) { const { data } = await api.get("/projects/export", { params, responseType: "blob" }); return data; },
   // Milestones
   async getMilestones(projectId)                   { const { data } = await api.get(`/projects/${projectId}/milestones`); return data; },
   async createMilestone(projectId, payload)        { const { data } = await api.post(`/projects/${projectId}/milestones`, payload); return data; },
