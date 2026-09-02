@@ -50,7 +50,8 @@ const ComingSoon = () => {
 
       <section className="min-h-screen bg-white p-3 sm:p-5">
         <div
-          className="relative flex min-h-[calc(100vh-40px)] flex-col overflow-hidden rounded-3xl bg-white border border-green/10 shadow-ring-green"
+          className="relative flex min-h-[calc(100vh-40px)] flex-col overflow-hidden rounded-3xl bg-white"
+          className="border border-green/10 shadow-ring-green"
         >
 
           {/* ── Background elements ── */}
@@ -123,7 +124,8 @@ const ComingSoon = () => {
               style={{ animationDelay: "0.46s" }}>
               {PILLARS.map((p) => (
                 <div key={p.title}
-                  className="flex flex-col items-center gap-2 rounded-2xl border border-green/10 bg-green/[2%] px-5 py-4 text-center">
+                  className="flex flex-col items-center gap-2 rounded-2xl border px-5 py-4 text-center"
+                  className="border-green/10 bg-green/[2%]">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/[7%] text-green">
                     {p.icon}
                   </div>
