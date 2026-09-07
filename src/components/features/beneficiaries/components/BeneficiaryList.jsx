@@ -199,7 +199,7 @@ export default function BeneficiaryList() {
   const hasFilters = search !== "" || statusFilter !== "all" || accountFilter !== "all";
 
   const bg = apiStats?.by_gender ?? {};
-  const genderTotal = (bg.male ?? 0) + (bg.female ?? 0) + (bg.unspecified ?? 0);
+  const genderTotal = (bg.male ?? 0) + (bg.female ?? 0);
   const genderPct = (n) => genderTotal > 0 ? Math.round((n / genderTotal) * 100) : 0;
 
   return (
@@ -251,15 +251,6 @@ export default function BeneficiaryList() {
             <span className="text-sm font-bold text-slate-800">{bg.female ?? 0}</span>
             <span className="text-xs text-slate-400">{t("beneficiaries.gender_female")} · {genderPct(bg.female ?? 0)}%</span>
           </div>
-
-          {/* Unspecified (only if non-zero) */}
-          {(bg.unspecified ?? 0) > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full bg-slate-300" />
-              <span className="text-sm font-bold text-slate-800">{bg.unspecified}</span>
-              <span className="text-xs text-slate-400">{t("beneficiaries.gender_unspecified")} · {genderPct(bg.unspecified)}%</span>
-            </div>
-          )}
 
           {/* Top city */}
           {apiStats.by_city?.length > 0 && (

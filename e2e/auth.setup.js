@@ -20,8 +20,14 @@ const ACCOUNTS = [
     homePattern: "**/beneficiary/**",
     authFile: path.join(__dirname, ".auth/beneficiary.json"),
   },
-  // No real staff credential available yet — re-add here (with role: "staff",
-  // homePattern: "**/staff/**", authFile: .auth/staff.json) once one exists.
+  {
+    role: "staff",
+    email: "adnanmadiadnan@gmail.com",
+    password: "Adnan421###",
+    requiresOtp: true,
+    homePattern: "**/staff/**",
+    authFile: path.join(__dirname, ".auth/staff.json"),
+  },
 ];
 
 setup.setTimeout(30_000);

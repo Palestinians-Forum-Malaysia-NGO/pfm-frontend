@@ -17,6 +17,7 @@ const RULES = {
   applicant_full_name:    [{ required: true }, { maxLength: 255 }],
   applicant_email:        [{ required: true }, { email: true }],
   applicant_phone:        [{ required: true }, { maxLength: 30 }],
+  applicant_resume:       [{ required: true }],
   applicant_cover_letter: [{ required: true }],
 };
 
@@ -206,7 +207,7 @@ const OpportunityApplicationForm = ({ opportunities, opportunityId }) => {
           label={t("opportunityApply.resume")}
           publicEndpoint="opportunityApplication"
           accept=".pdf,.doc,.docx"
-          required={false}
+          required
           onUpload={(key) => updateForm("applicant_resume", key)}
           onRemove={() => updateForm("applicant_resume", null)}
           field="applicant_resume"

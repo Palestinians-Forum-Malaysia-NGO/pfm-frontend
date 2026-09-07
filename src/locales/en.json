@@ -237,7 +237,8 @@
     "immigration_status": "Immigration Status",
     "terms_label": "I agree to the privacy policy and confirm the information provided is accurate.",
     "background_placeholder": "Brief background about your situation…",
-    "new_code_sent": "A new code has been sent."
+    "new_code_sent": "A new code has been sent.",
+    "server_error_banner": "We found an issue with the information below — please review the highlighted field and try again."
   },
   "auth": {
     "portal_access": "Portal Access",

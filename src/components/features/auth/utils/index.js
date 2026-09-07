@@ -85,3 +85,23 @@ export const extractError = (err, fallback = "Something went wrong. Please try a
   if (status >= 500)                      return SERVER_ERROR_MESSAGE;
   return fallback;
 };
+
+/**
+ * Like extractError, but keeps the field name a DRF error is attached to
+ * instead of discarding it — needed by any multi-step form that must route
+ * the user back to whichever step actually owns the invalid field, rather
+ * than showing a message disconnected from where the problem is (e.g. a
+ * duplicate-email error surfacing on the last step of a wizard when email
+ * was collected on the first). Returns null for non-field errors (network,
+ * 5xx, `detail`/`non_field_errors`) — those have nowhere more specific to go.
+ */
+export const extractFieldError = (err) => {
+  const res = err?.response?.data;
+  if (!res || typeof res !== "object" || Array.isArray(res)) return null;
+  if (res.detail || res.non_field_errors) return null;
+  for (const [field, value] of Object.entries(res)) {
+    const message = Array.isArray(value) ? value[0] : (typeof value === "string" ? value : null);
+    if (message) return { field, message };
+  }
+  return null;
+};

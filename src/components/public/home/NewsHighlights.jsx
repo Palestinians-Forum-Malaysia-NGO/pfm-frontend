@@ -41,7 +41,7 @@ const NewsHighlights = () => {
           {(loading ? Array.from({ length: 3 }) : latest).map((n, i) => (
             <article
               key={n?.id ?? i}
-              onClick={n ? () => navigate(`/news/${n.slug}`) : undefined}
+              onClick={n ? () => navigate(`/news/${n.id}`) : undefined}
               className={`group flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 ease-in-out ${n ? "cursor-pointer hover:-translate-y-1 hover:shadow-xl" : ""}`}
               style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(28px)", transition: "opacity 0.7s ease-in-out, transform 0.7s ease-in-out, box-shadow 0.3s ease-in-out", transitionDelay: `${i * 100}ms` }}
             >

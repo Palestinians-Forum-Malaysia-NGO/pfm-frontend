@@ -25,7 +25,16 @@ const ACCOUNTS = [
     // Beneficiary portal has no admin/staff management pages at all
     hiddenNav: ["Users", "Staff", "Beneficiaries", "Classifications", "Categories"],
   },
-  // No real staff credential available yet — re-add here once one exists.
+  {
+    role: "staff",
+    email: "adnanmadiadnan@gmail.com",
+    password: "Adnan421###",
+    homePattern: "**/staff/default",
+    visibleNav: ["Dashboard", "Projects", "Beneficiaries", "Applications"],
+    // Staff has no access to admin-only management pages.
+    hiddenNav: ["Users", "Staff", "Classifications"],
+    requiresOtp: true,
+  },
 ];
 
 for (const account of ACCOUNTS) {

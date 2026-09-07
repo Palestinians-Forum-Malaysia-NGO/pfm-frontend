@@ -100,12 +100,15 @@ const ACCOUNT_RULES = {
   phone_number:  [{ required: true }, { maxLength: 30 }],
 };
 
-const AccountStep = ({ data, onChange, onNext }) => {
+const AccountStep = ({ data, onChange, onNext, serverErrors, onClearServerError }) => {
   const { t } = useTranslation();
   const [errors, setErrors] = useState({});
-  const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+  const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
 
-  const canProceed = !Object.entries(ACCOUNT_RULES).some(([field, rules]) => !!validate(data[field], rules));
+  const allErrors = { ...errors, ...serverErrors };
+  const canProceed =
+    !Object.entries(ACCOUNT_RULES).some(([field, rules]) => !!validate(data[field], rules)) &&
+    !Object.keys(ACCOUNT_RULES).some((field) => serverErrors?.[field]);
 
   const handleNext = () => {
     const newErrors = {};
@@ -130,6 +133,10 @@ const AccountStep = ({ data, onChange, onNext }) => {
         </div>
       </div>
 
+      {serverErrors && Object.keys(serverErrors).length > 0 && (
+        <AlertBanner message={t("apply.server_error_banner")} />
+      )}
+
       <div className="flex flex-col gap-3">
         <StorageImageField
           label={t("common.profile_photo")}
@@ -137,15 +144,15 @@ const AccountStep = ({ data, onChange, onNext }) => {
           required
           onUpload={(key) => set("profile_photo", key)}
           onRemove={() => set("profile_photo", null)}
-          errors={errors}
+          errors={allErrors}
           field="profile_photo"
         />
         <InputField label={t("apply.full_name")} field="full_name" placeholder="Ahmad Faris bin Abdullah"
-          formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
+          formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
         <InputField label={t("apply.email")} field="email" type="email" placeholder="you@example.com"
-          formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.email} />
+          formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.email} />
         <InputField label={t("apply.phone")} field="phone_number" placeholder="+60 12-345 6789"
-          formData={data} errors={errors} updateFormData={set} rules={ACCOUNT_RULES.phone_number} />
+          formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.phone_number} />
       </div>
 
       <Button
@@ -172,11 +179,12 @@ const DOCUMENTS_RULES = {
   background:  [{ required: true }],
 };
 
-const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext }) => {
+const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, serverErrors, onClearServerError }) => {
   const { t } = useTranslation();
   const [errors, setErrors]         = useState({});
   const [idDocError, setIdDocError] = useState(null);
-  const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+  const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
+  const allErrors = { ...errors, ...serverErrors, id_document: idDocError };
 
   const ID_DOCUMENT_TYPE_OPTIONS = [
     { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
@@ -185,7 +193,8 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
   ];
 
   const canProceed =
-    !Object.entries(DOCUMENTS_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc;
+    !Object.entries(DOCUMENTS_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc &&
+    !Object.keys(DOCUMENTS_RULES).some((field) => serverErrors?.[field]);
 
   const handleNext = () => {
     const newErrors = {};
@@ -216,12 +225,16 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
         </div>
       </div>
 
+      {serverErrors && Object.keys(serverErrors).length > 0 && (
+        <AlertBanner message={t("apply.server_error_banner")} />
+      )}
+
       <div className="flex flex-col gap-3">
         <InputField label={t("apply.national_id")} field="national_id" placeholder="e.g. 900101-14-5678"
-          formData={data} errors={errors} updateFormData={set} rules={DOCUMENTS_RULES.national_id} />
+          formData={data} errors={allErrors} updateFormData={set} rules={DOCUMENTS_RULES.national_id} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
-          formData={data} errors={errors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
+          formData={data} errors={allErrors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
         <StorageDocumentField
           label={t("apply.id_document")}
           publicEndpoint="register"
@@ -230,10 +243,10 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext })
           onUpload={(key) => { onIdDocChange(key); setIdDocError(null); }}
           onRemove={() => onIdDocChange(null)}
           currentName={idDoc ? t("common.uploaded_file") : undefined}
-          field="id_document" errors={{ id_document: idDocError }}
+          field="id_document" errors={allErrors}
         />
         <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
-          required={false} formData={data} errors={errors} updateFormData={set} />
+          required={false} formData={data} errors={allErrors} updateFormData={set} />
       </div>
 
       <div className="mt-6 flex gap-3">
@@ -574,12 +587,36 @@ const OtpStep = ({ email, channel, onBack }) => {
 };
 
 /* ─────────────────────────────────────────────────
+   Which step owns each field the API can reject —
+   used to route a server-side validation error (e.g. a duplicate email or
+   national ID) back to the step that actually collected it, instead of
+   showing a generic message on whichever step the user happened to submit
+   from.
+───────────────────────────────────────────────── */
+const FIELD_TO_STEP = {
+  full_name: 1, email: 1, phone_number: 1, profile_photo: 1,
+  national_id: 3, background: 3, id_document: 3, id_document_type: 3,
+  has_visa: 4, visa_type: 4, visa_document: 4, situation: 4, unhcr_number: 4,
+  country_of_origin: 4, palestine_region: 4, state: 4, address: 4, terms_accepted: 4,
+};
+
+/* ─────────────────────────────────────────────────
    Main
 ───────────────────────────────────────────────── */
 export default function BeneficiaryRegisterForm() {
   const { t } = useTranslation();
   const [step, setStep]       = useState(1);
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
+  const [serverFieldErrors, setServerFieldErrors] = useState({});
+
+  const clearServerError = (field) => {
+    setServerFieldErrors((prev) => {
+      if (!(field in prev)) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
   const [documents, setDocuments] = useState({ background: "", national_id: "", id_document_type: "" });
@@ -639,7 +676,21 @@ export default function BeneficiaryRegisterForm() {
       const data = await createBeneficiary(payload);
       setOtpMeta({ email: account.email, channel: data.channel ?? "email" });
       setStep(5);
-    } catch { /* error shown by useCreateBeneficiary */ }
+    } catch (err) {
+      const fe = err?.fieldError;
+      const targetStep = fe && FIELD_TO_STEP[fe.field];
+      if (fe && targetStep) {
+        // Route back to whichever step actually owns the invalid field
+        // (e.g. a duplicate email belongs on step 1, not here on step 4)
+        // instead of leaving the user stuck reading a message that doesn't
+        // match anything on the screen in front of them.
+        setServerFieldErrors((prev) => ({ ...prev, [fe.field]: fe.message }));
+        setStep(targetStep);
+      }
+      // Non-field errors (network, 5xx, duplicate-unrelated-to-one-field)
+      // still surface via the generic AlertBanner on this step, from the
+      // hook's own `error` state.
+    }
   };
 
   return (
@@ -650,7 +701,10 @@ export default function BeneficiaryRegisterForm() {
         <div className="mx-auto max-w-2xl">
           <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
             {step === 1 && (
-              <AccountStep data={account} onChange={setAccount} onNext={() => setStep(2)} />
+              <AccountStep
+                data={account} onChange={setAccount} onNext={() => setStep(2)}
+                serverErrors={serverFieldErrors} onClearServerError={clearServerError}
+              />
             )}
             {step === 2 && (
               <FamilyStep
@@ -664,6 +718,7 @@ export default function BeneficiaryRegisterForm() {
                 data={documents} onChange={setDocuments}
                 idDoc={idDoc} onIdDocChange={setIdDoc}
                 onBack={() => setStep(2)} onNext={() => setStep(4)}
+                serverErrors={serverFieldErrors} onClearServerError={clearServerError}
               />
             )}
             {step === 4 && (

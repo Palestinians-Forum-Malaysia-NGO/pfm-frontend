@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { beneficiaryService } from "../services/beneficiaryService";
-import { extractError } from "components/features/auth/utils";
+import { extractError, extractFieldError } from "components/features/auth/utils";
 
 const useCreateBeneficiary = () => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,12 @@ const useCreateBeneficiary = () => {
     } catch (err) {
       const msg = extractError(err, "Failed to create beneficiary.");
       setError(msg);
-      throw new Error(msg);
+      const thrown = new Error(msg);
+      // Attached directly (not read back from hook state) so the caller can
+      // use it synchronously in its own catch block — hook state wouldn't
+      // have re-rendered yet at that point.
+      thrown.fieldError = extractFieldError(err);
+      throw thrown;
     } finally {
       setLoading(false);
     }
