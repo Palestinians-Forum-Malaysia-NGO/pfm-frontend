@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MdQrCode2 } from "react-icons/md";
 import useInView from "hooks/useInView";
+import qrCode from "assets/qrcode/pfm-qr-code.png";
 
 const QRCodeSection = () => {
   const { t } = useTranslation();
@@ -20,9 +20,8 @@ const QRCodeSection = () => {
             <p className="mx-auto mt-4 max-w-lg text-slate-500">{t("donate.qr_desc")}</p>
           </div>
 
-          <div className="flex h-56 w-56 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
-            <MdQrCode2 className="h-16 w-16 text-slate-300" />
-            <p className="text-xs font-medium text-slate-400">{t("donate.qr_placeholder")}</p>
+          <div className="flex h-56 w-56 items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <img src={qrCode} alt={t("donate.qr_title")} className="h-full w-full object-contain" />
           </div>
         </div>
       </div>
