@@ -14,11 +14,13 @@ export default function PublicLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
+      <PublicNavbar />
       <main className="flex-1">
         <Routes>
           {getRoutes()}
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
