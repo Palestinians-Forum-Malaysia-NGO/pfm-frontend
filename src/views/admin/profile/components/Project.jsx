@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { MdModeEditOutline } from "react-icons/md";
 import image1 from "assets/img/profile/image1.png";
 import image2 from "assets/img/profile/image2.png";
@@ -30,7 +30,7 @@ const Project = () => {
             <p className="mt-2 text-sm text-gray-600">
               Project #1 .
               <a
-                className="ml-1 font-medium text-brand-500 hover:text-brand-500 dark:text-white"
+                className="ml-1 font-medium text-green hover:text-green dark:text-white"
                 href=" "
               >
                 See product details
@@ -55,7 +55,7 @@ const Project = () => {
             <p className="mt-2 text-sm text-gray-600">
               Project #1 .
               <a
-                className="ml-1 font-medium text-brand-500 hover:text-brand-500 dark:text-white"
+                className="ml-1 font-medium text-green hover:text-green dark:text-white"
                 href=" "
               >
                 See product details
@@ -80,7 +80,7 @@ const Project = () => {
             <p className="mt-2 text-sm text-gray-600">
               Project #1 .
               <a
-                className="ml-1 font-medium text-brand-500 hover:text-brand-500 dark:text-white"
+                className="ml-1 font-medium text-green hover:text-green dark:text-white"
                 href=" "
               >
                 See product details

@@ -1,19 +1,30 @@
-﻿import React from "react";
+import React, { useState } from "react";
+import { validate } from "./utils/validation";
+import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
-const CheckBoxGroup = ({ label, field, options, formData, updateFormData, errors, required = false }) => {
+const CheckBoxGroup = ({
+  label, field, options, formData,
+  updateFormData, errors, required = false, rules = [],
+}) => {
+  const [localError, setLocalError] = useState(null);
+
+  const externalError = errors?.[field];
+  const displayError = localError || externalError;
+
   const isSelected = (id) => (formData[field] || []).includes(id);
 
   const toggleSelection = (id) => {
     const selected = formData[field] || [];
-    updateFormData(
-      field,
-      selected.includes(id) ? selected.filter((i) => i !== id) : [...selected, id]
-    );
+    const next = selected.includes(id)
+      ? selected.filter((i) => i !== id)
+      : [...selected, id];
+    updateFormData(field, next);
+    setLocalError(validate(next, rules));
   };
 
   return (
-    <div className="mb-5">
-      <label className="mb-2 block text-sm font-medium text-slate-900">
+    <div className={WRAPPER}>
+      <label className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
@@ -33,7 +44,6 @@ const CheckBoxGroup = ({ label, field, options, formData, updateFormData, errors
                 <span className="text-sm font-medium text-slate-900">{option.name}</span>
                 <span className="text-xs text-slate-400">{selected ? "Enabled" : "Disabled"}</span>
               </div>
-
               <div className="relative">
                 <input
                   type="checkbox"
@@ -49,7 +59,7 @@ const CheckBoxGroup = ({ label, field, options, formData, updateFormData, errors
         })}
       </div>
 
-      {errors?.[field] && <p className="mt-1.5 text-xs text-red-500">{errors[field]}</p>}
+      {displayError && <p className={ERROR_MSG}>{displayError}</p>}
     </div>
   );
 };

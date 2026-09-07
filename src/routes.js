@@ -2,6 +2,7 @@ import React from "react";
 
 // Page Imports
 import MainDashboard from "views/admin/default";
+import UsersPage from "views/admin/users";
 import Profile from "views/admin/profile";
 import Placeholder from "views/admin/placeholder";
 import SignIn from "views/auth/SignIn";
@@ -25,6 +26,7 @@ import {
   MdSettings,
   MdLock,
   MdBarChart,
+  MdManageAccounts,
 } from "react-icons/md";
 
 const routes = [
@@ -110,6 +112,20 @@ const routes = [
       { name: "Financial Report", path: "reports/financial" },
       { name: "Member Report",    path: "reports/members" },
       { name: "Campaign Report",  path: "reports/campaigns" },
+    ],
+  },
+
+  // ── SYSTEM ───────────────────────────────────────────────────────────────────
+  {
+    name: "Users",
+    layout: "/admin",
+    path: "users",
+    icon: <MdManageAccounts className="h-5 w-5" />,
+    component: <UsersPage />,
+    section: "SYSTEM",
+    children: [
+      { name: "All Users", path: "users" },
+      { name: "Add User",  path: "users/create" },
     ],
   },
 

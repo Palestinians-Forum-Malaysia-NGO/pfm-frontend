@@ -1,4 +1,4 @@
-const StatCard = ({ label, value, sub, icon: Icon, iconBg, iconColor, trend }) => {
+﻿const StatCard = ({ label, value, sub, icon: Icon, iconBg, iconColor, trend }) => {
   return (
     <div className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
@@ -11,7 +11,7 @@ const StatCard = ({ label, value, sub, icon: Icon, iconBg, iconColor, trend }) =
           <span
             className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
               trend >= 0
-                ? "bg-brand-50 text-brand-600"
+                ? "bg-green/10 text-[#006833]"
                 : "bg-pfmRed-50 text-pfmRed-500"
             }`}
           >

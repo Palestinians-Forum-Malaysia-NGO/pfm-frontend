@@ -1,10 +1,11 @@
-/* eslint-disable */
+﻿/* eslint-disable */
 import { HiX } from "react-icons/hi";
 import { MdOutlineHandshake } from "react-icons/md";
+import logo from "assets/brand/LOGO-wbg.png";
 import Links from "./components/Links";
 import routes from "routes.js";
 
-const Sidebar = ({ open, onClose }) => {
+const Sidebar = ({ open, onClose, layout = "/admin" }) => {
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-white shadow-xl transition-transform duration-200 ease-in-out md:z-50 lg:z-50 xl:z-0 ${
@@ -20,10 +21,8 @@ const Sidebar = ({ open, onClose }) => {
       </button>
 
       {/* ── Logo ── */}
-      <div className="flex items-center gap-3 px-6 pb-5 pt-8">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand shadow-md shadow-brand/30">
-          <span className="text-[11px] font-black tracking-tight text-white">PFM</span>
-        </div>
+      <div className="flex items-center gap-3 px-5 pb-4 pt-6">
+        <img src={logo} alt="PFM" className="h-12 w-12 flex-shrink-0 object-contain" />
         <div className="leading-tight">
           <p className="text-sm font-bold text-navy-700">Palestinians Forum</p>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
@@ -37,24 +36,12 @@ const Sidebar = ({ open, onClose }) => {
 
       {/* ── Navigation ── */}
       <div className="flex-1 overflow-y-auto py-5">
-        <Links routes={routes} />
+        <Links routes={routes} layout={layout} />
       </div>
 
       {/* ── Bottom divider ── */}
       <div className="mx-5 h-px bg-gray-100" />
 
-      {/* ── Palestinian solidarity card ── */}
-      <div className="mx-4 my-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-brand to-[#005629] p-4">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/20">
-            <MdOutlineHandshake className="h-5 w-5 text-white" />
-          </div>
-          <div className="leading-tight">
-            <p className="text-xs font-bold text-white">Stand with Palestine</p>
-            <p className="text-[10px] text-white/70">Together for a free Palestine 🇵🇸</p>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 };

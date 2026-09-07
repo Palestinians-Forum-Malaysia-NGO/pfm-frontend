@@ -11,7 +11,7 @@
  : color === "blue"
  ? "checked:border-none checked:bg-blue-500"
  : color === "green"
- ? "checked:border-none checked:bg-green-500"
+ ? "checked:border-none checked:bg-green"
  : color === "yellow"
  ? "checked:border-none checked:bg-yellow-500"
  : color === "orange"
@@ -34,7 +34,7 @@
  ? "checked:border-none checked:bg-indigo-500"
  : color === "gray"
  ? "checked:border-none checked:bg-gray-500"
- : "checked:bg-brand-500"
+ : "checked:bg-green"
  } ${extra}`}
  name="weekly"
  {...rest}

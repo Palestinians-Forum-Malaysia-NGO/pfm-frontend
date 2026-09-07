@@ -4,7 +4,7 @@
       <p className="text-xs text-gray-400">
         © {new Date().getFullYear()} Palestinian Forum Malaysia. All Rights Reserved.
       </p>
-      <p className="text-xs font-medium text-brand-500">
+      <p className="text-xs font-medium text-green">
         Standing with Palestine 🇵🇸
       </p>
     </footer>

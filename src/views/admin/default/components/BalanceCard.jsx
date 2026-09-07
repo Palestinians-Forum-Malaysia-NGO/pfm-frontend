@@ -1,4 +1,4 @@
-import { MdArrowForward } from "react-icons/md";
+﻿import { MdArrowForward } from "react-icons/md";
 
 const BalanceCard = ({ total, available, asOf }) => {
   return (
@@ -10,7 +10,7 @@ const BalanceCard = ({ total, available, asOf }) => {
       <p className="text-sm font-semibold text-gray-400">Total Balance</p>
       <p className="mt-0.5 text-xs text-gray-500">{asOf}</p>
 
-      <p className="mt-4 text-5xl font-extrabold tracking-tight text-brand-400">
+      <p className="mt-4 text-5xl font-extrabold tracking-tight text-green/75">
         {total}
       </p>
 
