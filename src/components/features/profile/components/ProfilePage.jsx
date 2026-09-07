@@ -1,0 +1,44 @@
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { MdPerson } from "react-icons/md";
+import PageHeader from "components/ui/PageHeader";
+import AlertBanner from "components/ui/AlertBanner";
+import Loading from "components/loading/Loading";
+import UserProfileCard from "components/ui/UserProfileCard";
+import EditProfileSection from "./sections/EditProfileSection";
+import SecuritySection from "./sections/SecuritySection";
+import MemberInfoSection from "./sections/MemberInfoSection";
+import { useProfile } from "components/features/profile/hooks";
+import useAuth from "components/features/auth/hooks/useAuth";
+
+const ProfilePage = () => {
+  const { t } = useTranslation();
+  const { profile, loading, error, refetch } = useProfile();
+  const { refreshUser } = useAuth();
+
+  if (loading) return <Loading text={t("profile.loading_profile")} />;
+  if (error)   return <AlertBanner message={error} />;
+  if (!profile) return null;
+
+  const handleSaved = () => { refetch(); refreshUser(); };
+
+  return (
+    <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
+      <PageHeader
+        icon={<MdPerson className="h-5 w-5" />}
+        title={t("profile.my_profile_title")}
+        subtitle={t("profile.my_profile_sub")}
+      />
+
+      <UserProfileCard user={profile} />
+
+      {profile.role === "beneficiary" && <MemberInfoSection profile={profile} />}
+
+      <EditProfileSection profile={profile} onSaved={handleSaved} />
+
+      <SecuritySection />
+    </div>
+  );
+};
+
+export default ProfilePage;

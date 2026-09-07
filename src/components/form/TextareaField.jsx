@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const TextareaField = ({
   label, field, rows = 4, required = true,
@@ -15,6 +10,7 @@ const TextareaField = ({
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
 
+  const inputId = field.replace(/[.[\]]/g, "-");
   const value = getNestedValue(formData, field) ?? "";
   const externalError = getNestedValue(errors, field);
   const displayError = localError || externalError;
@@ -31,17 +27,18 @@ const TextareaField = ({
 
   return (
     <div className={WRAPPER}>
-      <label className={LABEL}>
+      <label htmlFor={inputId} className={LABEL}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <textarea
+        id={inputId}
         rows={rows}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`w-full resize-none rounded-xl border px-3 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 ${
+        className={`w-full resize-none rounded-xl border px-3 py-3 text-sm text-start text-slate-900 outline-none transition-all placeholder:text-slate-400 ${
           displayError
             ? "border-red-400 bg-red-50 focus:border-red-400"
             : "border-slate-200 bg-slate-50 focus:border-green focus:bg-slate-100/70"

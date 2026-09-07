@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
@@ -6,6 +7,7 @@ const CheckBoxGroup = ({
   label, field, options, formData,
   updateFormData, errors, required = false, rules = [],
 }) => {
+  const { t } = useTranslation();
   const [localError, setLocalError] = useState(null);
 
   const externalError = errors?.[field];
@@ -42,7 +44,7 @@ const CheckBoxGroup = ({
             >
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-slate-900">{option.name}</span>
-                <span className="text-xs text-slate-400">{selected ? "Enabled" : "Disabled"}</span>
+                <span className="text-xs text-slate-400">{selected ? t("common.enabled") : t("common.disabled")}</span>
               </div>
               <div className="relative">
                 <input
@@ -52,7 +54,7 @@ const CheckBoxGroup = ({
                   className="peer sr-only"
                 />
                 <div className="h-6 w-11 rounded-full bg-slate-200 transition-colors peer-checked:bg-green" />
-                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                <div className="absolute ltr:left-0.5 rtl:right-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ltr:peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5" />
               </div>
             </label>
           );

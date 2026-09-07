@@ -1,11 +1,15 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const EmptyState = ({
   icon,
-  title = "Nothing here yet",
+  title,
   description,
   action,      // { label: string, onClick: fn } or { label: string, href: string }
-}) => (
+}) => {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("common.nothing_here_yet");
+  return (
   <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
     {/* Icon ring */}
     {icon && (
@@ -15,7 +19,7 @@ const EmptyState = ({
     )}
 
     {/* Text */}
-    <p className="text-base font-semibold text-slate-700">{title}</p>
+    <p className="text-base font-semibold text-slate-700">{resolvedTitle}</p>
     {description && (
       <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-slate-400">
         {description}
@@ -28,14 +32,14 @@ const EmptyState = ({
         {action.href ? (
           <a
             href={action.href}
-            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-colors hover:bg-[#006833]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833]"
           >
             {action.label}
           </a>
         ) : (
           <button
             onClick={action.onClick}
-            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-colors hover:bg-[#006833]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 ease-in-out hover:bg-[#006833]"
           >
             {action.label}
           </button>
@@ -43,6 +47,7 @@ const EmptyState = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 export default EmptyState;

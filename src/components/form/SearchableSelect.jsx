@@ -1,19 +1,17 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdExpandMore } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG, dropdownTriggerCls, dropdownPanelCls, dropdownSearchCls } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const SearchableSelect = ({
   label, field, options = [], required = true,
   formData, errors, updateFormData,
-  placeholder = "Select...", actions = [], rules = [],
+  placeholder, actions = [], rules = [],
 }) => {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("common.select_placeholder");
   const containerRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -62,7 +60,7 @@ const SearchableSelect = ({
         className={dropdownTriggerCls(isOpen, !!displayError)}
       >
         <span className={selectedLabel ? "text-slate-900" : "text-slate-400"}>
-          {selectedLabel || placeholder}
+          {selectedLabel || resolvedPlaceholder}
         </span>
         <MdExpandMore className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </div>
@@ -71,7 +69,7 @@ const SearchableSelect = ({
         <div className={dropdownPanelCls} style={{ width: containerRef.current?.offsetWidth ?? "100%" }}>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t("common.search_placeholder")}
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -90,7 +88,7 @@ const SearchableSelect = ({
 
             {!filteredOptions.length && actions.length > 0 && (
               <div className="mt-1 border-t border-slate-100 pt-2">
-                <p className="px-3 py-1.5 text-xs text-slate-400">No results found</p>
+                <p className="px-3 py-1.5 text-xs text-slate-400">{t("common.no_results")}</p>
                 {actions.map((action, i) => (
                   <li
                     key={i}
@@ -105,7 +103,7 @@ const SearchableSelect = ({
             )}
 
             {!filteredOptions.length && !actions.length && (
-              <p className="px-3 py-3 text-center text-sm text-slate-400">No results found</p>
+              <p className="px-3 py-3 text-center text-sm text-slate-400">{t("common.no_results")}</p>
             )}
           </ul>
         </div>

@@ -1,148 +1,97 @@
-﻿import {
-  MdFavorite,
-  MdCampaign,
-  MdPeople,
-  MdVolunteerActivism,
-} from "react-icons/md";
-
-import StatCard from "./components/StatCard";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { MdWavingHand, MdAdd, MdPersonAdd, MdFileDownload } from "react-icons/md";
+import PageHeader from "components/ui/PageHeader";
+import Button from "components/ui/buttons/Button";
+import ApplicationPipelineCard from "components/ui/dashboard/ApplicationPipelineCard";
+import PendingTasksList from "components/ui/dashboard/PendingTasksList";
+import NotificationsFeed from "components/ui/dashboard/NotificationsFeed";
+import QuickActionsGrid from "components/ui/dashboard/QuickActionsGrid";
 import BalanceCard from "./components/BalanceCard";
-import RecentTransactions from "./components/RecentTransactions";
-import QuickDonate from "./components/QuickDonate";
-
-// ── Mock data ──────────────────────────────────────────────────────────────────
-
-const STATS = [
-  {
-    label: "Total Donations",
-    value: "RM 125,000",
-    sub: "All time received",
-    icon: MdFavorite,
-    iconBg: "bg-green/10",
-    iconColor: "text-green",
-    trend: 12,
-  },
-  {
-    label: "Active Campaigns",
-    value: "8",
-    sub: "3 ending this month",
-    icon: MdCampaign,
-    iconBg: "bg-pfmRed-50",
-    iconColor: "text-pfmRed-500",
-    trend: 0,
-  },
-  {
-    label: "Total Members",
-    value: "342",
-    sub: "18 joined this week",
-    icon: MdPeople,
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-500",
-    trend: 5,
-  },
-  {
-    label: "Aid Distributed",
-    value: "RM 89,500",
-    sub: "Sent to beneficiaries",
-    icon: MdVolunteerActivism,
-    iconBg: "bg-amber-50",
-    iconColor: "text-amber-500",
-    trend: 8,
-  },
-];
-
-const TRANSACTIONS = [
-  {
-    description: "Donation from Ahmad Razali",
-    date: "12 Nov, 2024",
-    amount: "RM 500.00",
-    type: "Donation",
-  },
-  {
-    description: "Aid sent to Gaza families",
-    date: "11 Nov, 2024",
-    amount: "RM 2,000.00",
-    type: "Aid Sent",
-  },
-  {
-    description: "Donation from Siti Nurhaliza",
-    date: "10 Nov, 2024",
-    amount: "RM 1,200.00",
-    type: "Donation",
-  },
-  {
-    description: "Medical supplies — Palestine",
-    date: "09 Nov, 2024",
-    amount: "RM 3,500.00",
-    type: "Aid Sent",
-  },
-  {
-    description: "Donation from Ali Hassan",
-    date: "08 Nov, 2024",
-    amount: "RM 800.00",
-    type: "Donation",
-  },
-  {
-    description: "Donation from Nurul Izzah",
-    date: "07 Nov, 2024",
-    amount: "RM 250.00",
-    type: "Donation",
-  },
-];
-
-const CAMPAIGNS = [
-  "Gaza Medical Aid",
-  "Food for Palestine",
-  "Education Fund",
-  "Orphan Support",
-  "Winter Relief 2024",
-];
-
-const BENEFICIARIES = [
-  "Al-Shifa Hospital",
-  "UNRWA Malaysia",
-  "Islamic Relief",
-  "Palestinian Red Crescent",
-  "Aman Palestine",
-];
-
-const AS_OF = new Date().toLocaleDateString("en-MY", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-// ── Component ──────────────────────────────────────────────────────────────────
+import BeneficiaryStatsWidget from "./components/BeneficiaryStatsWidget";
+import OrgStatsOverview from "./components/OrgStatsOverview";
+import { useGetStats } from "components/features/stats/hooks";
+import { useGetFeedbacks } from "components/features/feedback/hooks";
+import { useDashboardActivity } from "components/features/stats/hooks/useDashboardActivity";
+import { useExportOrganizationReport } from "components/features/reports/hooks";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { useToast } from "components/ui/toast/ToastContext";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { stats, loading: statsLoading } = useGetStats();
+  const { feedbacks, loading: feedbackLoading } = useGetFeedbacks();
+  const { execute: exportReport, loading: exporting } = useExportOrganizationReport();
+  const { error: toastError } = useToast();
+
+  const { pipelineStats, tasks, notifications, recentActivities } = useDashboardActivity(
+    "admin_dashboard", "/admin", { applicationsStats: stats?.applications, feedbacks }
+  );
+
+  const quickActions = [
+    { label: t("admin_dashboard.action_new_project"), icon: <MdAdd className="h-5 w-5" />,       to: "/admin/projects/create" },
+    { label: t("admin_dashboard.action_new_user"),    icon: <MdPersonAdd className="h-5 w-5" />, to: "/admin/users/create" },
+  ];
+
+  const handleExport = async () => {
+    try {
+      await exportReport();
+    } catch (err) {
+      toastError(t("admin_dashboard.toast_export_failed"), err?.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* ── Stat cards ── */}
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {STATS.map((s) => (
-          <StatCard key={s.label} {...s} />
-        ))}
+    <div className="flex flex-col gap-4 max-w-5xl mx-auto px-4">
+
+      <PageHeader
+        icon={<MdWavingHand className="h-5 w-5" />}
+        title={t("admin_dashboard.welcome_title", { name: user?.full_name?.split(" ")[0] ?? "" })}
+        subtitle={t("admin_dashboard.welcome_subtitle")}
+        actions={
+          <Button variant="ghost" icon={<MdFileDownload className="h-4 w-4" />} text={t("admin_dashboard.export_report")} loading={exporting} onClick={handleExport} />
+        }
+      />
+
+      <OrgStatsOverview stats={stats} loading={statsLoading} />
+
+      <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <p className="mb-4 text-sm font-bold text-slate-900">{t("admin_dashboard.pipeline_title")}</p>
+        <ApplicationPipelineCard
+          mode="aggregate"
+          stats={pipelineStats}
+          loading={statsLoading}
+          onStatusClick={(status) => navigate(status === "total" ? "/admin/applications" : `/admin/applications?status=${status}`)}
+        />
       </div>
 
-      {/* ── Main grid: left (2/3) + right (1/3) ── */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left column */}
-        <div className="flex flex-col gap-6 lg:col-span-2">
-          <BalanceCard
-            total="RM 125,000"
-            available="RM 48,200"
-            asOf={AS_OF}
-          />
-          <RecentTransactions transactions={TRANSACTIONS} asOf={AS_OF} />
-        </div>
+      <BalanceCard />
+      <BeneficiaryStatsWidget />
 
-        {/* Right column */}
-        <div className="lg:col-span-1">
-          <QuickDonate campaigns={CAMPAIGNS} beneficiaries={BENEFICIARIES} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <p className="mb-4 text-sm font-bold text-slate-900">{t("admin_dashboard.recent_activities_title")}</p>
+          <NotificationsFeed items={recentActivities} loading={statsLoading || feedbackLoading} emptyText={t("admin_dashboard.no_recent_activity")} />
+        </div>
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <p className="mb-4 text-sm font-bold text-slate-900">{t("admin_dashboard.notifications_title")}</p>
+          <NotificationsFeed items={notifications} loading={statsLoading || feedbackLoading} emptyText={t("admin_dashboard.no_notifications")} />
         </div>
       </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <p className="mb-4 text-sm font-bold text-slate-900">{t("admin_dashboard.pending_tasks_title")}</p>
+          <PendingTasksList tasks={tasks} loading={statsLoading || feedbackLoading} emptyText={t("admin_dashboard.no_pending_tasks")} />
+        </div>
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <p className="mb-4 text-sm font-bold text-slate-900">{t("admin_dashboard.quick_actions_title")}</p>
+          <QuickActionsGrid actions={quickActions} />
+        </div>
+      </div>
+
     </div>
   );
 };
