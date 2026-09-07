@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Modal from "./Modal";
 import Button from "components/ui/buttons/Button";
 
@@ -26,39 +27,42 @@ const ConfirmModal = ({
   subtitle,
   message,
   icon,
-  confirmText   = "Confirm",
-  cancelText    = "Cancel",
+  confirmText,
+  cancelText,
   confirmVariant = "danger",
   loading        = false,
-}) => (
-  <Modal
-    open={open}
-    onClose={onClose}
-    title={title}
-    subtitle={subtitle}
-    icon={icon}
-    size="sm"
-    footer={
-      <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          text={cancelText}
-          onClick={onClose}
-          disabled={loading}
-          className="flex-1"
-        />
-        <Button
-          variant={confirmVariant}
-          text={confirmText}
-          loading={loading}
-          onClick={onConfirm}
-          className="flex-1"
-        />
-      </div>
-    }
-  >
-    <p className="text-sm text-slate-600">{message}</p>
-  </Modal>
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={title}
+      subtitle={subtitle}
+      icon={icon}
+      size="sm"
+      footer={
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            text={cancelText ?? t("common.cancel")}
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1"
+          />
+          <Button
+            variant={confirmVariant}
+            text={confirmText ?? t("common.confirm")}
+            loading={loading}
+            onClick={onConfirm}
+            className="flex-1"
+          />
+        </div>
+      }
+    >
+      <p className="text-sm text-slate-600">{message}</p>
+    </Modal>
+  );
+};
 
 export default ConfirmModal;

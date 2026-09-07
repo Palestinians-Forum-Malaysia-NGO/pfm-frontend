@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MdSearch } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 
@@ -7,6 +8,7 @@ const CheckSimpleBoxGroup = ({
   label, field, options, formData,
   updateFormData, errors, required = false, rules = [],
 }) => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [localError, setLocalError] = useState(null);
 
@@ -37,25 +39,25 @@ const CheckSimpleBoxGroup = ({
           </label>
           {filteredOptions.length > 0 && (
             <span className="text-xs text-slate-400">
-              {filteredOptions.filter((o) => isSelected(o.id)).length} selected
+              {t("common.selected_count", { count: filteredOptions.filter((o) => isSelected(o.id)).length })}
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <MdSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <MdSearch className="absolute ltr:left-3 rtl:right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t("common.search_placeholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none transition-all focus:border-green focus:bg-slate-100/70 placeholder:text-slate-400"
+              className="h-9 w-full rounded-lg border border-slate-200 bg-white ltr:pl-9 ltr:pr-3 rtl:pr-9 rtl:pl-3 text-sm text-start outline-none transition-all focus:border-green focus:bg-slate-100/70 placeholder:text-slate-400"
             />
           </div>
           {search && (
             <button type="button" onClick={() => setSearch("")} className="text-xs text-slate-400 hover:text-slate-600">
-              Clear
+              {t("common.clear")}
             </button>
           )}
         </div>
@@ -84,7 +86,7 @@ const CheckSimpleBoxGroup = ({
               );
             })
           ) : (
-            <p className="w-full py-4 text-center text-sm text-slate-400">No results found</p>
+            <p className="w-full py-4 text-center text-sm text-slate-400">{t("common.no_results")}</p>
           )}
         </div>
       </div>

@@ -1,8 +1,18 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import logo from "assets/brand/LOGO-wbg.png";
+import React from "react";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import logo from "assets/branding/LOGO-wbg.png";
 import routes from "routes.js";
+import LanguageSwitcher from "components/navbar/LanguageSwitcher";
 
 export default function Auth() {
+  const { i18n } = useTranslation();
+
+  React.useEffect(() => {
+    document.documentElement.dir  = i18n.language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   const getRoutes = () =>
     routes.map((route, key) =>
       route.layout === "/auth" ? (
@@ -11,7 +21,12 @@ export default function Auth() {
     );
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="relative flex min-h-screen bg-slate-50 rtl:flex-row-reverse">
+
+      {/* Language toggle — always visible in the top-start corner of the form panel */}
+      <div className="absolute right-4 top-4 z-20">
+        <LanguageSwitcher />
+      </div>
 
       {/* ── Left — Brand panel ── */}
       <div className="relative hidden flex-col items-center justify-between bg-green px-10 py-14 lg:flex lg:w-[42%] rounded-br-[100px]">
@@ -19,17 +34,10 @@ export default function Auth() {
         {/* Decorative layer — clipped separately so the panel curve isn't cut */}
         <div className="absolute inset-0 overflow-hidden rounded-br-[100px]">
           {/* Subtle grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+          <div className="absolute inset-0 bg-auth-grid bg-[size:40px_40px] opacity-[0.06]" />
           {/* Glow blobs */}
           <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-white/10 blur-[80px]" />
-          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-[#005629]/40 blur-[80px]" />
+          <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-green-700/40 blur-[80px]" />
         </div>
 
         {/* Top — flag labels */}
@@ -41,9 +49,9 @@ export default function Auth() {
 
         {/* Center — logo + identity */}
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="mb-7 flex h-44 w-44 items-center justify-center rounded-3xl bg-white p-4 shadow-2xl">
+          <Link to="/" className="mb-7 flex h-44 w-44 items-center justify-center rounded-3xl bg-white p-4 shadow-2xl transition-opacity hover:opacity-90">
             <img src={logo} alt="PFM" className="h-full w-full object-contain" />
-          </div>
+          </Link>
 
           <p className="text-xl font-bold leading-snug text-white" dir="rtl">
             المنتدى الفلسطيني ماليزيا
@@ -69,10 +77,10 @@ export default function Auth() {
       <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-[58%]">
 
         {/* Mobile logo */}
-        <div className="mb-8 flex flex-col items-center lg:hidden">
+        <Link to="/" className="mb-8 flex flex-col items-center lg:hidden">
           <img src={logo} alt="PFM" className="h-20 w-20 object-contain" />
           <p className="mt-2 text-sm font-semibold text-navy-700">Palestinian Forum Malaysia</p>
-        </div>
+        </Link>
 
         <div className="w-full max-w-[420px]">
           <Routes>

@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { validate } from "./utils/validation";
 import { WRAPPER, LABEL, LABEL_DARK, ERROR_MSG, inputCls } from "./utils/fieldStyles";
-
-const getNestedValue = (obj, path) => {
-  if (!path) return undefined;
-  return path.split(/[.[\]]/).filter(Boolean)
-    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
-};
+import { getNestedValue } from "./utils/getNestedValue";
 
 const InputField = ({
   label, field, type = "text", required = true,
@@ -16,6 +11,7 @@ const InputField = ({
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
 
+  const inputId = field.replace(/[.[\]]/g, "-");
   const value = getNestedValue(formData, field) ?? "";
   const externalError = getNestedValue(errors, field);
   const displayError = localError || externalError;
@@ -42,11 +38,12 @@ const InputField = ({
   return (
     <div className={WRAPPER}>
       {label && (
-        <label className={variant === "dark" ? LABEL_DARK : LABEL}>
+        <label htmlFor={inputId} className={variant === "dark" ? LABEL_DARK : LABEL}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <input
+        id={inputId}
         type={type}
         value={value}
         onChange={handleChange}

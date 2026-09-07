@@ -109,13 +109,45 @@ module.exports = {
         poppins: ["Poppins", "sans-serif"],
         dm: ["DM Sans", "sans-serif"],
       },
+      backgroundImage: {
+        "dot-green":        "radial-gradient(circle, rgb(0 122 61 / 13%) 1px, transparent 1px)",
+        "dot-green-dark":   "radial-gradient(circle, rgb(0 122 61 / 100%) 1px, transparent 1px)",
+        "dot-white":        "radial-gradient(circle, rgb(255 255 255 / 13%) 1px, transparent 1px)",
+        "dot-slate":        "radial-gradient(circle, rgb(203 213 225) 1px, transparent 1px)",
+        "auth-grid":        "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
+        "glow-top-green":   "radial-gradient(ellipse at top, rgb(0 122 61 / 6%) 0%, transparent 70%)",
+        "glow-circle-green":"radial-gradient(circle, rgb(0 122 61 / 3%) 0%, transparent 70%)",
+      },
       boxShadow: {
-        "3xl": "14px 17px 40px 4px",
-        inset: "inset 0px 18px 22px",
-        darkinset: "0px 4px 4px inset",
+        "3xl":         "14px 17px 40px 4px",
+        inset:         "inset 0px 18px 22px",
+        darkinset:     "0px 4px 4px inset",
+        "glow-green":  "0 4px 20px rgb(0 122 61 / 19%)",
+        "glow-green-sm":"0 4px 16px rgb(0 122 61 / 14%)",
+        "glow-red":    "0 4px 20px rgb(206 17 38 / 19%)",
+        "ring-green":  "0 4px 40px rgb(0 122 61 / 3%)",
       },
       borderRadius: {
         primary: "20px",
+      },
+      keyframes: {
+        "slide-in": {
+          "0%":   { opacity: "0", transform: "translateX(100%) scale(0.95)" },
+          "100%": { opacity: "1", transform: "translateX(0)   scale(1)" },
+        },
+        "page-enter": {
+          "0%":   { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "logout-fade": {
+          "0%":   { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+      },
+      animation: {
+        "slide-in":    "slide-in 0.25s ease-out forwards",
+        "page-enter":  "page-enter 0.25s ease-out both",
+        "logout-fade": "logout-fade 0.3s ease-out both",
       },
     },
     screens: {
@@ -150,6 +182,19 @@ module.exports = {
         700: "#707eae",
         800: "#252f40",
         900: "#1b2559",
+      },
+      green: {
+        DEFAULT: "#007A3D",
+        50: "#E6F7EF",
+        100: "#C2EAD7",
+        200: "#99DCBC",
+        300: "#66CC9E",
+        400: "#33BB7C",
+        500: "#007A3D",
+        600: "#006E37",
+        700: "#005F2F",
+        800: "#004F27",
+        900: "#00381B",
       },
       navy: {
         50: "#d0dcfb",
@@ -223,7 +268,6 @@ module.exports = {
         800: "#3f6212",
         900: "#365314",
       },
-      green: "#007A3D",
       teal: {
         50: "#f0fdfa",
         100: "#ccfbf1",

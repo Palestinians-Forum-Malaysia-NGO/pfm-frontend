@@ -1,0 +1,37 @@
+import api from "services/app";
+
+export const projectService = {
+  // Projects
+  async getAll(params = {})   { const { data } = await api.get("/projects", { params }); return data; },
+  async getById(id)           { const { data } = await api.get(`/projects/${id}`); return data; },
+  async create(payload)       { const { data } = await api.post("/projects", payload); return data; },
+  async update(id, payload)   { const { data } = await api.patch(`/projects/${id}`, payload); return data; },
+  async remove(id)            { await api.delete(`/projects/${id}`); },
+  async publish(id)           { const { data } = await api.post(`/projects/${id}/publish`); return data; },
+  async unpublish(id)         { const { data } = await api.post(`/projects/${id}/unpublish`); return data; },
+  async assignStaff(id, userIds)   { const { data } = await api.post(`/projects/${id}/assign-staff`, { user_ids: userIds }); return data; },
+  async unassignStaff(id, userIds) { const { data } = await api.post(`/projects/${id}/unassign-staff`, { user_ids: userIds }); return data; },
+  async exportReport(params = {}) { const { data } = await api.get("/projects/export", { params, responseType: "blob" }); return data; },
+  // Milestones
+  async getMilestones(projectId)                   { const { data } = await api.get(`/projects/${projectId}/milestones`); return data; },
+  async createMilestone(projectId, payload)        { const { data } = await api.post(`/projects/${projectId}/milestones`, payload); return data; },
+  async updateMilestone(projectId, id, payload)   { const { data } = await api.patch(`/projects/${projectId}/milestones/${id}`, payload); return data; },
+  async deleteMilestone(projectId, id)             { await api.delete(`/projects/${projectId}/milestones/${id}`); },
+  // Updates
+  async getUpdates(projectId)                      { const { data } = await api.get(`/projects/${projectId}/updates`); return data; },
+  async createUpdate(projectId, payload)           { const { data } = await api.post(`/projects/${projectId}/updates`, payload); return data; },
+  async updateUpdate(projectId, id, payload)       { const { data } = await api.patch(`/projects/${projectId}/updates/${id}`, payload); return data; },
+  async deleteUpdate(projectId, id)                { await api.delete(`/projects/${projectId}/updates/${id}`); },
+  // Gallery
+  async getGallery(projectId)                      { const { data } = await api.get(`/projects/${projectId}/gallery`); return data; },
+  async createGalleryPhoto(projectId, payload)     { const { data } = await api.post(`/projects/${projectId}/gallery`, payload); return data; },
+  async updateGalleryPhoto(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/gallery/${id}`, payload); return data; },
+  async deleteGalleryPhoto(projectId, id)          { await api.delete(`/projects/${projectId}/gallery/${id}`); },
+  // Project beneficiaries (aggregate across all milestones)
+  async getProjectBeneficiaries(projectId, params = {}) { const { data } = await api.get(`/projects/${projectId}/beneficiaries`, { params }); return data; },
+  // Milestone beneficiaries
+  async getMilestoneBeneficiaries(projectId, milestoneId)              { const { data } = await api.get(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`); return data; },
+  async createMilestoneBeneficiary(projectId, milestoneId, payload)    { const { data } = await api.post(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries`, payload); return data; },
+  async updateMilestoneBeneficiary(projectId, milestoneId, id, payload){ const { data } = await api.patch(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries/${id}`, payload); return data; },
+  async deleteMilestoneBeneficiary(projectId, milestoneId, id)         { await api.delete(`/projects/${projectId}/milestones/${milestoneId}/beneficiaries/${id}`); },
+};

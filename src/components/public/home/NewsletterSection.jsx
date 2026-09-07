@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { MdEmail, MdArrowForward, MdCheckCircle } from "react-icons/md";
+import useInView from "hooks/useInView";
+import AlertBanner from "components/ui/AlertBanner";
+import { useSubscribeNewsletter } from "components/features/newsletter/hooks";
+
+const NewsletterSection = () => {
+  const { t } = useTranslation();
+  const [ref, inView] = useInView();
+  const [email, setEmail]         = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const { execute: subscribe, loading, error } = useSubscribeNewsletter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    try {
+      await subscribe(email.trim());
+      setSubmitted(true);
+    } catch {
+      // error state is surfaced via the hook's `error`
+    }
+  };
+
+  return (
+    <section ref={ref} className="bg-white py-20">
+      <div
+        className="mx-auto max-w-2xl px-6 text-center"
+        style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(24px)", transition: "all 0.7s ease-in-out" }}
+      >
+        <div className="mb-5 flex justify-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green/10 text-green">
+            <MdEmail className="h-7 w-7" />
+          </div>
+        </div>
+
+        <span className="text-xs font-bold uppercase tracking-widest text-green">{t("home.stay_informed")}</span>
+        <h2 className="mt-3 text-4xl font-extrabold text-slate-900">{t("home.get_newsletter")}</h2>
+        <p className="mt-3 text-slate-400">{t("home.newsletter_subtitle")}</p>
+
+        <div className="mt-8">
+          {!submitted ? (
+            <>
+              <AlertBanner message={error} />
+              <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <MdEmail className="pointer-events-none absolute ltr:left-4 rtl:right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="your@email.com"
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 text-sm text-start text-slate-900 outline-none transition-all duration-200 focus:border-green focus:ring-1 focus:ring-green placeholder:text-slate-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-green px-6 py-3 text-sm font-bold text-white shadow-glow-green-sm transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98] disabled:opacity-60"
+                >
+                  {loading ? t("home.subscribing") : t("home.subscribe")} <MdArrowForward className="h-4 w-4" />
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="inline-flex items-center gap-2 rounded-full border border-green/20 bg-green/5 px-6 py-3 text-sm font-semibold text-green">
+              <MdCheckCircle className="h-5 w-5" />
+              {t("home.subscribed")}
+            </div>
+          )}
+          <p className="mt-3 text-xs text-slate-400">{t("home.no_spam")}</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default NewsletterSection;

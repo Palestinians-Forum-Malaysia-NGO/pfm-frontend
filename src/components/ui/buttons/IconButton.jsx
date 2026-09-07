@@ -20,10 +20,10 @@ const IconButton = ({
       disabled={disabled || loading}
       className={`
         inline-flex min-w-0 max-w-full items-center justify-center gap-1.5
-        rounded-xl border px-3 py-2 text-sm font-medium
+        rounded-xl border px-3.5 py-2 text-sm font-medium
         transition-all duration-200 ease-in-out
-        active:scale-[0.97]
-        disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none
+        enabled:hover:-translate-y-px enabled:active:translate-y-0 enabled:active:scale-[0.98]
+        disabled:cursor-not-allowed disabled:opacity-50 disabled:select-none
         ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} ${className}
       `}
     >

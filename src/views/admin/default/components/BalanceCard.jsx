@@ -1,27 +1,105 @@
-﻿import { MdArrowForward } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  MdPeople, MdCheckCircle, MdHourglassTop,
+  MdMale, MdFemale, MdArrowForward,
+} from "react-icons/md";
+import { useGetBeneficiaryStats } from "components/features/beneficiaries/hooks";
 
-const BalanceCard = ({ total, available, asOf }) => {
+const Skel = ({ className }) => (
+  <div className={`animate-pulse rounded-lg bg-slate-100 ${className}`} />
+);
+
+const StatCard = ({ icon: Icon, label, value, pct, iconBg, iconColor, badgeColor, loading }) => (
+  <div className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+    <div className="flex items-center justify-between">
+      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}>
+        <Icon className={`h-5 w-5 ${iconColor}`} />
+      </div>
+      {pct !== null && (
+        loading
+          ? <Skel className="h-5 w-10 rounded-full" />
+          : <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${badgeColor}`}>
+              {pct}%
+            </span>
+      )}
+    </div>
+    {loading
+      ? <>
+          <Skel className="h-7 w-16" />
+          <Skel className="h-3 w-20" />
+        </>
+      : <>
+      <div className="flex items-end gap-2">
+        <span className="text-base font-bold leading-none tracking-tight text-navy-700">
+          {value.toLocaleString()}
+          </span>
+          <span className="text-sm font-medium text-slate-500">
+            {label}
+          </span>
+        </div>
+      </>          
+    }
+  </div>
+);
+
+const BalanceCard = () => {
+  const { t } = useTranslation();
+  const { stats, loading } = useGetBeneficiaryStats();
+  const navigate = useNavigate();
+
+  const total   = stats?.total              ?? 0;
+  const active  = stats?.by_status?.active  ?? 0;
+  const pending = stats?.by_status?.pending ?? 0;
+  const male    = stats?.by_gender?.male    ?? 0;
+  const female  = stats?.by_gender?.female  ?? 0;
+
+  const pct = (n) => total > 0 ? Math.round((n / total) * 100) : 0;
+
+  const CARDS = [
+    {
+      icon: MdPeople,      label: t("beneficiaries.stat_total"), value: total,
+      pct: null,           iconBg: "bg-green/10",         iconColor: "text-green",
+      badgeColor: "",
+    },
+    {
+      icon: MdCheckCircle, label: t("beneficiaries.stat_active"), value: active,
+      pct: pct(active),    iconBg: "bg-green/10",         iconColor: "text-green",
+      badgeColor: "bg-green/10 text-green",
+    },
+    {
+      icon: MdHourglassTop,label: t("beneficiaries.stat_pending"), value: pending,
+      pct: pct(pending),   iconBg: "bg-amber-50",         iconColor: "text-amber-500",
+      badgeColor: "bg-amber-50 text-amber-500",
+    },
+    {
+      icon: MdMale,        label: t("beneficiaries.gender_male"), value: male,
+      pct: pct(male),      iconBg: "bg-blue-50",          iconColor: "text-blue-500",
+      badgeColor: "bg-blue-50 text-blue-500",
+    },
+    {
+      icon: MdFemale,      label: t("beneficiaries.gender_female"), value: female,
+      pct: pct(female),    iconBg: "bg-pink-50",          iconColor: "text-pink-500",
+      badgeColor: "bg-pink-50 text-pink-500",
+    },
+  ];
+
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-navy-900 p-6">
-      {/* decorative circles */}
-      <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/[0.03]" />
-      <div className="pointer-events-none absolute -bottom-12 -right-4 h-56 w-56 rounded-full bg-white/[0.03]" />
-
-      <p className="text-sm font-semibold text-gray-400">Total Balance</p>
-      <p className="mt-0.5 text-xs text-gray-500">{asOf}</p>
-
-      <p className="mt-4 text-5xl font-extrabold tracking-tight text-green/75">
-        {total}
-      </p>
-
-      <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
-        <p className="text-sm text-gray-400">
-          Available:{" "}
-          <span className="font-bold text-white">{available}</span>
-        </p>
-        <button className="flex items-center gap-1 text-sm font-semibold text-pfmRed-400 transition hover:text-pfmRed-300">
-          More <MdArrowForward className="h-4 w-4" />
+    <div>
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-sm font-bold text-navy-700">{t("admin_dashboard.beneficiary_summary")}</p>
+        <button
+          onClick={() => navigate("/admin/beneficiaries")}
+          className="inline-flex items-center gap-1 text-xs font-semibold text-green transition-colors duration-150 hover:text-green-600"
+        >
+          {t("home.view_all")} <MdArrowForward className="h-3.5 w-3.5" />
         </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {CARDS.map((c) => (
+          <StatCard key={c.label} {...c} loading={loading} />
+        ))}
       </div>
     </div>
   );
