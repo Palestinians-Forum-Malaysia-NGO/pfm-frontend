@@ -4,11 +4,14 @@ const { test, expect } = require("@playwright/test");
 // can't complete that handshake unattended, so it needs a live code via
 // PLAYWRIGHT_OTP and is skipped otherwise. See e2e/auth.setup.js for the
 // API-level login+OTP handshake used for the rest of the suite.
+//
+// Real credentials come from e2e/.env.e2e (gitignored, loaded via dotenv in
+// playwright.config.js) — never hardcode a real email/password here.
 const ACCOUNTS = [
   {
     role: "admin",
-    email: "pfmy.it@gmail.com",
-    password: "Admin123!@#",
+    email: process.env.E2E_ADMIN_EMAIL,
+    password: process.env.E2E_ADMIN_PASSWORD,
     homePattern: "**/admin/default",
     visibleNav: ["Users", "Staff", "Beneficiaries", "Projects"],
     hiddenNav: [],
@@ -16,8 +19,8 @@ const ACCOUNTS = [
   },
   {
     role: "beneficiary",
-    email: "adnanmadi417@gmail.com",
-    password: "Admin123!@#",
+    email: process.env.E2E_BENEFICIARY_EMAIL,
+    password: process.env.E2E_BENEFICIARY_PASSWORD,
     homePattern: "**/beneficiary/default",
     // Beneficiaries have their own scoped "Projects" (browse/apply), distinct
     // from admin/staff's project-management pages — it's expected to show.
@@ -27,8 +30,8 @@ const ACCOUNTS = [
   },
   {
     role: "staff",
-    email: "adnanmadiadnan@gmail.com",
-    password: "Adnan421###",
+    email: process.env.E2E_STAFF_EMAIL,
+    password: process.env.E2E_STAFF_PASSWORD,
     homePattern: "**/staff/default",
     visibleNav: ["Dashboard", "Projects", "Beneficiaries", "Applications"],
     // Staff has no access to admin-only management pages.
@@ -40,6 +43,8 @@ const ACCOUNTS = [
 for (const account of ACCOUNTS) {
   test.describe(`Login — ${account.role} via real sign-in form`, () => {
     test(`${account.role} logs in and lands on ${account.homePattern}`, async ({ page }) => {
+      test.skip(!account.email || !account.password,
+        `Missing credentials — copy e2e/.env.e2e.example to e2e/.env.e2e and fill in E2E_${account.role.toUpperCase()}_EMAIL/PASSWORD.`);
       test.skip(account.requiresOtp && !process.env.PLAYWRIGHT_OTP,
         "Requires a live OTP — re-run with PLAYWRIGHT_OTP=<code> after triggering a fresh login.");
 
