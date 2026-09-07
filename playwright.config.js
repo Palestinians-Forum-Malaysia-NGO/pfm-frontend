@@ -1,5 +1,11 @@
 // @ts-check
+const path = require("path");
 const { defineConfig, devices } = require("@playwright/test");
+
+// Real test-account credentials live in e2e/.env.e2e (gitignored, local-only
+// — see e2e/.env.e2e.example for the required keys). Never hardcode a real
+// email/password in a committed spec file.
+require("dotenv").config({ path: path.join(__dirname, "e2e/.env.e2e") });
 
 module.exports = defineConfig({
   testDir: "./e2e",

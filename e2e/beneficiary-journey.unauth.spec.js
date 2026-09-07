@@ -5,14 +5,17 @@ const RESUME = path.join(__dirname, "fixtures/test-document.pdf");
 const COVER_LETTER = path.join(__dirname, "fixtures/test-document.pdf");
 const OPPORTUNITY_ID = "cd12dead-b858-4560-9087-8b85b7e03b2b"; // Part-Time Arabic-English Translator
 
-// Full beneficiary journey for the account created by register.unauth.spec.js
-// (zylen.team@gmail.com — approved + password set out-of-band, since both
+// Full beneficiary journey for a dedicated test account created via
+// register.unauth.spec.js (approved + password set out-of-band, since both
 // admin approval and the password-reset email link need a human/admin step
 // that can't be scripted here). Runs as one continuous session so login
 // carries through every step — no OTP involved (beneficiary accounts don't
 // require 2FA), so this is safe to re-run.
-const EMAIL = process.env.PLAYWRIGHT_JOURNEY_EMAIL || "zylen.team@gmail.com";
-const PASSWORD = process.env.PLAYWRIGHT_JOURNEY_PASSWORD || "Admin123!@#";
+//
+// Real credentials come from e2e/.env.e2e (gitignored, loaded via dotenv in
+// playwright.config.js) — never hardcode a real email/password here.
+const EMAIL = process.env.PLAYWRIGHT_JOURNEY_EMAIL;
+const PASSWORD = process.env.PLAYWRIGHT_JOURNEY_PASSWORD;
 // NOTE: "active"-status projects are inexplicably invisible to beneficiaries
 // (GET /projects/ as this account returns only completed/upcoming ones, and
 // fetching an active project's own slug 404s even though it's published —
@@ -21,6 +24,9 @@ const PASSWORD = process.env.PLAYWRIGHT_JOURNEY_PASSWORD || "Admin123!@#";
 const PROJECT_SLUG = "palestinian-national-day-commemoration-2026";
 
 test("beneficiary: login → dashboard → profile edit → apply to a project", async ({ page }) => {
+  test.skip(!EMAIL || !PASSWORD,
+    "Missing credentials — set PLAYWRIGHT_JOURNEY_EMAIL/PASSWORD (see e2e/.env.e2e.example) to a beneficiary account created by register.unauth.spec.js.");
+
   await test.step("login via the real sign-in form", async () => {
     await page.goto("/auth/sign-in");
     await page.getByPlaceholder("you@example.com").fill(EMAIL);

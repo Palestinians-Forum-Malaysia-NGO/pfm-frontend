@@ -3,27 +3,29 @@ const path = require("path");
 
 const API = "https://staging-api.pfmy.org/api/v1";
 
+// Real credentials come from e2e/.env.e2e (gitignored, loaded via dotenv in
+// playwright.config.js) — never hardcode a real email/password here.
 const ACCOUNTS = [
   {
     role: "admin",
-    email: "pfmy.it@gmail.com",
-    password: "Admin123!@#",
+    email: process.env.E2E_ADMIN_EMAIL,
+    password: process.env.E2E_ADMIN_PASSWORD,
     requiresOtp: true,
     homePattern: "**/admin/**",
     authFile: path.join(__dirname, ".auth/admin.json"),
   },
   {
     role: "beneficiary",
-    email: "adnanmadi417@gmail.com",
-    password: "Admin123!@#",
+    email: process.env.E2E_BENEFICIARY_EMAIL,
+    password: process.env.E2E_BENEFICIARY_PASSWORD,
     requiresOtp: false,
     homePattern: "**/beneficiary/**",
     authFile: path.join(__dirname, ".auth/beneficiary.json"),
   },
   {
     role: "staff",
-    email: "adnanmadiadnan@gmail.com",
-    password: "Adnan421###",
+    email: process.env.E2E_STAFF_EMAIL,
+    password: process.env.E2E_STAFF_PASSWORD,
     requiresOtp: true,
     homePattern: "**/staff/**",
     authFile: path.join(__dirname, ".auth/staff.json"),
@@ -34,6 +36,9 @@ setup.setTimeout(30_000);
 
 for (const account of ACCOUNTS) {
   setup(`authenticate as ${account.role}`, async ({ page, request }) => {
+    setup.skip(!account.email || !account.password,
+      `Missing credentials — copy e2e/.env.e2e.example to e2e/.env.e2e and fill in E2E_${account.role.toUpperCase()}_EMAIL/PASSWORD.`);
+
     const otp = process.env.PLAYWRIGHT_OTP;
     let access, refresh;
 
