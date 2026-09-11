@@ -10,7 +10,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useGetOpportunities } from "components/features/opportunities/hooks";
 
 const PublicNavbar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { opportunities } = useGetOpportunities();
   const links = getNavLinks(t)
     .map((link) => link.children
@@ -65,8 +65,17 @@ const PublicNavbar = () => {
           <Link to="/" className="flex shrink-0 items-center gap-2.5">
             <img src={logo} alt="PFM" className="h-9 w-9 object-contain" />
             <div className="hidden leading-tight sm:block">
-              <p className="text-sm font-bold text-slate-900">Palestinian Forum</p>
-              <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">Malaysia</p>
+              {i18n.language === "ar" ? (
+                 <>
+                  <p className="text-sm font-bold text-slate-900" dir="rtl">المنتدى الفلسطيني </p>
+                  <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">ماليزيا</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-slate-900">Palestinian Forum</p>
+                  <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">Malaysia</p>
+                </>
+              )}
             </div>
           </Link>
 

@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdAdd, MdPeople, MdCheckCircle, MdCancel,
-  MdEdit, MdDeleteOutline, MdOpenInNew, MdManageAccounts, MdClose,
+  MdEdit, MdOpenInNew, MdManageAccounts, MdClose,
   MdPerson, MdVerified,
 } from "react-icons/md";
 import useLayoutBase from "hooks/useLayoutBase";
 import StorageImage from "components/ui/StorageImage";
 import { useUsers } from "components/features/users/hooks/useUsers";
-import UserDeleteModal from "./UserDeleteModal";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
 import FilterSelect from "components/ui/FilterSelect";
@@ -17,31 +16,15 @@ import RowIconButton from "components/ui/buttons/RowIconButton";
 import SearchInput from "components/form/SearchInput";
 import DataTable from "components/ui/DataTable";
 import { ROLE_AVATAR_BG, ROLE_BADGE } from "components/features/users/constants/roles";
-import { useToast } from "components/ui/toast/ToastContext";
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
 export default function UserList() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
-  const { success, error: toastError } = useToast();
-  const {
-    users, loading, error,
-    deleteUser, actionLoading,
-    openDelete, closeAll, handleDelete: _handleDelete,
-  } = useUsers();
-
-  const handleDelete = async () => {
-    const name = deleteUser?.full_name;
-    try {
-      await _handleDelete();
-      success(t("users.toast_deleted"), `${name} ${t("users.toast_has_been_removed")}`);
-    } catch (err) {
-      toastError(t("users.toast_delete_failed"), err?.message);
-    }
-  };
+  const { users, loading, error } = useUsers();
 
   const [search, setSearch]         = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -151,9 +134,8 @@ export default function UserList() {
       stopPropagation: true,
       render: (user) => (
         <div className="flex items-center justify-end gap-0.5">
-          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />}     title={t("users.view_user")} onClick={() => navigate(`${base}/users/${user.id}`)}      variant="primary" />
-          <RowIconButton icon={<MdEdit className="h-4 w-4" />}          title={t("users.edit")}      onClick={() => navigate(`${base}/users/${user.id}/edit`)} />
-          <RowIconButton icon={<MdDeleteOutline className="h-4 w-4" />} title={t("users.delete")}   onClick={() => openDelete(user)} variant="danger" />
+          <RowIconButton icon={<MdOpenInNew className="h-4 w-4" />} title={t("users.view_user")} onClick={() => navigate(`${base}/users/${user.id}`)}      variant="primary" />
+          <RowIconButton icon={<MdEdit className="h-4 w-4" />}      title={t("users.edit")}      onClick={() => navigate(`${base}/users/${user.id}/edit`)} />
         </div>
       ),
     },
@@ -209,14 +191,6 @@ export default function UserList() {
         emptyTitle={t("users.no_users")}
         emptyDesc={hasFilters ? t("users.adjust_filters") : t("users.add_first")}
         emptyAction={!hasFilters ? { label: t("users.add_user"), onClick: () => navigate(`${base}/users/create`) } : undefined}
-      />
-
-      <UserDeleteModal
-        open={!!deleteUser}
-        user={deleteUser}
-        onClose={closeAll}
-        onConfirm={handleDelete}
-        loading={actionLoading}
       />
     </div>
   );
