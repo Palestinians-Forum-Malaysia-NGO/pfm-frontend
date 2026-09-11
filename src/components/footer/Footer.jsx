@@ -12,7 +12,7 @@ const SOCIALS = [
 ];
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const NAV_COLS = [
     {
@@ -71,8 +71,17 @@ const Footer = () => {
                 <img src={logo} alt="PFM" className="h-full w-full object-contain" />
               </div>
               <div>
-                <p className="text-sm font-extrabold leading-tight text-white">Palestinian Forum</p>
-                <p className="text-[11px] font-medium text-white/50 uppercase tracking-widest">Malaysia</p>
+                {i18n.language === "ar" ? (
+                  <>
+                    <p className="text-sm font-extrabold leading-tight text-white" dir="rtl">المنتدى الفلسطيني</p>
+                    <p className="text-[11px] font-medium text-white/50 uppercase tracking-widest" dir="rtl">ماليزيا</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-extrabold leading-tight text-white">Palestinian Forum</p>
+                    <p className="text-[11px] font-medium text-white/50 uppercase tracking-widest">Malaysia</p>
+                  </>
+                )}
               </div>
             </Link>
 
@@ -124,7 +133,7 @@ const Footer = () => {
                       to={link.to}
                       className="group inline-flex items-center gap-1 text-sm text-white/55 transition-colors duration-150 hover:text-white"
                     >
-                      <MdArrowForward className="-translate-x-1 h-3 w-3 opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100" />
+                      <MdArrowForward className="ltr:-translate-x-1 rtl:translate-x-1 rtl:rotate-180 h-3 w-3 opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100" />
                       {link.label}
                     </Link>
                   </li>
