@@ -96,11 +96,11 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2.5">
                 <MdEmail className="h-4 w-4 shrink-0 text-white/40" />
-                {t("footer.email")}
+                <span dir="ltr">{t("footer.email")}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <MdPhone className="h-4 w-4 shrink-0 text-white/40" />
-                {t("footer.phone")}
+                <span dir="ltr">{t("footer.phone")}</span>
               </li>
             </ul>
 
