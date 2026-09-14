@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdEmail, MdArrowBack, MdArrowForward } from "react-icons/md";
 import InputField    from "components/form/InputField";
 import PasswordField from "components/form/PasswordField";
 import AlertBanner   from "components/ui/AlertBanner";
 import Button        from "components/ui/buttons/Button";
+import Loading       from "components/loading/Loading";
 import { validate }  from "components/form/utils/validation";
 import Checkbox      from "components/checkbox";
 import { useAuth, useLogin, useVerifyOtp, useResendOtp } from "components/features/auth/hooks";
+import { getRoleHome } from "components/features/auth/utils";
 
 const EMAIL_RULES    = [{ required: true }, { email: true }];
 const PASSWORD_RULES = [{ required: true }, { minLength: 8 }];
@@ -210,8 +212,14 @@ const OtpStep = ({ email, channel, onBack }) => {
    Main SignIn — orchestrates steps
 ────────────────────────────────────────────── */
 export default function SignIn() {
+  const { t } = useTranslation();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [step, setStep]       = useState("login"); // "login" | "otp"
   const [otpMeta, setOtpMeta] = useState({ email: "", channel: "" });
+
+  // Already logged in — no reason to show the sign-in form again.
+  if (authLoading) return <Loading text={t("common.loading")} />;
+  if (isAuthenticated) return <Navigate to={getRoleHome(user?.role)} replace />;
 
   return (
     <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">

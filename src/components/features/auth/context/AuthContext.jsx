@@ -20,7 +20,16 @@ export const AuthProvider = ({ children }) => {
 
     authService.getMe()
       .then((data) => setUser(data))
-      .catch(() => clearTokens())
+      .catch((err) => {
+        // Only drop the session on a genuine auth failure (the access token
+        // is invalid and the api.js interceptor's own refresh attempt also
+        // failed). A network error, CORS block, or transient 5xx here does
+        // NOT mean the stored tokens are bad — clearing them in that case
+        // forces a needless re-login even though the refresh token (valid
+        // for days) is still perfectly usable on the next successful call.
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) clearTokens();
+      })
       .finally(() => setLoading(false));
   }, []);
 
