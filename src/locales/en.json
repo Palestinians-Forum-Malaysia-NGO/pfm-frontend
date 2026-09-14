@@ -414,7 +414,8 @@
     "subscribed": "You're subscribed — thank you!",
     "no_spam": "No spam. Unsubscribe anytime.",
     "chat_with_pfm": "Chat with PFM",
-    "whatsapp_reply": "Typically replies within an hour"
+    "whatsapp_reply": "Typically replies within an hour",
+    "whatsapp_message": "Hi PFM, I'd like to know more about your work!"
   },
   "about": {
     "hero_badge": "Palestinian Forum Malaysia",
