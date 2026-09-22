@@ -7,6 +7,7 @@ import useUnpublishProject from "./useUnpublishProject";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
 import { projectService } from "../services/projectService";
+import { useGetClassifications } from "components/features/classifications/hooks";
 
 const useProjectList = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const useProjectList = () => {
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const isStaff = user?.role === "staff";
+  const { classifications } = useGetClassifications();
 
   // Staff only see projects they're assigned to. The list endpoint doesn't
   // return assigned_staff, so each project's detail has to be checked.
@@ -50,6 +52,7 @@ const useProjectList = () => {
   const [search,        setSearch]        = useState("");
   const [statusFilter,  setStatusFilter]  = useState("all");
   const [publishFilter, setPublishFilter] = useState("all");
+  const [classificationFilter, setClassificationFilter] = useState("all");
   const [toDelete,      setToDelete]      = useState(null);
 
   const filtered = useMemo(() => {
@@ -66,9 +69,13 @@ const useProjectList = () => {
       const matchPublish = publishFilter === "all"
         || (publishFilter === "published"   &&  p.is_published)
         || (publishFilter === "unpublished" && !p.is_published);
-      return matchSearch && matchStatus && matchPublish;
+      const matchClassification = classificationFilter === "all"
+        || p.is_featured
+        || p.classifications?.some((classification) => String(classification.id) === String(classificationFilter))
+        || p.classification_ids?.some((id) => String(id) === String(classificationFilter));
+      return matchSearch && matchStatus && matchPublish && matchClassification;
     });
-  }, [projects, search, statusFilter, publishFilter]);
+  }, [projects, search, statusFilter, publishFilter, classificationFilter]);
 
   const stats = useMemo(() => ({
     total:     projects.length,
@@ -114,6 +121,8 @@ const useProjectList = () => {
     search,        setSearch,
     statusFilter,  setStatusFilter,
     publishFilter, setPublishFilter,
+    classificationFilter, setClassificationFilter,
+    classifications,
     toDelete,      setToDelete,
     deleteLoading,
     publishLoading,

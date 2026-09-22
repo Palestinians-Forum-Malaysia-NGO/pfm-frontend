@@ -31,6 +31,8 @@ export default function ProjectList() {
     search,        setSearch,
     statusFilter,  setStatusFilter,
     publishFilter, setPublishFilter,
+    classificationFilter, setClassificationFilter,
+    classifications,
     toDelete,      setToDelete,
     deleteLoading,
     publishLoading,
@@ -62,6 +64,14 @@ export default function ProjectList() {
     { value: "all",         label: t("projects.publish_all") },
     { value: "published",   label: t("projects.publish_published") },
     { value: "unpublished", label: t("projects.publish_unpublished") },
+  ];
+
+  const CLASSIFICATION_OPTIONS = [
+    { value: "all", label: t("projects.classification_all") },
+    ...classifications.map((classification) => ({
+      value: classification.id,
+      label: (classification.name_ar && i18n.language === "ar") ? classification.name_ar : classification.name,
+    })),
   ];
 
   const statCards = [
@@ -163,7 +173,7 @@ export default function ProjectList() {
     },
   ];
 
-  const hasFilters = search !== "" || statusFilter !== "all" || publishFilter !== "all";
+  const hasFilters = search !== "" || statusFilter !== "all" || publishFilter !== "all" || classificationFilter !== "all";
 
   return (
     <div className="mx-auto max-w-5xl bg-white p-6 rounded-2xl border border-slate-200">
@@ -200,9 +210,10 @@ export default function ProjectList() {
         <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("projects.search_placeholder")} className="flex-1" />
         <FilterSelect value={statusFilter}  onChange={setStatusFilter}  options={STATUS_OPTIONS}  icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         <FilterSelect value={publishFilter} onChange={setPublishFilter} options={PUBLISH_OPTIONS} icon={<MdPublic className="h-3.5 w-3.5" />} />
+        <FilterSelect value={classificationFilter} onChange={setClassificationFilter} options={CLASSIFICATION_OPTIONS} />
         {hasFilters && (
           <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("projects.clear")}
-            onClick={() => { setSearch(""); setStatusFilter("all"); setPublishFilter("all"); }} />
+            onClick={() => { setSearch(""); setStatusFilter("all"); setPublishFilter("all"); setClassificationFilter("all"); }} />
         )}
       </div>
 

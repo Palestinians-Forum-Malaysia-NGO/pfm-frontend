@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
-import { MdArrowBack, MdAdd, MdAssignment, MdImage } from "react-icons/md";
+import { MdArrowBack, MdAdd, MdAssignment, MdImage, MdShield } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField, validate } from "components/form";
+import { InputField, TextareaField, SelectField, MultiSelect, ToggleInput, StorageCoverField, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import { useCreateProject } from "components/features/projects/hooks";
 import { useGetCategories } from "components/features/categories/hooks";
+import { useGetClassifications } from "components/features/classifications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
@@ -22,21 +23,27 @@ export default function ProjectCreateForm() {
   const base = useLayoutBase();
   const { execute: createProject, loading, error } = useCreateProject();
   const { categories } = useGetCategories({ module: "projects" });
+  const { classifications } = useGetClassifications();
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
     title: "", title_ar: "",
     cover_image: null,
+    classification_ids: [],
     category_id: "",
     status: "active",
     summary: "", summary_ar: "",
     description: "", description_ar: "",
     beneficiary_info: "", beneficiary_info_ar: "",
-    target: "", start_date: "", end_date: "", is_published: false,
+    target: "", start_date: "", end_date: "", is_published: false, is_featured: true,
   });
   const [errors, setErrors] = useState({});
 
-  const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
+  const set = (f, v) => setForm((p) => ({
+    ...p,
+    [f]: v,
+    ...(f === "is_featured" && v ? { classification_ids: [] } : {}),
+  }));
 
   const STATUS_OPTIONS = [
     { value: "",          label: t("projects.status_select") },
@@ -54,6 +61,11 @@ export default function ProjectCreateForm() {
     })),
   ];
 
+  const CLASSIFICATION_OPTIONS = classifications.map((c) => ({
+    value: c.id,
+    label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
+  }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -61,6 +73,9 @@ export default function ProjectCreateForm() {
       const err = validate(form[field], rules);
       if (err) newErrors[field] = err;
     });
+    if (!form.is_featured && !form.classification_ids.length) {
+      newErrors.classification_ids = t("projects.classification_required");
+    }
     if (Object.keys(newErrors).length) { setErrors(newErrors); return; }
     setErrors({});
 
@@ -70,6 +85,8 @@ export default function ProjectCreateForm() {
         title_ar:           form.title_ar           || undefined,
         cover_image:        form.cover_image         || undefined,
         category_id:        form.category_id         || undefined,
+        classification_ids:  form.is_featured ? [] : form.classification_ids,
+        is_featured:         form.is_featured,
         status:             form.status              || undefined,
         summary:            form.summary             || undefined,
         summary_ar:         form.summary_ar          || undefined,
@@ -145,6 +162,22 @@ export default function ProjectCreateForm() {
               placeholder={t("projects.summary_ar_placeholder")}
               required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
+        </div>
+
+        {/* ── Audience ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <FormHeader icon={<MdShield className="h-5 w-5" />} title={t("projects.audience_section")} subtitle={t("projects.audience_subtitle")} />
+          <ToggleInput label={t("projects.featured_toggle")} field="is_featured" formData={form} errors={errors} updateFormData={set} />
+          {!form.is_featured && (
+            <MultiSelect
+              label={t("projects.classification_label")}
+              field="classification_ids"
+              options={CLASSIFICATION_OPTIONS}
+              formData={form}
+              errors={errors}
+              updateFormData={set}
+            />
+          )}
         </div>
 
         {/* ── Details ── */}
