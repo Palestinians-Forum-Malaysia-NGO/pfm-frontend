@@ -75,8 +75,7 @@ export default function ProjectEditForm() {
   const [coverKey, setCoverKey] = useState(null);
   const { url: currentCoverUrl } = useStorageUrl(coverKey);
 
-  const set = (f, v) =>
-    setForm((p) => ({ ...p, [f]: v }));
+  const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
   const isDirty = !initial || JSON.stringify(form) !== JSON.stringify(initial);
 

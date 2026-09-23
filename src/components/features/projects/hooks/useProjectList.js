@@ -25,8 +25,8 @@ const useProjectList = () => {
     ...(publishFilter === "published" || publishFilter === "featured"
       ? { is_published: true }
       : publishFilter === "unpublished"
-        ? { is_published: false }
-        : {}),
+      ? { is_published: false }
+      : {}),
   };
   const {
     projects: allProjects,

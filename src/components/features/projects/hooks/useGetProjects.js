@@ -4,8 +4,8 @@ import { extractError } from "components/features/auth/utils";
 
 const useGetProjects = (params = {}) => {
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const queryKey = JSON.stringify(params);
 
   const refetch = useCallback(async () => {
@@ -21,7 +21,9 @@ const useGetProjects = (params = {}) => {
     }
   }, [queryKey]);
 
-  useEffect(() => { refetch(); }, [refetch]);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return { projects, loading, error, refetch };
 };
