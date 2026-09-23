@@ -39,11 +39,7 @@ export default function ProjectCreateForm() {
   });
   const [errors, setErrors] = useState({});
 
-  const set = (f, v) => setForm((p) => ({
-    ...p,
-    [f]: v,
-    ...(f === "is_featured" && v ? { classification_ids: [] } : {}),
-  }));
+  const set = (f, v) => setForm((p) => ({ ...p, [f]: v }));
 
   const STATUS_OPTIONS = [
     { value: "",          label: t("projects.status_select") },
@@ -85,7 +81,7 @@ export default function ProjectCreateForm() {
         title_ar:           form.title_ar           || undefined,
         cover_image:        form.cover_image         || undefined,
         category_id:        form.category_id         || undefined,
-        classification_ids:  form.is_featured ? [] : form.classification_ids,
+        classification_ids:  form.classification_ids,
         is_featured:         form.is_featured,
         status:             form.status              || undefined,
         summary:            form.summary             || undefined,
@@ -168,16 +164,14 @@ export default function ProjectCreateForm() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdShield className="h-5 w-5" />} title={t("projects.audience_section")} subtitle={t("projects.audience_subtitle")} />
           <ToggleInput label={t("projects.featured_toggle")} field="is_featured" formData={form} errors={errors} updateFormData={set} />
-          {!form.is_featured && (
-            <MultiSelect
-              label={t("projects.classification_label")}
-              field="classification_ids"
-              options={CLASSIFICATION_OPTIONS}
-              formData={form}
-              errors={errors}
-              updateFormData={set}
-            />
-          )}
+          <MultiSelect
+            label={t("projects.classification_label")}
+            field="classification_ids"
+            options={CLASSIFICATION_OPTIONS}
+            formData={form}
+            errors={errors}
+            updateFormData={set}
+          />
         </div>
 
         {/* ── Details ── */}

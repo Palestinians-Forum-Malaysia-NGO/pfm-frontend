@@ -11,10 +11,33 @@ import { useGetClassifications } from "components/features/classifications/hooks
 
 const useProjectList = () => {
   const { t } = useTranslation();
-  const { projects: allProjects, loading: loadingList, error, refetch } = useGetProjects();
-  const { execute: deleteProject,    loading: deleteLoading  } = useDeleteProject();
-  const { execute: publishProject,   loading: publishLoading } = usePublishProject();
-  const { execute: unpublishProject                          } = useUnpublishProject();
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [publishFilter, setPublishFilter] = useState("all");
+  const [classificationFilter, setClassificationFilter] = useState("all");
+  const [toDelete, setToDelete] = useState(null);
+  const projectQuery = {
+    ...(search.trim() ? { search: search.trim() } : {}),
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(classificationFilter !== "all"
+      ? { classification: classificationFilter }
+      : {}),
+    ...(publishFilter === "published" || publishFilter === "featured"
+      ? { is_published: true }
+      : publishFilter === "unpublished"
+        ? { is_published: false }
+        : {}),
+  };
+  const {
+    projects: allProjects,
+    loading: loadingList,
+    error,
+    refetch,
+  } = useGetProjects(projectQuery);
+  const { execute: deleteProject, loading: deleteLoading } = useDeleteProject();
+  const { execute: publishProject, loading: publishLoading } =
+    usePublishProject();
+  const { execute: unpublishProject } = useUnpublishProject();
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const isStaff = user?.role === "staff";
@@ -27,68 +50,82 @@ const useProjectList = () => {
 
   useEffect(() => {
     if (!isStaff) return;
-    if (allProjects.length === 0) { setAssignedProjects([]); setAssignLoading(false); return; }
+    if (allProjects.length === 0) {
+      setAssignedProjects([]);
+      setAssignLoading(false);
+      return;
+    }
 
     let cancelled = false;
     setAssignLoading(true);
     const myLabel = `${user?.full_name} (${user?.email})`;
 
-    Promise.all(allProjects.map((p) => projectService.getById(p.id).catch(() => null)))
+    Promise.all(
+      allProjects.map((p) => projectService.getById(p.id).catch(() => null))
+    )
       .then((details) => {
         if (cancelled) return;
         const assignedIds = new Set(
-          details.filter((d) => d?.assigned_staff?.includes(myLabel)).map((d) => d.id)
+          details
+            .filter((d) => d?.assigned_staff?.includes(myLabel))
+            .map((d) => d.id)
         );
         setAssignedProjects(allProjects.filter((p) => assignedIds.has(p.id)));
       })
-      .finally(() => { if (!cancelled) setAssignLoading(false); });
+      .finally(() => {
+        if (!cancelled) setAssignLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [allProjects, isStaff, user?.full_name, user?.email]);
 
-  const projects = isStaff ? (assignedProjects ?? []) : allProjects;
+  const projects = useMemo(
+    () => (isStaff ? assignedProjects ?? [] : allProjects),
+    [isStaff, assignedProjects, allProjects]
+  );
   const loading = loadingList || (isStaff && assignLoading);
-
-  const [search,        setSearch]        = useState("");
-  const [statusFilter,  setStatusFilter]  = useState("all");
-  const [publishFilter, setPublishFilter] = useState("all");
-  const [classificationFilter, setClassificationFilter] = useState("all");
-  const [toDelete,      setToDelete]      = useState(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return projects.filter((p) => {
-      const matchSearch  = !q
-        || p.title?.toLowerCase().includes(q)
-        || (p.title_ar ?? "").toLowerCase().includes(q)
-        || (p.summary ?? "").toLowerCase().includes(q)
-        || (p.summary_ar ?? "").toLowerCase().includes(q)
-        || p.category?.name?.toLowerCase().includes(q)
-        || (p.category?.name_ar ?? "").toLowerCase().includes(q);
-      const matchStatus  = statusFilter === "all"  || p.status === statusFilter;
-      const matchPublish = publishFilter === "all"
-        || (publishFilter === "published"   &&  p.is_published)
-        || (publishFilter === "unpublished" && !p.is_published);
-      const matchClassification = classificationFilter === "all"
-        || p.is_featured
-        || p.classifications?.some((classification) => String(classification.id) === String(classificationFilter))
-        || p.classification_ids?.some((id) => String(id) === String(classificationFilter));
-      return matchSearch && matchStatus && matchPublish && matchClassification;
+      const matchSearch =
+        !q ||
+        p.title?.toLowerCase().includes(q) ||
+        (p.title_ar ?? "").toLowerCase().includes(q) ||
+        (p.summary ?? "").toLowerCase().includes(q) ||
+        (p.summary_ar ?? "").toLowerCase().includes(q) ||
+        p.category?.name?.toLowerCase().includes(q) ||
+        (p.category?.name_ar ?? "").toLowerCase().includes(q);
+      const matchStatus = statusFilter === "all" || p.status === statusFilter;
+      const matchPublish =
+        publishFilter === "all" ||
+        (publishFilter === "published" && p.is_published && !p.is_featured) ||
+        (publishFilter === "unpublished" && !p.is_published) ||
+        (publishFilter === "featured" && p.is_featured);
+      return matchSearch && matchStatus && matchPublish;
     });
   }, [projects, search, statusFilter, publishFilter, classificationFilter]);
 
-  const stats = useMemo(() => ({
-    total:     projects.length,
-    active:    projects.filter((p) => p.status === "active").length,
-    published: projects.filter((p) => p.is_published).length,
-    completed: projects.filter((p) => p.status === "completed").length,
-  }), [projects]);
+  const stats = useMemo(
+    () => ({
+      total: projects.length,
+      active: projects.filter((p) => p.status === "active").length,
+      published: projects.filter((p) => p.is_published).length,
+      completed: projects.filter((p) => p.status === "completed").length,
+    }),
+    [projects]
+  );
 
   const handleDeleteConfirm = async () => {
     if (!toDelete) return;
     try {
       await deleteProject(toDelete.id);
-      success(t("projects.toast_deleted"), `"${toDelete.title}" ${t("projects.toast_deleted_sub")}`);
+      success(
+        t("projects.toast_deleted"),
+        `"${toDelete.title}" ${t("projects.toast_deleted_sub")}`
+      );
       refetch();
     } catch {
       toastError(t("projects.toast_delete_failed"));
@@ -101,10 +138,16 @@ const useProjectList = () => {
     try {
       if (project.is_published) {
         await unpublishProject(project.id);
-        success(t("projects.toast_unpublished"), `"${project.title}" ${t("projects.toast_unpublished_sub")}`);
+        success(
+          t("projects.toast_unpublished"),
+          `"${project.title}" ${t("projects.toast_unpublished_sub")}`
+        );
       } else {
         await publishProject(project.id);
-        success(t("projects.toast_published"), `"${project.title}" ${t("projects.toast_published_sub")}`);
+        success(
+          t("projects.toast_published"),
+          `"${project.title}" ${t("projects.toast_published_sub")}`
+        );
       }
       refetch();
     } catch {
@@ -118,12 +161,17 @@ const useProjectList = () => {
     error,
     refetch,
     stats,
-    search,        setSearch,
-    statusFilter,  setStatusFilter,
-    publishFilter, setPublishFilter,
-    classificationFilter, setClassificationFilter,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    publishFilter,
+    setPublishFilter,
+    classificationFilter,
+    setClassificationFilter,
     classifications,
-    toDelete,      setToDelete,
+    toDelete,
+    setToDelete,
     deleteLoading,
     publishLoading,
     handleDeleteConfirm,

@@ -64,6 +64,7 @@ export default function ProjectList() {
     { value: "all",         label: t("projects.publish_all") },
     { value: "published",   label: t("projects.publish_published") },
     { value: "unpublished", label: t("projects.publish_unpublished") },
+    { value: "featured",    label: t("projects.publish_featured") },
   ];
 
   const CLASSIFICATION_OPTIONS = [

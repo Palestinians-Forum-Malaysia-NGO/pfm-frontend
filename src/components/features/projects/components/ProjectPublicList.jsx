@@ -35,7 +35,7 @@ const fmtMYR = (val) => {
 };
 
 function ProjectCard({ project, onClick, statusLabels }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const pct = Math.min(
     100,
     Math.max(0, parseFloat(project.progress_percentage) || 0)
@@ -130,12 +130,13 @@ function ProjectCard({ project, onClick, statusLabels }) {
 }
 
 export default function ProjectPublicList({ basePath = "/projects" } = {}) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { projects: allProjects, loading } = useGetProjects();
-  const { classifications } = useGetClassifications();
-  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const currentLanguage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("i18nextLng") || "en"
+      : "en";
 
   const statusLabels = {
     active: t("projects.status_active"),
@@ -151,6 +152,16 @@ export default function ProjectPublicList({ basePath = "/projects" } = {}) {
   const statusFilter = ["active", "completed"].includes(statusParam)
     ? statusParam
     : null;
+  const projectQuery = {
+    ...(search.trim() ? { search: search.trim() } : {}),
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(classificationFilter !== "all"
+      ? { classification: classificationFilter }
+      : {}),
+  };
+  const { projects: allProjects, loading } = useGetProjects(projectQuery);
+  const { classifications } = useGetClassifications();
+  const { user } = useAuth();
   const clearStatusFilter = () =>
     setSearchParams((prev) => {
       prev.delete("status");
@@ -162,7 +173,7 @@ export default function ProjectPublicList({ basePath = "/projects" } = {}) {
     ...classifications.map((classification) => ({
       value: classification.id,
       label:
-        classification.name_ar && i18n.language === "ar"
+        classification.name_ar && currentLanguage === "ar"
           ? classification.name_ar
           : classification.name,
     })),
@@ -177,19 +188,6 @@ export default function ProjectPublicList({ basePath = "/projects" } = {}) {
   const projects = useMemo(() => {
     let list = visibleProjects;
     if (statusFilter) list = list.filter((p) => p.status === statusFilter);
-    if (classificationFilter !== "all") {
-      list = list.filter(
-        (p) =>
-          p.is_featured ||
-          p.classifications?.some(
-            (classification) =>
-              String(classification.id) === String(classificationFilter)
-          ) ||
-          p.classification_ids?.some(
-            (id) => String(id) === String(classificationFilter)
-          )
-      );
-    }
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(

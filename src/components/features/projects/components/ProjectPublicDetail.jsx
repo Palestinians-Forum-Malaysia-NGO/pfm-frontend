@@ -79,7 +79,7 @@ const fmtMYR = (val) => {
 };
 
 export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const navigate = useNavigate();
 
@@ -144,6 +144,26 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
     );
   }
 
+  const projectClassifications = Array.from(
+    new Map(
+      [
+        ...(project.classifications ?? []).map((classification) => ({
+          id: classification?.id,
+          label:
+            classification?.name_ar && i18n.language === "ar"
+              ? classification.name_ar
+              : classification?.name ?? `#${classification?.id}`,
+        })),
+        ...(project.classification_ids ?? []).map((id) => ({
+          id,
+          label: `#${id}`,
+        })),
+      ]
+        .filter((item) => item.id != null)
+        .map((item) => [String(item.id), item])
+    ).values()
+  );
+
   const progressPct = Math.min(
     100,
     Math.max(0, parseFloat(project.progress_percentage) || 0)
@@ -195,6 +215,19 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               </span>
             )}
           </div>
+
+          {projectClassifications.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {projectClassifications.map((classification) => (
+                <span
+                  key={String(classification.id)}
+                  className="inline-flex items-center rounded-full border border-green/20 bg-green/5 px-2.5 py-1 text-[11px] font-medium text-green"
+                >
+                  {classification.label}
+                </span>
+              ))}
+            </div>
+          )}
 
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
             {project.title}
