@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdFavorite, MdPeople, MdArrowForward } from "react-icons/md";
+import { MdPeople, MdArrowForward } from "react-icons/md";
 import useInView from "hooks/useInView";
 
 const CallToAction = () => {
@@ -29,12 +29,6 @@ const CallToAction = () => {
             className="inline-flex items-center gap-2 rounded-full bg-green px-7 py-3 text-sm font-bold text-white shadow-glow-green transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
           >
             <MdPeople className="h-4 w-4" /> {t("about.become_member")}
-          </Link>
-          <Link
-            to="/donate"
-            className="inline-flex items-center gap-2 rounded-full bg-pfmRed-500 px-7 py-3 text-sm font-bold text-white shadow-glow-red transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-          >
-            <MdFavorite className="h-4 w-4" /> {t("hero.donate_now")}
           </Link>
           <Link
             to="/contact"

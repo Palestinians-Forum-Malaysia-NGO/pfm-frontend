@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdFavorite, MdArrowForward, MdPeople, MdCampaign } from "react-icons/md";
+import { MdArrowForward, MdPeople, MdCampaign } from "react-icons/md";
 import img1 from "assets/img/gallery/gallery-16.jpg";
 import img2 from "assets/img/gallery/gallery-4.jpg";
 import { useGetStats } from "components/features/stats/hooks";
@@ -58,12 +58,6 @@ const HeroSection = () => {
             className="mt-8 flex flex-wrap items-center gap-3"
             style={{ animation: "fadeUp 0.7s 0.3s ease both" }}
           >
-            <Link
-              to="/donate"
-              className="inline-flex items-center gap-2 rounded-full bg-pfmRed-500 px-7 py-3 text-sm font-bold text-white shadow-glow-red transition-all duration-200 ease-in-out hover:-translate-y-px active:scale-[0.98]"
-            >
-              <MdFavorite className="h-4 w-4" /> {t("hero.donate_now")}
-            </Link>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98]"

@@ -38,7 +38,6 @@ import BeneficiaryOpportunities from "views/beneficiary/opportunities";
 import Home from "views/public/home";
 import About from "views/public/about";
 import PublicEvents from "views/public/events";
-import Donate from "views/public/donate";
 import Contact from "views/public/contact";
 import PublicProjectsPage from "views/public/projects";
 import RegisterPage from "views/public/register";
@@ -561,7 +560,6 @@ const routes = [
   { name: "About",    layout: "/", path: "/about",    component: <About /> },
   { name: "Events",   layout: "/", path: "/events",   component: <PublicEvents /> },
   { name: "Projects", layout: "/", path: "/projects", component: <PublicProjectsPage /> },
-  { name: "Donate",   layout: "/", path: "/donate",   component: <Donate /> },
   { name: "Contact",  layout: "/", path: "/contact",  component: <Contact /> },
   { name: "Opportunities", layout: "/", path: "/opportunities", component: <PublicOpportunitiesPage /> },
   { name: "News",          layout: "/", path: "/news",          component: <PublicNewsListPage /> },

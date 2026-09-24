@@ -27,7 +27,6 @@ const Footer = () => {
     {
       heading: t("footer.get_involved"),
       links: [
-        { label: t("footer.donate"),     to: "/donate" },
         { label: t("footer.volunteer"),  to: "/opportunities" },
         { label: t("footer.apply"),      to: "/apply" },
         { label: t("footer.events"),     to: "/events" },

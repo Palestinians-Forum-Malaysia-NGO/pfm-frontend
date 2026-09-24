@@ -96,10 +96,10 @@ const PublicNavbar = () => {
               {t("nav.sign_in")}
             </Link>
             <Link
-              to="/donate"
+              to="/apply"
               className="rounded-full bg-pfmRed-500 px-5 py-2 text-sm font-bold text-white shadow-sm shadow-pfmRed-500/30 transition-all duration-200 ease-in-out hover:-translate-y-px hover:bg-pfmRed-600 active:scale-[0.98]"
             >
-              {t("nav.donate_now")}
+              {t("nav.register_beneficiary")}
             </Link>
           </div>
 
@@ -153,11 +153,11 @@ const PublicNavbar = () => {
                 {t("nav.sign_in")}
               </Link>
               <Link
-                to="/donate"
+                to="/apply"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-xl bg-pfmRed-500 px-3 py-2.5 text-center text-sm font-bold text-white hover:bg-pfmRed-600"
               >
-                {t("nav.donate_now")}
+                {t("nav.register_beneficiary")}
               </Link>
             </div>
           </div>

@@ -38,8 +38,12 @@ export default function LanguageSwitcher() {
         <MdExpandMore className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
-      {/* Dropdown */}
-      <div className={`absolute end-0 top-full z-50 mt-2 w-44 origin-top-right overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 transition-all duration-200 ${
+      {/* Dropdown — anchored to the physical right edge regardless of text
+          direction, since every placement of this switcher (navbar corner,
+          auth layout's fixed top-right) keeps the button flush against the
+          right side of the viewport; a logical `end-0` flips to the left in
+          RTL and pushes the panel off-screen there instead. */}
+      <div className={`absolute right-0 top-full z-50 mt-2 w-44 origin-top-right overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-200/60 transition-all duration-200 ${
         open ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
       }`}>
         {LANGUAGES.map((lang) => (
