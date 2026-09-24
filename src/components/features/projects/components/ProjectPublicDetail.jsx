@@ -2,11 +2,25 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  MdArrowBack, MdAssignment, MdCalendarToday, MdCategory,
-  MdAttachMoney, MdTrendingUp, MdPeople, MdFlag,
-  MdRadioButtonUnchecked, MdCheck, MdCampaign, MdRateReview, MdLogin, MdPhotoLibrary,
+  MdArrowBack,
+  MdAssignment,
+  MdCalendarToday,
+  MdCategory,
+  MdAttachMoney,
+  MdTrendingUp,
+  MdPeople,
+  MdFlag,
+  MdRadioButtonUnchecked,
+  MdCheck,
+  MdCampaign,
+  MdRateReview,
+  MdLogin,
+  MdPhotoLibrary,
 } from "react-icons/md";
-import { useGetProject, useGetProjects } from "components/features/projects/hooks";
+import {
+  useGetProject,
+  useGetProjects,
+} from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { isSafeUrl } from "utils/url";
@@ -16,33 +30,58 @@ import FeedbackForm from "components/public/projects/FeedbackForm";
 import ProjectApplySection from "./ProjectApplySection";
 import useAuth from "components/features/auth/hooks/useAuth";
 import { ROLES } from "components/features/auth/types";
+import { canUserSeeProject } from "utils/projectVisibility";
 
 const GalleryPhotoLink = ({ image, caption, title }) => {
   const { url } = useStorageUrl(image);
   if (!isSafeUrl(url)) return null;
   return (
-    <a href={url} target="_blank" rel="noreferrer" className="group block overflow-hidden rounded-xl bg-slate-100" title={caption || ""}>
-      <img src={url} alt={caption || title} className="h-40 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-52" />
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="group block overflow-hidden rounded-xl bg-slate-100"
+      title={caption || ""}
+    >
+      <img
+        src={url}
+        alt={caption || title}
+        className="h-40 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-105 sm:h-52"
+      />
     </a>
   );
 };
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
+  d
+    ? new Date(d).toLocaleDateString("en-MY", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
 
 const fmtMonthYear = (d) =>
-  d ? new Date(d).toLocaleDateString("en-MY", { month: "short", year: "numeric" }) : null;
+  d
+    ? new Date(d).toLocaleDateString("en-MY", {
+        month: "short",
+        year: "numeric",
+      })
+    : null;
 
 const fmtMYR = (val) => {
   const n = parseFloat(val);
   if (isNaN(n)) return null;
-  return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  return `MYR ${n.toLocaleString("en-MY", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })}`;
 };
 
 export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
   const { project, execute: fetchProject, loading, error } = useGetProject();
   const { projects: allProjects } = useGetProjects();
@@ -50,13 +89,15 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
   const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 
   const statusLabels = {
-    active:    t("projects.status_active"),
+    active: t("projects.status_active"),
     completed: t("projects.status_completed"),
-    on_hold:   t("projects.status_on_hold"),
+    on_hold: t("projects.status_on_hold"),
     cancelled: t("projects.status_cancelled"),
   };
 
-  useEffect(() => { fetchProject(slug).catch(() => {}); }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchProject(slug).catch(() => {});
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <Loading text={t("projects.public_loading")} />;
 
@@ -64,18 +105,76 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <MdAssignment className="mx-auto mb-4 h-16 w-16 text-slate-200" />
-        <h2 className="mb-2 text-xl font-bold text-slate-700">{t("projects.public_not_found_title")}</h2>
-        <p className="mb-6 text-sm text-slate-400">{t("projects.public_not_found_body")}</p>
-        <button onClick={() => navigate(basePath)} className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90">
-          <MdArrowBack className="h-4 w-4" /> {t("projects.public_back_to_projects")}
+        <h2 className="mb-2 text-xl font-bold text-slate-700">
+          {t("projects.public_not_found_title")}
+        </h2>
+        <p className="mb-6 text-sm text-slate-400">
+          {t("projects.public_not_found_body")}
+        </p>
+        <button
+          onClick={() => navigate(basePath)}
+          className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90"
+        >
+          <MdArrowBack className="h-4 w-4" />{" "}
+          {t("projects.public_back_to_projects")}
         </button>
       </div>
     );
   }
 
-  const progressPct = Math.min(100, Math.max(0, parseFloat(project.progress_percentage) || 0));
+  const canViewProject = canUserSeeProject(project, user);
+  if (!canViewProject) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+        <MdAssignment className="mx-auto mb-4 h-16 w-16 text-slate-200" />
+        <h2 className="mb-2 text-xl font-bold text-slate-700">
+          {t("projects.public_not_found_title")}
+        </h2>
+        <p className="mb-6 text-sm text-slate-400">
+          {t("projects.public_not_found_body")}
+        </p>
+        <button
+          onClick={() => navigate(basePath)}
+          className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90"
+        >
+          <MdArrowBack className="h-4 w-4" />{" "}
+          {t("projects.public_back_to_projects")}
+        </button>
+      </div>
+    );
+  }
+
+  const projectClassifications = Array.from(
+    new Map(
+      [
+        ...(project.classifications ?? []).map((classification) => ({
+          id: classification?.id,
+          label:
+            classification?.name_ar && i18n.language === "ar"
+              ? classification.name_ar
+              : classification?.name ?? `#${classification?.id}`,
+        })),
+        ...(project.classification_ids ?? []).map((id) => ({
+          id,
+          label: `#${id}`,
+        })),
+      ]
+        .filter((item) => item.id != null)
+        .map((item) => [String(item.id), item])
+    ).values()
+  );
+
+  const progressPct = Math.min(
+    100,
+    Math.max(0, parseFloat(project.progress_percentage) || 0)
+  );
   const moreProjects = allProjects
-    .filter((p) => p.slug !== project.slug && p.status === "active")
+    .filter(
+      (p) =>
+        p.slug !== project.slug &&
+        p.status === "active" &&
+        canUserSeeProject(p, user)
+    )
     .slice(0, 3);
 
   return (
@@ -83,7 +182,11 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
       {/* ── Hero — plain full-bleed image, no overlay or text ── */}
       {project.cover_image && (
         <div className="h-72 w-full overflow-hidden sm:h-96 lg:h-[28rem]">
-          <StorageImage fileKey={project.cover_image} alt={project.title} className="h-full w-full object-cover" />
+          <StorageImage
+            fileKey={project.cover_image}
+            alt={project.title}
+            className="h-full w-full object-cover"
+          />
         </div>
       )}
 
@@ -98,7 +201,12 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
 
         <div className="max-w-3xl">
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${PROJECT_STATUS_BADGE[project.status] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                PROJECT_STATUS_BADGE[project.status] ??
+                "border-slate-200 bg-slate-100 text-slate-500"
+              }`}
+            >
               {statusLabels[project.status] ?? project.status}
             </span>
             {project.category?.name && (
@@ -107,6 +215,19 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               </span>
             )}
           </div>
+
+          {projectClassifications.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {projectClassifications.map((classification) => (
+                <span
+                  key={String(classification.id)}
+                  className="inline-flex items-center rounded-full border border-green/20 bg-green/5 px-2.5 py-1 text-[11px] font-medium text-green"
+                >
+                  {classification.label}
+                </span>
+              ))}
+            </div>
+          )}
 
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
             {project.title}
@@ -124,14 +245,14 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
       {/* ── Main content ── */}
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-14">
-
           {/* Left column — editorial reading column */}
           <div className="min-w-0 flex-1">
             <div className="max-w-3xl">
-
               {/* Summary */}
               {project.summary && (
-                <p className="mb-10 text-lg font-medium leading-relaxed text-slate-600">{project.summary}</p>
+                <p className="mb-10 text-lg font-medium leading-relaxed text-slate-600">
+                  {project.summary}
+                </p>
               )}
 
               {/* Description */}
@@ -140,7 +261,9 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                   <span className="mb-3 block text-xs font-bold uppercase tracking-widest text-green">
                     {t("projects.public_about_project")}
                   </span>
-                  <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{project.description}</p>
+                  <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+                    {project.description}
+                  </p>
                 </div>
               )}
 
@@ -148,9 +271,12 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {project.beneficiary_info && (
                 <div className="mb-12 rounded-2xl border border-green/20 bg-green/5 p-6">
                   <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-green">
-                    <MdPeople className="h-4 w-4" /> {t("projects.public_who_benefits")}
+                    <MdPeople className="h-4 w-4" />{" "}
+                    {t("projects.public_who_benefits")}
                   </h3>
-                  <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{project.beneficiary_info}</p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                    {project.beneficiary_info}
+                  </p>
                 </div>
               )}
 
@@ -158,27 +284,59 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {project.milestones?.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
-                    <MdFlag className="h-5 w-5 text-green" /> {t("projects.milestones_title")}
+                    <MdFlag className="h-5 w-5 text-green" />{" "}
+                    {t("projects.milestones_title")}
                   </h2>
                   <div className="flex flex-col divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
                     {project.milestones.map((m) => (
-                      <div key={m.id} className="flex items-start gap-3 px-5 py-4">
+                      <div
+                        key={m.id}
+                        className="flex items-start gap-3 px-5 py-4"
+                      >
                         <div className="mt-0.5 shrink-0">
-                          {m.is_completed
-                            ? <MdCheck className="h-5 w-5 text-green" />
-                            : <MdRadioButtonUnchecked className="h-5 w-5 text-slate-300" />
-                          }
+                          {m.is_completed ? (
+                            <MdCheck className="h-5 w-5 text-green" />
+                          ) : (
+                            <MdRadioButtonUnchecked className="h-5 w-5 text-slate-300" />
+                          )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
-                          {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
-                          {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
+                          <p
+                            className={`text-sm font-medium ${
+                              m.is_completed
+                                ? "text-slate-400 line-through"
+                                : "text-slate-900"
+                            }`}
+                          >
+                            {m.title}
+                          </p>
+                          {m.description && (
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              {m.description}
+                            </p>
+                          )}
+                          {m.target_date && (
+                            <p className="mt-0.5 text-xs text-slate-400">
+                              {t("projects.target_prefix")}{" "}
+                              {fmtDate(m.target_date)}
+                            </p>
+                          )}
                           {m.percentage && (
                             <div className="mt-2 flex items-center gap-2">
                               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
-                                <div className="h-full rounded-full bg-green" style={{ width: `${Math.min(100, parseFloat(m.percentage) || 0)}%` }} />
+                                <div
+                                  className="h-full rounded-full bg-green"
+                                  style={{
+                                    width: `${Math.min(
+                                      100,
+                                      parseFloat(m.percentage) || 0
+                                    )}%`,
+                                  }}
+                                />
                               </div>
-                              <span className="text-xs font-medium text-green">{parseFloat(m.percentage).toFixed(0)}%</span>
+                              <span className="text-xs font-medium text-green">
+                                {parseFloat(m.percentage).toFixed(0)}%
+                              </span>
                             </div>
                           )}
                         </div>
@@ -192,15 +350,22 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {project.updates?.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
-                    <MdCampaign className="h-5 w-5 text-green" /> {t("projects.public_latest_updates")}
+                    <MdCampaign className="h-5 w-5 text-green" />{" "}
+                    {t("projects.public_latest_updates")}
                   </h2>
                   <div className="flex flex-col gap-10">
                     {project.updates.map((u) => (
                       <div key={u.id}>
                         {u.photo && (
-                          <StorageImage fileKey={u.photo} alt={t("projects.update_alt")} className="mb-3 max-h-[420px] w-full rounded-2xl object-cover" />
+                          <StorageImage
+                            fileKey={u.photo}
+                            alt={t("projects.update_alt")}
+                            className="mb-3 max-h-[420px] w-full rounded-2xl object-cover"
+                          />
                         )}
-                        <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{u.body}</p>
+                        <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+                          {u.body}
+                        </p>
                         {(u.posted_by || u.created_at) && (
                           <p className="mt-2 text-xs text-slate-400">
                             {u.posted_by}
@@ -218,11 +383,17 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {project.gallery?.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
-                    <MdPhotoLibrary className="h-5 w-5 text-green" /> {t("projects.gallery_title")}
+                    <MdPhotoLibrary className="h-5 w-5 text-green" />{" "}
+                    {t("projects.gallery_title")}
                   </h2>
                   <div className="grid grid-cols-2 gap-3">
                     {project.gallery.map((p) => (
-                      <GalleryPhotoLink key={p.id} image={p.image} caption={p.caption} title={t("projects.gallery_title")} />
+                      <GalleryPhotoLink
+                        key={p.id}
+                        image={p.image}
+                        caption={p.caption}
+                        title={t("projects.gallery_title")}
+                      />
                     ))}
                   </div>
                 </div>
@@ -239,16 +410,22 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {(isBeneficiary || !isAuthenticated) && (
                 <div>
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
-                    <MdRateReview className="h-5 w-5 text-green" /> {t("feedback.section_title")}
+                    <MdRateReview className="h-5 w-5 text-green" />{" "}
+                    {t("feedback.section_title")}
                   </h2>
                   {isBeneficiary ? (
-                    <FeedbackForm projectId={project.id} fullName={user.full_name} />
+                    <FeedbackForm
+                      projectId={project.id}
+                      fullName={user.full_name}
+                    />
                   ) : (
                     <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green">
                         <MdLogin className="h-6 w-6" />
                       </div>
-                      <p className="text-sm text-slate-600">{t("feedback.signin_prompt")}</p>
+                      <p className="text-sm text-slate-600">
+                        {t("feedback.signin_prompt")}
+                      </p>
                       <Link
                         to="/auth/sign-in"
                         className="inline-flex items-center gap-2 rounded-full bg-green px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-green/90"
@@ -263,47 +440,88 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
           </div>
 
           {/* Right sidebar — funding stats */}
-          <aside className="w-full lg:w-72 shrink-0">
+          <aside className="w-full shrink-0 lg:w-72">
             <div className="sticky top-6 overflow-hidden rounded-2xl border border-slate-100">
               <div className="h-1 w-full bg-green" />
               <div className="p-5">
-                <h3 className="mb-4 text-base font-bold text-slate-900">{t("projects.public_progress_title")}</h3>
+                <h3 className="mb-4 text-base font-bold text-slate-900">
+                  {t("projects.public_progress_title")}
+                </h3>
 
                 {project.target ? (
                   <>
                     <div className="mb-3">
                       <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
                         <span>{t("projects.public_funding_raised")}</span>
-                        <span className="font-bold text-green">{progressPct.toFixed(0)}%</span>
+                        <span className="font-bold text-green">
+                          {progressPct.toFixed(0)}%
+                        </span>
                       </div>
                       <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                        <div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${progressPct}%` }} />
+                        <div
+                          className="h-full rounded-full bg-green transition-all duration-500"
+                          style={{ width: `${progressPct}%` }}
+                        />
                       </div>
                     </div>
                     <div className="mb-1 flex items-center justify-between">
-                      <span className="text-xs text-slate-400 flex items-center gap-1"><MdTrendingUp className="h-3.5 w-3.5" /> {t("projects.public_raised")}</span>
-                      <span className="text-sm font-bold text-slate-900">{fmtMYR(project.amount_raised) ?? "—"}</span>
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <MdTrendingUp className="h-3.5 w-3.5" />{" "}
+                        {t("projects.public_raised")}
+                      </span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {fmtMYR(project.amount_raised) ?? "—"}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                      <span className="text-xs text-slate-400 flex items-center gap-1"><MdAttachMoney className="h-3.5 w-3.5" /> {t("projects.public_target")}</span>
-                      <span className="text-sm font-bold text-slate-900">{fmtMYR(project.target)}</span>
+                    <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-3">
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <MdAttachMoney className="h-3.5 w-3.5" />{" "}
+                        {t("projects.public_target")}
+                      </span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {fmtMYR(project.target)}
+                      </span>
                     </div>
                   </>
                 ) : (
-                  <p className="mb-4 text-xs text-slate-400">{t("projects.public_funding_not_set")}</p>
+                  <p className="mb-4 text-xs text-slate-400">
+                    {t("projects.public_funding_not_set")}
+                  </p>
                 )}
 
                 {project.total_beneficiaries_helped && (
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdPeople className="h-3.5 w-3.5" /> {t("projects.public_beneficiaries_helped")}</span>
-                    <span className="text-sm font-bold text-slate-900">{project.total_beneficiaries_helped}</span>
+                    <span className="flex items-center gap-1 text-xs text-slate-400">
+                      <MdPeople className="h-3.5 w-3.5" />{" "}
+                      {t("projects.public_beneficiaries_helped")}
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {project.total_beneficiaries_helped}
+                    </span>
                   </div>
                 )}
 
-                <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-400 space-y-1">
-                  {project.start_date && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> {t("projects.public_started_prefix")} {fmtDate(project.start_date)}</p>}
-                  {project.end_date   && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5 text-slate-300" /> {t("projects.public_ends_prefix")} {fmtDate(project.end_date)}</p>}
-                  {project.category?.name && <p className="flex items-center gap-1"><MdCategory className="h-3.5 w-3.5" /> {project.category.name}</p>}
+                <div className="mt-5 space-y-1 border-t border-slate-100 pt-4 text-xs text-slate-400">
+                  {project.start_date && (
+                    <p className="flex items-center gap-1">
+                      <MdCalendarToday className="h-3.5 w-3.5" />{" "}
+                      {t("projects.public_started_prefix")}{" "}
+                      {fmtDate(project.start_date)}
+                    </p>
+                  )}
+                  {project.end_date && (
+                    <p className="flex items-center gap-1">
+                      <MdCalendarToday className="h-3.5 w-3.5 text-slate-300" />{" "}
+                      {t("projects.public_ends_prefix")}{" "}
+                      {fmtDate(project.end_date)}
+                    </p>
+                  )}
+                  {project.category?.name && (
+                    <p className="flex items-center gap-1">
+                      <MdCategory className="h-3.5 w-3.5" />{" "}
+                      {project.category.name}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -316,7 +534,8 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
         <div className="border-t border-slate-100 bg-slate-50 py-14">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <h2 className="mb-8 flex items-center gap-2 text-2xl font-extrabold text-slate-900">
-              <MdAssignment className="h-5 w-5 text-green" /> {t("projects.public_more_projects")}
+              <MdAssignment className="h-5 w-5 text-green" />{" "}
+              {t("projects.public_more_projects")}
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               {moreProjects.map((p) => (
@@ -342,7 +561,11 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                     <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
                       {p.title}
                     </h3>
-                    {p.start_date && <p className="mt-auto text-xs text-slate-400">{fmtMonthYear(p.start_date)}</p>}
+                    {p.start_date && (
+                      <p className="mt-auto text-xs text-slate-400">
+                        {fmtMonthYear(p.start_date)}
+                      </p>
+                    )}
                   </div>
                 </button>
               ))}

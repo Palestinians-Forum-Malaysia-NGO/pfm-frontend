@@ -1,23 +1,45 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MdSearch, MdClose, MdAssignment, MdCalendarToday, MdCategory, MdTrendingUp } from "react-icons/md";
+import {
+  MdSearch,
+  MdClose,
+  MdAssignment,
+  MdCalendarToday,
+  MdCategory,
+  MdTrendingUp,
+} from "react-icons/md";
 import { useGetProjects } from "components/features/projects/hooks";
 import StorageImage from "components/ui/StorageImage";
+import FilterSelect from "components/ui/FilterSelect";
+import { useGetClassifications } from "components/features/classifications/hooks";
 import { PROJECT_STATUS_BADGE } from "components/features/projects/constants/projects";
+import useAuth from "components/features/auth/hooks/useAuth";
+import { canUserSeeProject } from "utils/projectVisibility";
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-MY", { month: "short", year: "numeric" }) : null;
+  d
+    ? new Date(d).toLocaleDateString("en-MY", {
+        month: "short",
+        year: "numeric",
+      })
+    : null;
 
 const fmtMYR = (val) => {
   const n = parseFloat(val);
   if (isNaN(n)) return null;
-  return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  return `MYR ${n.toLocaleString("en-MY", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })}`;
 };
 
 function ProjectCard({ project, onClick, statusLabels }) {
   const { t } = useTranslation();
-  const pct = Math.min(100, Math.max(0, parseFloat(project.progress_percentage) || 0));
+  const pct = Math.min(
+    100,
+    Math.max(0, parseFloat(project.progress_percentage) || 0)
+  );
 
   return (
     <button
@@ -39,7 +61,12 @@ function ProjectCard({ project, onClick, statusLabels }) {
         )}
         {/* Status badge */}
         <div className="absolute left-3 top-3">
-          <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-sm ${PROJECT_STATUS_BADGE[project.status] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-sm ${
+              PROJECT_STATUS_BADGE[project.status] ??
+              "border-slate-200 bg-slate-100 text-slate-500"
+            }`}
+          >
             {statusLabels[project.status] ?? project.status}
           </span>
         </div>
@@ -52,25 +79,37 @@ function ProjectCard({ project, onClick, statusLabels }) {
             <MdCategory className="h-3.5 w-3.5" /> {project.category.name}
           </span>
         )}
-        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 group-hover:text-green transition-colors duration-150">
+        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
           {project.title}
         </h3>
         {project.summary && (
-          <p className="mb-3 line-clamp-2 text-sm text-slate-500">{project.summary}</p>
+          <p className="mb-3 line-clamp-2 text-sm text-slate-500">
+            {project.summary}
+          </p>
         )}
 
         {/* Progress */}
         {project.target && (
           <div className="mb-3">
             <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
-              <span className="flex items-center gap-1"><MdTrendingUp className="h-3.5 w-3.5" /> {t("projects.public_raised")}</span>
-              <span className="font-semibold text-green">{pct.toFixed(0)}%</span>
+              <span className="flex items-center gap-1">
+                <MdTrendingUp className="h-3.5 w-3.5" />{" "}
+                {t("projects.public_raised")}
+              </span>
+              <span className="font-semibold text-green">
+                {pct.toFixed(0)}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${pct}%` }} />
+              <div
+                className="h-full rounded-full bg-green transition-all duration-500"
+                style={{ width: `${pct}%` }}
+              />
             </div>
             {fmtMYR(project.target) && (
-              <p className="mt-1 text-xs text-slate-400">{t("projects.target_prefix")} {fmtMYR(project.target)}</p>
+              <p className="mt-1 text-xs text-slate-400">
+                {t("projects.target_prefix")} {fmtMYR(project.target)}
+              </p>
             )}
           </div>
         )}
@@ -79,7 +118,10 @@ function ProjectCard({ project, onClick, statusLabels }) {
         {project.start_date && (
           <div className="mt-auto flex items-center gap-1 text-xs text-slate-400">
             <MdCalendarToday className="h-3.5 w-3.5" />
-            <span>{fmtDate(project.start_date)}{project.end_date ? ` – ${fmtDate(project.end_date)}` : ""}</span>
+            <span>
+              {fmtDate(project.start_date)}
+              {project.end_date ? ` – ${fmtDate(project.end_date)}` : ""}
+            </span>
           </div>
         )}
       </div>
@@ -90,39 +132,79 @@ function ProjectCard({ project, onClick, statusLabels }) {
 export default function ProjectPublicList({ basePath = "/projects" } = {}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { projects: allProjects, loading } = useGetProjects();
   const [searchParams, setSearchParams] = useSearchParams();
+  const currentLanguage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("i18nextLng") || "en"
+      : "en";
 
   const statusLabels = {
-    active:    t("projects.status_active"),
+    active: t("projects.status_active"),
     completed: t("projects.status_completed"),
-    on_hold:   t("projects.status_on_hold"),
+    on_hold: t("projects.status_on_hold"),
     cancelled: t("projects.status_cancelled"),
   };
 
   const [search, setSearch] = useState("");
+  const [classificationFilter, setClassificationFilter] = useState("all");
 
   const statusParam = searchParams.get("status");
-  const statusFilter = ["active", "completed"].includes(statusParam) ? statusParam : null;
-  const clearStatusFilter = () => setSearchParams((prev) => { prev.delete("status"); return prev; });
+  const statusFilter = ["active", "completed"].includes(statusParam)
+    ? statusParam
+    : null;
+  const projectQuery = {
+    ...(search.trim() ? { search: search.trim() } : {}),
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(classificationFilter !== "all"
+      ? { classification: classificationFilter }
+      : {}),
+  };
+  const { projects: allProjects, loading } = useGetProjects(projectQuery);
+  const { classifications } = useGetClassifications();
+  const { user } = useAuth();
+  const clearStatusFilter = () =>
+    setSearchParams((prev) => {
+      prev.delete("status");
+      return prev;
+    });
+
+  const CLASSIFICATION_OPTIONS = [
+    { value: "all", label: t("projects.classification_all") },
+    ...classifications.map((classification) => ({
+      value: classification.id,
+      label:
+        classification.name_ar && currentLanguage === "ar"
+          ? classification.name_ar
+          : classification.name,
+    })),
+  ];
+
+  const visibleProjects = useMemo(() => {
+    return (allProjects || []).filter((project) =>
+      canUserSeeProject(project, user)
+    );
+  }, [allProjects, user]);
 
   const projects = useMemo(() => {
-    let list = allProjects;
+    let list = visibleProjects;
     if (statusFilter) list = list.filter((p) => p.status === statusFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((p) =>
-        p.title?.toLowerCase().includes(q) ||
-        p.summary?.toLowerCase().includes(q) ||
-        p.category?.name?.toLowerCase().includes(q)
+      list = list.filter(
+        (p) =>
+          p.title?.toLowerCase().includes(q) ||
+          p.summary?.toLowerCase().includes(q) ||
+          p.category?.name?.toLowerCase().includes(q)
       );
     }
     return list;
-  }, [allProjects, search, statusFilter]);
+  }, [visibleProjects, search, statusFilter, classificationFilter]);
 
-  const hasSearch = search !== "";
+  const hasSearch = search !== "" || classificationFilter !== "all";
 
-  const activeCount = allProjects.filter((p) => p.status === "active").length;
+  const activeCount = visibleProjects.filter(
+    (p) => p.status === "active"
+  ).length;
 
   return (
     <div>
@@ -132,87 +214,108 @@ export default function ProjectPublicList({ basePath = "/projects" } = {}) {
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <div className="max-w-2xl">
             <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
               {t("projects.public_active_projects", { count: activeCount })}
             </span>
-            <h1 className="mt-3 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl leading-tight">
+            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
               {t("projects.public_hero_title")}
             </h1>
-            <p className="mt-4 text-base text-white/75 sm:text-lg leading-relaxed">
+            <p className="mt-4 text-base leading-relaxed text-white/75 sm:text-lg">
               {t("projects.public_hero_subtitle")}
             </p>
           </div>
         </div>
       </div>
 
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-
-      {/* Search */}
-      <div className="mb-8 flex items-center gap-2">
-        <div className="relative flex-1">
-          <MdSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("projects.public_search_placeholder")}
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm text-slate-900 outline-none focus:border-green focus:ring-2 focus:ring-green/20 placeholder:text-slate-400"
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        {/* Search */}
+        <div className="mb-8 flex flex-wrap items-center gap-2">
+          <div className="relative flex-1">
+            <MdSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("projects.public_search_placeholder")}
+              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-green focus:ring-2 focus:ring-green/20"
+            />
+          </div>
+          <FilterSelect
+            value={classificationFilter}
+            onChange={setClassificationFilter}
+            options={CLASSIFICATION_OPTIONS}
           />
-        </div>
-        {hasSearch && (
-          <button
-            onClick={() => setSearch("")}
-            className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-          >
-            <MdClose className="h-4 w-4" /> {t("projects.clear")}
-          </button>
-        )}
-      </div>
-
-      {/* Active status filter chip */}
-      {statusFilter && (
-        <div className="mb-8 -mt-4 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
-            {statusLabels[statusFilter]}
-            <button onClick={clearStatusFilter} aria-label={t("projects.clear")}>
-              <MdClose className="h-3.5 w-3.5" />
-            </button>
-          </span>
-        </div>
-      )}
-
-      {/* Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse rounded-2xl border border-slate-100 bg-slate-50 h-80" />
-          ))}
-        </div>
-      ) : projects.length === 0 ? (
-        <div className="py-20 text-center">
-          <MdAssignment className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-          <p className="text-slate-500">{hasSearch ? t("projects.public_no_match") : t("projects.public_no_projects")}</p>
-          {(hasSearch || statusFilter) && (
+          {hasSearch && (
             <button
-              onClick={() => { setSearch(""); clearStatusFilter(); }}
-              className="mt-4 text-sm font-medium text-green hover:underline"
+              onClick={() => {
+                setSearch("");
+                setClassificationFilter("all");
+              }}
+              className="flex items-center gap-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50"
             >
-              {t("projects.clear")}
+              <MdClose className="h-4 w-4" /> {t("projects.clear")}
             </button>
           )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((p) => (
-            <ProjectCard
-              key={p.id}
-              project={p}
-              statusLabels={statusLabels}
-              onClick={() => navigate(`${basePath}/${p.slug}`)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
+
+        {/* Active status filter chip */}
+        {statusFilter && (
+          <div className="-mt-4 mb-8 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green/10 px-3 py-1 text-xs font-semibold text-green">
+              {statusLabels[statusFilter]}
+              <button
+                onClick={clearStatusFilter}
+                aria-label={t("projects.clear")}
+              >
+                <MdClose className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
+
+        {/* Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="h-80 animate-pulse rounded-2xl border border-slate-100 bg-slate-50"
+              />
+            ))}
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="py-20 text-center">
+            <MdAssignment className="mx-auto mb-3 h-12 w-12 text-slate-300" />
+            <p className="text-slate-500">
+              {hasSearch
+                ? t("projects.public_no_match")
+                : t("projects.public_no_projects")}
+            </p>
+            {(hasSearch || statusFilter) && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setClassificationFilter("all");
+                  clearStatusFilter();
+                }}
+                className="mt-4 text-sm font-medium text-green hover:underline"
+              >
+                {t("projects.clear")}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((p) => (
+              <ProjectCard
+                key={p.id}
+                project={p}
+                statusLabels={statusLabels}
+                onClick={() => navigate(`${basePath}/${p.slug}`)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
