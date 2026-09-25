@@ -40,7 +40,8 @@ const fmtMYR = (val) => {
 };
 
 export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const { slug } = useParams();
   const navigate  = useNavigate();
 
@@ -73,6 +74,12 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
     );
   }
 
+  const title            = (isAr && project.title_ar)            || project.title;
+  const summary          = (isAr && project.summary_ar)          || project.summary;
+  const description      = (isAr && project.description_ar)      || project.description;
+  const beneficiaryInfo  = (isAr && project.beneficiary_info_ar) || project.beneficiary_info;
+  const categoryName     = (isAr && project.category?.name_ar)   || project.category?.name;
+
   const progressPct = Math.min(100, Math.max(0, parseFloat(project.progress_percentage) || 0));
   const moreProjects = allProjects
     .filter((p) => p.slug !== project.slug && p.status === "active")
@@ -83,7 +90,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
       {/* ── Hero — plain full-bleed image, no overlay or text ── */}
       {project.cover_image && (
         <div className="h-72 w-full overflow-hidden sm:h-96 lg:h-[28rem]">
-          <StorageImage fileKey={project.cover_image} alt={project.title} className="h-full w-full object-cover" />
+          <StorageImage fileKey={project.cover_image} alt={title} className="h-full w-full object-cover" />
         </div>
       )}
 
@@ -101,15 +108,15 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
             <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${PROJECT_STATUS_BADGE[project.status] ?? "bg-slate-100 text-slate-500 border-slate-200"}`}>
               {statusLabels[project.status] ?? project.status}
             </span>
-            {project.category?.name && (
+            {categoryName && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-green">
-                <MdCategory className="h-3.5 w-3.5" /> {project.category.name}
+                <MdCategory className="h-3.5 w-3.5" /> {categoryName}
               </span>
             )}
           </div>
 
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-            {project.title}
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl" dir={isAr && project.title_ar ? "rtl" : undefined}>
+            {title}
           </h1>
 
           {(project.start_date || project.end_date) && (
@@ -130,27 +137,27 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
             <div className="max-w-3xl">
 
               {/* Summary */}
-              {project.summary && (
-                <p className="mb-10 text-lg font-medium leading-relaxed text-slate-600">{project.summary}</p>
+              {summary && (
+                <p className="mb-10 text-lg font-medium leading-relaxed text-slate-600" dir={isAr && project.summary_ar ? "rtl" : undefined}>{summary}</p>
               )}
 
               {/* Description */}
-              {project.description && (
+              {description && (
                 <div className="mb-12">
                   <span className="mb-3 block text-xs font-bold uppercase tracking-widest text-green">
                     {t("projects.public_about_project")}
                   </span>
-                  <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{project.description}</p>
+                  <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && project.description_ar ? "rtl" : undefined}>{description}</p>
                 </div>
               )}
 
               {/* Beneficiary Info */}
-              {project.beneficiary_info && (
+              {beneficiaryInfo && (
                 <div className="mb-12 rounded-2xl border border-green/20 bg-green/5 p-6">
                   <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-green">
                     <MdPeople className="h-4 w-4" /> {t("projects.public_who_benefits")}
                   </h3>
-                  <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{project.beneficiary_info}</p>
+                  <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && project.beneficiary_info_ar ? "rtl" : undefined}>{beneficiaryInfo}</p>
                 </div>
               )}
 
@@ -161,7 +168,10 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                     <MdFlag className="h-5 w-5 text-green" /> {t("projects.milestones_title")}
                   </h2>
                   <div className="flex flex-col divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
-                    {project.milestones.map((m) => (
+                    {project.milestones.map((m) => {
+                      const mTitle = (isAr && m.title_ar) || m.title;
+                      const mDesc  = (isAr && m.description_ar) || m.description;
+                      return (
                       <div key={m.id} className="flex items-start gap-3 px-5 py-4">
                         <div className="mt-0.5 shrink-0">
                           {m.is_completed
@@ -170,8 +180,8 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                           }
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
-                          {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
+                          <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`} dir={isAr && m.title_ar ? "rtl" : undefined}>{mTitle}</p>
+                          {mDesc && <p className="mt-0.5 text-xs text-slate-500" dir={isAr && m.description_ar ? "rtl" : undefined}>{mDesc}</p>}
                           {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
                           {m.percentage && (
                             <div className="mt-2 flex items-center gap-2">
@@ -183,7 +193,8 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                           )}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -195,12 +206,14 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                     <MdCampaign className="h-5 w-5 text-green" /> {t("projects.public_latest_updates")}
                   </h2>
                   <div className="flex flex-col gap-10">
-                    {project.updates.map((u) => (
+                    {project.updates.map((u) => {
+                      const uBody = (isAr && u.body_ar) || u.body;
+                      return (
                       <div key={u.id}>
                         {u.photo && (
                           <StorageImage fileKey={u.photo} alt={t("projects.update_alt")} className="mb-3 max-h-[420px] w-full rounded-2xl object-cover" />
                         )}
-                        <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{u.body}</p>
+                        <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && u.body_ar ? "rtl" : undefined}>{uBody}</p>
                         {(u.posted_by || u.created_at) && (
                           <p className="mt-2 text-xs text-slate-400">
                             {u.posted_by}
@@ -209,7 +222,8 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                           </p>
                         )}
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -303,7 +317,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
                 <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-400 space-y-1">
                   {project.start_date && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> {t("projects.public_started_prefix")} {fmtDate(project.start_date)}</p>}
                   {project.end_date   && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5 text-slate-300" /> {t("projects.public_ends_prefix")} {fmtDate(project.end_date)}</p>}
-                  {project.category?.name && <p className="flex items-center gap-1"><MdCategory className="h-3.5 w-3.5" /> {project.category.name}</p>}
+                  {categoryName && <p className="flex items-center gap-1"><MdCategory className="h-3.5 w-3.5" /> {categoryName}</p>}
                 </div>
               </div>
             </div>
@@ -319,33 +333,36 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               <MdAssignment className="h-5 w-5 text-green" /> {t("projects.public_more_projects")}
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {moreProjects.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => navigate(`${basePath}/${p.slug}`)}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md"
-                >
-                  <div className="h-40 w-full shrink-0 overflow-hidden bg-slate-100">
-                    {p.cover_image ? (
-                      <StorageImage
-                        fileKey={p.cover_image}
-                        alt={p.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <MdAssignment className="h-10 w-10 text-slate-300" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col p-4">
-                    <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
-                      {p.title}
-                    </h3>
-                    {p.start_date && <p className="mt-auto text-xs text-slate-400">{fmtMonthYear(p.start_date)}</p>}
-                  </div>
-                </button>
-              ))}
+              {moreProjects.map((p) => {
+                const pTitle = (isAr && p.title_ar) || p.title;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => navigate(`${basePath}/${p.slug}`)}
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-md"
+                  >
+                    <div className="h-40 w-full shrink-0 overflow-hidden bg-slate-100">
+                      {p.cover_image ? (
+                        <StorageImage
+                          fileKey={p.cover_image}
+                          alt={pTitle}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <MdAssignment className="h-10 w-10 text-slate-300" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col p-4">
+                      <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green" dir={isAr && p.title_ar ? "rtl" : undefined}>
+                        {pTitle}
+                      </h3>
+                      {p.start_date && <p className="mt-auto text-xs text-slate-400">{fmtMonthYear(p.start_date)}</p>}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

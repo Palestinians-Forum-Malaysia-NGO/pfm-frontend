@@ -16,7 +16,11 @@ const fmtMYR = (val) => {
 };
 
 function ProjectCard({ project, onClick, statusLabels }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+  const title    = (isAr && project.title_ar)          || project.title;
+  const summary  = (isAr && project.summary_ar)         || project.summary;
+  const catName  = (isAr && project.category?.name_ar)  || project.category?.name;
   const pct = Math.min(100, Math.max(0, parseFloat(project.progress_percentage) || 0));
 
   return (
@@ -29,7 +33,7 @@ function ProjectCard({ project, onClick, statusLabels }) {
         {project.cover_image ? (
           <StorageImage
             fileKey={project.cover_image}
-            alt={project.title}
+            alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -47,16 +51,16 @@ function ProjectCard({ project, onClick, statusLabels }) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-5">
-        {project.category?.name && (
+        {catName && (
           <span className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-green">
-            <MdCategory className="h-3.5 w-3.5" /> {project.category.name}
+            <MdCategory className="h-3.5 w-3.5" /> {catName}
           </span>
         )}
-        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 group-hover:text-green transition-colors duration-150">
-          {project.title}
+        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 group-hover:text-green transition-colors duration-150" dir={isAr && project.title_ar ? "rtl" : undefined}>
+          {title}
         </h3>
-        {project.summary && (
-          <p className="mb-3 line-clamp-2 text-sm text-slate-500">{project.summary}</p>
+        {summary && (
+          <p className="mb-3 line-clamp-2 text-sm text-slate-500" dir={isAr && project.summary_ar ? "rtl" : undefined}>{summary}</p>
         )}
 
         {/* Progress */}
@@ -113,8 +117,11 @@ export default function ProjectPublicList({ basePath = "/projects" } = {}) {
       const q = search.toLowerCase();
       list = list.filter((p) =>
         p.title?.toLowerCase().includes(q) ||
+        p.title_ar?.toLowerCase().includes(q) ||
         p.summary?.toLowerCase().includes(q) ||
-        p.category?.name?.toLowerCase().includes(q)
+        p.summary_ar?.toLowerCase().includes(q) ||
+        p.category?.name?.toLowerCase().includes(q) ||
+        p.category?.name_ar?.toLowerCase().includes(q)
       );
     }
     return list;
