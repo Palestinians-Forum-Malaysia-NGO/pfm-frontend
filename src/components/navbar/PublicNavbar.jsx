@@ -80,14 +80,14 @@ const PublicNavbar = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-0.5 md:flex" aria-label={t("common.main_navigation")}>
+          <nav className="hidden items-center gap-0.5 xl:flex" aria-label={t("common.main_navigation")}>
             {links.map((link) => (
               <NavItem key={link.to + link.label} link={link} isActive={isActive} />
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden shrink-0 items-center gap-2 md:flex">
+          <div className="hidden shrink-0 items-center gap-2 xl:flex">
             <LanguageSwitcher />
             <Link
               to="/auth/sign-in"
@@ -105,7 +105,7 @@ const PublicNavbar = () => {
 
           {/* Mobile toggle */}
           <button
-            className="relative h-9 w-9 rounded-xl text-slate-500 transition-all duration-200 ease-in-out hover:bg-slate-100 md:hidden"
+            className="relative h-9 w-9 rounded-xl text-slate-500 transition-all duration-200 ease-in-out hover:bg-slate-100 xl:hidden"
             onClick={() => setMenuOpen((o) => !o)}
             aria-label={t("common.toggle_menu")}
             aria-expanded={menuOpen}

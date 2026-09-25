@@ -27,7 +27,7 @@ const NavItem = ({ link, isActive }) => {
     return (
       <Link
         to={link.to}
-        className={`relative px-3 py-1.5 text-sm font-medium transition-colors duration-200 ease-in-out ${
+        className={`relative whitespace-nowrap px-3 py-1.5 text-sm font-medium transition-colors duration-200 ease-in-out ${
           isActive(link.to) ? "text-green" : "text-slate-600 hover:text-slate-900"
         }`}
       >
@@ -54,7 +54,7 @@ const NavItem = ({ link, isActive }) => {
         onClick={() => setOpen(false)}
         aria-expanded={open}
         aria-haspopup="true"
-        className={`relative inline-flex items-center gap-0.5 px-3 py-1.5 text-sm font-medium transition-colors duration-200 ease-in-out ${
+        className={`relative inline-flex items-center gap-0.5 whitespace-nowrap px-3 py-1.5 text-sm font-medium transition-colors duration-200 ease-in-out ${
           isActive(link.to) ? "text-green" : "text-slate-600 hover:text-slate-900"
         }`}
       >
