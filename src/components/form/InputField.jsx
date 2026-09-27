@@ -6,7 +6,7 @@ import { getNestedValue } from "./utils/getNestedValue";
 const InputField = ({
   label, field, type = "text", required = true,
   placeholder = "", formData, errors, updateFormData,
-  variant = "default", rules = [],
+  variant = "default", rules = [], dir,
 }) => {
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
@@ -49,6 +49,7 @@ const InputField = ({
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
+        dir={dir}
         {...dateProps}
         className={fieldCls}
       />

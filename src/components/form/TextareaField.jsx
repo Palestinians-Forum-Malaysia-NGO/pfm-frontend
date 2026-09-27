@@ -5,7 +5,7 @@ import { getNestedValue } from "./utils/getNestedValue";
 
 const TextareaField = ({
   label, field, rows = 4, required = true,
-  placeholder = "", formData, errors, updateFormData, rules = [],
+  placeholder = "", formData, errors, updateFormData, rules = [], dir,
 }) => {
   const [touched, setTouched] = useState(false);
   const [localError, setLocalError] = useState(null);
@@ -38,6 +38,7 @@ const TextareaField = ({
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
+        dir={dir}
         className={`w-full resize-none rounded-xl border px-3 py-3 text-sm text-start text-slate-900 outline-none transition-all placeholder:text-slate-400 ${
           displayError
             ? "border-red-400 bg-red-50 focus:border-red-400"
