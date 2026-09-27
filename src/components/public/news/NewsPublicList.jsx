@@ -17,8 +17,11 @@ export default function NewsPublicList() {
     const q = search.toLowerCase();
     return allArticles.filter((a) =>
       a.title?.toLowerCase().includes(q) ||
+      a.title_ar?.toLowerCase().includes(q) ||
       a.excerpt?.toLowerCase().includes(q) ||
-      a.category?.name?.toLowerCase().includes(q)
+      a.excerpt_ar?.toLowerCase().includes(q) ||
+      a.category?.name?.toLowerCase().includes(q) ||
+      a.category?.name_ar?.toLowerCase().includes(q)
     );
   }, [allArticles, search]);
 

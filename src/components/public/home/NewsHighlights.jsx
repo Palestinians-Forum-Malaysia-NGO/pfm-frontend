@@ -10,7 +10,8 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 const NewsHighlights = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const [ref, inView] = useInView();
   const navigate = useNavigate();
   const { articles: allArticles, loading } = useGetNewsArticles();
@@ -47,17 +48,17 @@ const NewsHighlights = () => {
             >
               <div className="relative h-48 overflow-hidden bg-slate-100">
                 {n?.cover_image && (
-                  <StorageImage fileKey={n.cover_image} alt={n.title} className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105" />
+                  <StorageImage fileKey={n.cover_image} alt={(isAr && n.title_ar) || n.title} className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105" />
                 )}
                 {n?.category?.name && (
                   <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 backdrop-blur-sm">
-                    {n.category.name}
+                    {(isAr && n.category.name_ar) || n.category.name}
                   </span>
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-2 p-5">
                 {n?.published_at && <p className="text-[11px] font-semibold text-slate-400">{fmtDate(n.published_at)}</p>}
-                <h3 className="text-sm font-bold leading-snug text-slate-900 group-hover:text-green transition-colors duration-200">{n ? n.title : "—"}</h3>
+                <h3 className="text-sm font-bold leading-snug text-slate-900 group-hover:text-green transition-colors duration-200" dir={isAr && n?.title_ar ? "rtl" : undefined}>{n ? (isAr && n.title_ar) || n.title : "—"}</h3>
                 <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-green">
                   {t("home.read_more")} <MdArrowForward className="h-3.5 w-3.5" />
                 </span>

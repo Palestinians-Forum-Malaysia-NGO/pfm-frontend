@@ -14,6 +14,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
   title:    [{ required: true }, { maxLength: 255 }],
+  title_ar: [{ maxLength: 255 }],
   category: [{ required: true }],
   content:  [{ required: true }],
 };
@@ -28,10 +29,13 @@ export default function NewsCreateForm() {
 
   const [form, setForm] = useState({
     title: "",
+    title_ar: "",
     cover_image: null,
     category: "",
     excerpt: "",
+    excerpt_ar: "",
     content: "",
+    content_ar: "",
     is_published: false, is_featured: false,
   });
   const [errors, setErrors] = useState({});
@@ -59,10 +63,13 @@ export default function NewsCreateForm() {
     try {
       const created = await createNews({
         title:        form.title,
+        title_ar:     form.title_ar.trim()   || undefined,
         cover_image:  form.cover_image   || undefined,
         category:     form.category     || undefined,
         excerpt:      form.excerpt      || undefined,
+        excerpt_ar:   form.excerpt_ar.trim() || undefined,
         content:      form.content      || undefined,
+        content_ar:   form.content_ar.trim() || undefined,
         is_published: form.is_published,
         is_featured:  form.is_featured,
       });
@@ -107,11 +114,18 @@ export default function NewsCreateForm() {
           <InputField label={t("news.title_en")} field="title" placeholder="e.g. PFM Launches New Aid Campaign"
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
+          <InputField label={t("news.title_ar")} field="title_ar" placeholder={t("news.title_ar_placeholder")} dir="rtl"
+            formData={form} errors={errors} updateFormData={set} rules={RULES.title_ar} required={false} />
+
           <SelectField label={t("news.category_label")} field="category" options={CATEGORY_OPTIONS}
             formData={form} errors={errors} updateFormData={set} rules={RULES.category} />
 
           <TextareaField label={t("news.excerpt_en")} field="excerpt" rows={2}
             placeholder={t("news.excerpt_en_placeholder")}
+            required={false} formData={form} errors={errors} updateFormData={set} />
+
+          <TextareaField label={t("news.excerpt_ar")} field="excerpt_ar" rows={2} dir="rtl"
+            placeholder={t("news.excerpt_ar_placeholder")}
             required={false} formData={form} errors={errors} updateFormData={set} />
 
           <p className="-mt-2 mb-4 text-xs text-slate-400">{t("news.auto_translate_hint")}</p>
@@ -123,6 +137,10 @@ export default function NewsCreateForm() {
           <TextareaField label={t("news.content_en")} field="content" rows={8}
             placeholder={t("news.content_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
+
+          <TextareaField label={t("news.content_ar")} field="content_ar" rows={8} dir="rtl"
+            placeholder={t("news.content_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
         </div>
 
         {/* ── Publishing ── */}

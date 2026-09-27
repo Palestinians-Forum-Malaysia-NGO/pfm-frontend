@@ -1611,7 +1611,7 @@
     "slug_label": "الرابط المختصر",
     "excerpt_en": "الملخص",
     "excerpt_en_placeholder": "ملخص قصير يظهر في قائمة المقالات...",
-    "auto_translate_hint": "يتم إنشاء النسخة العربية تلقائياً من هذا النص.",
+    "auto_translate_hint": "أي حقل عربي يُترك فارغاً تتم ترجمته تلقائياً من النص الإنجليزي.",
     "content_section": "المحتوى",
     "content_subtitle": "نص المقال الكامل",
     "content_en": "المحتوى",
@@ -1651,7 +1651,13 @@
     "delete_msg_post": "لا يمكن التراجع عن هذا الإجراء.",
     "deleting_btn": "جاري الحذف…",
     "delete_btn": "حذف",
-    "cancel_btn": "إلغاء"
+    "cancel_btn": "إلغاء",
+    "title_ar": "العنوان (بالعربية)",
+    "title_ar_placeholder": "اتركه فارغاً للترجمة التلقائية",
+    "excerpt_ar": "المقتطف (بالعربية)",
+    "excerpt_ar_placeholder": "اتركه فارغاً للترجمة التلقائية",
+    "content_ar": "المحتوى (بالعربية)",
+    "content_ar_placeholder": "اتركه فارغاً للترجمة التلقائية"
   },
   "blogs": {
     "title": "المدونة",
