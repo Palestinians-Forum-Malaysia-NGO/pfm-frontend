@@ -115,6 +115,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
 
   const ID_DOCUMENT_TYPE_OPTIONS_T = [
     { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
+    { value: "unhcr",       label: t("beneficiaries.id_doc_type_unhcr") },
     { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
     { value: "other",       label: t("beneficiaries.id_doc_type_other") },
   ];
