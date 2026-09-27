@@ -10,7 +10,8 @@ const fmtDate = (d) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 const UpcomingEvents = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const [ref, inView] = useInView();
   const navigate = useNavigate();
   const { events: allEvents, loading } = useGetEvents();
@@ -52,7 +53,7 @@ const UpcomingEvents = () => {
               >
                 <div className="relative h-40 overflow-hidden bg-slate-100">
                   {e?.cover_image ? (
-                    <StorageImage fileKey={e.cover_image} alt={e.title} className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105" />
+                    <StorageImage fileKey={e.cover_image} alt={(isAr && e.title_ar) || e.title} className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-green/10 to-green-50">
                       <MdEvent className="h-10 w-10 text-green/30" />
@@ -65,7 +66,7 @@ const UpcomingEvents = () => {
                   )}
                 </div>
                 <div className="flex flex-1 flex-col gap-2 p-5">
-                  <h3 className="line-clamp-2 font-bold text-slate-900">{e ? e.title : "—"}</h3>
+                  <h3 className="line-clamp-2 font-bold text-slate-900" dir={isAr && e?.title_ar ? "rtl" : undefined}>{e ? (isAr && e.title_ar) || e.title : "—"}</h3>
                   <div className="flex flex-col gap-1 text-xs text-slate-400">
                     {e?.event_date && (
                       <span className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> {fmtDate(e.event_date)}</span>

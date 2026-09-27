@@ -116,6 +116,9 @@ export default function EventDetailView() {
         <div className="px-6 pb-6 pt-4 flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <h2 className="text-xl font-bold text-slate-900">{event.title}</h2>
+            {event.title_ar && (
+              <p className="mt-0.5 text-base font-semibold text-slate-500" dir="rtl">{event.title_ar}</p>
+            )}
             {event.location && (
               <p className="mt-1 flex items-center gap-1 text-sm text-slate-500"><MdLocationOn className="h-4 w-4" /> {event.location}</p>
             )}
@@ -142,10 +145,15 @@ export default function EventDetailView() {
       </div>
 
       {/* ── Description ── */}
-      {event.description && (
+      {(event.description || event.description_ar) && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdEvent className="h-5 w-5" />} title={t("events.section_description")} subtitle={t("events.section_description_sub")} />
-          <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{event.description}</p>
+          {event.description && (
+            <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{event.description}</p>
+          )}
+          {event.description_ar && (
+            <p className="mt-4 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap border-t border-slate-100 pt-4" dir="rtl">{event.description_ar}</p>
+          )}
         </div>
       )}
 

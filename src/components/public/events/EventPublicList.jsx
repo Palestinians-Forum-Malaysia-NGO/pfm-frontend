@@ -13,7 +13,9 @@ const fmtDate = (d) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 function EventCard({ event, onClick, isBeneficiary, user, enableApply }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr  = i18n.language === "ar";
+  const title = (isAr && event.title_ar) || event.title;
   const filled = event.capacity ? event.capacity - (event.spots_left ?? event.capacity) : 0;
   const filledPct = event.capacity ? Math.min(100, Math.max(0, (filled / event.capacity) * 100)) : 0;
   const canRegister = event.is_active && !event.is_full;
@@ -48,7 +50,7 @@ function EventCard({ event, onClick, isBeneficiary, user, enableApply }) {
         {event.cover_image ? (
           <StorageImage
             fileKey={event.cover_image}
-            alt={event.title}
+            alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -66,8 +68,8 @@ function EventCard({ event, onClick, isBeneficiary, user, enableApply }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
-          {event.title}
+        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green" dir={isAr && event.title_ar ? "rtl" : undefined}>
+          {title}
         </h3>
         <div className="mb-3 flex flex-col gap-1 text-xs text-slate-400">
           {event.event_date && (
@@ -147,6 +149,7 @@ export default function EventPublicList({ basePath = "/events", enableApply = fa
       const q = search.toLowerCase();
       list = list.filter((e) =>
         e.title?.toLowerCase().includes(q) ||
+        e.title_ar?.toLowerCase().includes(q) ||
         (e.location ?? "").toLowerCase().includes(q)
       );
     }
