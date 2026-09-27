@@ -19,7 +19,8 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 export default function UpdatesSection({ projectId, initialUpdates = [] }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const [updates, setUpdates] = useState(initialUpdates);
 
   // Create state
@@ -190,7 +191,7 @@ export default function UpdatesSection({ projectId, initialUpdates = [] }) {
                       {u.posted_by && <span className="text-xs font-semibold text-slate-700">{u.posted_by}</span>}
                       <span className="text-xs text-slate-400">{fmtDate(u.created_at)}</span>
                     </div>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{u.body}</p>
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap" dir={isAr && u.body_ar ? "rtl" : undefined}>{(isAr && u.body_ar) || u.body}</p>
                     {u.photo && (
                       <StorageImage fileKey={u.photo} alt={t("projects.update_alt")} className="mt-2 max-h-48 w-full max-w-md rounded-lg object-cover border border-slate-100" />
                     )}

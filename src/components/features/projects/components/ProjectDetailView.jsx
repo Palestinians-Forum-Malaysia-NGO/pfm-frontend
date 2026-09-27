@@ -122,16 +122,16 @@ export default function ProjectDetailView() {
   const progressPct = parseFloat(project.progress_percentage) || 0;
   const clampedPct  = Math.min(100, Math.max(0, progressPct));
   const statusLabel = t(`projects.status_${project.status}`, { defaultValue: project.status });
-  const categoryName = (project.category?.name_ar && i18n.language === "ar")
-    ? project.category.name_ar
-    : project.category?.name;
+  const isAr = i18n.language === "ar";
+  const title        = (isAr && project.title_ar)        || project.title;
+  const categoryName = (isAr && project.category?.name_ar) || project.category?.name;
 
   return (
     <div className="mx-auto max-w-5xl flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
 
       <PageHeader
         icon={<MdAssignment className="h-5 w-5" />}
-        title={project.title}
+        title={title}
         subtitle={t("projects.detail_subtitle")}
         actions={
           <>
@@ -158,7 +158,7 @@ export default function ProjectDetailView() {
       {/* ── Hero card ── */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {project.cover_image ? (
-          <StorageImage fileKey={project.cover_image} alt={project.title} className="h-48 w-full object-cover" />
+          <StorageImage fileKey={project.cover_image} alt={title} className="h-48 w-full object-cover" />
         ) : (
           <div className="h-28 w-full bg-gradient-to-br from-green/10 via-green/5 to-green-50">
             <div className="h-full w-full bg-dot-green bg-[size:20px_20px] opacity-40" />
