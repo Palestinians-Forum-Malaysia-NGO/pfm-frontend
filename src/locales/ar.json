@@ -1264,7 +1264,12 @@
     "toast_status_updated_sub": "تغيرت حالة الحساب إلى",
     "toast_status_failed": "فشل تحديث الحالة",
     "loading": "جاري تحميل المستفيد…",
-    "toast_export_failed": "فشل تصدير التقرير."
+    "toast_export_failed": "فشل تصدير التقرير.",
+    "state": "الولاية",
+    "state_select": "اختر الولاية",
+    "state_all": "جميع الولايات",
+    "top_state": "أكثر ولاية",
+    "family_readonly_hint": "لا يمكن تعديل بيانات الأسرة إلا من قبل المستفيد من ملفه الشخصي."
   },
   "classifications": {
     "title": "التصنيفات",

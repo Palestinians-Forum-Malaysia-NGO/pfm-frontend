@@ -21,7 +21,7 @@ import StorageFileLink from "components/ui/StorageFileLink";
 import Loading from "components/loading/Loading";
 import DocumentManagerSection from "components/ui/DocumentManagerSection";
 import {
-  useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary,
+  useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary, useGetStates,
   useGetBeneficiaryDocuments, useCreateBeneficiaryDocument, useUpdateBeneficiaryDocument, useDeleteBeneficiaryDocument,
 } from "components/features/beneficiaries/hooks";
 import { ACCOUNT_STATUS_BADGE } from "components/features/beneficiaries/constants/beneficiary";
@@ -44,6 +44,7 @@ export default function BeneficiaryDetailView() {
   const { beneficiary, execute: fetchBeneficiary, loading, error } = useGetBeneficiary();
   const { execute: deleteBeneficiary, loading: deleteLoading, error: deleteError } = useDeleteBeneficiary();
   const { execute: updateBeneficiary, loading: statusSaving } = useUpdateBeneficiary();
+  const { states } = useGetStates();
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -128,6 +129,11 @@ export default function BeneficiaryDetailView() {
   const hasBanking   = bi.bank_name || bi.account_number || bi.account_holder_name;
   const hasFinancial = fin.job_title || fin.salary || fin.payment_frequency;
   const children     = fi.children_information ?? [];
+  const stateLabel = (code) => {
+    const st = states.find((x) => x.code === code);
+    if (!st) return code;
+    return (st.label_ar && i18n.language === "ar") ? st.label_ar : st.label;
+  };
 
   const classDisplayName = (cls) => (cls.name_ar && i18n.language === "ar") ? cls.name_ar : cls.name;
   const classNamesSummary = classifications.map(classDisplayName).join(", ");
@@ -281,6 +287,7 @@ export default function BeneficiaryDetailView() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdFlag className="h-4 w-4" />}         label={t("beneficiaries.info_country")}  value={COUNTRY_NAME_BY_CODE[beneficiary.country_of_origin] || beneficiary.country_of_origin || "—"} />
           <InfoRow icon={<MdFlight className="h-4 w-4" />}       label={t("beneficiaries.info_arrived")}  value={fmtDate(beneficiary.date_arrived_in_malaysia)} />
+          <InfoRow icon={<MdLocationCity className="h-4 w-4" />} label={t("beneficiaries.state")}         value={stateLabel(beneficiary.state) || "—"} />
           <InfoRow icon={<MdLocationCity className="h-4 w-4" />} label={t("beneficiaries.info_city")}     value={beneficiary.current_city || "—"} />
           <InfoRow icon={<MdHome className="h-4 w-4" />}         label={t("beneficiaries.info_address")}  value={beneficiary.address || "—"} />
         </div>
@@ -364,6 +371,14 @@ export default function BeneficiaryDetailView() {
                   {child.child_name    && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_child_name")}    value={child.child_name} />}
                   {child.child_name_ar && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_child_name_ar")} value={child.child_name_ar} />}
                   {child.child_date_of_birth && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.info_child_dob")} value={fmtDate(child.child_date_of_birth)} />}
+                  {child.passport_copy && (
+                    <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.passport_copy")}
+                      value={<StorageFileLink fileKey={child.passport_copy} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
+                  )}
+                  {child.entrance_stump && (
+                    <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.entrance_stamp")}
+                      value={<StorageFileLink fileKey={child.entrance_stump} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
+                  )}
                 </div>
               </div>
             ))}

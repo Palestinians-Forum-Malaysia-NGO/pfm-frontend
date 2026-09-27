@@ -1264,7 +1264,12 @@
     "toast_status_updated_sub": "Account status changed to",
     "toast_status_failed": "Failed to update status",
     "loading": "Loading beneficiary…",
-    "toast_export_failed": "Failed to export report."
+    "toast_export_failed": "Failed to export report.",
+    "state": "State",
+    "state_select": "Select a state",
+    "state_all": "All States",
+    "top_state": "Top State",
+    "family_readonly_hint": "Family details can only be changed by the beneficiary from their own profile."
   },
   "classifications": {
     "title": "Classifications",
