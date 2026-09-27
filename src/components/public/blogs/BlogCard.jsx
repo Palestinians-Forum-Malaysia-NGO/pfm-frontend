@@ -7,7 +7,11 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 export default function BlogCard({ blog, onClick }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+  const title        = (isAr && blog.title_ar)          || blog.title;
+  const summary      = (isAr && blog.summary_ar)        || blog.summary;
+  const categoryName = (isAr && blog.category?.name_ar) || blog.category?.name;
   return (
     <button
       onClick={onClick}
@@ -17,7 +21,7 @@ export default function BlogCard({ blog, onClick }) {
         {blog.cover_image ? (
           <StorageImage
             fileKey={blog.cover_image}
-            alt={blog.title}
+            alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -35,16 +39,16 @@ export default function BlogCard({ blog, onClick }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        {blog.category?.name && (
+        {categoryName && (
           <span className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-green">
-            <MdCategory className="h-3.5 w-3.5" /> {blog.category.name}
+            <MdCategory className="h-3.5 w-3.5" /> {categoryName}
           </span>
         )}
-        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
-          {blog.title}
+        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green" dir={isAr && blog.title_ar ? "rtl" : undefined}>
+          {title}
         </h3>
-        {blog.summary && (
-          <p className="mb-3 line-clamp-2 text-sm text-slate-500">{blog.summary}</p>
+        {summary && (
+          <p className="mb-3 line-clamp-2 text-sm text-slate-500" dir={isAr && blog.summary_ar ? "rtl" : undefined}>{summary}</p>
         )}
         {blog.created_at && (
           <div className="mt-auto flex items-center text-xs text-slate-400">

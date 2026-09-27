@@ -11,7 +11,8 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
 
 export default function BlogPublicDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const { slug } = useParams();
   const navigate  = useNavigate();
 
@@ -39,12 +40,17 @@ export default function BlogPublicDetail() {
     );
   }
 
+  const title        = (isAr && blog.title_ar)          || blog.title;
+  const summary      = (isAr && blog.summary_ar)        || blog.summary;
+  const content      = (isAr && blog.content_ar)        || blog.content;
+  const categoryName = (isAr && blog.category?.name_ar) || blog.category?.name;
+
   return (
     <div className="bg-white">
       {/* ── Hero — plain full-bleed image, no overlay or text ── */}
       {blog.cover_image && (
         <div className="h-72 w-full overflow-hidden sm:h-96 lg:h-[28rem]">
-          <StorageImage fileKey={blog.cover_image} alt={blog.title} className="h-full w-full object-cover" />
+          <StorageImage fileKey={blog.cover_image} alt={title} className="h-full w-full object-cover" />
         </div>
       )}
 
@@ -58,9 +64,9 @@ export default function BlogPublicDetail() {
         </button>
 
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          {blog.category?.name && (
+          {categoryName && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green">
-              <MdCategory className="h-3.5 w-3.5" /> {blog.category.name}
+              <MdCategory className="h-3.5 w-3.5" /> {categoryName}
             </span>
           )}
           {blog.is_featured && (
@@ -70,8 +76,8 @@ export default function BlogPublicDetail() {
           )}
         </div>
 
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-          {blog.title}
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl" dir={isAr && blog.title_ar ? "rtl" : undefined}>
+          {title}
         </h1>
 
         {blog.created_at && (
@@ -83,11 +89,11 @@ export default function BlogPublicDetail() {
 
       {/* ── Content ── */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-        {blog.summary && (
-          <p className="mb-8 text-lg font-medium leading-relaxed text-slate-600">{blog.summary}</p>
+        {summary && (
+          <p className="mb-8 text-lg font-medium leading-relaxed text-slate-600" dir={isAr && blog.summary_ar ? "rtl" : undefined}>{summary}</p>
         )}
-        {blog.content && (
-          <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{blog.content}</p>
+        {content && (
+          <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && blog.content_ar ? "rtl" : undefined}>{content}</p>
         )}
       </div>
 
