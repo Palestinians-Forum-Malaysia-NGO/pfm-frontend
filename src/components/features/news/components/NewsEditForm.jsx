@@ -16,6 +16,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
   title:    [{ required: true }, { maxLength: 255 }],
+  title_ar: [{ maxLength: 255 }],
   category: [{ required: true }],
   content:  [{ required: true }],
 };
@@ -33,10 +34,13 @@ export default function NewsEditForm() {
 
   const [form, setForm] = useState({
     title: "",
+    title_ar: "",
     cover_image: null,
     category: "",
     excerpt: "",
+    excerpt_ar: "",
     content: "",
+    content_ar: "",
     is_published: false, is_featured: false,
   });
   const [initial, setInitial]   = useState(null);
@@ -61,10 +65,13 @@ export default function NewsEditForm() {
       if (!data) return;
       const snap = {
         title:        data.title        ?? "",
+        title_ar:     data.title_ar     ?? "",
         cover_image:  null,
         category:     data.category?.id ?? "",
         excerpt:      data.excerpt      ?? "",
+        excerpt_ar:   data.excerpt_ar   ?? "",
         content:      data.content      ?? "",
+        content_ar:   data.content_ar   ?? "",
         is_published: data.is_published ?? false,
         is_featured:  data.is_featured  ?? false,
       };
@@ -94,6 +101,11 @@ export default function NewsEditForm() {
         is_featured:  form.is_featured,
         ...(form.cover_image !== null ? { cover_image: form.cover_image || null } : {}),
       };
+      // Only send Arabic fields the user actually changed, so an English-only
+      // edit doesn't pin the previous auto-translation in place.
+      ["title_ar", "excerpt_ar", "content_ar"].forEach((f) => {
+        if (form[f] !== initial?.[f]) payload[f] = form[f].trim();
+      });
       await updateNews(id, payload);
       success(t("news.toast_updated"), `"${form.title}" ${t("news.toast_updated_sub")}`);
       navigate(`${base}/news/${id}`);
@@ -140,6 +152,9 @@ export default function NewsEditForm() {
           <InputField label={t("news.title_en")} field="title" placeholder="e.g. PFM Launches New Aid Campaign"
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
+          <InputField label={t("news.title_ar")} field="title_ar" placeholder={t("news.title_ar_placeholder")} dir="rtl"
+            formData={form} errors={errors} updateFormData={set} rules={RULES.title_ar} required={false} />
+
           <SelectField label={t("news.category_label")} field="category" options={CATEGORY_OPTIONS}
             formData={form} errors={errors} updateFormData={set} rules={RULES.category} />
 
@@ -154,6 +169,10 @@ export default function NewsEditForm() {
             placeholder={t("news.excerpt_en_placeholder")}
             required={false} formData={form} errors={errors} updateFormData={set} />
 
+          <TextareaField label={t("news.excerpt_ar")} field="excerpt_ar" rows={2} dir="rtl"
+            placeholder={t("news.excerpt_ar_placeholder")}
+            required={false} formData={form} errors={errors} updateFormData={set} />
+
           <p className="-mt-2 mb-4 text-xs text-slate-400">{t("news.auto_translate_hint")}</p>
         </div>
 
@@ -163,6 +182,10 @@ export default function NewsEditForm() {
           <TextareaField label={t("news.content_en")} field="content" rows={8}
             placeholder={t("news.content_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
+
+          <TextareaField label={t("news.content_ar")} field="content_ar" rows={8} dir="rtl"
+            placeholder={t("news.content_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
         </div>
 
         {/* ── Publishing ── */}

@@ -13,9 +13,10 @@ import { useGetCategories } from "components/features/categories/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  title:   [{ required: true }, { maxLength: 255 }],
-  summary: [{ required: true }],
-  content: [{ required: true }],
+  title:    [{ required: true }, { maxLength: 255 }],
+  title_ar: [{ maxLength: 200 }],
+  summary:  [{ required: true }],
+  content:  [{ required: true }],
 };
 
 export default function BlogCreateForm() {
@@ -28,10 +29,13 @@ export default function BlogCreateForm() {
 
   const [form, setForm] = useState({
     title: "",
+    title_ar: "",
     cover_image: null,
     category_id: "",
     summary: "",
+    summary_ar: "",
     content: "",
+    content_ar: "",
     is_published: false, is_featured: false,
   });
   const [errors, setErrors] = useState({});
@@ -59,10 +63,13 @@ export default function BlogCreateForm() {
     try {
       const created = await createBlog({
         title:        form.title,
+        title_ar:     form.title_ar.trim()   || undefined,
         cover_image:  form.cover_image  || undefined,
         category_id:  form.category_id  || undefined,
         summary:      form.summary,
+        summary_ar:   form.summary_ar.trim() || undefined,
         content:      form.content,
+        content_ar:   form.content_ar.trim() || undefined,
         is_published: form.is_published,
         is_featured:  form.is_featured,
       });
@@ -107,12 +114,19 @@ export default function BlogCreateForm() {
           <InputField label={t("blogs.title_en")} field="title" placeholder="e.g. A Volunteer's First Month with PFM"
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
+          <InputField label={t("blogs.title_ar")} field="title_ar" placeholder={t("blogs.title_ar_placeholder")} dir="rtl"
+            formData={form} errors={errors} updateFormData={set} rules={RULES.title_ar} required={false} />
+
           <SelectField label={t("blogs.category_label")} field="category_id" options={CATEGORY_OPTIONS}
             formData={form} errors={errors} updateFormData={set} required={false} />
 
           <TextareaField label={t("blogs.summary_en")} field="summary" rows={2}
             placeholder={t("blogs.summary_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.summary} />
+
+          <TextareaField label={t("blogs.summary_ar")} field="summary_ar" rows={2} dir="rtl"
+            placeholder={t("blogs.summary_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
 
           <p className="-mt-2 mb-4 text-xs text-slate-400">{t("blogs.auto_translate_hint")}</p>
         </div>
@@ -123,6 +137,10 @@ export default function BlogCreateForm() {
           <TextareaField label={t("blogs.content_en")} field="content" rows={8}
             placeholder={t("blogs.content_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
+
+          <TextareaField label={t("blogs.content_ar")} field="content_ar" rows={8} dir="rtl"
+            placeholder={t("blogs.content_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
         </div>
 
         {/* ── Publishing ── */}

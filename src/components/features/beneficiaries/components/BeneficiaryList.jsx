@@ -8,7 +8,7 @@ import {
   MdGroups, MdHourglassEmpty, MdFlag,
   MdPerson, MdBlock, MdFileDownload,
 } from "react-icons/md";
-import { useBeneficiaryList, useExportBeneficiaries } from "components/features/beneficiaries/hooks";
+import { useBeneficiaryList, useExportBeneficiaries, useGetStates } from "components/features/beneficiaries/hooks";
 import BeneficiaryDeleteModal from "./BeneficiaryDeleteModal";
 import { ACCOUNT_STATUS_BADGE } from "components/features/beneficiaries/constants/beneficiary";
 import { COUNTRY_NAME_BY_CODE } from "components/features/beneficiaries/constants/countries";
@@ -36,6 +36,7 @@ export default function BeneficiaryList() {
     search,        setSearch,
     statusFilter,  setStatusFilter,
     accountFilter, setAccountFilter,
+    stateFilter,   setStateFilter,
     toDelete,      setToDelete,
     deleteLoading,
     handleDeleteConfirm,
@@ -43,11 +44,21 @@ export default function BeneficiaryList() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { execute: exportReport, loading: exporting } = useExportBeneficiaries();
+  const { states } = useGetStates();
+  const stateLabel = (code) => {
+    const st = states.find((x) => x.code === code);
+    if (!st) return code;
+    return (st.label_ar && i18n.language === "ar") ? st.label_ar : st.label;
+  };
+  const STATE_OPTIONS = [
+    { value: "all", label: t("beneficiaries.state_all") },
+    ...states.map((st) => ({ value: st.code, label: stateLabel(st.code) })),
+  ];
   const { error: toastError } = useToast();
 
   const handleExport = async () => {
     try {
-      await exportReport();
+      await exportReport(stateFilter === "all" ? {} : { state: stateFilter });
     } catch (err) {
       toastError(t("beneficiaries.toast_export_failed"), err?.message);
     }
@@ -196,7 +207,7 @@ export default function BeneficiaryList() {
     },
   ];
 
-  const hasFilters = search !== "" || statusFilter !== "all" || accountFilter !== "all";
+  const hasFilters = search !== "" || statusFilter !== "all" || accountFilter !== "all" || stateFilter !== "all";
 
   const bg = apiStats?.by_gender ?? {};
   const genderTotal = (bg.male ?? 0) + (bg.female ?? 0);
@@ -264,17 +275,31 @@ export default function BeneficiaryList() {
               </div>
             </>
           )}
+
+          {/* Top state */}
+          {apiStats.by_state?.length > 0 && (
+            <>
+              <span className="mx-1 h-4 w-px shrink-0 bg-slate-200" />
+              <div className="flex items-center gap-1.5">
+                <MdFlag className="h-4 w-4 text-slate-400" />
+                <span className="text-xs text-slate-400">{t("beneficiaries.top_state")}:</span>
+                <span className="text-sm font-semibold text-slate-700">{stateLabel(apiStats.by_state[0].state)}</span>
+                <span className="rounded-full bg-slate-200 px-1.5 py-0.5 text-xs font-medium text-slate-600">{apiStats.by_state[0].count}</span>
+              </div>
+            </>
+          )}
         </div>
       )}
 
       {/* ── Filters ── */}
-      <div className="mb-4 flex items-center gap-2">
-        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("beneficiaries.search_placeholder")} className="flex-1" />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <SearchInput value={search} onChange={(v) => setSearch(v)} placeholder={t("beneficiaries.search_placeholder")} className="min-w-[12rem] flex-1" />
+        <FilterSelect value={stateFilter}   onChange={setStateFilter}   options={STATE_OPTIONS}           icon={<MdFlag className="h-3.5 w-3.5" />} />
         <FilterSelect value={accountFilter} onChange={setAccountFilter} options={ACCOUNT_STATUS_OPTIONS} icon={<MdGroups className="h-3.5 w-3.5" />} />
         <FilterSelect value={statusFilter}  onChange={setStatusFilter}  options={STATUS_OPTIONS}          icon={<MdCheckCircle className="h-3.5 w-3.5" />} />
         {hasFilters && (
           <Button variant="danger" icon={<MdClose className="h-3.5 w-3.5" />} text={t("beneficiaries.clear")}
-            onClick={() => { setSearch(""); setStatusFilter("all"); setAccountFilter("all"); }} />
+            onClick={() => { setSearch(""); setStatusFilter("all"); setAccountFilter("all"); setStateFilter("all"); }} />
         )}
       </div>
 

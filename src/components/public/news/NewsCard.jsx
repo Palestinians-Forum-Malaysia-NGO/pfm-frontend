@@ -7,7 +7,11 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 export default function NewsCard({ article, onClick }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+  const title        = (isAr && article.title_ar)          || article.title;
+  const excerpt      = (isAr && article.excerpt_ar)        || article.excerpt;
+  const categoryName = (isAr && article.category?.name_ar) || article.category?.name;
   return (
     <button
       onClick={onClick}
@@ -17,7 +21,7 @@ export default function NewsCard({ article, onClick }) {
         {article.cover_image ? (
           <StorageImage
             fileKey={article.cover_image}
-            alt={article.title}
+            alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -35,16 +39,16 @@ export default function NewsCard({ article, onClick }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        {article.category?.name && (
+        {categoryName && (
           <span className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-green">
-            <MdCategory className="h-3.5 w-3.5" /> {article.category.name}
+            <MdCategory className="h-3.5 w-3.5" /> {categoryName}
           </span>
         )}
-        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
-          {article.title}
+        <h3 className="mb-1.5 line-clamp-2 text-base font-bold text-slate-900 transition-colors duration-150 group-hover:text-green" dir={isAr && article.title_ar ? "rtl" : undefined}>
+          {title}
         </h3>
-        {article.excerpt && (
-          <p className="mb-3 line-clamp-2 text-sm text-slate-500">{article.excerpt}</p>
+        {excerpt && (
+          <p className="mb-3 line-clamp-2 text-sm text-slate-500" dir={isAr && article.excerpt_ar ? "rtl" : undefined}>{excerpt}</p>
         )}
         <div className="mt-auto flex items-center justify-between text-xs text-slate-400">
           {article.published_at && (

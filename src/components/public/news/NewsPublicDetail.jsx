@@ -12,7 +12,8 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : null;
 
 export default function NewsPublicDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const { id } = useParams();
   const navigate  = useNavigate();
   const { success } = useToast();
@@ -32,7 +33,7 @@ export default function NewsPublicDetail() {
     const url = window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title: article.title, url });
+        await navigator.share({ title: (isAr && article.title_ar) || article.title, url });
         return;
       } catch {
         return;
@@ -65,12 +66,17 @@ export default function NewsPublicDetail() {
     );
   }
 
+  const title        = (isAr && article.title_ar)          || article.title;
+  const excerpt      = (isAr && article.excerpt_ar)        || article.excerpt;
+  const content      = (isAr && article.content_ar)        || article.content;
+  const categoryName = (isAr && article.category?.name_ar) || article.category?.name;
+
   return (
     <div className="bg-white">
       {/* ── Hero — plain full-bleed image, no overlay or text ── */}
       {article.cover_image && (
         <div className="h-72 w-full overflow-hidden sm:h-96 lg:h-[28rem]">
-          <StorageImage fileKey={article.cover_image} alt={article.title} className="h-full w-full object-cover" />
+          <StorageImage fileKey={article.cover_image} alt={title} className="h-full w-full object-cover" />
         </div>
       )}
 
@@ -84,9 +90,9 @@ export default function NewsPublicDetail() {
         </button>
 
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          {article.category?.name && (
+          {categoryName && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green">
-              <MdCategory className="h-3.5 w-3.5" /> {article.category.name}
+              <MdCategory className="h-3.5 w-3.5" /> {categoryName}
             </span>
           )}
           {article.is_featured && (
@@ -96,8 +102,8 @@ export default function NewsPublicDetail() {
           )}
         </div>
 
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-          {article.title}
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl" dir={isAr && article.title_ar ? "rtl" : undefined}>
+          {title}
         </h1>
 
         <div className="mt-4 flex items-center justify-between">
@@ -117,11 +123,11 @@ export default function NewsPublicDetail() {
 
       {/* ── Content ── */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-        {article.excerpt && (
-          <p className="mb-8 text-lg font-medium leading-relaxed text-slate-600">{article.excerpt}</p>
+        {excerpt && (
+          <p className="mb-8 text-lg font-medium leading-relaxed text-slate-600" dir={isAr && article.excerpt_ar ? "rtl" : undefined}>{excerpt}</p>
         )}
-        {article.content && (
-          <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{article.content}</p>
+        {content && (
+          <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && article.content_ar ? "rtl" : undefined}>{content}</p>
         )}
       </div>
 

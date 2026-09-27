@@ -1264,7 +1264,12 @@
     "toast_status_updated_sub": "Account status changed to",
     "toast_status_failed": "Failed to update status",
     "loading": "Loading beneficiary…",
-    "toast_export_failed": "Failed to export report."
+    "toast_export_failed": "Failed to export report.",
+    "state": "State",
+    "state_select": "Select a state",
+    "state_all": "All States",
+    "top_state": "Top State",
+    "family_readonly_hint": "Family details can only be changed by the beneficiary from their own profile."
   },
   "classifications": {
     "title": "Classifications",
@@ -1611,7 +1616,7 @@
     "slug_label": "Slug",
     "excerpt_en": "Excerpt",
     "excerpt_en_placeholder": "A short summary shown in the article list...",
-    "auto_translate_hint": "The Arabic version is generated automatically from this text.",
+    "auto_translate_hint": "Any Arabic field left blank is translated automatically from the English text.",
     "content_section": "Content",
     "content_subtitle": "The full article body",
     "content_en": "Content",
@@ -1651,7 +1656,13 @@
     "delete_msg_post": "This action cannot be undone.",
     "deleting_btn": "Deleting…",
     "delete_btn": "Delete",
-    "cancel_btn": "Cancel"
+    "cancel_btn": "Cancel",
+    "title_ar": "Title (Arabic)",
+    "title_ar_placeholder": "Leave blank to translate automatically",
+    "excerpt_ar": "Excerpt (Arabic)",
+    "excerpt_ar_placeholder": "Leave blank to translate automatically",
+    "content_ar": "Content (Arabic)",
+    "content_ar_placeholder": "Leave blank to translate automatically"
   },
   "blogs": {
     "title": "Blogs",
@@ -1700,7 +1711,7 @@
     "slug_label": "Slug",
     "summary_en": "Summary",
     "summary_en_placeholder": "A short summary shown in the blog list...",
-    "auto_translate_hint": "The Arabic version is generated automatically from this text.",
+    "auto_translate_hint": "Any Arabic field left blank is translated automatically from the English text.",
     "content_section": "Content",
     "content_subtitle": "The full blog body",
     "content_en": "Content",
@@ -1739,7 +1750,13 @@
     "delete_msg_post": "This action cannot be undone.",
     "deleting_btn": "Deleting…",
     "delete_btn": "Delete",
-    "cancel_btn": "Cancel"
+    "cancel_btn": "Cancel",
+    "title_ar": "Title (Arabic)",
+    "title_ar_placeholder": "Leave blank to translate automatically",
+    "summary_ar": "Summary (Arabic)",
+    "summary_ar_placeholder": "Leave blank to translate automatically",
+    "content_ar": "Content (Arabic)",
+    "content_ar_placeholder": "Leave blank to translate automatically"
   },
   "newsPublic": {
     "hero_title": "Latest News",

@@ -15,9 +15,10 @@ import { useGetCategories } from "components/features/categories/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
-  title:   [{ required: true }, { maxLength: 255 }],
-  summary: [{ required: true }],
-  content: [{ required: true }],
+  title:    [{ required: true }, { maxLength: 255 }],
+  title_ar: [{ maxLength: 200 }],
+  summary:  [{ required: true }],
+  content:  [{ required: true }],
 };
 
 export default function BlogEditForm() {
@@ -33,10 +34,13 @@ export default function BlogEditForm() {
 
   const [form, setForm] = useState({
     title: "",
+    title_ar: "",
     cover_image: null,
     category_id: "",
     summary: "",
+    summary_ar: "",
     content: "",
+    content_ar: "",
     is_published: false, is_featured: false,
   });
   const [initial, setInitial]   = useState(null);
@@ -61,10 +65,13 @@ export default function BlogEditForm() {
       if (!data) return;
       const snap = {
         title:        data.title        ?? "",
+        title_ar:     data.title_ar     ?? "",
         cover_image:  null,
         category_id:  data.category?.id ?? "",
         summary:      data.summary      ?? "",
+        summary_ar:   data.summary_ar   ?? "",
         content:      data.content      ?? "",
+        content_ar:   data.content_ar   ?? "",
         is_published: data.is_published ?? false,
         is_featured:  data.is_featured  ?? false,
       };
@@ -94,6 +101,11 @@ export default function BlogEditForm() {
         is_featured:  form.is_featured,
         ...(form.cover_image !== null ? { cover_image: form.cover_image || null } : {}),
       };
+      // Only send Arabic fields the user actually changed, so an English-only
+      // edit doesn't pin the previous auto-translation in place.
+      ["title_ar", "summary_ar", "content_ar"].forEach((f) => {
+        if (form[f] !== initial?.[f]) payload[f] = form[f].trim();
+      });
       await updateBlog(id, payload);
       success(t("blogs.toast_updated"), `"${form.title}" ${t("blogs.toast_updated_sub")}`);
       navigate(`${base}/blogs/${id}`);
@@ -140,6 +152,9 @@ export default function BlogEditForm() {
           <InputField label={t("blogs.title_en")} field="title" placeholder="e.g. A Volunteer's First Month with PFM"
             formData={form} errors={errors} updateFormData={set} rules={RULES.title} />
 
+          <InputField label={t("blogs.title_ar")} field="title_ar" placeholder={t("blogs.title_ar_placeholder")} dir="rtl"
+            formData={form} errors={errors} updateFormData={set} rules={RULES.title_ar} required={false} />
+
           <SelectField label={t("blogs.category_label")} field="category_id" options={CATEGORY_OPTIONS}
             formData={form} errors={errors} updateFormData={set} required={false} />
 
@@ -154,6 +169,10 @@ export default function BlogEditForm() {
             placeholder={t("blogs.summary_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.summary} />
 
+          <TextareaField label={t("blogs.summary_ar")} field="summary_ar" rows={2} dir="rtl"
+            placeholder={t("blogs.summary_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
+
           <p className="-mt-2 mb-4 text-xs text-slate-400">{t("blogs.auto_translate_hint")}</p>
         </div>
 
@@ -163,6 +182,10 @@ export default function BlogEditForm() {
           <TextareaField label={t("blogs.content_en")} field="content" rows={8}
             placeholder={t("blogs.content_en_placeholder")}
             formData={form} errors={errors} updateFormData={set} rules={RULES.content} />
+
+          <TextareaField label={t("blogs.content_ar")} field="content_ar" rows={8} dir="rtl"
+            placeholder={t("blogs.content_ar_placeholder")}
+            formData={form} errors={errors} updateFormData={set} required={false} />
         </div>
 
         {/* ── Publishing ── */}

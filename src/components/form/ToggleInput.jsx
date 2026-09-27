@@ -6,6 +6,7 @@ import { WRAPPER, LABEL, ERROR_MSG } from "./utils/fieldStyles";
 const ToggleInput = ({
   label, field, formData, updateFormData,
   errors, required = false, rules = [],
+  onText, offText, hint,
 }) => {
   const { t } = useTranslation();
   const [localError, setLocalError] = useState(null);
@@ -36,8 +37,10 @@ const ToggleInput = ({
         }`}
       >
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-900">{selected ? t("common.enabled") : t("common.disabled")}</span>
-          <span className="text-xs text-slate-400">{t("common.click_to_toggle")}</span>
+          <span className="text-sm font-medium text-slate-900">
+            {selected ? (onText ?? t("common.enabled")) : (offText ?? t("common.disabled"))}
+          </span>
+          {hint !== null && <span className="text-xs text-slate-400">{hint ?? t("common.click_to_toggle")}</span>}
         </div>
         <div className="relative">
           <input type="checkbox" checked={selected} onChange={handleChange} className="peer sr-only" />

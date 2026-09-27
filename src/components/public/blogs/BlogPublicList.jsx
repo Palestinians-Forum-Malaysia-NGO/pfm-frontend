@@ -17,8 +17,11 @@ export default function BlogPublicList() {
     const q = search.toLowerCase();
     return allBlogs.filter((b) =>
       b.title?.toLowerCase().includes(q) ||
+      b.title_ar?.toLowerCase().includes(q) ||
       b.summary?.toLowerCase().includes(q) ||
-      b.category?.name?.toLowerCase().includes(q)
+      b.summary_ar?.toLowerCase().includes(q) ||
+      b.category?.name?.toLowerCase().includes(q) ||
+      b.category?.name_ar?.toLowerCase().includes(q)
     );
   }, [allBlogs, search]);
 

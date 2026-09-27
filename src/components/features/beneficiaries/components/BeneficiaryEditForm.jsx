@@ -16,7 +16,9 @@ import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
-import { useGetBeneficiary, useUpdateBeneficiary, useGetClassifications } from "components/features/beneficiaries/hooks";
+import InfoRow from "components/ui/InfoRow";
+import { useGetBeneficiary, useUpdateBeneficiary, useGetClassifications, useGetStates } from "components/features/beneficiaries/hooks";
+import { useUpdateUser } from "components/features/users/hooks";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useToast } from "components/ui/toast/ToastContext";
@@ -34,8 +36,14 @@ export default function BeneficiaryEditForm() {
   const base = useLayoutBase();
 
   const { beneficiary, execute: fetchBeneficiary, loading, error: loadError } = useGetBeneficiary();
-  const { execute: updateBeneficiary, loading: saving, error: saveError } = useUpdateBeneficiary();
+  const { execute: updateBeneficiary, loading: savingProfile, error: profileSaveError } = useUpdateBeneficiary();
+  // Name, email, phone, photo, banking and financial details live on the User,
+  // which the beneficiary endpoint ignores — they're saved via /accounts/users/.
+  const { execute: updateUser, loading: savingUser, error: userSaveError } = useUpdateUser();
+  const saving    = savingProfile || savingUser;
+  const saveError = profileSaveError || userSaveError;
   const { classifications } = useGetClassifications();
+  const { states } = useGetStates();
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -49,10 +57,7 @@ export default function BeneficiaryEditForm() {
     marital_status: "", account_status: "", background: "", id_document_type: "",
   });
   const [locationForm, setLocationForm] = useState({
-    country_of_origin: "", date_arrived_in_malaysia: "", current_city: "", address: "",
-  });
-  const [familyForm, setFamilyForm] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_ar: "", spouse_job: "", number_of_children: "",
+    country_of_origin: "", date_arrived_in_malaysia: "", state: "", current_city: "", address: "",
   });
   const [visaForm, setVisaForm] = useState({
     has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
@@ -68,7 +73,6 @@ export default function BeneficiaryEditForm() {
   const [initialClass,    setInitialClass]    = useState(null);
   const [initialPersonal, setInitialPersonal] = useState(null);
   const [initialLocation, setInitialLocation] = useState(null);
-  const [initialFamily,   setInitialFamily]   = useState(null);
   const [initialVisa,     setInitialVisa]     = useState(null);
   const [initialBank,     setInitialBank]     = useState(null);
   const [initialFin,      setInitialFin]      = useState(null);
@@ -80,10 +84,17 @@ export default function BeneficiaryEditForm() {
   const setC  = (f, v) => setClassForm((p)   => ({ ...p, [f]: v }));
   const setP  = (f, v) => setPersonalForm((p) => ({ ...p, [f]: v }));
   const setL  = (f, v) => setLocationForm((p) => ({ ...p, [f]: v }));
-  const setFa = (f, v) => setFamilyForm((p)  => ({ ...p, [f]: v }));
   const setV  = (f, v) => setVisaForm((p)    => ({ ...p, [f]: v }));
   const setB  = (f, v) => setBankForm((p)    => ({ ...p, [f]: v }));
   const setFi = (f, v) => setFinForm((p)     => ({ ...p, [f]: v }));
+
+  const STATE_OPTIONS = [
+    { value: "", label: t("beneficiaries.state_select") },
+    ...states.map((s) => ({
+      value: s.code,
+      label: (s.label_ar && i18n.language === "ar") ? s.label_ar : s.label,
+    })),
+  ];
 
   const CLASSIFICATION_OPTIONS = classifications.map((c) => ({
     value: c.id,
@@ -143,12 +154,11 @@ export default function BeneficiaryEditForm() {
     { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
   ];
 
-  const isDirty = initialUser === null || initialClass === null || !initialPersonal || !initialLocation || !initialFamily || !initialVisa || !initialBank || !initialFin || initialIdDoc === undefined || (
+  const isDirty = initialUser === null || initialClass === null || !initialPersonal || !initialLocation || !initialVisa || !initialBank || !initialFin || initialIdDoc === undefined || (
     JSON.stringify(userForm)     !== JSON.stringify(initialUser)     ||
     JSON.stringify(classForm)    !== JSON.stringify(initialClass)    ||
     JSON.stringify(personalForm) !== JSON.stringify(initialPersonal) ||
     JSON.stringify(locationForm) !== JSON.stringify(initialLocation) ||
-    JSON.stringify(familyForm)   !== JSON.stringify(initialFamily)   ||
     JSON.stringify(visaForm)     !== JSON.stringify(initialVisa)     ||
     JSON.stringify(bankForm)     !== JSON.stringify(initialBank)     ||
     JSON.stringify(finForm)      !== JSON.stringify(initialFin)      ||
@@ -160,14 +170,13 @@ export default function BeneficiaryEditForm() {
     fetchBeneficiary(id).then((data) => {
       if (!data) return;
       const u   = data.user ?? {};
-      const fi  = data.family_information ?? {};
       const bi  = u.banking_information   ?? {};
       const fi2 = u.financial_information ?? {};
 
       const uSnap = { full_name: u.full_name ?? "", email: u.email ?? "", phone_number: u.phone_number ?? "", is_active: u.is_active ?? true, profile_photo: u.profile_photo ?? null };
       const cSnap = { classifications: (data.classifications ?? []).map((c) => c.id) };
       const pSnap = {
-        full_name_ar:     data.full_name_ar       ?? "",
+        full_name_ar:     u.full_name_ar          ?? "",
         passport_number:  data.passport_number    ?? "",
         date_of_birth:    data.date_of_birth      ? data.date_of_birth.slice(0, 10) : "",
         gender:           data.gender             ?? "",
@@ -179,15 +188,9 @@ export default function BeneficiaryEditForm() {
       const lSnap = {
         country_of_origin:        data.country_of_origin        ?? "",
         date_arrived_in_malaysia: data.date_arrived_in_malaysia  ? data.date_arrived_in_malaysia.slice(0, 10) : "",
+        state:                    data.state                    ?? "",
         current_city:             data.current_city             ?? "",
         address:                  data.address                  ?? "",
-      };
-      const faSnap = {
-        family_in_malaysia: fi.family_in_malaysia  ?? false,
-        spouse_name:        fi.spouse_name         ?? "",
-        spouse_name_ar:     fi.spouse_name_ar      ?? "",
-        spouse_job:         fi.spouse_job          ?? "",
-        number_of_children: fi.number_of_children  ?? "",
       };
       const vSnap = {
         has_visa:         data.has_visa == null ? "" : String(data.has_visa),
@@ -202,12 +205,12 @@ export default function BeneficiaryEditForm() {
       const visaDocSnap = data.visa_document ?? null;
 
       setUserForm(uSnap);    setClassForm(cSnap);    setPersonalForm(pSnap);
-      setLocationForm(lSnap); setFamilyForm(faSnap); setVisaForm(vSnap);
+      setLocationForm(lSnap); setVisaForm(vSnap);
       setBankForm(bSnap);    setFinForm(fiSnap);     setIdDoc(docSnap);
       setPhotoKey(u.profile_photo ?? null); setVisaDoc(visaDocSnap);
 
       setInitialUser(uSnap);    setInitialClass(cSnap);    setInitialPersonal(pSnap);
-      setInitialLocation(lSnap); setInitialFamily(faSnap); setInitialVisa(vSnap);
+      setInitialLocation(lSnap); setInitialVisa(vSnap);
       setInitialBank(bSnap);    setInitialFin(fiSnap);     setInitialIdDoc(docSnap);
       setInitialVisaDoc(visaDocSnap);
     }).catch(() => {});
@@ -225,26 +228,8 @@ export default function BeneficiaryEditForm() {
 
     try {
       const hasVisaBool = visaForm.has_visa === "true" ? true : visaForm.has_visa === "false" ? false : undefined;
-      const payload = {
-        user: {
-          full_name:    userForm.full_name,
-          email:        userForm.email,
-          phone_number: userForm.phone_number || undefined,
-          is_active:    userForm.is_active,
-          profile_photo: userForm.profile_photo || undefined,
-          banking_information: {
-            bank_name:           bankForm.bank_name           || undefined,
-            account_number:      bankForm.account_number      || undefined,
-            account_holder_name: bankForm.account_holder_name || undefined,
-          },
-          financial_information: {
-            job_title:         finForm.job_title         || undefined,
-            salary:            finForm.salary            || undefined,
-            payment_frequency: finForm.payment_frequency || undefined,
-          },
-        },
+      const profilePayload = {
         classifications:            classForm.classifications,
-        full_name_ar:               personalForm.full_name_ar            || undefined,
         passport_number:            personalForm.passport_number         || undefined,
         date_of_birth:              personalForm.date_of_birth           || undefined,
         gender:                     personalForm.gender                  || undefined,
@@ -261,17 +246,42 @@ export default function BeneficiaryEditForm() {
         palestine_region:           locationForm.country_of_origin === "PS" ? (visaForm.palestine_region || undefined) : undefined,
         country_of_origin:          locationForm.country_of_origin        || undefined,
         date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia  || undefined,
+        state:                      locationForm.state                    || undefined,
         current_city:               locationForm.current_city             || undefined,
         address:                    locationForm.address                  || undefined,
-        family_information: {
-          family_in_malaysia:  familyForm.family_in_malaysia,
-          spouse_name:         familyForm.spouse_name        || null,
-          spouse_name_ar:      familyForm.spouse_name_ar || null,
-          spouse_job:          familyForm.spouse_job         || null,
-          number_of_children:  familyForm.number_of_children !== "" ? Number(familyForm.number_of_children) : null,
-        },
       };
-      await updateBeneficiary(id, payload);
+
+      const userChanged =
+        JSON.stringify(userForm) !== JSON.stringify(initialUser) ||
+        personalForm.full_name_ar !== initialPersonal.full_name_ar;
+      const bankChanged = JSON.stringify(bankForm) !== JSON.stringify(initialBank);
+      const finChanged  = JSON.stringify(finForm)  !== JSON.stringify(initialFin);
+
+      await updateBeneficiary(id, profilePayload);
+      if (userChanged || bankChanged || finChanged) {
+        await updateUser(beneficiary.user.id, {
+          full_name:     userForm.full_name,
+          full_name_ar:  personalForm.full_name_ar,
+          email:         userForm.email,
+          phone_number:  userForm.phone_number || "",
+          ...(userForm.profile_photo !== initialUser.profile_photo ? { profile_photo: userForm.profile_photo } : {}),
+          ...(isAdmin ? { is_active: userForm.is_active } : {}),
+          ...(bankChanged ? {
+            banking_information: {
+              bank_name:           bankForm.bank_name           || undefined,
+              account_number:      bankForm.account_number      || undefined,
+              account_holder_name: bankForm.account_holder_name || undefined,
+            },
+          } : {}),
+          ...(finChanged ? {
+            financial_information: {
+              job_title:         finForm.job_title         || undefined,
+              salary:            finForm.salary            || undefined,
+              payment_frequency: finForm.payment_frequency || undefined,
+            },
+          } : {}),
+        });
+      }
       success(t("beneficiaries.toast_updated"), `${userForm.full_name} ${t("beneficiaries.toast_updated_sub")}`);
       navigate(`${base}/beneficiaries/${id}`);
     } catch (err) {
@@ -364,9 +374,10 @@ export default function BeneficiaryEditForm() {
             <InputField  label={t("beneficiaries.date_arrived")}      field="date_arrived_in_malaysia" type="date" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <SelectField label={t("beneficiaries.state")}       field="state"        options={STATE_OPTIONS}   required={false} formData={locationForm} errors={errors} updateFormData={setL} />
             <InputField label={t("beneficiaries.current_city")} field="current_city" placeholder="Kuala Lumpur"  required={false} formData={locationForm} errors={errors} updateFormData={setL} />
-            <InputField label={t("beneficiaries.address")}      field="address"      placeholder="No. 1, Jalan…" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
           </div>
+          <InputField label={t("beneficiaries.address")} field="address" placeholder="No. 1, Jalan…" required={false} formData={locationForm} errors={errors} updateFormData={setL} />
         </div>
 
         {/* ── Visa & Status ── */}
@@ -419,17 +430,20 @@ export default function BeneficiaryEditForm() {
           </div>
         </div>
 
-        {/* ── Family Information ── */}
+        {/* ── Family Information (read-only: the API only lets the beneficiary edit it, from their own profile) ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family")} subtitle={t("beneficiaries.section_family_sub")} />
-          <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={familyForm} errors={errors} updateFormData={setFa} />
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("beneficiaries.spouse_name")}          field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_ar" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
-          </div>
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
-            <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" placeholder="0" required={false} formData={familyForm} errors={errors} updateFormData={setFa} />
+          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family")} subtitle={t("beneficiaries.family_readonly_hint")} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")}
+              value={beneficiary?.family_information?.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
+            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_children_count")}
+              value={beneficiary?.family_information?.number_of_children ?? "—"} />
+            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}
+              value={beneficiary?.family_information?.spouse_name || "—"} />
+            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")}
+              value={beneficiary?.family_information?.spouse_name_ar || "—"} />
+            <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}
+              value={beneficiary?.family_information?.spouse_job || "—"} />
           </div>
         </div>
 

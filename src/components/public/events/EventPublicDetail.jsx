@@ -22,7 +22,8 @@ const fmtTime = (t) => {
 };
 
 export default function EventPublicDetail({ basePath = "/events", enableApply = false }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const { slug } = useParams();
   const navigate  = useNavigate();
 
@@ -48,6 +49,9 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
     );
   }
 
+  const title       = (isAr && event.title_ar)       || event.title;
+  const description = (isAr && event.description_ar) || event.description;
+
   const canRegister = event.is_active && !event.is_full;
   const moreEvents = allEvents
     .filter((e) => e.slug !== event.slug && e.is_active)
@@ -59,7 +63,7 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
       {/* ── Hero — plain full-bleed image, no overlay or text ── */}
       {event.cover_image && (
         <div className="h-72 w-full overflow-hidden sm:h-96 lg:h-[28rem]">
-          <StorageImage fileKey={event.cover_image} alt={event.title} className="h-full w-full object-cover" />
+          <StorageImage fileKey={event.cover_image} alt={title} className="h-full w-full object-cover" />
         </div>
       )}
 
@@ -85,8 +89,8 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
           </div>
         )}
 
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-          {event.title}
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl" dir={isAr && event.title_ar ? "rtl" : undefined}>
+          {title}
         </h1>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium uppercase tracking-wide text-slate-400">
@@ -104,8 +108,8 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
 
       {/* ── Content ── */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-        {event.description && (
-          <p className="mb-10 text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">{event.description}</p>
+        {description && (
+          <p className="mb-10 text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap" dir={isAr && event.description_ar ? "rtl" : undefined}>{description}</p>
         )}
 
         {enableApply && (!canRegister || isBeneficiary || !isAuthenticated) && (
@@ -152,7 +156,7 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
                     {e.cover_image ? (
                       <StorageImage
                         fileKey={e.cover_image}
-                        alt={e.title}
+                        alt={(isAr && e.title_ar) || e.title}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
@@ -162,8 +166,8 @@ export default function EventPublicDetail({ basePath = "/events", enableApply = 
                     )}
                   </div>
                   <div className="flex flex-1 flex-col p-4">
-                    <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green">
-                      {e.title}
+                    <h3 className="mb-1 line-clamp-2 text-sm font-bold text-slate-900 transition-colors duration-150 group-hover:text-green" dir={isAr && e.title_ar ? "rtl" : undefined}>
+                      {(isAr && e.title_ar) || e.title}
                     </h3>
                     {e.event_date && <p className="mt-auto text-xs text-slate-400">{fmtDate(e.event_date)}</p>}
                   </div>

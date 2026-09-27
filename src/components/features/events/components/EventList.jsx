@@ -87,6 +87,7 @@ export default function EventList() {
       render: (e) => (
         <div className="min-w-0 max-w-[240px]">
           <p className="truncate font-semibold text-slate-900">{e.title}</p>
+          {e.title_ar && <p className="truncate text-xs text-slate-400" dir="rtl">{e.title_ar}</p>}
           {e.location && (
             <p className="truncate text-xs text-slate-400 flex items-center gap-1">
               <MdLocationOn className="h-3 w-3" /> {e.location}

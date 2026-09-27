@@ -284,7 +284,8 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
       </div>
 
       <div className="flex flex-col gap-3">
-        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set} />
+        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set}
+          onText={t("beneficiaries.info_yes")} offText={t("beneficiaries.info_no")} hint={null} />
         <InputField label={t("beneficiaries.spouse_name")}        field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_ar" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
         <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={data} errors={{}} updateFormData={set} />

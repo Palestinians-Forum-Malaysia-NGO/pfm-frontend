@@ -115,6 +115,9 @@ export default function NewsDetailView() {
               <p className="mt-0.5 text-base font-semibold text-slate-500" dir="rtl">{article.title_ar}</p>
             )}
             {article.excerpt && <p className="mt-1 text-sm text-slate-500">{article.excerpt}</p>}
+            {article.excerpt_ar && (
+              <p className="mt-0.5 text-sm text-slate-400" dir="rtl">{article.excerpt_ar}</p>
+            )}
             <div className="mt-3 flex flex-wrap gap-2">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${article.is_published ? "bg-green/10 text-green" : "bg-slate-100 text-slate-500"}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${article.is_published ? "bg-green animate-pulse" : "bg-slate-400"}`} />

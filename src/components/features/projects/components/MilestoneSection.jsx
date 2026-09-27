@@ -17,7 +17,8 @@ const EMPTY_FORM = { title: "", description: "", target_date: "", is_completed: 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 export default function MilestoneSection({ projectId, initialMilestones = [] }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const [milestones, setMilestones] = useState(initialMilestones);
   const [addOpen,  setAddOpen]  = useState(false);
   const [addForm,  setAddForm]  = useState(EMPTY_FORM);
@@ -166,8 +167,10 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
                     }
                   </button>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`}>{m.title}</p>
-                    {m.description && <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>}
+                    <p className={`text-sm font-medium ${m.is_completed ? "line-through text-slate-400" : "text-slate-900"}`} dir={isAr && m.title_ar ? "rtl" : undefined}>{(isAr && m.title_ar) || m.title}</p>
+                    {((isAr && m.description_ar) || m.description) && (
+                      <p className="mt-0.5 text-xs text-slate-500" dir={isAr && m.description_ar ? "rtl" : undefined}>{(isAr && m.description_ar) || m.description}</p>
+                    )}
                     {m.target_date && <p className="mt-0.5 text-xs text-slate-400">{t("projects.target_prefix")} {fmtDate(m.target_date)}</p>}
                     <button
                       onClick={() => setExpandedId((cur) => (cur === m.id ? null : m.id))}

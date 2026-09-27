@@ -7,7 +7,11 @@ import { useToast } from "components/ui/toast/ToastContext";
 
 const useBeneficiaryList = () => {
   const { t } = useTranslation();
-  const { beneficiaries, loading, error, refetch } = useGetBeneficiaries();
+  const [stateFilter, setStateFilter] = useState("all");
+  // State is filtered server-side (?state=) — the rest are filtered locally below.
+  const { beneficiaries, loading, error, refetch } = useGetBeneficiaries(
+    stateFilter === "all" ? {} : { state: stateFilter }
+  );
   const { stats: apiStats, loading: statsLoading } = useGetBeneficiaryStats();
   const { execute: deleteBeneficiary, loading: deleteLoading } = useDeleteBeneficiary();
   const { success, error: toastError } = useToast();
@@ -67,6 +71,7 @@ const useBeneficiaryList = () => {
     search,        setSearch,
     statusFilter,  setStatusFilter,
     accountFilter, setAccountFilter,
+    stateFilter,   setStateFilter,
     toDelete,      setToDelete,
     deleteLoading,
     handleDeleteConfirm,
