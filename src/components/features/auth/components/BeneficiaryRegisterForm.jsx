@@ -21,7 +21,7 @@ import { useCreateBeneficiary, useGetStates } from "components/features/benefici
 import SupportingDocumentsEditor from "components/features/beneficiaries/components/SupportingDocumentsEditor";
 import FamilyMembersEditor from "components/features/beneficiaries/components/FamilyMembersEditor";
 import {
-  documentProblems, memberProblems, starterDocuments, documentsUntouched, toDocumentPayload, toMemberPayload,
+  documentProblems, memberProblems, starterDocuments, documentsUntouched, allowedDocTypes, toDocumentPayload, toMemberPayload,
 } from "components/features/beneficiaries/constants/family";
 
 /* ─────────────────────────────────────────────────
@@ -300,6 +300,7 @@ const DocumentsStep = ({ status, data, onChange, documents, onDocumentsChange, o
           onChange={(next) => { onDocumentsChange(next); onClearServerError?.("supporting_documents"); }}
           publicEndpoint="register"
           problems={problems}
+          allowedTypes={allowedDocTypes(status.has_visa, status.situation)}
         />
       </div>
 

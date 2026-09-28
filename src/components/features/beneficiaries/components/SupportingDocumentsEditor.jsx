@@ -63,10 +63,16 @@ const DocumentRow = ({ doc, index, onChange, onRemove, publicEndpoint, folder, t
  *   onChange       – (nextList) => void
  *   publicEndpoint – "register" during registration (no auth yet); otherwise pass `folder`
  *   problems       – i18n keys from documentProblems(), shown under the list
+ *   allowedTypes   – types offered for this person's status (allowedDocTypes());
+ *                    a row whose type is no longer allowed keeps it so it can be fixed
  */
-export default function SupportingDocumentsEditor({ documents, onChange, publicEndpoint, folder, problems = [] }) {
+export default function SupportingDocumentsEditor({
+  documents, onChange, publicEndpoint, folder, problems = [], allowedTypes = SUPPORTING_DOC_TYPES,
+}) {
   const { t } = useTranslation();
-  const typeOptions = SUPPORTING_DOC_TYPES.map((v) => ({ value: v, label: t(`beneficiaries.doc_type_${v}`) }));
+  const optionsFor = (current) => SUPPORTING_DOC_TYPES
+    .filter((v) => allowedTypes.includes(v) || v === current)
+    .map((v) => ({ value: v, label: t(`beneficiaries.doc_type_${v}`) }));
 
   return (
     <div className="flex flex-col gap-3">
@@ -75,7 +81,7 @@ export default function SupportingDocumentsEditor({ documents, onChange, publicE
           key={doc._key ?? i}
           doc={doc}
           index={i}
-          typeOptions={typeOptions}
+          typeOptions={optionsFor(doc.document_type)}
           publicEndpoint={publicEndpoint}
           folder={folder}
           onChange={(next) => onChange(documents.map((d, idx) => (idx === i ? next : d)))}

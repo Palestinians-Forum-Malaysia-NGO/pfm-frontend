@@ -10,6 +10,14 @@ export const SUPPORTING_DOC_TYPES = [
 
 export const RELATIONSHIPS = ["spouse", "child", "other"];
 
+// Which document types a person may upload, by status: a visa document only
+// for visa holders, a UNHCR card only for refugees.
+export const allowedDocTypes = (hasVisa, situation) => SUPPORTING_DOC_TYPES.filter((type) => {
+  if (type === "visa") return hasVisa === "true";
+  if (type === "unhcr_document") return hasVisa === "false" && situation === "refugee";
+  return true;
+});
+
 // Stable React key for list rows (never sent to the API).
 let seq = 0;
 export const rowKey = () => `row-${++seq}`;
@@ -38,6 +46,8 @@ export const documentProblems = ({ hasVisa, situation, documents, isMember = fal
   const docs = documents ?? [];
   const problems = [];
   if (docs.some((d) => !d.document_type || !d.document_file)) problems.push("doc_rule_incomplete");
+  const allowed = allowedDocTypes(hasVisa, situation);
+  if (docs.some((d) => d.document_type && !allowed.includes(d.document_type))) problems.push("doc_rule_type_not_allowed");
 
   if (hasVisa === "true") {
     if (!hasType(docs, "passport") || !hasType(docs, "visa")) problems.push("doc_rule_passport_and_visa");
@@ -45,11 +55,11 @@ export const documentProblems = ({ hasVisa, situation, documents, isMember = fal
       problems.push("doc_rule_passport_details");
     }
   } else if (hasVisa === "false") {
+    // Only refugees need a document (their UNHCR card); other statuses
+    // without a visa have no required documents.
     if (situation === "refugee"
       && !docs.some((d) => d.document_type === "unhcr_document" && d.document_file && d.document_number)) {
       problems.push("doc_rule_unhcr");
-    } else if (!isMember && !hasType(docs, "passport") && !hasType(docs, "unhcr_document")) {
-      problems.push("doc_rule_id");
     }
   }
   return problems;
@@ -75,14 +85,16 @@ export const documentsUntouched = (docs = []) =>
 // Documents a person starts with for their status, so the required rows are
 // already on screen (the user can still add more). Empty until the status is
 // fully chosen — "no visa" alone doesn't say whether a UNHCR card is needed.
+// Visa holders: passport + visa. Refugees: UNHCR card. Anyone else: none.
 export const starterDocuments = (hasVisa, situation) => {
-  if (hasVisa === "" || (hasVisa === "false" && !situation)) return [];
   if (hasVisa === "true") return [
     { ...EMPTY_DOCUMENT, _key: rowKey(), document_type: "passport" },
     { ...EMPTY_DOCUMENT, _key: rowKey(), document_type: "visa" },
   ];
-  if (situation === "refugee") return [{ ...EMPTY_DOCUMENT, _key: rowKey(), document_type: "unhcr_document" }];
-  return [{ ...EMPTY_DOCUMENT, _key: rowKey(), document_type: "passport" }];
+  if (hasVisa === "false" && situation === "refugee") {
+    return [{ ...EMPTY_DOCUMENT, _key: rowKey(), document_type: "unhcr_document" }];
+  }
+  return []; // nothing required — the user can still add documents
 };
 
 // ── Payload shaping: drop blanks so optional dates aren't sent as "" ────────

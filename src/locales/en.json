@@ -244,7 +244,7 @@
     "family_subtitle": "Add your spouse, children or other relatives, then accept the terms and submit.",
     "documents_hint_visa": "As a visa holder, upload your passport and your visa. You can add more documents if needed.",
     "documents_hint_refugee": "Upload your UNHCR card with its number. You can add a passport or other documents too.",
-    "documents_hint_other": "Upload your passport or UNHCR card. You can add more documents if needed."
+    "documents_hint_other": "No documents are required for your status. You can add a passport or other documents if you have them."
   },
   "auth": {
     "portal_access": "Portal Access",
@@ -1328,7 +1328,6 @@
     "doc_rule_passport_and_visa": "Visa holders need both a passport and a visa document.",
     "doc_rule_passport_details": "The passport needs its number, issue date and expiry date.",
     "doc_rule_unhcr": "Refugees need a UNHCR card with its UNHCR number.",
-    "doc_rule_id": "Add a passport or a UNHCR card.",
     "member_rule_relationship": "Choose the relationship.",
     "member_rule_name": "Enter the full name.",
     "member_rule_visa_status": "Choose the visa status.",
@@ -1346,7 +1345,8 @@
     "relationship_other": "Other relative",
     "no_documents": "No documents.",
     "no_members": "No family members added.",
-    "section_family_members_sub": "Spouse, children and other relatives, with their documents"
+    "section_family_members_sub": "Spouse, children and other relatives, with their documents",
+    "doc_rule_type_not_allowed": "Remove or change documents that don't match your status (visa only for visa holders, UNHCR card only for refugees)."
   },
   "classifications": {
     "title": "Classifications",
