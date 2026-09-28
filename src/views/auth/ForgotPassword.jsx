@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdLockReset, MdArrowBack } from "react-icons/md";
 import InputField  from "components/form/InputField";
@@ -12,7 +12,6 @@ const EMAIL_RULES = [{ required: true }, { email: true }];
 
 export default function ForgotPassword() {
   const { t }    = useTranslation();
-  const navigate = useNavigate();
 
   const { execute: forgotPassword, loading, error } = useForgotPassword();
 
@@ -49,11 +48,13 @@ export default function ForgotPassword() {
           <span className="font-semibold text-slate-700">{formData.email}</span>.{" "}
           {t("auth.check_email_body2")}
         </p>
-        <Button
-          onClick={() => navigate("/auth/reset-password")}
-          text={t("auth.enter_reset_token")}
-          className="mt-7 h-11 w-full"
-        />
+        <p className="mt-4 text-xs text-slate-400">{t("auth.check_email_expiry")}</p>
+        <Link
+          to="/auth/sign-in"
+          className="mt-7 flex h-11 w-full items-center justify-center rounded-full bg-green text-sm font-semibold text-white shadow-sm shadow-green/20 transition-all duration-200 hover:bg-[#006833] active:scale-[0.98]"
+        >
+          {t("auth.back_to_sign_in")}
+        </Link>
         <button
           onClick={() => setSent(false)}
           className="mt-3 w-full text-center text-sm text-slate-400 transition-colors hover:text-slate-700"

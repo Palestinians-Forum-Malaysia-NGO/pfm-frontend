@@ -5,7 +5,7 @@ import { extractError } from "../utils";
 /**
  * POST /auth/password-reset/
  * Returns: { execute, loading, error }
- * execute({ email, otp, new_password }) → { detail }
+ * execute({ token, password }) → { detail }   (token comes from the emailed link)
  */
 const useResetPassword = () => {
   const [loading, setLoading] = useState(false);
