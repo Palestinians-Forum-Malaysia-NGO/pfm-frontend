@@ -10,13 +10,13 @@ import {
 import PageHeader from "components/ui/PageHeader";
 import {
   InputField, SelectField, MultiSelect, TextareaField,
-  ToggleInput, StorageDocumentField, StorageImageField, validate,
+  ToggleInput, StorageImageField, validate,
 } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
-import InfoRow from "components/ui/InfoRow";
+import FamilyMembersView from "./FamilyMembersView";
 import { useGetBeneficiary, useUpdateBeneficiary, useGetClassifications, useGetStates } from "components/features/beneficiaries/hooks";
 import { useUpdateUser } from "components/features/users/hooks";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
@@ -53,22 +53,17 @@ export default function BeneficiaryEditForm() {
   const { url: currentPhotoUrl } = useStorageUrl(photoKey);
   const [classForm, setClassForm] = useState({ classifications: [] });
   const [personalForm, setPersonalForm] = useState({
-    full_name_ar: "", passport_number: "", date_of_birth: "", gender: "",
-    marital_status: "", account_status: "", background: "", id_document_type: "",
+    full_name_ar: "", date_of_birth: "", gender: "",
+    marital_status: "", account_status: "", background: "",
   });
   const [locationForm, setLocationForm] = useState({
     country_of_origin: "", date_arrived_in_malaysia: "", state: "", current_city: "", address: "",
   });
   const [visaForm, setVisaForm] = useState({
-    has_visa: "", visa_type: "", situation: "", unhcr_number: "", palestine_region: "",
+    has_visa: "", visa_type: "", situation: "", palestine_region: "",
   });
   const [bankForm, setBankForm] = useState({ bank_name: "", account_number: "", account_holder_name: "" });
   const [finForm,  setFinForm]  = useState({ job_title: "", salary: "", payment_frequency: "" });
-  const [idDoc, setIdDoc] = useState(null);
-  const { url: currentIdDocUrl } = useStorageUrl(idDoc, { forcePresigned: true });
-  const [visaDoc, setVisaDoc] = useState(null);
-  const { url: currentVisaDocUrl } = useStorageUrl(visaDoc, { forcePresigned: true });
-
   const [initialUser,     setInitialUser]     = useState(null);
   const [initialClass,    setInitialClass]    = useState(null);
   const [initialPersonal, setInitialPersonal] = useState(null);
@@ -76,8 +71,6 @@ export default function BeneficiaryEditForm() {
   const [initialVisa,     setInitialVisa]     = useState(null);
   const [initialBank,     setInitialBank]     = useState(null);
   const [initialFin,      setInitialFin]      = useState(null);
-  const [initialIdDoc,    setInitialIdDoc]    = useState(undefined);
-  const [initialVisaDoc,  setInitialVisaDoc]  = useState(undefined);
   const [errors, setErrors] = useState({});
 
   const setU  = (f, v) => setUserForm((p)    => ({ ...p, [f]: v }));
@@ -126,13 +119,6 @@ export default function BeneficiaryEditForm() {
     { value: "false", label: t("beneficiaries.visa_status_no") },
   ];
 
-  const ID_DOCUMENT_TYPE_OPTIONS_T = [
-    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
-    { value: "unhcr",       label: t("beneficiaries.id_doc_type_unhcr") },
-    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
-    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
-  ];
-
   const VISA_TYPE_OPTIONS_T = [
     { value: "student",      label: t("beneficiaries.visa_type_student") },
     { value: "work",         label: t("beneficiaries.visa_type_work") },
@@ -155,16 +141,14 @@ export default function BeneficiaryEditForm() {
     { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
   ];
 
-  const isDirty = initialUser === null || initialClass === null || !initialPersonal || !initialLocation || !initialVisa || !initialBank || !initialFin || initialIdDoc === undefined || (
+  const isDirty = initialUser === null || initialClass === null || !initialPersonal || !initialLocation || !initialVisa || !initialBank || !initialFin || (
     JSON.stringify(userForm)     !== JSON.stringify(initialUser)     ||
     JSON.stringify(classForm)    !== JSON.stringify(initialClass)    ||
     JSON.stringify(personalForm) !== JSON.stringify(initialPersonal) ||
     JSON.stringify(locationForm) !== JSON.stringify(initialLocation) ||
     JSON.stringify(visaForm)     !== JSON.stringify(initialVisa)     ||
     JSON.stringify(bankForm)     !== JSON.stringify(initialBank)     ||
-    JSON.stringify(finForm)      !== JSON.stringify(initialFin)      ||
-    idDoc !== initialIdDoc ||
-    visaDoc !== initialVisaDoc
+    JSON.stringify(finForm)      !== JSON.stringify(initialFin)
   );
 
   useEffect(() => {
@@ -178,13 +162,11 @@ export default function BeneficiaryEditForm() {
       const cSnap = { classifications: (data.classifications ?? []).map((c) => c.id) };
       const pSnap = {
         full_name_ar:     u.full_name_ar          ?? "",
-        passport_number:  data.passport_number    ?? "",
         date_of_birth:    data.date_of_birth      ? data.date_of_birth.slice(0, 10) : "",
         gender:           data.gender             ?? "",
         marital_status:   data.marital_status     ?? "",
         account_status:   data.account_status     ?? "",
         background:       data.background         ?? "",
-        id_document_type: data.id_document_type   ?? "",
       };
       const lSnap = {
         country_of_origin:        data.country_of_origin        ?? "",
@@ -197,23 +179,19 @@ export default function BeneficiaryEditForm() {
         has_visa:         data.has_visa == null ? "" : String(data.has_visa),
         visa_type:        data.visa_type        ?? "",
         situation:        data.situation        ?? "",
-        unhcr_number:     data.unhcr_number     ?? "",
         palestine_region: data.palestine_region ?? "",
       };
       const bSnap  = { bank_name: bi.bank_name ?? "", account_number: bi.account_number ?? "", account_holder_name: bi.account_holder_name ?? "" };
       const fiSnap = { job_title: fi2.job_title ?? "", salary: fi2.salary ?? "", payment_frequency: fi2.payment_frequency ?? "" };
-      const docSnap = data.id_document ?? null;
-      const visaDocSnap = data.visa_document ?? null;
 
       setUserForm(uSnap);    setClassForm(cSnap);    setPersonalForm(pSnap);
       setLocationForm(lSnap); setVisaForm(vSnap);
-      setBankForm(bSnap);    setFinForm(fiSnap);     setIdDoc(docSnap);
-      setPhotoKey(u.profile_photo ?? null); setVisaDoc(visaDocSnap);
+      setBankForm(bSnap);    setFinForm(fiSnap);
+      setPhotoKey(u.profile_photo ?? null);
 
       setInitialUser(uSnap);    setInitialClass(cSnap);    setInitialPersonal(pSnap);
       setInitialLocation(lSnap); setInitialVisa(vSnap);
-      setInitialBank(bSnap);    setInitialFin(fiSnap);     setInitialIdDoc(docSnap);
-      setInitialVisaDoc(visaDocSnap);
+      setInitialBank(bSnap);    setInitialFin(fiSnap);
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -231,19 +209,14 @@ export default function BeneficiaryEditForm() {
       const hasVisaBool = visaForm.has_visa === "true" ? true : visaForm.has_visa === "false" ? false : undefined;
       const profilePayload = {
         classifications:            classForm.classifications,
-        passport_number:            personalForm.passport_number         || undefined,
         date_of_birth:              personalForm.date_of_birth           || undefined,
         gender:                     personalForm.gender                  || undefined,
         marital_status:             personalForm.marital_status          || undefined,
         account_status:             personalForm.account_status          || undefined,
         background:                 personalForm.background              || undefined,
-        id_document:                idDoc                                ?? undefined,
-        id_document_type:           personalForm.id_document_type        || undefined,
         has_visa:                   hasVisaBool,
         visa_type:                  hasVisaBool === true  ? (visaForm.visa_type    || undefined) : undefined,
-        visa_document:              hasVisaBool === true  ? (visaDoc ?? undefined) : undefined,
         situation:                  hasVisaBool === false ? (visaForm.situation    || undefined) : undefined,
-        unhcr_number:               (hasVisaBool === false && visaForm.situation === "refugee") ? (visaForm.unhcr_number || undefined) : undefined,
         palestine_region:           locationForm.country_of_origin === "PS" ? (visaForm.palestine_region || undefined) : undefined,
         country_of_origin:          locationForm.country_of_origin        || undefined,
         date_arrived_in_malaysia:   locationForm.date_arrived_in_malaysia  || undefined,
@@ -342,7 +315,6 @@ export default function BeneficiaryEditForm() {
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_personal")} subtitle={t("beneficiaries.section_personal_sub")} />
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField  label={t("beneficiaries.full_name_ar_label")} field="full_name_ar" placeholder={t("beneficiaries.full_name_ar_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-            <InputField  label={t("beneficiaries.passport_number")}    field="passport_number"  placeholder="A12345678" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date" required={false} formData={personalForm} errors={errors} updateFormData={setP} />
@@ -353,18 +325,6 @@ export default function BeneficiaryEditForm() {
             <SelectField label={t("beneficiaries.account_status_label")} field="account_status" options={ACCOUNT_STATUS_FORM_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
           </div>
           <TextareaField label={t("beneficiaries.background")} field="background" rows={3} placeholder={t("beneficiaries.background_placeholder")} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS_T} required={false} formData={personalForm} errors={errors} updateFormData={setP} />
-          <StorageDocumentField
-            label={t("beneficiaries.id_document")}
-            folder="beneficiaries/documents"
-            accept=".pdf,.jpg,.jpeg,.png"
-            currentName={idDoc ? "Current document" : undefined}
-            currentUrl={currentIdDocUrl}
-            onUpload={(key) => setIdDoc(key)}
-            onRemove={() => setIdDoc(null)}
-            errors={errors}
-            field="id_document"
-          />
         </div>
 
         {/* ── Location & Travel ── */}
@@ -388,23 +348,11 @@ export default function BeneficiaryEditForm() {
           {visaForm.has_visa === "true" && (
             <>
               <SelectField label={t("beneficiaries.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
-              <StorageDocumentField
-                label={t("beneficiaries.visa_document_label")}
-                folder="beneficiaries/documents"
-                accept=".pdf,.jpg,.jpeg,.png"
-                currentName={visaDoc ? "Current document" : undefined}
-                currentUrl={currentVisaDocUrl}
-                onUpload={(key) => setVisaDoc(key)}
-                onRemove={() => setVisaDoc(null)}
-              />
             </>
           )}
           {visaForm.has_visa === "false" && (
             <>
               <SelectField label={t("beneficiaries.situation")} field="situation" options={SITUATION_OPTIONS_T} required={false} formData={visaForm} errors={errors} updateFormData={setV} />
-              {visaForm.situation === "refugee" && (
-                <InputField label={t("beneficiaries.unhcr_number")} field="unhcr_number" placeholder="e.g. MYS/2023/12345" required={false} formData={visaForm} errors={errors} updateFormData={setV} />
-              )}
             </>
           )}
           {locationForm.country_of_origin === "PS" && (
@@ -434,18 +382,7 @@ export default function BeneficiaryEditForm() {
         {/* ── Family Information (read-only: the API only lets the beneficiary edit it, from their own profile) ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family")} subtitle={t("beneficiaries.family_readonly_hint")} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")}
-              value={beneficiary?.family_information?.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
-            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_children_count")}
-              value={beneficiary?.family_information?.number_of_children ?? "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}
-              value={beneficiary?.family_information?.spouse_name || "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")}
-              value={beneficiary?.family_information?.spouse_name_ar || "—"} />
-            <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}
-              value={beneficiary?.family_information?.spouse_job || "—"} />
-          </div>
+          <FamilyMembersView family={beneficiary?.family_information} />
         </div>
 
         <div className="flex gap-3">

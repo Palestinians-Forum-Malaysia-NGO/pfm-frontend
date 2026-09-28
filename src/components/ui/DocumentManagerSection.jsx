@@ -22,10 +22,17 @@ const EMPTY = { document_type: "", document_name: "", remarks: "" };
  *   onUpdate   – (id, payload) => Promise
  *   onDelete   – (id) => Promise
  *   loading    – true while the list itself is being fetched
+ *   typeOptions  – optional [{ value, label }] replacing the default type list
+ *                  (beneficiary documents use their own typed set)
+ *   typeRequired – make the type mandatory (the beneficiary API requires it)
+ *   withNumber   – also collect a document_number (passport / UNHCR no., …)
  */
-const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDelete, loading }) => {
+const DocumentManagerSection = ({
+  documents = [], folder, onAdd, onUpdate, onDelete, loading,
+  typeOptions, typeRequired = false, withNumber = false,
+}) => {
   const { t } = useTranslation();
-  const DOCUMENT_TYPE_OPTIONS = DOCUMENT_TYPE_VALUES.map((value) => ({ value, label: t(`documents.type_${value}`) }));
+  const DOCUMENT_TYPE_OPTIONS = typeOptions ?? DOCUMENT_TYPE_VALUES.map((value) => ({ value, label: t(`documents.type_${value}`) }));
   const DOCUMENT_TYPE_LABELS = Object.fromEntries(DOCUMENT_TYPE_OPTIONS.map((o) => [o.value, o.label]));
   const [addOpen, setAddOpen] = useState(false);
   const [newDoc, setNewDoc] = useState(EMPTY);
@@ -47,14 +54,17 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
 
   const startEdit = (doc) => {
     setEditingId(doc.id);
-    setEditDoc({ document_type: doc.document_type || "", document_name: doc.document_name || "", remarks: doc.remarks || "" });
+    setEditDoc({
+      document_type: doc.document_type || "", document_name: doc.document_name || "", remarks: doc.remarks || "",
+      ...(withNumber ? { document_number: doc.document_number || "" } : {}),
+    });
     setEditFileKey(null);
     setEditOriginalFile(doc.document_file?.file_key ?? doc.document_file ?? null);
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!newDoc.document_name.trim() || !newFileKey) return;
+    if (!newDoc.document_name.trim() || !newFileKey || (typeRequired && !newDoc.document_type)) return;
     setAdding(true);
     try {
       await onAdd({ ...newDoc, document_file: newFileKey });
@@ -105,8 +115,11 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
             <InputField label={t("documents.name_label")} field="document_name" placeholder={t("documents.name_placeholder")}
               formData={newDoc} errors={{}} updateFormData={setN} rules={[{ required: true }]} />
             <SelectField label={t("documents.type_label")} field="document_type" options={DOCUMENT_TYPE_OPTIONS}
-              required={false} formData={newDoc} errors={{}} updateFormData={setN} />
+              required={typeRequired} formData={newDoc} errors={{}} updateFormData={setN} />
           </div>
+          {withNumber && (
+            <InputField label={t("documents.number_label")} field="document_number" required={false} formData={newDoc} errors={{}} updateFormData={setN} />
+          )}
           <InputField label={t("documents.remarks_label")} field="remarks" required={false} formData={newDoc} errors={{}} updateFormData={setN} />
           <StorageDocumentField
             label={t("documents.file_label")}
@@ -118,7 +131,7 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
           />
           <div className="flex gap-2">
             <Button variant="ghost" text={t("common.cancel")} type="button" onClick={resetAddForm} className="flex-1" />
-            <Button variant="primary" text={t("documents.add_submit")} type="submit" loading={adding} disabled={!newDoc.document_name.trim() || !newFileKey} className="flex-1" />
+            <Button variant="primary" text={t("documents.add_submit")} type="submit" loading={adding} disabled={!newDoc.document_name.trim() || !newFileKey || (typeRequired && !newDoc.document_type)} className="flex-1" />
           </div>
         </form>
       )}
@@ -135,8 +148,11 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
                 <div className="flex flex-col gap-3 rounded-xl border border-green/20 bg-green/5 p-4">
                   <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <InputField label={t("documents.name_label")} field="document_name" formData={editDoc} errors={{}} updateFormData={setE} rules={[{ required: true }]} />
-                    <SelectField label={t("documents.type_label")} field="document_type" options={DOCUMENT_TYPE_OPTIONS} required={false} formData={editDoc} errors={{}} updateFormData={setE} />
+                    <SelectField label={t("documents.type_label")} field="document_type" options={DOCUMENT_TYPE_OPTIONS} required={typeRequired} formData={editDoc} errors={{}} updateFormData={setE} />
                   </div>
+                  {withNumber && (
+                    <InputField label={t("documents.number_label")} field="document_number" required={false} formData={editDoc} errors={{}} updateFormData={setE} />
+                  )}
                   <InputField label={t("documents.remarks_label")} field="remarks" required={false} formData={editDoc} errors={{}} updateFormData={setE} />
                   <StorageDocumentField
                     label={t("documents.file_label")}
@@ -157,7 +173,8 @@ const DocumentManagerSection = ({ documents = [], folder, onAdd, onUpdate, onDel
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-slate-900">{doc.document_name || DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}</p>
                     <p className="truncate text-xs text-slate-400">
-                      {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}{doc.remarks ? ` · ${doc.remarks}` : ""}
+                      {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
+                      {doc.document_number ? ` · ${doc.document_number}` : ""}{doc.remarks ? ` · ${doc.remarks}` : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">

@@ -7,7 +7,7 @@ import {
   MdEmail, MdPhone, MdCalendarToday, MdShield, MdVerified,
   MdPerson, MdFlag, MdLocationCity, MdHome, MdFlight,
   MdFamilyRestroom, MdBadge, MdUpdate, MdClose,
-  MdCardTravel, MdAccountBalance, MdAttachMoney, MdFingerprint, MdWarning, MdChildCare,
+  MdCardTravel, MdAccountBalance, MdAttachMoney, MdFingerprint, MdWarning,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -17,9 +17,10 @@ import AlertBanner from "components/ui/AlertBanner";
 import BeneficiaryDeleteModal from "./BeneficiaryDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import StorageImage from "components/ui/StorageImage";
-import StorageFileLink from "components/ui/StorageFileLink";
 import Loading from "components/loading/Loading";
 import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import FamilyMembersView from "./FamilyMembersView";
+import { SUPPORTING_DOC_TYPES } from "components/features/beneficiaries/constants/family";
 import {
   useGetBeneficiary, useDeleteBeneficiary, useUpdateBeneficiary, useGetStates,
   useGetBeneficiaryDocuments, useCreateBeneficiaryDocument, useUpdateBeneficiaryDocument, useDeleteBeneficiaryDocument,
@@ -122,13 +123,11 @@ export default function BeneficiaryDetailView() {
   if (!beneficiary) return null;
 
   const u   = beneficiary.user ?? {};
-  const fi  = beneficiary.family_information ?? {};
   const classifications = beneficiary.classifications ?? [];
   const bi  = u.banking_information  ?? {};
   const fin = u.financial_information ?? {};
   const hasBanking   = bi.bank_name || bi.account_number || bi.account_holder_name;
   const hasFinancial = fin.job_title || fin.salary || fin.payment_frequency;
-  const children     = fi.children_information ?? [];
   const stateLabel = (code) => {
     const st = states.find((x) => x.code === code);
     if (!st) return code;
@@ -251,7 +250,6 @@ export default function BeneficiaryDetailView() {
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_personal")} subtitle={t("beneficiaries.section_personal_sub")} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow icon={<MdBadge className="h-4 w-4" />}         label={t("beneficiaries.info_passport")} value={beneficiary.passport_number || "—"} />
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.info_dob")}      value={fmtDate(beneficiary.date_of_birth)} />
           <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_gender")}
             value={t(`beneficiaries.gender_${beneficiary.gender}`, { defaultValue: beneficiary.gender ?? "—" })} />
@@ -262,21 +260,6 @@ export default function BeneficiaryDetailView() {
           <div className="mt-3">
             <p className="mb-1 text-xs font-medium text-slate-400">{t("beneficiaries.info_background")}</p>
             <p className="text-sm text-slate-700 leading-relaxed">{beneficiary.background}</p>
-          </div>
-        )}
-        {beneficiary.id_document_type && (
-          <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.id_doc_type_label")}
-            value={t(`beneficiaries.id_doc_type_${beneficiary.id_document_type}`, { defaultValue: beneficiary.id_document_type })} />
-        )}
-        {beneficiary.id_document && (
-          <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
-            <MdBadge className="h-5 w-5 shrink-0 text-green" />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-400">{t("beneficiaries.info_id_doc")}</p>
-              <StorageFileLink fileKey={beneficiary.id_document} className="text-sm font-medium text-green hover:underline">
-                {t("beneficiaries.view_doc")}
-              </StorageFileLink>
-            </div>
           </div>
         )}
       </div>
@@ -310,16 +293,9 @@ export default function BeneficiaryDetailView() {
               <InfoRow icon={<MdShield className="h-4 w-4" />} label={t("beneficiaries.info_situation")}
                 value={t(`beneficiaries.situation_${beneficiary.situation}`, { defaultValue: beneficiary.situation })} />
             )}
-            {beneficiary.unhcr_number && (
-              <InfoRow icon={<MdFingerprint className="h-4 w-4" />} label={t("beneficiaries.info_unhcr")} value={beneficiary.unhcr_number} />
-            )}
             {beneficiary.palestine_region && (
               <InfoRow icon={<MdFlag className="h-4 w-4" />} label={t("beneficiaries.info_palestine_region")}
                 value={t(`beneficiaries.region_${beneficiary.palestine_region}`, { defaultValue: beneficiary.palestine_region })} />
-            )}
-            {beneficiary.has_visa && beneficiary.visa_document && (
-              <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.visa_document_label")}
-                value={<StorageFileLink fileKey={beneficiary.visa_document} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
             )}
           </div>
         </div>
@@ -344,47 +320,11 @@ export default function BeneficiaryDetailView() {
         </div>
       )}
 
-      {/* ── Family Information ── */}
-      {beneficiary.family_information && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family_info")} subtitle={t("beneficiaries.section_family_info_sub")} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")}
-              value={fi.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
-            <InfoRow icon={<MdPeople className="h-4 w-4" />} label={t("beneficiaries.info_children_count")} value={fi.number_of_children ?? "—"} />
-            {fi.spouse_name    && <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}    value={fi.spouse_name} />}
-            {fi.spouse_name_ar && <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={fi.spouse_name_ar} />}
-            {fi.spouse_job     && <InfoRow icon={<MdBadge className="h-4 w-4" />}  label={t("beneficiaries.info_spouse_job")}     value={fi.spouse_job} />}
-          </div>
-        </div>
-      )}
-
-      {/* ── Children ── */}
-      {children.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <FormHeader icon={<MdChildCare className="h-5 w-5" />} title={t("beneficiaries.section_children")} subtitle={t("beneficiaries.section_family_info_sub")} />
-          <div className="flex flex-col gap-3">
-            {children.map((child, i) => (
-              <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="mb-2 text-xs font-semibold text-slate-400">{t("beneficiaries.child_n", { n: i + 1 })}</p>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {child.child_name    && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_child_name")}    value={child.child_name} />}
-                  {child.child_name_ar && <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_child_name_ar")} value={child.child_name_ar} />}
-                  {child.child_date_of_birth && <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.info_child_dob")} value={fmtDate(child.child_date_of_birth)} />}
-                  {child.passport_copy && (
-                    <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.passport_copy")}
-                      value={<StorageFileLink fileKey={child.passport_copy} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
-                  )}
-                  {child.entrance_stump && (
-                    <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.entrance_stamp")}
-                      value={<StorageFileLink fileKey={child.entrance_stump} className="text-green hover:underline">{t("beneficiaries.view_doc")}</StorageFileLink>} />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ── Family members (spouse, children and other relatives) ── */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family_info")} subtitle={t("beneficiaries.section_family_members_sub")} />
+        <FamilyMembersView family={beneficiary.family_information} />
+      </div>
 
       {/* ── Banking Information ── */}
       {hasBanking && (
@@ -415,6 +355,9 @@ export default function BeneficiaryDetailView() {
 
       {/* ── Supporting Documents ── */}
       <DocumentManagerSection
+        typeOptions={SUPPORTING_DOC_TYPES.map((v) => ({ value: v, label: t(`beneficiaries.doc_type_${v}`) }))}
+        typeRequired
+        withNumber
         documents={documents}
         loading={docsLoading}
         folder="beneficiaries/documents"

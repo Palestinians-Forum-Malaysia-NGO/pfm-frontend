@@ -29,7 +29,6 @@ const useBeneficiaryList = () => {
         (b.user?.full_name    ?? "").toLowerCase().includes(q) ||
         (b.user?.full_name_ar ?? "").toLowerCase().includes(q) ||
         (b.user?.email        ?? "").toLowerCase().includes(q) ||
-        (b.passport_number    ?? "").toLowerCase().includes(q) ||
         (b.classification?.name    ?? "").toLowerCase().includes(q) ||
         (b.classification?.name_ar ?? "").toLowerCase().includes(q);
 

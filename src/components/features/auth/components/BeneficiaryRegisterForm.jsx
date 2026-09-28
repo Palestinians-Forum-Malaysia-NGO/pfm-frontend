@@ -9,7 +9,6 @@ import InputField           from "components/form/InputField";
 import SelectField          from "components/form/SelectField";
 import TextareaField        from "components/form/TextareaField";
 import ToggleInput          from "components/form/ToggleInput";
-import StorageDocumentField from "components/form/upload/StorageDocumentField";
 import { StorageImageField } from "components/form";
 import AlertBanner          from "components/ui/AlertBanner";
 import Button                from "components/ui/buttons/Button";
@@ -19,6 +18,11 @@ import { setTokens }        from "components/features/auth/utils";
 import { OTP_PURPOSE }      from "components/features/auth/types";
 import { COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import { useCreateBeneficiary, useGetStates } from "components/features/beneficiaries/hooks";
+import SupportingDocumentsEditor from "components/features/beneficiaries/components/SupportingDocumentsEditor";
+import FamilyMembersEditor from "components/features/beneficiaries/components/FamilyMembersEditor";
+import {
+  documentProblems, memberProblems, starterDocuments, documentsUntouched, toDocumentPayload, toMemberPayload,
+} from "components/features/beneficiaries/constants/family";
 
 /* ─────────────────────────────────────────────────
    Step config
@@ -27,9 +31,9 @@ const useSteps = () => {
   const { t } = useTranslation();
   return [
     { n: 1, label: t("apply.step_account"),   icon: <MdPersonAdd className="h-4 w-4" /> },
-    { n: 2, label: t("apply.step_family"),    icon: <MdFamilyRestroom className="h-4 w-4" /> },
+    { n: 2, label: t("apply.step_status"),    icon: <MdCardTravel className="h-4 w-4" /> },
     { n: 3, label: t("apply.step_documents"), icon: <MdDescription className="h-4 w-4" /> },
-    { n: 4, label: t("apply.step_status"),    icon: <MdCardTravel className="h-4 w-4" /> },
+    { n: 4, label: t("apply.step_family"),    icon: <MdFamilyRestroom className="h-4 w-4" /> },
   ];
 };
 
@@ -172,340 +176,164 @@ const AccountStep = ({ data, onChange, onNext, serverErrors, onClearServerError 
 };
 
 /* ─────────────────────────────────────────────────
-   Step 2 — Documents & Background
+   Shared step chrome
 ───────────────────────────────────────────────── */
-const DOCUMENTS_RULES = {
-  national_id:      [{ required: true }, { maxLength: 20 }],
-  background:       [{ required: true }],
-  id_document_type: [{ required: true }],
-};
+const StepHeader = ({ icon, title, subtitle }) => (
+  <div className="mb-6 flex items-start gap-4">
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10 text-green">{icon}</div>
+    <div>
+      <h2 className="text-xl font-bold text-navy-700">{title}</h2>
+      <p className="mt-0.5 text-sm text-slate-400">{subtitle}</p>
+    </div>
+  </div>
+);
 
-const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, serverErrors, onClearServerError }) => {
+const StepNav = ({ onBack, onNext, nextDisabled, nextText, nextIcon, loading }) => {
   const { t } = useTranslation();
-  const [errors, setErrors]         = useState({});
-  const [idDocError, setIdDocError] = useState(null);
-  const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
-  const allErrors = { ...errors, ...serverErrors, id_document: idDocError };
-
-  const ID_DOCUMENT_TYPE_OPTIONS = [
-    { value: "passport", label: t("beneficiaries.id_doc_type_passport") },
-    { value: "unhcr",    label: t("beneficiaries.id_doc_type_unhcr") },
-  ];
-
-  const canProceed =
-    !Object.entries(DOCUMENTS_RULES).some(([field, rules]) => !!validate(data[field], rules)) && !!idDoc &&
-    !Object.keys(DOCUMENTS_RULES).some((field) => serverErrors?.[field]);
-
-  const handleNext = () => {
-    const newErrors = {};
-    Object.entries(DOCUMENTS_RULES).forEach(([field, rules]) => {
-      const err = validate(data[field], rules);
-      if (err) newErrors[field] = err;
-    });
-    const idErr = idDoc ? null : t("validation.required");
-    if (Object.keys(newErrors).length || idErr) {
-      setErrors(newErrors);
-      setIdDocError(idErr);
-      return;
-    }
-    setErrors({});
-    setIdDocError(null);
-    onNext();
-  };
-
   return (
-    <>
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
-          <MdDescription className="h-5 w-5 text-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-navy-700">{t("apply.documents_title")}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{t("apply.documents_subtitle")}</p>
-        </div>
-      </div>
-
-      {serverErrors && Object.keys(serverErrors).length > 0 && (
-        <AlertBanner message={t("apply.server_error_banner")} />
-      )}
-
-      <div className="flex flex-col gap-3">
-        <InputField label={t("apply.national_id")} field="national_id" placeholder={t("apply.national_id_placeholder")}
-          formData={data} errors={allErrors} updateFormData={set} rules={DOCUMENTS_RULES.national_id} />
-        <TextareaField label={t("apply.background")} field="background"
-          placeholder={t("apply.background_placeholder")}
-          formData={data} errors={allErrors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
-        <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
-          formData={data} errors={allErrors} updateFormData={set} rules={DOCUMENTS_RULES.id_document_type} />
-        <StorageDocumentField
-          label={t("apply.id_document")}
-          publicEndpoint="register"
-          accept=".pdf,.jpg,.jpeg,.png"
-          required
-          onUpload={(key) => { onIdDocChange(key); setIdDocError(null); }}
-          onRemove={() => onIdDocChange(null)}
-          currentName={idDoc ? t("common.uploaded_file") : undefined}
-          field="id_document" errors={allErrors}
-        />
-      </div>
-
-      <div className="mt-6 flex gap-3">
-        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
-        <Button type="button" onClick={handleNext} disabled={!canProceed} text={t("apply.continue")} icon={<MdArrowForward className="h-4 w-4" />} iconPosition="right" className="h-11 flex-1" />
-      </div>
-    </>
+    <div className="mt-6 flex gap-3">
+      <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
+      <Button type="button" onClick={onNext} disabled={nextDisabled} loading={loading}
+        text={nextText ?? t("apply.continue")} icon={nextIcon ?? <MdArrowForward className="h-4 w-4" />}
+        iconPosition={nextIcon ? undefined : "right"} className="h-11 flex-1" />
+    </div>
   );
 };
 
 /* ─────────────────────────────────────────────────
-   Step 3 — Family Information
-───────────────────────────────────────────────── */
-const EMPTY_CHILD = {
-  child_name: "", child_name_ar: "", child_date_of_birth: "",
-  passport_copy: null, entrance_stump: null,
-};
-
-const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext }) => {
-  const { t } = useTranslation();
-  const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
-  const setChild = (i, f, v) =>
-    onChildrenChange((prev) => prev.map((c, idx) => idx === i ? { ...c, [f]: v } : c));
-
-  return (
-    <>
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
-          <MdFamilyRestroom className="h-5 w-5 text-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-navy-700">{t("beneficiaries.section_family")}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{t("beneficiaries.section_family_sub")}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set}
-          onText={t("beneficiaries.info_yes")} offText={t("beneficiaries.info_no")} hint={null} />
-        <InputField label={t("beneficiaries.spouse_name")}        field="spouse_name"        placeholder="Fatimah binti Ali" required={false} formData={data} errors={{}} updateFormData={set} />
-        <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_ar" placeholder={t("beneficiaries.spouse_name_ar_placeholder")} required={false} formData={data} errors={{}} updateFormData={set} />
-        <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         placeholder="Teacher"      required={false} formData={data} errors={{}} updateFormData={set} />
-        <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" placeholder="0" required={false} formData={data} errors={{}} updateFormData={set} />
-
-        {children.length > 0 && (
-          <div className="flex flex-col gap-4">
-            {children.map((child, i) => (
-              <div key={i} className="rounded-xl border border-slate-200 p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-xs font-semibold text-slate-500">{t("beneficiaries.child_label", { num: i + 1 })}</p>
-                  <button type="button" onClick={() => onChildrenChange((p) => p.filter((_, idx) => idx !== i))}
-                    className="text-xs font-medium text-red-400 transition-colors hover:text-red-600">
-                    {t("beneficiaries.child_remove")}
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                  <InputField label={t("beneficiaries.child_name")}        field="child_name"        placeholder="Ahmad Jr." formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
-                  <InputField label={t("beneficiaries.child_name_ar_label")} field="child_name_ar" placeholder="أحمد"     formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
-                </div>
-                <InputField label={t("beneficiaries.child_dob")} field="child_date_of_birth" type="date" formData={child} errors={{}} updateFormData={(f, v) => setChild(i, f, v)} />
-                <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                  <StorageDocumentField label={t("beneficiaries.passport_copy")}  publicEndpoint="register" accept=".pdf,.jpg,.jpeg,.png"
-                    onUpload={(key) => setChild(i, "passport_copy",  key)}
-                    onRemove={() => setChild(i, "passport_copy",  null)} field={`passport_copy_${i}`} errors={{}} />
-                  <StorageDocumentField label={t("beneficiaries.entrance_stamp")} publicEndpoint="register" accept=".pdf,.jpg,.jpeg,.png"
-                    onUpload={(key) => setChild(i, "entrance_stump", key)}
-                    onRemove={() => setChild(i, "entrance_stump", null)} field={`entrance_stump_${i}`} errors={{}} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={() => onChildrenChange((p) => [...p, { ...EMPTY_CHILD }])}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-green transition-colors hover:text-green-600"
-        >
-          {t("beneficiaries.add_child")}
-        </button>
-      </div>
-
-      <div className="mt-6 flex gap-3">
-        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
-        <Button type="button" onClick={onNext} text={t("apply.continue")} icon={<MdArrowForward className="h-4 w-4" />} iconPosition="right" className="h-11 flex-1" />
-      </div>
-    </>
-  );
-};
-
-/* ─────────────────────────────────────────────────
-   Step 4 — Status, Country & Terms
+   Step 2 — Status & location
+   (asked before documents: what's required depends on visa status)
 ───────────────────────────────────────────────── */
 const REQUIRED = [{ required: true }];
 
-const validateStatusStep = (visaData, visaDoc) => {
+const statusErrors = (v) => {
   const errors = {};
-
-  const hasVisaErr = validate(visaData.has_visa, REQUIRED);
-  if (hasVisaErr) errors.has_visa = hasVisaErr;
-
-  if (visaData.has_visa === "true") {
-    const err = validate(visaData.visa_type, REQUIRED);
-    if (err) errors.visa_type = err;
-    const docErr = validate(visaDoc, REQUIRED);
-    if (docErr) errors.visa_document = docErr;
-  } else if (visaData.has_visa === "false") {
-    const err = validate(visaData.situation, REQUIRED);
-    if (err) errors.situation = err;
-    if (visaData.situation === "refugee") {
-      const uErr = validate(visaData.unhcr_number, REQUIRED);
-      if (uErr) errors.unhcr_number = uErr;
-    }
-  }
-
-  const countryErr = validate(visaData.country, REQUIRED);
-  if (countryErr) errors.country = countryErr;
-  if (visaData.country === "PS") {
-    const regionErr = validate(visaData.palestine_region, REQUIRED);
-    if (regionErr) errors.palestine_region = regionErr;
-  }
-
-  const stateErr = validate(visaData.state, REQUIRED);
-  if (stateErr) errors.state = stateErr;
-
-  const addressErr = validate(visaData.address, REQUIRED);
-  if (addressErr) errors.address = addressErr;
-
+  if (v.has_visa === "") errors.has_visa = true;
+  if (v.has_visa === "true"  && !v.visa_type) errors.visa_type = true;
+  if (v.has_visa === "false" && !v.situation) errors.situation = true;
+  if (!v.country) errors.country = true;
+  if (v.country === "PS" && !v.palestine_region) errors.palestine_region = true;
+  if (!v.state) errors.state = true;
+  if (!v.address?.trim()) errors.address = true;
   return errors;
 };
 
-const StatusStep = ({ visaData, onVisaChange, visaDoc, onVisaDocChange, onBack, onSubmit, loading, error }) => {
+const StatusStep = ({ data, onChange, onBack, onNext, serverErrors, onClearServerError }) => {
   const { t, i18n } = useTranslation();
-  const [visaErrors, setVisaErrors] = useState({});
-  const setV = (f, v) => onVisaChange((p) => ({ ...p, [f]: v }));
+  const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
   const { states } = useGetStates();
+  const opts = (values, prefix) => values.map((v) => ({ value: v, label: t(`beneficiaries.${prefix}${v}`) }));
 
   const STATE_OPTIONS = states.map((s) => ({
     value: s.code,
     label: (s.label_ar && i18n.language === "ar") ? s.label_ar : s.label,
   }));
-
-  const HAS_VISA_OPTIONS_T = [
-    { value: "",      label: t("beneficiaries.visa_status_unset") },
+  const HAS_VISA_OPTIONS = [
     { value: "true",  label: t("beneficiaries.visa_status_yes") },
     { value: "false", label: t("beneficiaries.visa_status_no") },
   ];
-  const VISA_TYPE_OPTIONS_T = [
-    { value: "student",      label: t("beneficiaries.visa_type_student") },
-    { value: "work",         label: t("beneficiaries.visa_type_work") },
-    { value: "dependent",    label: t("beneficiaries.visa_type_dependent") },
-    { value: "social_visit", label: t("beneficiaries.visa_type_social_visit") },
-    { value: "refugee_pass", label: t("beneficiaries.visa_type_refugee_pass") },
-    { value: "other",        label: t("beneficiaries.visa_type_other") },
-  ];
-  const SITUATION_OPTIONS_T = [
-    { value: "refugee",       label: t("beneficiaries.situation_refugee") },
-    { value: "asylum_seeker", label: t("beneficiaries.situation_asylum_seeker") },
-    { value: "undocumented",  label: t("beneficiaries.situation_undocumented") },
-    { value: "overstayed",    label: t("beneficiaries.situation_overstayed") },
-  ];
-  const PALESTINE_REGION_OPTIONS_T = [
-    { value: "gaza",            label: t("beneficiaries.region_gaza") },
-    { value: "west_bank",       label: t("beneficiaries.region_west_bank") },
-    { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
-  ];
-
-  const liveErrors  = validateStatusStep(visaData, visaDoc);
-  const termsMissing = !visaData.terms_accepted;
-  const canSubmit   = Object.keys(liveErrors).length === 0 && !termsMissing;
-
-  const handleSubmitClick = () => {
-    const nextErrors = validateStatusStep(visaData, visaDoc);
-    if (termsMissing) nextErrors.terms_accepted = t("validation.required");
-    if (Object.keys(nextErrors).length) {
-      setVisaErrors(nextErrors);
-      return;
-    }
-    setVisaErrors({});
-    onSubmit();
-  };
+  const canProceed = Object.keys(statusErrors(data)).length === 0;
 
   return (
     <>
-      <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green/10">
-          <MdCardTravel className="h-5 w-5 text-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-navy-700">{t("apply.visa_title")}</h2>
-          <p className="mt-0.5 text-sm text-slate-400">{t("apply.visa_subtitle")}</p>
-        </div>
-      </div>
-
-      <AlertBanner message={error} />
+      <StepHeader icon={<MdCardTravel className="h-5 w-5" />} title={t("apply.visa_title")} subtitle={t("apply.visa_subtitle")} />
+      {serverErrors && Object.keys(serverErrors).length > 0 && <AlertBanner message={t("apply.server_error_banner")} />}
 
       <div className="flex flex-col gap-3">
-        {/* Visa status */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
             <MdCardTravel className="h-3.5 w-3.5" /> {t("apply.immigration_status")}
           </p>
-          <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS_T}
-            formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
-          {visaData.has_visa === "true" && (
-            <>
-              <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T}
-                formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
-              <StorageDocumentField
-                label={t("beneficiaries.visa_document_label")}
-                publicEndpoint="register"
-                accept=".pdf,.jpg,.jpeg,.png"
-                required
-                onUpload={(key) => { onVisaDocChange(key); setVisaErrors((p) => ({ ...p, visa_document: null })); }}
-                onRemove={() => onVisaDocChange(null)}
-                currentName={visaDoc ? t("common.uploaded_file") : undefined}
-                field="visa_document" errors={visaErrors}
-              />
-            </>
+          <SelectField label={t("apply.visa_status")} field="has_visa" options={HAS_VISA_OPTIONS}
+            formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
+          {data.has_visa === "true" && (
+            <SelectField label={t("apply.visa_type")} field="visa_type"
+              options={opts(["student", "work", "dependent", "social_visit", "refugee_pass", "other"], "visa_type_")}
+              formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
           )}
-          {visaData.has_visa === "false" && (
-            <>
-              <SelectField label={t("apply.situation")} field="situation" options={SITUATION_OPTIONS_T}
-                formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
-              {visaData.situation === "refugee" && (
-                <InputField label={t("apply.unhcr")} field="unhcr_number" placeholder="e.g. MYS/2023/12345"
-                  formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
-              )}
-            </>
+          {data.has_visa === "false" && (
+            <SelectField label={t("apply.situation")} field="situation"
+              options={opts(["refugee", "asylum_seeker", "undocumented", "overstayed"], "situation_")}
+              formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
           )}
         </div>
 
-        {/* Country */}
         <SelectField label={t("apply.country_origin")} field="country" options={COUNTRY_OPTIONS}
-          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
-        {visaData.country === "PS" && (
-          <SelectField label={t("apply.palestine_region")} field="palestine_region" options={PALESTINE_REGION_OPTIONS_T}
-            formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+          formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
+        {data.country === "PS" && (
+          <SelectField label={t("apply.palestine_region")} field="palestine_region"
+            options={opts(["gaza", "west_bank", "refugee_outside"], "region_")}
+            formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
         )}
         <SelectField label={t("apply.state")} field="state" options={STATE_OPTIONS}
-          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+          formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
         <InputField label={t("beneficiaries.address")} field="address" placeholder="No. 1, Jalan…"
-          formData={visaData} errors={visaErrors} updateFormData={setV} rules={REQUIRED} />
+          formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
+      </div>
 
-        {/* Terms */}
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <ToggleInput label={t("apply.terms_label")} field="terms_accepted"
-            formData={visaData} errors={visaErrors} updateFormData={setV} />
+      <StepNav onBack={onBack} onNext={onNext} nextDisabled={!canProceed} />
+    </>
+  );
+};
+
+/* ─────────────────────────────────────────────────
+   Step 3 — Documents & background
+───────────────────────────────────────────────── */
+const DocumentsStep = ({ status, data, onChange, documents, onDocumentsChange, onBack, onNext, serverErrors, onClearServerError }) => {
+  const { t } = useTranslation();
+  const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
+  const problems = documentProblems({ hasVisa: status.has_visa, situation: status.situation, documents });
+  const canProceed = problems.length === 0 && !!data.background?.trim();
+
+  return (
+    <>
+      <StepHeader icon={<MdDescription className="h-5 w-5" />} title={t("apply.documents_title")} subtitle={t("apply.documents_subtitle")} />
+      {serverErrors?.supporting_documents && <AlertBanner message={serverErrors.supporting_documents} />}
+
+      <div className="flex flex-col gap-3">
+        <TextareaField label={t("apply.background")} field="background" rows={3}
+          placeholder={t("apply.background_placeholder")}
+          formData={data} errors={serverErrors} updateFormData={set} rules={REQUIRED} />
+        <p className="text-xs text-slate-500">{t(`apply.documents_hint_${status.has_visa === "true" ? "visa" : status.situation === "refugee" ? "refugee" : "other"}`)}</p>
+        <SupportingDocumentsEditor
+          documents={documents}
+          onChange={(next) => { onDocumentsChange(next); onClearServerError?.("supporting_documents"); }}
+          publicEndpoint="register"
+          problems={problems}
+        />
+      </div>
+
+      <StepNav onBack={onBack} onNext={onNext} nextDisabled={!canProceed} />
+    </>
+  );
+};
+
+/* ─────────────────────────────────────────────────
+   Step 4 — Family members, terms & submit
+───────────────────────────────────────────────── */
+const FamilyStep = ({ data, onChange, members, onMembersChange, onBack, onSubmit, loading, error, serverErrors }) => {
+  const { t } = useTranslation();
+  const set = (f, v) => onChange((p) => ({ ...p, [f]: v }));
+  const membersValid = members.every((m) => memberProblems(m).length === 0);
+  const canSubmit = membersValid && data.terms_accepted;
+
+  return (
+    <>
+      <StepHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family")} subtitle={t("apply.family_subtitle")} />
+      <AlertBanner message={serverErrors?.family_information || error} />
+
+      <div className="flex flex-col gap-3">
+        <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" required formData={data} errors={{}} updateFormData={set}
+          onText={t("beneficiaries.info_yes")} offText={t("beneficiaries.info_no")} hint={null} />
+        <FamilyMembersEditor members={members} onChange={onMembersChange} publicEndpoint="register" />
+
+        <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <ToggleInput label={t("apply.terms_label")} field="terms_accepted" formData={data} errors={{}} updateFormData={set} />
         </div>
       </div>
 
-      <div className="mt-6 flex gap-3">
-        <Button type="button" variant="ghost" onClick={onBack} text={t("apply.back")} icon={<MdArrowBack className="h-4 w-4" />} className="h-11 flex-1" />
-        <Button
-          type="button" onClick={handleSubmitClick} disabled={!canSubmit} loading={loading}
-          text={loading ? t("apply.submitting") : t("apply.submit")} icon={<MdCheckCircle className="h-4 w-4" />}
-          className="h-11 flex-1"
-        />
-      </div>
+      <StepNav onBack={onBack} onNext={onSubmit} nextDisabled={!canSubmit} loading={loading}
+        nextText={loading ? t("apply.submitting") : t("apply.submit")} nextIcon={<MdCheckCircle className="h-4 w-4" />} />
     </>
   );
 };
@@ -593,16 +421,14 @@ const OtpStep = ({ email, channel, onBack }) => {
 
 /* ─────────────────────────────────────────────────
    Which step owns each field the API can reject —
-   used to route a server-side validation error (e.g. a duplicate email or
-   national ID) back to the step that actually collected it, instead of
-   showing a generic message on whichever step the user happened to submit
-   from.
+   used to route a server-side validation error (e.g. a duplicate email)
+   back to the step that actually collected it.
 ───────────────────────────────────────────────── */
 const FIELD_TO_STEP = {
   full_name: 1, email: 1, phone_number: 1, profile_photo: 1,
-  national_id: 3, background: 3, id_document: 3, id_document_type: 3,
-  has_visa: 4, visa_type: 4, visa_document: 4, situation: 4, unhcr_number: 4,
-  country_of_origin: 4, palestine_region: 4, state: 4, address: 4, terms_accepted: 4,
+  has_visa: 2, visa_type: 2, situation: 2, country_of_origin: 2, palestine_region: 2, state: 2, address: 2,
+  background: 3, supporting_documents: 3,
+  family_information: 4, terms_accepted: 4,
 };
 
 /* ─────────────────────────────────────────────────
@@ -623,60 +449,49 @@ export default function BeneficiaryRegisterForm() {
     });
   };
 
-  const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
-  const [documents, setDocuments] = useState({ background: "", national_id: "", id_document_type: "passport" });
-  const [idDoc, setIdDoc] = useState(null);
-  const [visaDoc, setVisaDoc] = useState(null);
-  const [family, setFamily] = useState({
-    family_in_malaysia: false, spouse_name: "", spouse_name_ar: "",
-    spouse_job: "", number_of_children: "",
+  const [account, setAccount] = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
+  const [status, setStatus]   = useState({
+    has_visa: "", visa_type: "", situation: "", country: "", palestine_region: "", state: "", address: "",
   });
-  const [children, setChildren] = useState([]);
-  const [visa,  setVisa]  = useState({
-    has_visa: "", visa_type: "", situation: "", unhcr_number: "",
-    country: "", palestine_region: "", state: "", address: "", terms_accepted: false,
-  });
+  const [about, setAbout]         = useState({ background: "" });
+  const [documents, setDocuments] = useState([]);
+  const [family, setFamily]       = useState({ family_in_malaysia: false, terms_accepted: false });
+  const [members, setMembers]     = useState([]);
 
   const { execute: createBeneficiary, loading, error } = useCreateBeneficiary();
 
+  // Entering the documents step with nothing filled in yet: start with the
+  // rows this status requires (passport + visa, UNHCR card, or passport) —
+  // also when the user came back and changed their status.
+  const goToDocuments = () => {
+    if (documentsUntouched(documents)) setDocuments(starterDocuments(status.has_visa, status.situation));
+    setStep(3);
+  };
+
   const handleSubmit = async () => {
-    const hasVisaBool = visa.has_visa === "true" ? true : visa.has_visa === "false" ? false : undefined;
+    const hasVisa = status.has_visa === "true";
     try {
       const payload = {
-        full_name:         account.full_name     || undefined,
-        email:             account.email         || undefined,
+        full_name:         account.full_name,
+        email:             account.email,
         phone_number:      account.phone_number  || undefined,
         profile_photo:     account.profile_photo || undefined,
-        national_id:       documents.national_id || undefined,
-        background:        documents.background  || undefined,
-        id_document:       idDoc                  || undefined,
-        id_document_type:  documents.id_document_type || undefined,
-        terms_accepted:    visa.terms_accepted,
-
-        has_visa:          hasVisaBool,
-        visa_type:         hasVisaBool === true  ? (visa.visa_type || undefined) : undefined,
-        visa_document:     hasVisaBool === true  ? (visaDoc || undefined) : undefined,
-        situation:         hasVisaBool === false ? (visa.situation || undefined) : undefined,
-        unhcr_number:      (hasVisaBool === false && visa.situation === "refugee") ? (visa.unhcr_number || undefined) : undefined,
-        country_of_origin: visa.country || undefined,
-        palestine_region:  visa.country === "PS" ? (visa.palestine_region || undefined) : undefined,
-        state:             visa.state   || undefined,
-        address:           visa.address || undefined,
-
-        family_information: {
-          family_in_malaysia:  family.family_in_malaysia,
-          spouse_name:         family.spouse_name        || null,
-          spouse_name_ar:      family.spouse_name_ar     || null,
-          spouse_job:          family.spouse_job         || null,
-          number_of_children:  family.number_of_children !== "" ? Number(family.number_of_children) : null,
-          children_information: children.map((c) => ({
-            child_name:          c.child_name         || undefined,
-            child_name_ar:       c.child_name_ar      || undefined,
-            child_date_of_birth: c.child_date_of_birth || undefined,
-            passport_copy:       c.passport_copy      || undefined,
-            entrance_stump:      c.entrance_stump     || undefined,
-          })),
-        },
+        has_visa:          hasVisa,
+        visa_type:         hasVisa  ? status.visa_type : undefined,
+        situation:         !hasVisa ? status.situation : undefined,
+        country_of_origin: status.country || undefined,
+        palestine_region:  status.country === "PS" ? status.palestine_region : undefined,
+        state:             status.state   || undefined,
+        address:           status.address || undefined,
+        background:        about.background || undefined,
+        terms_accepted:    family.terms_accepted,
+        supporting_documents: documents.map(toDocumentPayload),
+        ...((family.family_in_malaysia || members.length) ? {
+          family_information: {
+            family_in_malaysia: family.family_in_malaysia,
+            members: members.map(toMemberPayload),
+          },
+        } : {}),
       };
       const data = await createBeneficiary(payload);
       setOtpMeta({ email: account.email, channel: data.channel ?? "email" });
@@ -685,16 +500,11 @@ export default function BeneficiaryRegisterForm() {
       const fe = err?.fieldError;
       const targetStep = fe && FIELD_TO_STEP[fe.field];
       if (fe && targetStep) {
-        // Route back to whichever step actually owns the invalid field
-        // (e.g. a duplicate email belongs on step 1, not here on step 4)
-        // instead of leaving the user stuck reading a message that doesn't
-        // match anything on the screen in front of them.
+        // Route back to whichever step owns the invalid field instead of
+        // leaving the user reading a message about another screen.
         setServerFieldErrors((prev) => ({ ...prev, [fe.field]: fe.message }));
         setStep(targetStep);
       }
-      // Non-field errors (network, 5xx, duplicate-unrelated-to-one-field)
-      // still surface via the generic AlertBanner on this step, from the
-      // hook's own `error` state.
     }
   };
 
@@ -712,26 +522,26 @@ export default function BeneficiaryRegisterForm() {
               />
             )}
             {step === 2 && (
-              <FamilyStep
-                data={family} onChange={setFamily}
-                children={children} onChildrenChange={setChildren}
-                onBack={() => setStep(1)} onNext={() => setStep(3)}
+              <StatusStep
+                data={status} onChange={setStatus}
+                onBack={() => setStep(1)} onNext={goToDocuments}
+                serverErrors={serverFieldErrors} onClearServerError={clearServerError}
               />
             )}
             {step === 3 && (
               <DocumentsStep
-                data={documents} onChange={setDocuments}
-                idDoc={idDoc} onIdDocChange={setIdDoc}
+                status={status} data={about} onChange={setAbout}
+                documents={documents} onDocumentsChange={setDocuments}
                 onBack={() => setStep(2)} onNext={() => setStep(4)}
                 serverErrors={serverFieldErrors} onClearServerError={clearServerError}
               />
             )}
             {step === 4 && (
-              <StatusStep
-                visaData={visa} onVisaChange={setVisa}
-                visaDoc={visaDoc} onVisaDocChange={setVisaDoc}
+              <FamilyStep
+                data={family} onChange={setFamily}
+                members={members} onMembersChange={setMembers}
                 onBack={() => setStep(3)} onSubmit={handleSubmit}
-                loading={loading} error={error}
+                loading={loading} error={error} serverErrors={serverFieldErrors}
               />
             )}
             {step === 5 && (

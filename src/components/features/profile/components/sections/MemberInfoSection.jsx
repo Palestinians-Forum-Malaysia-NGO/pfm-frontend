@@ -2,20 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MdPerson, MdLocationOn, MdCalendarToday, MdTranslate,
-  MdFamilyRestroom, MdAccountBalance, MdFolder, MdOpenInNew,
-  MdCategory, MdEdit, MdCardTravel, MdBadge,
+  MdFamilyRestroom, MdAccountBalance, MdFolder,
+  MdCategory, MdEdit, MdCardTravel,
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
-import StorageFileLink from "components/ui/StorageFileLink";
-import { InputField, SelectField, ToggleInput, TextareaField, StorageDocumentField } from "components/form";
+import { InputField, SelectField, ToggleInput, TextareaField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
 import { useGetStates } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
-import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
-import { DOCUMENT_TYPE_VALUES } from "components/ui/constants/documentTypes";
+import FamilyMembersEditor from "components/features/beneficiaries/components/FamilyMembersEditor";
+import FamilyMembersView, { DocumentList } from "components/features/beneficiaries/components/FamilyMembersView";
+import { memberFromApi, memberProblems, toMemberPayload } from "components/features/beneficiaries/constants/family";
 
 const STATUS_BADGE   = {
   pending:   "bg-amber-50 text-amber-600 border border-amber-200",
@@ -47,20 +47,12 @@ const emptyForm = (profile) => {
     state:                    p.state                     ?? "",
     address:                  p.address                   ?? "",
     background:               p.background                ?? "",
-    passport_number:          p.passport_number           ?? "",
-    id_document:              p.id_document?.file_key ?? p.id_document ?? "",
-    id_document_type:         p.id_document_type          ?? "",
     has_visa:                 p.has_visa === true ? "true" : p.has_visa === false ? "false" : "",
     visa_type:                p.visa_type                 ?? "",
-    visa_document:            p.visa_document?.file_key ?? p.visa_document ?? "",
     situation:                p.situation                 ?? "",
-    unhcr_number:             p.unhcr_number              ?? "",
     palestine_region:         p.palestine_region          ?? "",
     family_in_malaysia:       fi.family_in_malaysia        ?? false,
-    spouse_name:              fi.spouse_name               ?? "",
-    spouse_name_arabic:       fi.spouse_name_ar            ?? "",
-    spouse_job:               fi.spouse_job                ?? "",
-    number_of_children:       fi.number_of_children        ?? "",
+    members:                  (fi.members ?? []).map(memberFromApi),
     bank_name:                bi.bank_name                 ?? "",
     account_number:           bi.account_number            ?? "",
     account_holder_name:      bi.account_holder_name       ?? "",
@@ -78,8 +70,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const [snapshot, setSnapshot] = useState(null);
 
   const p = profile?.profile;
-  const { url: currentIdDocUrl }   = useStorageUrl(p?.id_document,   { forcePresigned: true });
-  const { url: currentVisaDocUrl } = useStorageUrl(p?.visa_document, { forcePresigned: true });
 
   useEffect(() => {
     if (!profile) return;
@@ -91,6 +81,8 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const updateFormData = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
 
   const isDirty = snapshot && JSON.stringify(formData) !== JSON.stringify(snapshot);
+  const membersChanged = snapshot && JSON.stringify(formData.members) !== JSON.stringify(snapshot.members);
+  const membersValid = (formData.members ?? []).every((m) => memberProblems(m).length === 0);
 
   const GENDER_OPTIONS_T = [
     { value: "male",   label: t("beneficiaries.gender_male") },
@@ -112,14 +104,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
     active: t("beneficiaries.account_status_active"), pending: t("beneficiaries.account_status_pending"),
     suspended: t("beneficiaries.account_status_suspended"), rejected: t("beneficiaries.account_status_rejected"),
   };
-
-  const ID_DOCUMENT_TYPE_OPTIONS_T = [
-    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
-    { value: "unhcr",       label: t("beneficiaries.id_doc_type_unhcr") },
-    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
-    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
-  ];
-  const ID_DOCUMENT_TYPE_LABELS = Object.fromEntries(ID_DOCUMENT_TYPE_OPTIONS_T.map((o) => [o.value, o.label]));
 
   const STATE_OPTIONS = states.map((s) => ({
     value: s.code,
@@ -153,9 +137,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const VISA_TYPE_LABELS = Object.fromEntries(VISA_TYPE_OPTIONS_T.map((o) => [o.value, o.label]));
   const SITUATION_LABELS = Object.fromEntries(SITUATION_OPTIONS_T.map((o) => [o.value, o.label]));
   const PALESTINE_REGION_LABELS = Object.fromEntries(PALESTINE_REGION_OPTIONS_T.map((o) => [o.value, o.label]));
-  const SUPPORTING_DOC_TYPE_LABELS = Object.fromEntries(
-    DOCUMENT_TYPE_VALUES.map((value) => [value, t(`documents.type_${value}`)])
-  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -173,23 +154,15 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           state:                    formData.state                    || undefined,
           address:                  formData.address                  || undefined,
           background:               formData.background               || undefined,
-          passport_number:          formData.passport_number          || undefined,
-          // id_document is sent as-is (never omitted) so removing it (empty
-          // string) actually persists — the API 500s on null but accepts "".
-          id_document:              formData.id_document,
-          id_document_type:         formData.id_document_type         || undefined,
           has_visa:                 hasVisaBool,
           visa_type:                hasVisaBool === true  ? (formData.visa_type || undefined) : undefined,
-          visa_document:            hasVisaBool === true  ? formData.visa_document : undefined,
           situation:                hasVisaBool === false ? (formData.situation || undefined) : undefined,
-          unhcr_number:             (hasVisaBool === false && formData.situation === "refugee") ? (formData.unhcr_number || undefined) : undefined,
           palestine_region:         formData.country_of_origin === "PS" ? (formData.palestine_region || undefined) : undefined,
           family_information: {
             family_in_malaysia: formData.family_in_malaysia,
-            spouse_name:        formData.spouse_name        || null,
-            spouse_name_ar:     formData.spouse_name_arabic || null,
-            spouse_job:         formData.spouse_job         || null,
-            number_of_children: formData.number_of_children !== "" ? Number(formData.number_of_children) : null,
+            // Sending `members` replaces the whole list (and their documents),
+            // so only send it when the user actually changed it.
+            ...(membersChanged ? { members: formData.members.map(toMemberPayload) } : {}),
           },
         },
         ...(hasBanking ? {
@@ -230,8 +203,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
       >
         {editMode ? (
           <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            <InfoRow icon={<MdBadge className="h-4 w-4" />}   label={t("apply.national_id")} value={p.national_id || "—"} />
-            <InputField label={t("beneficiaries.info_passport")} field="passport_number" required={false} formData={formData} updateFormData={updateFormData} />
             <SelectField label={t("beneficiaries.gender")} field="gender" options={GENDER_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
             <InputField  label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date" required={false} formData={formData} updateFormData={updateFormData} />
             <SelectField label={t("beneficiaries.marital_status")} field="marital_status" options={MARITAL_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
@@ -243,24 +214,12 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             <div className="sm:col-span-2">
               <TextareaField label={t("apply.background")} field="background" required={false} formData={formData} updateFormData={updateFormData} />
             </div>
-            <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
-            <div className="sm:col-span-2">
-              <StorageDocumentField
-                label={t("apply.id_document")}
-                folder="beneficiaries/documents"
-                currentUrl={currentIdDocUrl}
-                onUpload={(key) => updateFormData("id_document", key)}
-                onRemove={() => updateFormData("id_document", "")}
-              />
-            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {profile.full_name_ar && (
               <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.full_name_ar_label")} value={profile.full_name_ar} />
             )}
-            <InfoRow icon={<MdBadge className="h-4 w-4" />}         label={t("apply.national_id")}                value={p.national_id || "—"} />
-            <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.info_passport")}      value={p.passport_number || "—"} />
             <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.gender")}            value={GENDER_LABELS[p.gender] ?? p.gender ?? "—"} />
             <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("beneficiaries.date_of_birth")}     value={fmtDate(p.date_of_birth)} />
             <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("beneficiaries.marital_status")}    value={MARITAL_LABELS[p.marital_status] ?? p.marital_status ?? "—"} />
@@ -272,17 +231,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             {p.background && (
               <div className="sm:col-span-2">
                 <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("apply.background")} value={p.background} />
-              </div>
-            )}
-            {p.id_document_type && (
-              <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("beneficiaries.id_doc_type_label")} value={ID_DOCUMENT_TYPE_LABELS[p.id_document_type] ?? p.id_document_type} />
-            )}
-            {p.id_document && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">{t("apply.id_document")}</span>
-                <StorageFileLink fileKey={p.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
-                  {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
-                </StorageFileLink>
               </div>
             )}
             <div className="flex items-center gap-2">
@@ -307,23 +255,11 @@ const MemberInfoSection = ({ profile, onSaved }) => {
             {formData.has_visa === "true" && (
               <>
                 <SelectField label={t("apply.visa_type")} field="visa_type" options={VISA_TYPE_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
-                <div className="sm:col-span-2">
-                  <StorageDocumentField
-                    label={t("beneficiaries.visa_document_label")}
-                    folder="beneficiaries/documents"
-                    currentUrl={currentVisaDocUrl}
-                    onUpload={(key) => updateFormData("visa_document", key)}
-                    onRemove={() => updateFormData("visa_document", "")}
-                  />
-                </div>
               </>
             )}
             {formData.has_visa === "false" && (
               <>
                 <SelectField label={t("apply.situation")} field="situation" options={SITUATION_OPTIONS_T} required={false} formData={formData} updateFormData={updateFormData} />
-                {formData.situation === "refugee" && (
-                  <InputField label={t("apply.unhcr")} field="unhcr_number" required={false} formData={formData} updateFormData={updateFormData} />
-                )}
               </>
             )}
             {formData.country_of_origin === "PS" && (
@@ -337,23 +273,10 @@ const MemberInfoSection = ({ profile, onSaved }) => {
               <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.visa_type")} value={VISA_TYPE_LABELS[p.visa_type] ?? p.visa_type ?? "—"} />
             )}
             {p.has_visa === false && (
-              <>
-                <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.situation")} value={SITUATION_LABELS[p.situation] ?? p.situation ?? "—"} />
-                {p.situation === "refugee" && (
-                  <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("apply.unhcr")} value={p.unhcr_number || "—"} />
-                )}
-              </>
+              <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("apply.situation")} value={SITUATION_LABELS[p.situation] ?? p.situation ?? "—"} />
             )}
             {p.country_of_origin === "PS" && (
               <InfoRow icon={<MdLocationOn className="h-4 w-4" />} label={t("apply.palestine_region")} value={PALESTINE_REGION_LABELS[p.palestine_region] ?? p.palestine_region ?? "—"} />
-            )}
-            {p.visa_document && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">{t("beneficiaries.visa_document_label")}</span>
-                <StorageFileLink fileKey={p.visa_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
-                  {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
-                </StorageFileLink>
-              </div>
             )}
           </div>
         )}
@@ -384,47 +307,16 @@ const MemberInfoSection = ({ profile, onSaved }) => {
         >
           {editMode ? (
             <>
-              <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={formData} updateFormData={updateFormData} />
-              <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                <InputField label={t("beneficiaries.spouse_name")}          field="spouse_name"        required={false} formData={formData} updateFormData={updateFormData} />
-                <InputField label={t("beneficiaries.spouse_name_ar_label")} field="spouse_name_arabic" required={false} placeholder={t("beneficiaries.spouse_name_ar_placeholder")} formData={formData} updateFormData={updateFormData} />
-              </div>
-              <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                <InputField label={t("beneficiaries.spouse_job")}         field="spouse_job"         required={false} formData={formData} updateFormData={updateFormData} />
-                <InputField label={t("beneficiaries.number_of_children")} field="number_of_children" type="number" required={false} formData={formData} updateFormData={updateFormData} />
-              </div>
+              <ToggleInput label={t("beneficiaries.family_in_malaysia")} field="family_in_malaysia" formData={formData} updateFormData={updateFormData}
+                onText={t("beneficiaries.info_yes")} offText={t("beneficiaries.info_no")} hint={null} />
+              <FamilyMembersEditor
+                members={formData.members ?? []}
+                onChange={(members) => updateFormData("members", members)}
+                folder="beneficiaries/documents"
+              />
             </>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_family_malaysia")} value={p.family_information.family_in_malaysia ? t("beneficiaries.info_yes") : t("beneficiaries.info_no")} />
-              {p.family_information.spouse_name && (
-                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name")}         value={p.family_information.spouse_name} />
-              )}
-              {p.family_information.spouse_name_ar && (
-                <InfoRow icon={<MdTranslate className="h-4 w-4" />} label={t("beneficiaries.info_spouse_name_ar")} value={p.family_information.spouse_name_ar} />
-              )}
-              {p.family_information.spouse_job && (
-                <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("beneficiaries.info_spouse_job")}   value={p.family_information.spouse_job} />
-              )}
-              <InfoRow icon={<MdFamilyRestroom className="h-4 w-4" />} label={t("beneficiaries.info_children_count")}  value={p.family_information.number_of_children ?? "—"} />
-
-              {p.family_information.children_information?.length > 0 && (
-                <div className="col-span-full mt-2">
-                  <p className="mb-2 text-xs font-semibold text-slate-500">{t("beneficiaries.section_children")}</p>
-                  <div className="flex flex-col gap-2">
-                    {p.family_information.children_information.map((child, i) => (
-                      <div key={child.id ?? i} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                        <p className="text-sm font-medium text-slate-900">{child.child_name || t("beneficiaries.child_n", { n: i + 1 })}</p>
-                        {child.child_name_ar && <p className="text-xs text-slate-400">{child.child_name_ar}</p>}
-                        {child.child_date_of_birth && (
-                          <p className="mt-1 text-xs text-slate-400">{t("profile.dob_prefix")} {fmtDate(child.child_date_of_birth)}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <FamilyMembersView family={p.family_information} />
           )}
         </SectionCard>
       )}
@@ -459,31 +351,14 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           title={t("beneficiaries.section_documents")}
           subtitle={t("profile.documents_sub")}
         >
-          <div className="flex flex-col gap-2">
-            {p.supporting_documents.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{doc.document_name || SUPPORTING_DOC_TYPE_LABELS[doc.document_type] || doc.document_type}</p>
-                  {doc.remarks && <p className="mt-0.5 text-xs text-slate-400">{doc.remarks}</p>}
-                </div>
-                {doc.document_file && (
-                  <StorageFileLink
-                    fileKey={doc.document_file}
-                    className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-green/50 hover:text-green"
-                  >
-                    <MdOpenInNew className="h-3.5 w-3.5" /> {t("beneficiaries.doc_view")}
-                  </StorageFileLink>
-                )}
-              </div>
-            ))}
-          </div>
+          <DocumentList documents={p.supporting_documents} />
         </SectionCard>
       )}
 
       {editMode && (
         <div className="mt-4 flex gap-3">
           <Button variant="ghost" text={t("common.cancel")} onClick={handleCancel} className="flex-1" />
-          <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty} className="flex-1" />
+          <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty || !membersValid} className="flex-1" />
         </div>
       )}
     </form>
