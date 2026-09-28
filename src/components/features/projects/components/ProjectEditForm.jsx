@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import useLayoutBase from "hooks/useLayoutBase";
 import { MdArrowBack, MdEdit, MdAssignment, MdImage } from "react-icons/md";
 import PageHeader from "components/ui/PageHeader";
-import { InputField, TextareaField, SelectField, ToggleInput, StorageCoverField, validate } from "components/form";
+import { InputField, TextareaField, SelectField, MultiSelect, ToggleInput, StorageCoverField, validate } from "components/form";
 import Button from "components/ui/buttons/Button";
 import FormHeader from "components/ui/form/FormHeader";
 import AlertBanner from "components/ui/AlertBanner";
@@ -12,6 +12,8 @@ import Loading from "components/loading/Loading";
 import { useGetProject, useUpdateProject } from "components/features/projects/hooks";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
 import { useGetCategories } from "components/features/categories/hooks";
+import { useGetClassifications } from "components/features/classifications/hooks";
+import useAuth from "components/features/auth/hooks/useAuth";
 import { useToast } from "components/ui/toast/ToastContext";
 
 const RULES = {
@@ -27,6 +29,9 @@ export default function ProjectEditForm() {
   const { project, execute: fetchProject, loading, error: loadError } = useGetProject();
   const { execute: updateProject, loading: saving, error: saveError }  = useUpdateProject();
   const { categories } = useGetCategories({ module: "projects" });
+  const { classifications } = useGetClassifications();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const { success, error: toastError } = useToast();
 
   const [form, setForm] = useState({
@@ -38,6 +43,7 @@ export default function ProjectEditForm() {
     description: "", description_ar: "",
     beneficiary_info: "", beneficiary_info_ar: "",
     target: "", start_date: "", end_date: "", is_published: false,
+    classification_ids: [], is_featured: false, milestones_visible: false,
   });
   const [initial, setInitial] = useState(null);
   const [errors, setErrors]   = useState({});
@@ -55,6 +61,11 @@ export default function ProjectEditForm() {
     { value: "on_hold",   label: t("projects.status_on_hold") },
     { value: "cancelled", label: t("projects.status_cancelled") },
   ];
+
+  const CLASSIFICATION_OPTIONS = classifications.map((c) => ({
+    value: c.id,
+    label: (c.name_ar && i18n.language === "ar") ? c.name_ar : c.name,
+  }));
 
   const CATEGORY_OPTIONS = [
     { value: "", label: t("projects.category_select") },
@@ -83,6 +94,9 @@ export default function ProjectEditForm() {
         start_date:         data.start_date  ? data.start_date.slice(0, 10)  : "",
         end_date:           data.end_date    ? data.end_date.slice(0, 10)    : "",
         is_published:       data.is_published ?? false,
+        classification_ids: (data.classifications ?? []).map((c) => c.id),
+        is_featured:        data.is_featured ?? false,
+        milestones_visible: data.milestones_visible ?? false,
       };
       setCoverKey(data.cover_image ?? null);
       setForm(snap);
@@ -126,6 +140,9 @@ export default function ProjectEditForm() {
         start_date:         form.start_date         || undefined,
         end_date:           form.end_date           || undefined,
         is_published:       form.is_published,
+        is_featured:        form.is_featured,
+        classification_ids: form.classification_ids,
+        ...(isAdmin ? { milestones_visible: form.milestones_visible } : {}),
         ...(form.cover_image !== null ? { cover_image: form.cover_image || null } : {}),
       };
       await updateProject(id, payload);
@@ -186,6 +203,9 @@ export default function ProjectEditForm() {
             <SelectField label={t("projects.status_label")} field="status" options={STATUS_OPTIONS}
               formData={form} errors={errors} updateFormData={set} />
           </div>
+          <MultiSelect label={t("projects.classifications_label")} field="classification_ids" options={CLASSIFICATION_OPTIONS}
+            required={false} formData={form} errors={errors} updateFormData={set} />
+          <p className="-mt-2 mb-4 text-xs text-slate-400">{t("projects.classifications_hint")}</p>
 
           {project?.slug && (
             <div className="mb-3 mt-1">
@@ -242,6 +262,12 @@ export default function ProjectEditForm() {
               required={false} formData={form} errors={errors} updateFormData={set} />
           </div>
           <ToggleInput label={t("projects.publish_toggle_edit")} field="is_published" formData={form} errors={errors} updateFormData={set} />
+          <ToggleInput label={t("projects.featured_toggle")} field="is_featured" formData={form} errors={errors} updateFormData={set}
+            onText={t("projects.featured_on")} offText={t("projects.featured_off")} hint={t("projects.featured_hint")} />
+          {isAdmin && (
+            <ToggleInput label={t("projects.milestones_visible_toggle")} field="milestones_visible" formData={form} errors={errors} updateFormData={set}
+              onText={t("projects.milestones_visible_on")} offText={t("projects.milestones_visible_off")} hint={t("projects.milestones_visible_hint")} />
+          )}
         </div>
 
         <div className="flex gap-3">

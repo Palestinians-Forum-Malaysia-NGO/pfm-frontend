@@ -1058,7 +1058,19 @@
     "toast_req_updated": "تم تحديث المتطلب",
     "toast_req_removed": "تمت إزالة المتطلب",
     "toast_req_save_failed": "تعذر حفظ المتطلب",
-    "toast_req_delete_failed": "تعذرت إزالة المتطلب"
+    "toast_req_delete_failed": "تعذرت إزالة المتطلب",
+    "classifications_label": "التصنيفات المستهدفة",
+    "classifications_hint": "لا يمكن التقديم إلا للمستفيدين ضمن أحد هذه التصنيفات. اتركه فارغاً للسماح للجميع.",
+    "classifications_none": "مفتوح لجميع المستفيدين",
+    "featured_toggle": "مميز",
+    "featured_on": "مميز",
+    "featured_off": "غير مميز",
+    "featured_hint": "المشاريع المميزة هي التي تظهر للزوار غير المسجلين.",
+    "featured_badge": "مميز",
+    "milestones_visible_toggle": "المراحل ظاهرة للموظفين والمستفيدين",
+    "milestones_visible_on": "ظاهرة",
+    "milestones_visible_off": "للمسؤولين فقط",
+    "milestones_visible_hint": "يرى المسؤولون المراحل دائماً."
   },
   "beneficiaries": {
     "title": "المستفيدون",

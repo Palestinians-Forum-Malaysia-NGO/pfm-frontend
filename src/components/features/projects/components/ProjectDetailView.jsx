@@ -6,7 +6,7 @@ import {
   MdArrowBack, MdEdit, MdDeleteOutline, MdAssignment,
   MdCalendarToday, MdPublic, MdPublicOff, MdPerson,
   MdCategory, MdInfoOutline, MdUpdate, MdAttachMoney,
-  MdTrendingUp, MdPeople, MdPersonAdd, MdClose,
+  MdTrendingUp, MdPeople, MdPersonAdd, MdClose, MdStar, MdFlag, MdShield,
 } from "react-icons/md";
 import Button from "components/ui/buttons/Button";
 import PageHeader from "components/ui/PageHeader";
@@ -188,6 +188,11 @@ export default function ProjectDetailView() {
                   <MdCategory className="h-3 w-3" /> {categoryName}
                 </span>
               )}
+              {project.is_featured && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
+                  <MdStar className="h-3 w-3" /> {t("projects.featured_badge")}
+                </span>
+              )}
             </div>
           </div>
           <Button
@@ -237,6 +242,12 @@ export default function ProjectDetailView() {
           <InfoRow icon={<MdCalendarToday className="h-4 w-4" />} label={t("projects.end_date_info")}     value={fmtDate(project.end_date)} />
           <InfoRow icon={<MdPerson className="h-4 w-4" />}        label={t("projects.created_by_info")}   value={project.created_by || "—"} />
           <InfoRow icon={<MdUpdate className="h-4 w-4" />}        label={t("projects.last_updated_info")} value={fmtDate(project.updated_at)} />
+          <InfoRow icon={<MdFlag className="h-4 w-4" />}          label={t("projects.milestones_visible_toggle")}
+            value={project.milestones_visible ? t("projects.milestones_visible_on") : t("projects.milestones_visible_off")} />
+          <InfoRow icon={<MdShield className="h-4 w-4" />}        label={t("projects.classifications_label")}
+            value={project.classifications?.length
+              ? project.classifications.map((c) => (isAr && c.name_ar) || c.name).join(", ")
+              : t("projects.classifications_none")} />
         </div>
       </div>
 

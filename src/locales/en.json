@@ -1058,7 +1058,19 @@
     "toast_req_updated": "Requirement updated",
     "toast_req_removed": "Requirement removed",
     "toast_req_save_failed": "Couldn't save the requirement",
-    "toast_req_delete_failed": "Couldn't remove the requirement"
+    "toast_req_delete_failed": "Couldn't remove the requirement",
+    "classifications_label": "Target Classifications",
+    "classifications_hint": "Only beneficiaries in one of these classifications can apply. Leave empty to allow everyone.",
+    "classifications_none": "Open to all beneficiaries",
+    "featured_toggle": "Featured",
+    "featured_on": "Featured",
+    "featured_off": "Not featured",
+    "featured_hint": "Featured projects are the ones shown to visitors who aren't signed in.",
+    "featured_badge": "Featured",
+    "milestones_visible_toggle": "Milestones visible to staff & beneficiaries",
+    "milestones_visible_on": "Visible",
+    "milestones_visible_off": "Admins only",
+    "milestones_visible_hint": "Admins always see milestones."
   },
   "beneficiaries": {
     "title": "Beneficiaries",
