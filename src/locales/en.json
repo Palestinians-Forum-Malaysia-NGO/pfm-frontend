@@ -1071,10 +1071,11 @@
     "featured_off": "Not featured",
     "featured_hint": "Featured projects are the ones shown to visitors who aren't signed in.",
     "featured_badge": "Featured",
-    "milestones_visible_toggle": "Milestones visible to staff & beneficiaries",
-    "milestones_visible_on": "Visible",
-    "milestones_visible_off": "Admins only",
-    "milestones_visible_hint": "Admins always see milestones."
+    "milestones_visible_toggle": "Progress & milestones visibility",
+    "milestones_visible_on": "Admins & assigned staff only",
+    "milestones_visible_off": "Everyone",
+    "milestones_visible_hint": "Who sees funding progress and milestones on the project page.",
+    "public_details_title": "Project Details"
   },
   "beneficiaries": {
     "title": "Beneficiaries",

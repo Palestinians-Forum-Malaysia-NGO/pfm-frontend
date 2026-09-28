@@ -124,6 +124,10 @@ export default function ProjectDetailView() {
   const clampedPct  = Math.min(100, Math.max(0, progressPct));
   const statusLabel = t(`projects.status_${project.status}`, { defaultValue: project.status });
   const isAr = i18n.language === "ar";
+  // milestones_visible = true → progress & milestones for admins and staff
+  // assigned to this project only (assigned_staff holds "Name (email)" labels).
+  const isAssigned = (project.assigned_staff ?? []).some((label) => user?.email && label.includes(`(${user.email})`));
+  const canSeeProgress = !project.milestones_visible || isAdmin || isAssigned;
   const title        = (isAr && project.title_ar)        || project.title;
   const categoryName = (isAr && project.category?.name_ar) || project.category?.name;
 
@@ -206,7 +210,7 @@ export default function ProjectDetailView() {
       </div>
 
       {/* ── Funding Stats ── */}
-      {(project.target || project.amount_raised || project.total_beneficiaries_helped) && (
+      {canSeeProgress && !!(project.target || project.amount_raised || project.total_beneficiaries_helped) && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdAttachMoney className="h-5 w-5" />} title={t("projects.funding_impact")} subtitle={t("projects.funding_impact_sub")} />
           {project.target && (
@@ -224,10 +228,10 @@ export default function ProjectDetailView() {
             {project.target && (
               <InfoRow icon={<MdAttachMoney className="h-4 w-4" />} label={t("projects.target_info")} value={fmtMYR(project.target)} />
             )}
-            {project.amount_raised && (
+            {project.amount_raised != null && (
               <InfoRow icon={<MdTrendingUp className="h-4 w-4" />} label={t("projects.raised_info")} value={fmtMYR(project.amount_raised)} />
             )}
-            {project.total_beneficiaries_helped && (
+            {project.total_beneficiaries_helped != null && (
               <InfoRow icon={<MdPeople className="h-4 w-4" />} label={t("projects.beneficiaries_info")} value={project.total_beneficiaries_helped} />
             )}
           </div>
@@ -325,7 +329,7 @@ export default function ProjectDetailView() {
       )}
 
       {/* ── Milestones ── */}
-      <MilestoneSection projectId={id} initialMilestones={project.milestones ?? []} />
+      {canSeeProgress && <MilestoneSection projectId={id} initialMilestones={project.milestones ?? []} />}
 
       {/* ── Documents applicants must submit ── */}
       <DocumentRequirementsSection projectId={id} />

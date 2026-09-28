@@ -1071,10 +1071,11 @@
     "featured_off": "غير مميز",
     "featured_hint": "المشاريع المميزة هي التي تظهر للزوار غير المسجلين.",
     "featured_badge": "مميز",
-    "milestones_visible_toggle": "المراحل ظاهرة للموظفين والمستفيدين",
-    "milestones_visible_on": "ظاهرة",
-    "milestones_visible_off": "للمسؤولين فقط",
-    "milestones_visible_hint": "يرى المسؤولون المراحل دائماً."
+    "milestones_visible_toggle": "ظهور التقدم والمراحل",
+    "milestones_visible_on": "المسؤولون والموظفون المكلّفون فقط",
+    "milestones_visible_off": "الجميع",
+    "milestones_visible_hint": "من يرى تقدم التمويل والمراحل في صفحة المشروع.",
+    "public_details_title": "تفاصيل المشروع"
   },
   "beneficiaries": {
     "title": "المستفيدون",

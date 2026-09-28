@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   MdArrowBack, MdAssignment, MdCalendarToday, MdCategory,
-  MdAttachMoney, MdTrendingUp, MdPeople, MdFlag,
+  MdPeople, MdFlag,
   MdRadioButtonUnchecked, MdCheck, MdCampaign, MdRateReview, MdLogin, MdPhotoLibrary,
 } from "react-icons/md";
 import { useGetProject, useGetProjects } from "components/features/projects/hooks";
@@ -32,12 +32,6 @@ const fmtDate = (d) =>
 
 const fmtMonthYear = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { month: "short", year: "numeric" }) : null;
-
-const fmtMYR = (val) => {
-  const n = parseFloat(val);
-  if (isNaN(n)) return null;
-  return `MYR ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-};
 
 export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
   const { t, i18n } = useTranslation();
@@ -80,7 +74,12 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
   const beneficiaryInfo  = (isAr && project.beneficiary_info_ar) || project.beneficiary_info;
   const categoryName     = (isAr && project.category?.name_ar)   || project.category?.name;
 
-  const progressPct = Math.min(100, Math.max(0, parseFloat(project.progress_percentage) || 0));
+  // milestones_visible = true → milestones are for admins and assigned staff
+  // only. The anonymous detail response omits the flag, so fall back to the
+  // project list; keep milestones hidden until the flag is known.
+  const milestonesVisible = project.milestones_visible
+    ?? allProjects.find((p) => p.slug === project.slug)?.milestones_visible;
+  const showMilestones = milestonesVisible === false;
   const moreProjects = allProjects
     .filter((p) => p.slug !== project.slug && p.status === "active")
     .slice(0, 3);
@@ -162,7 +161,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               )}
 
               {/* Milestones (read-only) */}
-              {project.milestones?.length > 0 && (
+              {showMilestones && project.milestones?.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-slate-900">
                     <MdFlag className="h-5 w-5 text-green" /> {t("projects.milestones_title")}
@@ -276,45 +275,14 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
             </div>
           </div>
 
-          {/* Right sidebar — funding stats */}
+          {/* Right sidebar — project dates & category (funding progress isn't shown publicly) */}
           <aside className="w-full lg:w-72 shrink-0">
             <div className="sticky top-6 overflow-hidden rounded-2xl border border-slate-100">
               <div className="h-1 w-full bg-green" />
               <div className="p-5">
-                <h3 className="mb-4 text-base font-bold text-slate-900">{t("projects.public_progress_title")}</h3>
+                <h3 className="mb-4 text-base font-bold text-slate-900">{t("projects.public_details_title")}</h3>
 
-                {project.target ? (
-                  <>
-                    <div className="mb-3">
-                      <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
-                        <span>{t("projects.public_funding_raised")}</span>
-                        <span className="font-bold text-green">{progressPct.toFixed(0)}%</span>
-                      </div>
-                      <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                        <div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${progressPct}%` }} />
-                      </div>
-                    </div>
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="text-xs text-slate-400 flex items-center gap-1"><MdTrendingUp className="h-3.5 w-3.5" /> {t("projects.public_raised")}</span>
-                      <span className="text-sm font-bold text-slate-900">{fmtMYR(project.amount_raised) ?? "—"}</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                      <span className="text-xs text-slate-400 flex items-center gap-1"><MdAttachMoney className="h-3.5 w-3.5" /> {t("projects.public_target")}</span>
-                      <span className="text-sm font-bold text-slate-900">{fmtMYR(project.target)}</span>
-                    </div>
-                  </>
-                ) : (
-                  <p className="mb-4 text-xs text-slate-400">{t("projects.public_funding_not_set")}</p>
-                )}
-
-                {project.total_beneficiaries_helped && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400 flex items-center gap-1"><MdPeople className="h-3.5 w-3.5" /> {t("projects.public_beneficiaries_helped")}</span>
-                    <span className="text-sm font-bold text-slate-900">{project.total_beneficiaries_helped}</span>
-                  </div>
-                )}
-
-                <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-400 space-y-1">
+                <div className="space-y-1 text-xs text-slate-400">
                   {project.start_date && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5" /> {t("projects.public_started_prefix")} {fmtDate(project.start_date)}</p>}
                   {project.end_date   && <p className="flex items-center gap-1"><MdCalendarToday className="h-3.5 w-3.5 text-slate-300" /> {t("projects.public_ends_prefix")} {fmtDate(project.end_date)}</p>}
                   {categoryName && <p className="flex items-center gap-1"><MdCategory className="h-3.5 w-3.5" /> {categoryName}</p>}
