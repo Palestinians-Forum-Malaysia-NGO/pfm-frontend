@@ -23,6 +23,7 @@ import ProjectBeneficiariesSection from "./ProjectBeneficiariesSection";
 import ProjectApplicationsSection from "./ProjectApplicationsSection";
 import UpdatesSection from "./UpdatesSection";
 import GallerySection from "./GallerySection";
+import DocumentRequirementsSection from "./DocumentRequirementsSection";
 import {
   useGetProject, useDeleteProject, usePublishProject, useUnpublishProject,
   useAssignStaff, useUnassignStaff,
@@ -314,6 +315,9 @@ export default function ProjectDetailView() {
 
       {/* ── Milestones ── */}
       <MilestoneSection projectId={id} initialMilestones={project.milestones ?? []} />
+
+      {/* ── Documents applicants must submit ── */}
+      <DocumentRequirementsSection projectId={id} />
 
       {/* ── Beneficiaries Helped (aggregate across milestones) ── */}
       <ProjectBeneficiariesSection projectId={id} />

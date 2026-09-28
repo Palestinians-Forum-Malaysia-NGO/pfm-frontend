@@ -56,7 +56,7 @@ const BeneficiaryDashboard = () => {
   // lists recent status changes rather than claiming true time-based recency.
   const notifications = useMemo(() => (
     myApplications
-      .filter((a) => a.status !== "pending")
+      .filter((a) => a.status === "approved" || a.status === "rejected")
       .map((a) => ({
         id: a.id,
         message: t("beneficiary_dashboard.notif_application_status", {

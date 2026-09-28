@@ -27,6 +27,11 @@ export const projectService = {
   async createGalleryPhoto(projectId, payload)     { const { data } = await api.post(`/projects/${projectId}/gallery`, payload); return data; },
   async updateGalleryPhoto(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/gallery/${id}`, payload); return data; },
   async deleteGalleryPhoto(projectId, id)          { await api.delete(`/projects/${projectId}/gallery/${id}`); },
+  // Document requirements applicants must submit
+  async getDocumentRequirements(projectId)              { const { data } = await api.get(`/projects/${projectId}/document-requirements`); return data; },
+  async createDocumentRequirement(projectId, payload)   { const { data } = await api.post(`/projects/${projectId}/document-requirements`, payload); return data; },
+  async updateDocumentRequirement(projectId, id, payload) { const { data } = await api.patch(`/projects/${projectId}/document-requirements/${id}`, payload); return data; },
+  async deleteDocumentRequirement(projectId, id)        { await api.delete(`/projects/${projectId}/document-requirements/${id}`); },
   // Project beneficiaries (aggregate across all milestones)
   async getProjectBeneficiaries(projectId, params = {}) { const { data } = await api.get(`/projects/${projectId}/beneficiaries`, { params }); return data; },
   // Milestone beneficiaries

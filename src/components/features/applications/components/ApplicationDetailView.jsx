@@ -20,6 +20,7 @@ import { APPLICATION_STATUS_BADGE } from "components/features/applications/const
 import {
   useGetApplication, useDeleteApplication,
   useApproveApplication, useRejectApplication, useUpdateApplication,
+  useGetApplicationDocuments,
 } from "components/features/applications/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
@@ -40,6 +41,7 @@ export default function ApplicationDetailView() {
   const { execute: approveApplication, loading: approveLoading } = useApproveApplication();
   const { execute: rejectApplication, loading: rejectLoading } = useRejectApplication();
   const { execute: updateApplication, loading: noteLoading } = useUpdateApplication();
+  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetApplicationDocuments();
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -50,6 +52,7 @@ export default function ApplicationDetailView() {
   const [noteDraft, setNoteDraft] = useState("");
 
   useEffect(() => { fetchApplication(id); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchDocuments(id); }, [id, fetchDocuments]);
 
   const handleDelete = async () => {
     try {
@@ -209,6 +212,39 @@ export default function ApplicationDetailView() {
           </div>
         </div>
       )}
+
+      {/* ── Documents submitted for the project's requirements ── */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <FormHeader icon={<MdFolderSpecial className="h-5 w-5" />} title={t("applications.section_documents")} subtitle={t("applications.section_documents_sub")} />
+        {status === "draft" && (
+          <p className="mb-3 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">{t("applications.draft_admin_hint")}</p>
+        )}
+        {docsLoading ? (
+          <p className="text-sm text-slate-400">{t("applications.loading")}</p>
+        ) : documents.length === 0 ? (
+          <p className="text-sm text-slate-400">{t("applications.no_documents")}</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {documents.map((doc) => (
+              <div key={doc.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {doc.requirement_name}
+                    {doc.requirement_is_required && <span className="ms-1 text-red-500">*</span>}
+                  </p>
+                  {doc.requirement_type && <p className="text-xs text-slate-400">{doc.requirement_type}</p>}
+                  {doc.remarks && <p className="mt-0.5 text-xs text-slate-500">{doc.remarks}</p>}
+                </div>
+                {doc.file && (
+                  <StorageFileLink fileKey={doc.file} className="shrink-0 text-xs font-medium text-green hover:underline">
+                    {t("beneficiaries.doc_view")}
+                  </StorageFileLink>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* ── Application details ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">

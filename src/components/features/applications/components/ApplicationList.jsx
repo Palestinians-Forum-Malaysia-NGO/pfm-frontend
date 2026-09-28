@@ -18,7 +18,7 @@ import DataTable      from "components/ui/DataTable";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
 
-const VALID_STATUSES = ["pending", "approved", "rejected"];
+const VALID_STATUSES = ["draft", "pending", "approved", "rejected"];
 
 export default function ApplicationList() {
   const { t } = useTranslation();

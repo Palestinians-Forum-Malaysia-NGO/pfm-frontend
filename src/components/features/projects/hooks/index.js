@@ -23,3 +23,7 @@ export { default as useUpdateMilestoneBeneficiary } from "./useUpdateMilestoneBe
 export { default as useDeleteMilestoneBeneficiary } from "./useDeleteMilestoneBeneficiary";
 export { default as useProjectList       } from "./useProjectList";
 export { default as useExportProjects    } from "./useExportProjects";
+export { default as useGetDocumentRequirements   } from "./useGetDocumentRequirements";
+export { default as useCreateDocumentRequirement } from "./useCreateDocumentRequirement";
+export { default as useUpdateDocumentRequirement } from "./useUpdateDocumentRequirement";
+export { default as useDeleteDocumentRequirement } from "./useDeleteDocumentRequirement";
