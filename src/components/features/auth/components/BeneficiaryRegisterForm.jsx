@@ -175,8 +175,9 @@ const AccountStep = ({ data, onChange, onNext, serverErrors, onClearServerError 
    Step 2 — Documents & Background
 ───────────────────────────────────────────────── */
 const DOCUMENTS_RULES = {
-  national_id: [{ required: true }],
-  background:  [{ required: true }],
+  national_id:      [{ required: true }, { maxLength: 20 }],
+  background:       [{ required: true }],
+  id_document_type: [{ required: true }],
 };
 
 const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, serverErrors, onClearServerError }) => {
@@ -187,9 +188,8 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, s
   const allErrors = { ...errors, ...serverErrors, id_document: idDocError };
 
   const ID_DOCUMENT_TYPE_OPTIONS = [
-    { value: "passport",    label: t("beneficiaries.id_doc_type_passport") },
-    { value: "national_id", label: t("beneficiaries.id_doc_type_national_id") },
-    { value: "other",       label: t("beneficiaries.id_doc_type_other") },
+    { value: "passport", label: t("beneficiaries.id_doc_type_passport") },
+    { value: "unhcr",    label: t("beneficiaries.id_doc_type_unhcr") },
   ];
 
   const canProceed =
@@ -230,11 +230,13 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, s
       )}
 
       <div className="flex flex-col gap-3">
-        <InputField label={t("apply.national_id")} field="national_id" placeholder="e.g. 900101-14-5678"
+        <InputField label={t("apply.national_id")} field="national_id" placeholder={t("apply.national_id_placeholder")}
           formData={data} errors={allErrors} updateFormData={set} rules={DOCUMENTS_RULES.national_id} />
         <TextareaField label={t("apply.background")} field="background"
           placeholder={t("apply.background_placeholder")}
           formData={data} errors={allErrors} updateFormData={set} rows={3} rules={DOCUMENTS_RULES.background} />
+        <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
+          formData={data} errors={allErrors} updateFormData={set} rules={DOCUMENTS_RULES.id_document_type} />
         <StorageDocumentField
           label={t("apply.id_document")}
           publicEndpoint="register"
@@ -245,8 +247,6 @@ const DocumentsStep = ({ data, onChange, idDoc, onIdDocChange, onBack, onNext, s
           currentName={idDoc ? t("common.uploaded_file") : undefined}
           field="id_document" errors={allErrors}
         />
-        <SelectField label={t("beneficiaries.id_doc_type_label")} field="id_document_type" options={ID_DOCUMENT_TYPE_OPTIONS}
-          required={false} formData={data} errors={allErrors} updateFormData={set} />
       </div>
 
       <div className="mt-6 flex gap-3">
@@ -342,7 +342,7 @@ const FamilyStep = ({ data, onChange, children, onChildrenChange, onBack, onNext
 ───────────────────────────────────────────────── */
 const REQUIRED = [{ required: true }];
 
-const validateStatusStep = (visaData) => {
+const validateStatusStep = (visaData, visaDoc) => {
   const errors = {};
 
   const hasVisaErr = validate(visaData.has_visa, REQUIRED);
@@ -351,6 +351,8 @@ const validateStatusStep = (visaData) => {
   if (visaData.has_visa === "true") {
     const err = validate(visaData.visa_type, REQUIRED);
     if (err) errors.visa_type = err;
+    const docErr = validate(visaDoc, REQUIRED);
+    if (docErr) errors.visa_document = docErr;
   } else if (visaData.has_visa === "false") {
     const err = validate(visaData.situation, REQUIRED);
     if (err) errors.situation = err;
@@ -412,12 +414,12 @@ const StatusStep = ({ visaData, onVisaChange, visaDoc, onVisaDocChange, onBack, 
     { value: "refugee_outside", label: t("beneficiaries.region_refugee_outside") },
   ];
 
-  const liveErrors  = validateStatusStep(visaData);
+  const liveErrors  = validateStatusStep(visaData, visaDoc);
   const termsMissing = !visaData.terms_accepted;
   const canSubmit   = Object.keys(liveErrors).length === 0 && !termsMissing;
 
   const handleSubmitClick = () => {
-    const nextErrors = validateStatusStep(visaData);
+    const nextErrors = validateStatusStep(visaData, visaDoc);
     if (termsMissing) nextErrors.terms_accepted = t("validation.required");
     if (Object.keys(nextErrors).length) {
       setVisaErrors(nextErrors);
@@ -457,9 +459,11 @@ const StatusStep = ({ visaData, onVisaChange, visaDoc, onVisaDocChange, onBack, 
                 label={t("beneficiaries.visa_document_label")}
                 publicEndpoint="register"
                 accept=".pdf,.jpg,.jpeg,.png"
-                onUpload={(key) => onVisaDocChange(key)}
+                required
+                onUpload={(key) => { onVisaDocChange(key); setVisaErrors((p) => ({ ...p, visa_document: null })); }}
                 onRemove={() => onVisaDocChange(null)}
                 currentName={visaDoc ? t("common.uploaded_file") : undefined}
+                field="visa_document" errors={visaErrors}
               />
             </>
           )}
@@ -620,7 +624,7 @@ export default function BeneficiaryRegisterForm() {
   };
 
   const [account,  setAccount]  = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
-  const [documents, setDocuments] = useState({ background: "", national_id: "", id_document_type: "" });
+  const [documents, setDocuments] = useState({ background: "", national_id: "", id_document_type: "passport" });
   const [idDoc, setIdDoc] = useState(null);
   const [visaDoc, setVisaDoc] = useState(null);
   const [family, setFamily] = useState({

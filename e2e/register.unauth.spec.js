@@ -33,7 +33,7 @@ test("beneficiary completes the registration wizard through to the OTP step", as
   // ── Step 3: Documents ────────────────────────────────────────────
   // national_id must be unique too — a fixed value only works once.
   const uniqueSuffix = String(Date.now()).slice(-4);
-  await page.getByPlaceholder("e.g. 900101-14-5678").fill(`990101-14-${uniqueSuffix}`);
+  await page.getByPlaceholder("e.g. A12345678 or MYS/2023/12345").fill(`990101-14-${uniqueSuffix}`);
   await page.getByPlaceholder("Brief background about your situation…").fill(
     "E2E test registration — background info for automated testing."
   );
