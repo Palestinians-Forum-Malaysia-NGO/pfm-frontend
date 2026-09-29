@@ -243,7 +243,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
               {/* Apply for assistance — beneficiaries only */}
               {isBeneficiary && (
                 <div className="mb-12">
-                  <ProjectApplySection projectId={project.id} requirements={project.document_requirements ?? []} />
+                  <ProjectApplySection projectId={project.id} slug={project.slug} />
                 </div>
               )}
 

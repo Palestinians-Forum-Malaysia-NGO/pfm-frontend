@@ -9,6 +9,7 @@ import { ROUTE_KEY } from "components/sidebar/components/Links";
 import PageTransition from "components/ui/PageTransition";
 import BeneficiaryEventDetail from "views/beneficiary/events/EventDetail";
 import BeneficiaryProjectDetail from "views/beneficiary/projects/ProjectDetail";
+import BeneficiaryProjectApply from "views/beneficiary/projects/Apply";
 import BeneficiaryOpportunityDetail from "views/beneficiary/opportunities/OpportunityDetail";
 
 export default function BeneficiaryLayout() {
@@ -70,6 +71,7 @@ export default function BeneficiaryLayout() {
               {getRoutes()}
               <Route path="/events/:slug" element={<BeneficiaryEventDetail />} />
               <Route path="/projects/:slug" element={<BeneficiaryProjectDetail />} />
+              <Route path="/projects/:slug/apply" element={<BeneficiaryProjectApply />} />
               <Route path="/opportunities/:id" element={<BeneficiaryOpportunityDetail />} />
               <Route path="/" element={<Navigate to="/beneficiary/default" replace />} />
             </Routes>
