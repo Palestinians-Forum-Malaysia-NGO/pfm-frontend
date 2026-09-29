@@ -301,7 +301,7 @@
     "resend_code": "إعادة إرسال الرمز",
     "sending": "جاري الإرسال...",
     "change_title": "تغيير كلمة المرور",
-    "change_subtitle": "حدّث كلمة مرور حسابك. ستحتاج إلى كلمة مرورك الحالية.",
+    "change_subtitle": "أدخل كلمة المرور الحالية وكلمة مرور جديدة.",
     "current_password": "كلمة المرور الحالية",
     "current_password_placeholder": "أدخل كلمة المرور الحالية",
     "password_placeholder": "أدخل كلمة المرور",

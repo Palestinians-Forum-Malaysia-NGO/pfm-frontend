@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Dropdown from "components/dropdown";
@@ -7,13 +7,9 @@ import { MdNotificationsNone } from "react-icons/md";
 import { AuthContext } from "components/features/auth/context/AuthContext";
 import LanguageSwitcher from "components/navbar/LanguageSwitcher";
 import StorageImage from "components/ui/StorageImage";
+import ChangePasswordModal from "components/features/auth/components/ChangePasswordModal";
+import { getRoleProfile } from "components/features/auth/utils";
 
-const ROLE_PROFILE = {
-  admin:       "/admin/profile",
-  staff:       "/staff/profile",
-  member:      "/member/profile",
-  beneficiary: "/beneficiary/profile",
-};
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase() || "?";
@@ -22,7 +18,8 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
   const { t } = useTranslation();
   const { user, handleLogout } = useContext(AuthContext);
 
-  const profilePath = ROLE_PROFILE[user?.role] ?? "/admin/profile";
+  const profilePath = getRoleProfile(user?.role);
+  const [changeOpen, setChangeOpen] = useState(false);
   const initials    = getInitials(user?.full_name);
 
   return (
@@ -108,12 +105,13 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
                 >
                   {t("navbar.profile_settings")}
                 </Link>
-                <Link
-                  to="/auth/change-password"
-                  className="rounded-lg px-3 py-2 text-sm text-navy-700 transition hover:bg-gray-50"
+                <button
+                  type="button"
+                  onClick={() => setChangeOpen(true)}
+                  className="rounded-lg px-3 py-2 text-left text-sm text-navy-700 transition hover:bg-gray-50"
                 >
                   {t("navbar.change_password")}
-                </Link>
+                </button>
                 <div className="my-1 h-px bg-gray-100" />
                 <button
                   onClick={handleLogout}
@@ -126,6 +124,7 @@ const Navbar = ({ onOpenSidenav, brandText }) => {
           }
         />
       </div>
+      <ChangePasswordModal open={changeOpen} onClose={() => setChangeOpen(false)} />
     </header>
   );
 };

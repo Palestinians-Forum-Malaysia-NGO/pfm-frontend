@@ -22,6 +22,15 @@ export const isTokenStored = () => !!localStorage.getItem("access");
 /** Returns the home route for a given role */
 export const getRoleHome = (role) => ROLE_HOME[role] ?? "/auth/sign-in";
 
+const ROLE_PROFILE = {
+  admin:       "/admin/profile",
+  staff:       "/staff/profile",
+  beneficiary: "/beneficiary/profile",
+};
+
+/** Returns the profile page for a given role */
+export const getRoleProfile = (role) => ROLE_PROFILE[role] ?? "/admin/profile";
+
 /** Returns true if the user's role matches the required role */
 export const hasRole = (user, role) => user?.role === role;
 

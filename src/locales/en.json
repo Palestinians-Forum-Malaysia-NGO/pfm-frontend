@@ -301,7 +301,7 @@
     "resend_code": "Resend code",
     "sending": "Sending...",
     "change_title": "Change password",
-    "change_subtitle": "Update your account password. You'll need your current password.",
+    "change_subtitle": "Enter your current password and a new one.",
     "current_password": "Current Password",
     "current_password_placeholder": "Enter current password",
     "password_placeholder": "Enter your password",
