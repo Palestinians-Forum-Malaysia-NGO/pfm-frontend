@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdArrowBack, MdAdd, MdFactCheck } from "react-icons/md";
@@ -10,7 +10,7 @@ import FormHeader   from "components/ui/form/FormHeader";
 import AlertBanner  from "components/ui/AlertBanner";
 import Loading      from "components/loading/Loading";
 import { useCreateApplication } from "components/features/applications/hooks";
-import { useGetProjects } from "components/features/projects/hooks";
+import { useGetProjects, useGetProject } from "components/features/projects/hooks";
 import { useGetBeneficiaries } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 
@@ -21,22 +21,55 @@ const RULES = {
 
 const EMPTY = { project: "", beneficiary: "" };
 
+const idsOf = (classifications) => (classifications ?? []).map((c) => c.id ?? c);
+
 export default function ApplicationCreateForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const base = useLayoutBase();
   const { execute: createApplication, loading, error } = useCreateApplication();
   const { success, error: toastError } = useToast();
   const { projects, loading: projectsLoading } = useGetProjects();
   const { beneficiaries, loading: beneficiariesLoading } = useGetBeneficiaries();
+  const { project, execute: fetchProject, loading: projectLoading } = useGetProject();
 
   const [formData, setFormData] = useState(EMPTY);
   const [errors, setErrors]     = useState({});
 
-  const updateFormData = (field, value) => setFormData((p) => ({ ...p, [field]: value }));
+  // The backend rejects an application when the project has target
+  // classifications and the beneficiary is in none of them — so once a project
+  // is picked, only offer beneficiaries who can actually apply to it.
+  const selectedProject = project?.id === formData.project ? project : null;
+  const targetIds = useMemo(() => idsOf(selectedProject?.classifications), [selectedProject]);
+  const eligible = useMemo(() => (
+    targetIds.length === 0
+      ? beneficiaries
+      : beneficiaries.filter((b) => idsOf(b.classifications).some((id) => targetIds.includes(id)))
+  ), [beneficiaries, targetIds]);
+
+  const updateFormData = (field, value) => {
+    setFormData((p) => ({ ...p, [field]: value }));
+    if (field === "project" && value) {
+      fetchProject(value)
+        .then((proj) => {
+          const ids = idsOf(proj?.classifications);
+          if (!ids.length) return;
+          // Drop a previously picked beneficiary the new project doesn't accept.
+          setFormData((p) => {
+            const b = beneficiaries.find((x) => x.id === p.beneficiary);
+            return b && !idsOf(b.classifications).some((id) => ids.includes(id)) ? { ...p, beneficiary: "" } : p;
+          });
+        })
+        .catch(() => {}); // surfaced via the create call's 400 if it matters
+    }
+  };
 
   const projectOptions = projects.map((p) => ({ value: p.id, label: p.title }));
-  const beneficiaryOptions = beneficiaries.map((b) => ({ value: b.id, label: `${b.user?.full_name} (${b.user?.email})` }));
+  const beneficiaryOptions = eligible.map((b) => ({ value: b.id, label: `${b.user?.full_name} (${b.user?.email})` }));
+  const targetNames = (selectedProject?.classifications ?? [])
+    .map((c) => (i18n.language === "ar" && c.name_ar) || c.name)
+    .filter(Boolean)
+    .join(", ");
 
   const canSubmit = !Object.entries(RULES).some(([field, rules]) => !!validate(formData[field], rules));
 
@@ -94,6 +127,13 @@ export default function ApplicationCreateForm() {
               formData={formData} errors={errors} updateFormData={updateFormData} rules={RULES.beneficiary}
             />
           </div>
+          {formData.project && !projectLoading && targetIds.length > 0 && (
+            <p className={`mt-2 text-xs ${eligible.length ? "text-slate-500" : "text-red-500"}`}>
+              {eligible.length
+                ? t("applications.eligible_hint", { classifications: targetNames })
+                : t("applications.no_eligible", { classifications: targetNames })}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-3 p-6">

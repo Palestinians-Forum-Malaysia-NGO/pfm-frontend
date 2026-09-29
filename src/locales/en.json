@@ -2153,6 +2153,8 @@
     "cancel_btn": "Cancel"
   },
   "applications": {
+    "eligible_hint": "This project is limited to: {{classifications}}. Only beneficiaries in one of these classifications are listed.",
+    "no_eligible": "No beneficiaries are in this project's classifications ({{classifications}}).",
     "title": "Applications",
     "subtitle": "Beneficiary applications to projects",
     "total": "Total",

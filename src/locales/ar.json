@@ -2153,6 +2153,8 @@
     "cancel_btn": "إلغاء"
   },
   "applications": {
+    "eligible_hint": "هذا المشروع مخصص لـ: {{classifications}}. تظهر فقط أسماء المستفيدين ضمن أحد هذه التصنيفات.",
+    "no_eligible": "لا يوجد مستفيدون ضمن تصنيفات هذا المشروع ({{classifications}}).",
     "title": "الطلبات",
     "subtitle": "طلبات المستفيدين للمشاريع",
     "total": "الإجمالي",
