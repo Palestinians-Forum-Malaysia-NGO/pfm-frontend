@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MdEdit, MdPhone, MdSecurity, MdPerson, MdAccountBalance, MdAttachMoney,
-  MdBusiness, MdWork, MdLocationCity, MdCardTravel, MdBadge, MdOpenInNew,
+  MdBusiness, MdWork, MdLocationCity, MdCardTravel, MdBadge, MdOpenInNew, MdInsertDriveFile,
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
@@ -397,10 +397,8 @@ const EditProfileSection = ({ profile, onSaved }) => {
                   <InfoRow icon={<MdBadge className="h-4 w-4" />} label={t("staff.id_doc_type_label")} value={ID_DOCUMENT_TYPE_LABELS[adminProfile.id_document_type] ?? adminProfile.id_document_type} />
                 )}
                 {adminProfile.id_document && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">{t("staff.id_document")}</span>
-                    <StorageFileActions fileKey={adminProfile.id_document} name={t("staff.id_document")} ownerName={profile.full_name} />
-                  </div>
+                  <InfoRow icon={<MdInsertDriveFile className="h-4 w-4" />} label={t("staff.id_document")}
+                    value={<StorageFileActions fileKey={adminProfile.id_document} name={t("staff.id_document")} ownerName={profile.full_name} />} />
                 )}
                 <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.has_visa")} value={adminProfile.has_visa ? t("common.enabled") : t("common.disabled")} />
                 {adminProfile.has_visa && (
@@ -413,10 +411,8 @@ const EditProfileSection = ({ profile, onSaved }) => {
                       <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.visa_expiry_date")} value={adminProfile.visa_expiry_date.slice(0, 10)} />
                     )}
                     {adminProfile.visa_document && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400">{t("staff.visa_document_label")}</span>
-                        <StorageFileActions fileKey={adminProfile.visa_document} name={t("staff.visa_document_label")} ownerName={profile.full_name} />
-                      </div>
+                      <InfoRow icon={<MdInsertDriveFile className="h-4 w-4" />} label={t("staff.visa_document_label")}
+                        value={<StorageFileActions fileKey={adminProfile.visa_document} name={t("staff.visa_document_label")} ownerName={profile.full_name} />} />
                     )}
                   </>
                 )}

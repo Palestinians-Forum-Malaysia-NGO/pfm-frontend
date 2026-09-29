@@ -2404,12 +2404,7 @@
     "toast_profile_update_failed": "فشل تحديث الملف الشخصي",
     "saving_photo": "جارٍ حفظ الصورة…",
     "toast_photo_updated": "تم تحديث الصورة",
-    "toast_photo_update_failed": "فشل تحديث الصورة",
-    "security_title": "الأمان",
-    "security_sub": "إدارة كلمة المرور والمصادقة",
-    "password_title": "كلمة المرور",
-    "password_sub": "تغيير كلمة مرور حسابك",
-    "change_btn": "تغيير"
+    "toast_photo_update_failed": "فشل تحديث الصورة"
   },
   "navbar": {
     "notifications": "الإشعارات",

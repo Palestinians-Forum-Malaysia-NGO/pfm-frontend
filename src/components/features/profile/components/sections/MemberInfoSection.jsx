@@ -2,25 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   MdPerson, MdLocationOn, MdCalendarToday, MdTranslate,
-  MdFamilyRestroom, MdAccountBalance,
-  MdCategory, MdEdit, MdCardTravel,
+  MdFamilyRestroom, MdAccountBalance, MdFolder,
+  MdCategory, MdEdit, MdCardTravel, MdVerifiedUser,
 } from "react-icons/md";
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
 import { InputField, SelectField, ToggleInput, TextareaField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
-import {
-  useGetStates, useGetBeneficiaryDocuments, useCreateBeneficiaryDocument,
-  useUpdateBeneficiaryDocument, useDeleteBeneficiaryDocument,
-} from "components/features/beneficiaries/hooks";
-import DocumentManagerSection from "components/ui/DocumentManagerSection";
+import { useGetStates } from "components/features/beneficiaries/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import { COUNTRY_NAME_BY_CODE, COUNTRY_OPTIONS } from "components/features/beneficiaries/constants/countries";
 import FamilyMembersEditor from "components/features/beneficiaries/components/FamilyMembersEditor";
-import FamilyMembersView from "components/features/beneficiaries/components/FamilyMembersView";
+import FamilyMembersView, { DocumentList } from "components/features/beneficiaries/components/FamilyMembersView";
 import {
-  memberFromApi, memberProblems, toMemberPayload, allowedDocTypes,
+  memberFromApi, memberProblems, toMemberPayload,
 } from "components/features/beneficiaries/constants/family";
 
 const STATUS_BADGE   = {
@@ -76,25 +72,6 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   const [snapshot, setSnapshot] = useState(null);
 
   const p = profile?.profile;
-
-  // The beneficiary's own supporting documents — managed on
-  // /beneficiaries/<own id>/documents/, which a beneficiary may use for
-  // their own profile only.
-  const { documents, execute: fetchDocuments, loading: docsLoading } = useGetBeneficiaryDocuments();
-  const { execute: createDocument } = useCreateBeneficiaryDocument();
-  const { execute: updateDocument } = useUpdateBeneficiaryDocument();
-  const { execute: deleteDocument } = useDeleteBeneficiaryDocument();
-  useEffect(() => { if (p?.id) fetchDocuments(p.id); }, [p?.id, fetchDocuments]);
-
-  const docAction = (fn, okKey, failKey) => async (...args) => {
-    try {
-      await fn(p.id, ...args);
-      success(t(okKey));
-      fetchDocuments(p.id);
-    } catch (err) {
-      toastError(t(failKey), err?.message);
-    }
-  };
 
   useEffect(() => {
     if (!profile) return;
@@ -218,8 +195,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
   );
 
   return (
-    <>
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* ── Personal Info ── */}
       <SectionCard
         icon={<MdPerson className="h-5 w-5" />}
@@ -259,12 +235,12 @@ const MemberInfoSection = ({ profile, onSaved }) => {
                 <InfoRow icon={<MdPerson className="h-4 w-4" />} label={t("apply.background")} value={p.background} />
               </div>
             )}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">{t("beneficiaries.account_status_label")}</span>
-              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_BADGE[p.account_status] ?? "bg-slate-100 text-slate-500"}`}>
-                {ACCOUNT_STATUS_LABELS[p.account_status] ?? p.account_status ?? "—"}
-              </span>
-            </div>
+            <InfoRow icon={<MdVerifiedUser className="h-4 w-4" />} label={t("beneficiaries.account_status_label")}
+              value={
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_BADGE[p.account_status] ?? "bg-slate-100 text-slate-500"}`}>
+                  {ACCOUNT_STATUS_LABELS[p.account_status] ?? p.account_status ?? "—"}
+                </span>
+              } />
           </div>
         )}
       </SectionCard>
@@ -342,7 +318,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
               />
             </>
           ) : (
-            <FamilyMembersView family={p.family_information} beneficiaryName={profile.full_name} />
+            <FamilyMembersView family={p.family_information} beneficiaryName={profile.full_name} actionsVariant="prominent" />
           )}
         </SectionCard>
       )}
@@ -370,30 +346,22 @@ const MemberInfoSection = ({ profile, onSaved }) => {
         </SectionCard>
       )}
 
+      {/* ── Supporting Documents (read-only — staff manage them) ── */}
+      <SectionCard
+        icon={<MdFolder className="h-5 w-5" />}
+        title={t("beneficiaries.section_documents")}
+        subtitle={t("profile.documents_sub")}
+      >
+        <DocumentList documents={p.supporting_documents ?? []} ownerName={profile.full_name} actionsVariant="prominent" />
+      </SectionCard>
+
       {editMode && (
-        <div className="mt-4 flex gap-3">
+        <div className="flex gap-3">
           <Button variant="ghost" text={t("common.cancel")} onClick={handleCancel} className="flex-1" />
           <Button type="submit" variant="primary" text={t("profile.save_changes")} loading={saving} disabled={!isDirty || !membersValid} className="flex-1" />
         </div>
       )}
     </form>
-
-    {/* ── Supporting Documents — outside the profile <form>: the manager has
-        its own add form, and forms can't be nested ── */}
-    <DocumentManagerSection
-      typeOptions={allowedDocTypes(p.has_visa == null ? "" : String(p.has_visa), p.situation)
-        .map((v) => ({ value: v, label: t(`beneficiaries.doc_type_${v}`) }))}
-      typeRequired
-      withNumber
-      ownerName={profile.full_name}
-      documents={documents}
-      loading={docsLoading}
-      folder="beneficiaries/documents"
-      onAdd={docAction(createDocument, "documents.toast_added", "documents.toast_add_failed")}
-      onUpdate={docAction(updateDocument, "documents.toast_saved", "documents.toast_save_failed")}
-      onDelete={docAction(deleteDocument, "documents.toast_deleted", "documents.toast_delete_failed")}
-    />
-    </>
   );
 };
 

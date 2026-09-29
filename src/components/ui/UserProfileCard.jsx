@@ -21,7 +21,9 @@ const getInitials = (name = "") =>
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }) : "—";
 
-const UserProfileCard = ({ user }) => {
+// hideBanking — the beneficiary profile shows (and edits) banking in its own
+// section, so the card leaves it out there instead of showing it twice.
+const UserProfileCard = ({ user, hideBanking = false }) => {
   const { t } = useTranslation();
 
   const ROLE_LABELS = {
@@ -117,7 +119,7 @@ const UserProfileCard = ({ user }) => {
       </div>
 
       {/* ── Banking Information ── */}
-      {hasBanking && (
+      {hasBanking && !hideBanking && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdAccountBalance className="h-5 w-5" />} title={t("users.banking_info")} subtitle={t("users.info_banking_sub")} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

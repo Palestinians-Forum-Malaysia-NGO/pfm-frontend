@@ -2404,12 +2404,7 @@
     "toast_profile_update_failed": "Failed to update profile",
     "saving_photo": "Saving photo…",
     "toast_photo_updated": "Photo updated",
-    "toast_photo_update_failed": "Failed to update photo",
-    "security_title": "Security",
-    "security_sub": "Manage your password and authentication",
-    "password_title": "Password",
-    "password_sub": "Change your account password",
-    "change_btn": "Change"
+    "toast_photo_update_failed": "Failed to update photo"
   },
   "navbar": {
     "notifications": "Notifications",

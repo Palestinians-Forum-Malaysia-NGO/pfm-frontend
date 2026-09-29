@@ -6,7 +6,6 @@ import AlertBanner from "components/ui/AlertBanner";
 import Loading from "components/loading/Loading";
 import UserProfileCard from "components/ui/UserProfileCard";
 import EditProfileSection from "./sections/EditProfileSection";
-import SecuritySection from "./sections/SecuritySection";
 import MemberInfoSection from "./sections/MemberInfoSection";
 import { useProfile } from "components/features/profile/hooks";
 import useAuth from "components/features/auth/hooks/useAuth";
@@ -30,13 +29,11 @@ const ProfilePage = () => {
         subtitle={t("profile.my_profile_sub")}
       />
 
-      <UserProfileCard user={profile} />
+      <UserProfileCard user={profile} hideBanking={profile.role === "beneficiary"} />
 
       {profile.role === "beneficiary" && <MemberInfoSection profile={profile} />}
 
       <EditProfileSection profile={profile} onSaved={handleSaved} />
-
-      <SecuritySection />
     </div>
   );
 };
