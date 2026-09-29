@@ -9,6 +9,7 @@ import {
   useUpdateDocumentRequirement, useDeleteDocumentRequirement,
 } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
+import useConfirmDelete from "hooks/useConfirmDelete";
 
 const EMPTY_FORM = { document_name: "", document_type: "", description: "", is_required: true };
 
@@ -41,6 +42,7 @@ const RequirementForm = ({ form, setForm, onCancel, onSubmit, saving, submitText
 export default function DocumentRequirementsSection({ projectId }) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
+  const { askDelete, confirmDialog } = useConfirmDelete();
   const { requirements, execute: fetchRequirements, loading } = useGetDocumentRequirements();
   const { execute: createRequirement, loading: creating } = useCreateDocumentRequirement();
   const { execute: updateRequirement, loading: updating } = useUpdateDocumentRequirement();
@@ -151,13 +153,20 @@ export default function DocumentRequirementsSection({ projectId }) {
                 </div>
                 <div className="flex shrink-0 items-center gap-0.5">
                   <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />} title={t("projects.edit_project")} onClick={() => startEdit(r)} />
-                  <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(r.id)} variant="danger" disabled={deleting} />
+                  <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("common.delete")} variant="danger" disabled={deleting}
+                    onClick={() => askDelete({
+                      title: t("projects.confirm_delete_requirement_title"),
+                      message: t("projects.confirm_delete_requirement_body", { name: (isAr && r.document_name_ar) || r.document_name }),
+                      confirmText: t("common.delete"),
+                      onConfirm: () => handleDelete(r.id),
+                    })} />
                 </div>
               </div>
             )
           )}
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

@@ -1067,7 +1067,7 @@
     "toast_req_save_failed": "تعذر حفظ المتطلب",
     "toast_req_delete_failed": "تعذرت إزالة المتطلب",
     "classifications_label": "التصنيفات المستهدفة",
-    "classifications_hint": "لا يمكن التقديم إلا للمستفيدين ضمن أحد هذه التصنيفات. اتركه فارغاً للسماح للجميع.",
+    "classifications_hint": "لا يرى هذا المشروع ولا يتقدّم إليه إلا المستفيدون ضمن أحد هذه التصنيفات. اتركه فارغاً لفتحه لجميع المستفيدين.",
     "classifications_none": "مفتوح لجميع المستفيدين",
     "featured_toggle": "مميز",
     "featured_on": "مميز",
@@ -1078,7 +1078,17 @@
     "milestones_visible_on": "المسؤولون والموظفون المكلّفون فقط",
     "milestones_visible_off": "الجميع",
     "milestones_visible_hint": "من يرى تقدم التمويل والمراحل في صفحة المشروع.",
-    "public_details_title": "تفاصيل المشروع"
+    "public_details_title": "تفاصيل المشروع",
+    "confirm_delete_milestone_title": "حذف المرحلة",
+    "confirm_delete_named_body": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm_delete_update_title": "حذف التحديث",
+    "confirm_delete_update_body": "حذف هذا التحديث؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm_delete_photo_title": "حذف الصورة",
+    "confirm_delete_photo_body": "حذف هذه الصورة من المعرض؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm_delete_requirement_title": "حذف المستند المطلوب",
+    "confirm_delete_requirement_body": "حذف \"{{name}}\"؟ لن يُطلب من المتقدمين رفعه بعد الآن.",
+    "confirm_remove_beneficiary_title": "إزالة المستفيد",
+    "confirm_remove_beneficiary_body": "إزالة {{name}} من هذه المرحلة؟"
   },
   "beneficiaries": {
     "title": "المستفيدون",
@@ -2573,6 +2583,7 @@
     "toast_save_failed": "فشل حفظ المستند",
     "toast_deleted": "تم حذف المستند",
     "toast_delete_failed": "فشل حذف المستند",
-    "number_label": "رقم المستند"
+    "number_label": "رقم المستند",
+    "confirm_delete_title": "حذف المستند"
   }
 }

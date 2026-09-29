@@ -6,6 +6,7 @@ import FormHeader from "components/ui/form/FormHeader";
 import StorageFileActions from "components/ui/StorageFileActions";
 import { InputField, SelectField, StorageDocumentField } from "components/form";
 import { DOCUMENT_TYPE_VALUES } from "components/ui/constants/documentTypes";
+import useConfirmDelete from "hooks/useConfirmDelete";
 
 const EMPTY = { document_type: "", document_name: "", remarks: "" };
 
@@ -35,6 +36,7 @@ const DocumentManagerSection = ({
   typeOptions, typeRequired = false, withNumber = false, ownerName, actionsVariant,
 }) => {
   const { t } = useTranslation();
+  const { askDelete, confirmDialog } = useConfirmDelete();
   const DOCUMENT_TYPE_OPTIONS = typeOptions ?? DOCUMENT_TYPE_VALUES.map((value) => ({ value, label: t(`documents.type_${value}`) }));
   const DOCUMENT_TYPE_LABELS = Object.fromEntries(DOCUMENT_TYPE_OPTIONS.map((o) => [o.value, o.label]));
   const [addOpen, setAddOpen] = useState(false);
@@ -188,7 +190,16 @@ const DocumentManagerSection = ({
                     <button type="button" onClick={() => startEdit(doc)} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700">
                       <MdEdit className="h-3.5 w-3.5" />
                     </button>
-                    <button type="button" onClick={() => handleDelete(doc.id)} disabled={deletingId === doc.id} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
+                    <button type="button" title={t("common.delete")} disabled={deletingId === doc.id}
+                      onClick={() => askDelete({
+                        title: t("documents.confirm_delete_title"),
+                        message: t("projects.confirm_delete_named_body", {
+                          name: doc.document_name || DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type,
+                        }),
+                        confirmText: t("common.delete"),
+                        onConfirm: () => handleDelete(doc.id),
+                      })}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
                       <MdDeleteOutline className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -198,6 +209,7 @@ const DocumentManagerSection = ({
           ))}
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 };

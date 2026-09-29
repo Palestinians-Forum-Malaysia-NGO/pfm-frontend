@@ -11,9 +11,11 @@ import {
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
+import useConfirmDelete from "hooks/useConfirmDelete";
 
 export default function GallerySection({ projectId, initialGallery = [] }) {
   const { t } = useTranslation();
+  const { askDelete, confirmDialog } = useConfirmDelete();
   const [photos, setPhotos] = useState(initialGallery);
 
   // Add state
@@ -171,8 +173,14 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
                   {isAdmin && (
                     <button
                       type="button"
-                      onClick={() => handleDelete(p.id)}
+                      onClick={() => askDelete({
+                        title: t("projects.confirm_delete_photo_title"),
+                        message: t("projects.confirm_delete_photo_body"),
+                        confirmText: t("common.delete"),
+                        onConfirm: () => handleDelete(p.id),
+                      })}
                       disabled={deleting}
+                      title={t("common.delete")}
                       className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/90 text-white backdrop-blur-sm transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <MdDeleteOutline className="h-3.5 w-3.5" />
@@ -184,6 +192,7 @@ export default function GallerySection({ projectId, initialGallery = [] }) {
           )}
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

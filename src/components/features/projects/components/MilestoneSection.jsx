@@ -11,6 +11,7 @@ import MilestoneBeneficiariesPanel from "./MilestoneBeneficiariesPanel";
 import { useCreateMilestone, useUpdateMilestone, useDeleteMilestone } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useAuth from "components/features/auth/hooks/useAuth";
+import useConfirmDelete from "hooks/useConfirmDelete";
 
 const EMPTY_FORM = { title: "", description: "", target_date: "", is_completed: false };
 
@@ -18,6 +19,7 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-MY", { day: "numer
 
 export default function MilestoneSection({ projectId, initialMilestones = [] }) {
   const { t, i18n } = useTranslation();
+  const { askDelete, confirmDialog } = useConfirmDelete();
   const isAr = i18n.language === "ar";
   const [milestones, setMilestones] = useState(initialMilestones);
   const [addOpen,  setAddOpen]  = useState(false);
@@ -184,7 +186,13 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
                   <div className="flex shrink-0 items-center gap-0.5">
                     <RowIconButton icon={<MdEdit className="h-3.5 w-3.5" />}          title={t("projects.edit_project")}   onClick={() => startEdit(m)} />
                     {isAdmin && (
-                      <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("projects.delete_project")} onClick={() => handleDelete(m.id)} variant="danger" disabled={deleting} />
+                      <RowIconButton icon={<MdDeleteOutline className="h-3.5 w-3.5" />} title={t("common.delete")} variant="danger" disabled={deleting}
+                        onClick={() => askDelete({
+                          title: t("projects.confirm_delete_milestone_title"),
+                          message: t("projects.confirm_delete_named_body", { name: (isAr && m.title_ar) || m.title }),
+                          confirmText: t("common.delete"),
+                          onConfirm: () => handleDelete(m.id),
+                        })} />
                     )}
                   </div>
                 </div>
@@ -202,6 +210,7 @@ export default function MilestoneSection({ projectId, initialMilestones = [] }) 
           )}
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

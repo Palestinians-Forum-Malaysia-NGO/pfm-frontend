@@ -12,6 +12,7 @@ import { useToast } from "components/ui/toast/ToastContext";
 import { isSafeUrl } from "utils/url";
 import useAuth from "components/features/auth/hooks/useAuth";
 import useStorageUrl from "components/features/storage/hooks/useStorageUrl";
+import useConfirmDelete from "hooks/useConfirmDelete";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -28,6 +29,7 @@ const MilestoneProofThumbnail = ({ proof, label }) => {
 
 export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, onCountChange }) {
   const { t } = useTranslation();
+  const { askDelete, confirmDialog } = useConfirmDelete();
   const { beneficiaries: records, execute: fetchRecords, loading } = useGetMilestoneBeneficiaries();
 
   useEffect(() => { onCountChange?.(records.length); }, [records]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -194,7 +196,12 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
                       <MdEdit className="h-3.5 w-3.5" />
                     </button>
                     {isAdmin && (
-                      <button onClick={() => handleDelete(r.id)} disabled={deleting} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
+                      <button onClick={() => askDelete({
+                        title: t("projects.confirm_remove_beneficiary_title"),
+                        message: t("projects.confirm_remove_beneficiary_body", { name: r.beneficiary?.full_name ?? "" }),
+                        confirmText: t("common.remove"),
+                        onConfirm: () => handleDelete(r.id),
+                      })} disabled={deleting} title={t("common.remove")} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50">
                         <MdDeleteOutline className="h-3.5 w-3.5" />
                       </button>
                     )}
@@ -205,6 +212,7 @@ export default function MilestoneBeneficiariesPanel({ projectId, milestoneId, on
           ))}
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 }

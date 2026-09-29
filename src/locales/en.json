@@ -1067,7 +1067,7 @@
     "toast_req_save_failed": "Couldn't save the requirement",
     "toast_req_delete_failed": "Couldn't remove the requirement",
     "classifications_label": "Target Classifications",
-    "classifications_hint": "Only beneficiaries in one of these classifications can apply. Leave empty to allow everyone.",
+    "classifications_hint": "Only beneficiaries in one of these classifications can see and apply to this project. Leave empty to open it to all beneficiaries.",
     "classifications_none": "Open to all beneficiaries",
     "featured_toggle": "Featured",
     "featured_on": "Featured",
@@ -1078,7 +1078,17 @@
     "milestones_visible_on": "Admins & assigned staff only",
     "milestones_visible_off": "Everyone",
     "milestones_visible_hint": "Who sees funding progress and milestones on the project page.",
-    "public_details_title": "Project Details"
+    "public_details_title": "Project Details",
+    "confirm_delete_milestone_title": "Delete milestone",
+    "confirm_delete_named_body": "Delete \"{{name}}\"? This can't be undone.",
+    "confirm_delete_update_title": "Delete update",
+    "confirm_delete_update_body": "Delete this update? This can't be undone.",
+    "confirm_delete_photo_title": "Delete photo",
+    "confirm_delete_photo_body": "Delete this photo from the gallery? This can't be undone.",
+    "confirm_delete_requirement_title": "Delete required document",
+    "confirm_delete_requirement_body": "Delete \"{{name}}\"? Applicants will no longer be asked to upload it.",
+    "confirm_remove_beneficiary_title": "Remove beneficiary",
+    "confirm_remove_beneficiary_body": "Remove {{name}} from this milestone?"
   },
   "beneficiaries": {
     "title": "Beneficiaries",
@@ -2573,6 +2583,7 @@
     "toast_save_failed": "Failed to save document",
     "toast_deleted": "Document deleted",
     "toast_delete_failed": "Failed to delete document",
-    "number_label": "Document Number"
+    "number_label": "Document Number",
+    "confirm_delete_title": "Delete document"
   }
 }
