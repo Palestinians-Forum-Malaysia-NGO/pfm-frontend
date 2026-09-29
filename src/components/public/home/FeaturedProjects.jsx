@@ -16,11 +16,15 @@ const FeaturedProjects = () => {
   const { t } = useTranslation();
   const [ref, inView] = useInView();
   const navigate = useNavigate();
-  const { projects: allProjects, loading } = useGetProjects();
+  const { projects: allProjects, loading } = useGetProjects({ publishedOnly: true });
 
-  const featured = [...allProjects]
-    .sort((a, b) => (parseFloat(b.progress_percentage) || 0) - (parseFloat(a.progress_percentage) || 0))
-    .slice(0, 3);
+  // Projects marked featured first; fill any remaining slots with the
+  // furthest-along projects so the section isn't empty before anything is featured.
+  const byProgress = (a, b) => (parseFloat(b.progress_percentage) || 0) - (parseFloat(a.progress_percentage) || 0);
+  const featured = [
+    ...allProjects.filter((p) => p.is_featured).sort(byProgress),
+    ...allProjects.filter((p) => !p.is_featured).sort(byProgress),
+  ].slice(0, 3);
 
   if (!loading && featured.length === 0) return null;
 

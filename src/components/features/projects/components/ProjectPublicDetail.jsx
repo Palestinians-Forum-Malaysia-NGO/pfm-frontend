@@ -39,7 +39,7 @@ export default function ProjectPublicDetail({ basePath = "/projects" } = {}) {
   const navigate  = useNavigate();
 
   const { project, execute: fetchProject, loading, error } = useGetProject();
-  const { projects: allProjects } = useGetProjects();
+  const { projects: allProjects } = useGetProjects({ publishedOnly: true });
   const { user, isAuthenticated } = useAuth();
   const isBeneficiary = isAuthenticated && user?.role === ROLES.BENEFICIARY;
 

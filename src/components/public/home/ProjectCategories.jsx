@@ -15,7 +15,7 @@ const ICON_COLORS = [
 const ProjectCategories = () => {
   const { t, i18n } = useTranslation();
   const [ref, inView] = useInView();
-  const { projects: allProjects, loading } = useGetProjects();
+  const { projects: allProjects, loading } = useGetProjects({ publishedOnly: true });
 
   const byCategory = new Map();
   allProjects.forEach((p) => {

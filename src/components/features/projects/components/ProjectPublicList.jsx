@@ -94,7 +94,7 @@ function ProjectCard({ project, onClick, statusLabels }) {
 export default function ProjectPublicList({ basePath = "/projects" } = {}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { projects: allProjects, loading } = useGetProjects();
+  const { projects: allProjects, loading } = useGetProjects({ publishedOnly: true });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const statusLabels = {
