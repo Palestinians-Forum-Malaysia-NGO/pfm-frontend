@@ -367,7 +367,9 @@
     "change_photo": "تغيير الصورة",
     "image_size_hint": "المقاس الموصى به {{dimensions}} بكسل، بحد أقصى {{size}} ميجابايت",
     "file_too_large": "حجم الملف كبير جداً. الحد الأقصى {{size}} ميجابايت.",
-    "export": "تصدير"
+    "export": "تصدير",
+    "view_file": "عرض",
+    "download_file": "تنزيل"
   },
   "home": {
     "our_work": "أعمالنا",

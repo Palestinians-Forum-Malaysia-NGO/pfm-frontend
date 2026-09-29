@@ -316,7 +316,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
               />
             </>
           ) : (
-            <FamilyMembersView family={p.family_information} />
+            <FamilyMembersView family={p.family_information} beneficiaryName={profile.full_name} />
           )}
         </SectionCard>
       )}
@@ -351,7 +351,7 @@ const MemberInfoSection = ({ profile, onSaved }) => {
           title={t("beneficiaries.section_documents")}
           subtitle={t("profile.documents_sub")}
         >
-          <DocumentList documents={p.supporting_documents} />
+          <DocumentList documents={p.supporting_documents} ownerName={profile.full_name} />
         </SectionCard>
       )}
 

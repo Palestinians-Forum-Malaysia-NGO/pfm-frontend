@@ -7,7 +7,7 @@ import {
 import FormHeader from "components/ui/form/FormHeader";
 import InfoRow from "components/ui/InfoRow";
 import Button from "components/ui/buttons/Button";
-import StorageFileLink from "components/ui/StorageFileLink";
+import StorageFileActions from "components/ui/StorageFileActions";
 import DocumentManagerSection from "components/ui/DocumentManagerSection";
 import { InputField, SelectField, ToggleInput, StorageImageField, StorageDocumentField } from "components/form";
 import { useUpdateProfile } from "components/features/profile/hooks";
@@ -399,9 +399,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
                 {adminProfile.id_document && (
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-400">{t("staff.id_document")}</span>
-                    <StorageFileLink fileKey={adminProfile.id_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
-                      {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
-                    </StorageFileLink>
+                    <StorageFileActions fileKey={adminProfile.id_document} name={t("staff.id_document")} ownerName={profile.full_name} />
                   </div>
                 )}
                 <InfoRow icon={<MdCardTravel className="h-4 w-4" />} label={t("staff.has_visa")} value={adminProfile.has_visa ? t("common.enabled") : t("common.disabled")} />
@@ -417,9 +415,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
                     {adminProfile.visa_document && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-400">{t("staff.visa_document_label")}</span>
-                        <StorageFileLink fileKey={adminProfile.visa_document} className="inline-flex items-center gap-1 text-xs font-medium text-green hover:underline">
-                          {t("beneficiaries.doc_view")} <MdOpenInNew className="h-3 w-3" />
-                        </StorageFileLink>
+                        <StorageFileActions fileKey={adminProfile.visa_document} name={t("staff.visa_document_label")} ownerName={profile.full_name} />
                       </div>
                     )}
                   </>
@@ -433,6 +429,7 @@ const EditProfileSection = ({ profile, onSaved }) => {
       {isAdmin && (
         <div className="mt-5 border-t border-slate-200 pt-5">
           <DocumentManagerSection
+            ownerName={profile.full_name}
             documents={documents}
             loading={docsLoading}
             folder="users/documents"

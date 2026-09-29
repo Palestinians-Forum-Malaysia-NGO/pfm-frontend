@@ -367,7 +367,9 @@
     "image_size_hint": "Recommended {{dimensions}}px, up to {{size}} MB",
     "file_too_large": "File is too large. Maximum size is {{size}} MB.",
     "current_image": "Current",
-    "export": "Export"
+    "export": "Export",
+    "view_file": "View",
+    "download_file": "Download"
   },
   "home": {
     "our_work": "Our Work",

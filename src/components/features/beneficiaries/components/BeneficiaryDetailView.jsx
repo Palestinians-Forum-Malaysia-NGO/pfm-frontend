@@ -323,7 +323,7 @@ export default function BeneficiaryDetailView() {
       {/* ── Family members (spouse, children and other relatives) ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family_info")} subtitle={t("beneficiaries.section_family_members_sub")} />
-        <FamilyMembersView family={beneficiary.family_information} />
+        <FamilyMembersView family={beneficiary.family_information} beneficiaryName={u.full_name} />
       </div>
 
       {/* ── Banking Information ── */}
@@ -358,6 +358,7 @@ export default function BeneficiaryDetailView() {
         typeOptions={SUPPORTING_DOC_TYPES.map((v) => ({ value: v, label: t(`beneficiaries.doc_type_${v}`) }))}
         typeRequired
         withNumber
+        ownerName={u.full_name}
         documents={documents}
         loading={docsLoading}
         folder="beneficiaries/documents"

@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import StorageFileLink from "components/ui/StorageFileLink";
+import StorageFileActions from "components/ui/StorageFileActions";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 /* Read-only list of a person's typed documents with a link to each file. */
-export const DocumentList = ({ documents = [] }) => {
+export const DocumentList = ({ documents = [], ownerName }) => {
   const { t } = useTranslation();
   if (!documents.length) return <p className="text-xs text-slate-400">{t("beneficiaries.no_documents")}</p>;
   return (
@@ -27,9 +27,8 @@ export const DocumentList = ({ documents = [] }) => {
             )}
           </div>
           {d.document_file && (
-            <StorageFileLink fileKey={d.document_file} className="shrink-0 text-xs font-medium text-green hover:underline">
-              {t("beneficiaries.view_doc")}
-            </StorageFileLink>
+            <StorageFileActions fileKey={d.document_file} ownerName={ownerName}
+              name={d.document_name || t(`beneficiaries.doc_type_${d.document_type}`, { defaultValue: d.document_type })} />
           )}
         </div>
       ))}
@@ -38,7 +37,7 @@ export const DocumentList = ({ documents = [] }) => {
 };
 
 /* Read-only view of family_information: { family_in_malaysia, members[] }. */
-export default function FamilyMembersView({ family }) {
+export default function FamilyMembersView({ family, beneficiaryName }) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
   const members = family?.members ?? [];
@@ -74,7 +73,8 @@ export default function FamilyMembersView({ family }) {
                 .filter(Boolean).join(" · ")}
             </p>
           )}
-          <DocumentList documents={m.documents} />
+          <DocumentList documents={m.documents}
+            ownerName={beneficiaryName ? `${m.full_name} (${beneficiaryName})` : m.full_name} />
         </div>
       ))}
     </div>

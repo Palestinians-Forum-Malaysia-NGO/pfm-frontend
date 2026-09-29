@@ -336,6 +336,7 @@ export default function UserEditForm() {
       </div>
 
       <DocumentManagerSection
+        ownerName={formData.full_name}
         documents={documents}
         loading={docsLoading}
         folder="users/documents"

@@ -14,7 +14,7 @@ import InfoRow       from "components/ui/InfoRow";
 import AlertBanner   from "components/ui/AlertBanner";
 import Loading       from "components/loading/Loading";
 import { TextareaField } from "components/form";
-import StorageFileLink from "components/ui/StorageFileLink";
+import StorageFileActions from "components/ui/StorageFileActions";
 import OpportunityApplicationDeleteModal from "./OpportunityApplicationDeleteModal";
 import {
   useGetOpportunityApplication, useDeleteOpportunityApplication,
@@ -152,7 +152,7 @@ export default function OpportunityApplicationDetailView() {
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_resume")} value={
             application.applicant_resume
-              ? <StorageFileLink fileKey={application.applicant_resume} className="text-green hover:underline">{t("opportunityApplications.view_link")}</StorageFileLink>
+              ? <StorageFileActions fileKey={application.applicant_resume} name={t("opportunityApplications.info_resume")} ownerName={application.applicant_full_name} />
               : "—"
           } />
           <InfoRow icon={<MdLink className="h-4 w-4" />} label={t("opportunityApplications.info_portfolio")} value={
@@ -165,9 +165,7 @@ export default function OpportunityApplicationDetailView() {
           <div>
             <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t("opportunityApplications.info_cover_letter")}</p>
             {isFileKey(application.applicant_cover_letter) ? (
-              <StorageFileLink fileKey={application.applicant_cover_letter} className="inline-flex items-center gap-1 text-sm text-green hover:underline">
-                <MdLink className="h-4 w-4" /> {t("opportunityApplications.view_link")}
-              </StorageFileLink>
+              <StorageFileActions fileKey={application.applicant_cover_letter} name={t("opportunityApplications.info_cover_letter")} ownerName={application.applicant_full_name} className="justify-start" />
             ) : (
               <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
                 <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{application.applicant_cover_letter}</p>

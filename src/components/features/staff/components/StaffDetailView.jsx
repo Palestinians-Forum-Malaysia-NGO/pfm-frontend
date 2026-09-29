@@ -18,7 +18,7 @@ import StaffDeleteModal from "./StaffDeleteModal";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading       from "components/loading/Loading";
 import StorageImage  from "components/ui/StorageImage";
-import StorageFileLink from "components/ui/StorageFileLink";
+import StorageFileActions from "components/ui/StorageFileActions";
 import DocumentManagerSection from "components/ui/DocumentManagerSection";
 import {
   useGetStaff, useDeleteStaff,
@@ -243,7 +243,7 @@ export default function StaffDetailView() {
               <InfoRow
                 icon={<MdInsertDriveFile className="h-4 w-4" />}
                 label={t("staff.id_document")}
-                value={<StorageFileLink fileKey={staff.id_document} className="text-green hover:underline">{t("common.open")}</StorageFileLink>}
+                value={<StorageFileActions fileKey={staff.id_document} name={t("staff.id_document")} ownerName={u.full_name} />}
               />
             )}
             {staff.id_document_type && (
@@ -262,7 +262,7 @@ export default function StaffDetailView() {
               <InfoRow
                 icon={<MdInsertDriveFile className="h-4 w-4" />}
                 label={t("staff.visa_document_label")}
-                value={<StorageFileLink fileKey={staff.visa_document} className="text-green hover:underline">{t("common.open")}</StorageFileLink>}
+                value={<StorageFileActions fileKey={staff.visa_document} name={t("staff.visa_document_label")} ownerName={u.full_name} />}
               />
             )}
           </div>
@@ -273,6 +273,7 @@ export default function StaffDetailView() {
         documents={documents}
         loading={docsLoading}
         folder="staff/documents"
+        ownerName={u.full_name}
         onAdd={handleAddDocument}
         onUpdate={handleUpdateDocument}
         onDelete={handleDeleteDocument}

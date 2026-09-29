@@ -11,7 +11,7 @@ import PageHeader     from "components/ui/PageHeader";
 import FormHeader     from "components/ui/form/FormHeader";
 import InfoRow        from "components/ui/InfoRow";
 import AlertBanner    from "components/ui/AlertBanner";
-import StorageFileLink from "components/ui/StorageFileLink";
+import StorageFileActions from "components/ui/StorageFileActions";
 import DropdownButton from "components/ui/buttons/DropdownButton";
 import Loading        from "components/loading/Loading";
 import ApplicationDeleteModal from "./ApplicationDeleteModal";
@@ -185,7 +185,7 @@ export default function ApplicationDetailView() {
       {beneficiary?.supporting_documents?.length > 0 && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdBadge className="h-5 w-5" />} title={t("beneficiaries.section_documents")} subtitle={t("beneficiaries.section_documents_sub")} />
-          <DocumentList documents={beneficiary.supporting_documents} />
+          <DocumentList documents={beneficiary.supporting_documents} ownerName={beneficiary?.user?.full_name} />
         </div>
       )}
 
@@ -212,9 +212,7 @@ export default function ApplicationDetailView() {
                   {doc.remarks && <p className="mt-0.5 text-xs text-slate-500">{doc.remarks}</p>}
                 </div>
                 {doc.file && (
-                  <StorageFileLink fileKey={doc.file} className="shrink-0 text-xs font-medium text-green hover:underline">
-                    {t("beneficiaries.doc_view")}
-                  </StorageFileLink>
+                  <StorageFileActions fileKey={doc.file} name={doc.requirement_name} ownerName={beneficiary?.user?.full_name} />
                 )}
               </div>
             ))}

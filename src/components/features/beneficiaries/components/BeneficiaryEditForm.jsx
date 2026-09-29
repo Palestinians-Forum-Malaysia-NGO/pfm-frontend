@@ -382,7 +382,7 @@ export default function BeneficiaryEditForm() {
         {/* ── Family Information (read-only: the API only lets the beneficiary edit it, from their own profile) ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <FormHeader icon={<MdFamilyRestroom className="h-5 w-5" />} title={t("beneficiaries.section_family")} subtitle={t("beneficiaries.family_readonly_hint")} />
-          <FamilyMembersView family={beneficiary?.family_information} />
+          <FamilyMembersView family={beneficiary?.family_information} beneficiaryName={beneficiary?.user?.full_name} />
         </div>
 
         <div className="flex gap-3">
