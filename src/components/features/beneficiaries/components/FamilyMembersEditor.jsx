@@ -4,7 +4,7 @@ import { MdPersonAdd, MdDeleteOutline } from "react-icons/md";
 import { InputField, SelectField } from "components/form";
 import SupportingDocumentsEditor from "./SupportingDocumentsEditor";
 import {
-  RELATIONSHIPS, EMPTY_MEMBER, rowKey, memberProblems, documentProblems, starterDocuments, documentsUntouched, allowedDocTypes,
+  RELATIONSHIPS, EMPTY_MEMBER, rowKey, memberProblems, documentProblems, starterDocuments, documentsUntouched, allowedDocTypes, requiredDocTypes,
 } from "components/features/beneficiaries/constants/family";
 
 const VISA_TYPES = ["student", "work", "dependent", "social_visit", "refugee_pass", "other"];
@@ -83,6 +83,7 @@ const MemberCard = ({ member, index, onChange, onRemove, publicEndpoint, folder 
             folder={folder}
             problems={docProblems}
             allowedTypes={allowedDocTypes(member.has_visa, member.situation)}
+            requiredTypes={requiredDocTypes(member.has_visa, member.situation)}
           />
         </>
       )}

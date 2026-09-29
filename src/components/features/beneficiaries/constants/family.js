@@ -10,6 +10,15 @@ export const SUPPORTING_DOC_TYPES = [
 
 export const RELATIONSHIPS = ["spouse", "child", "other"];
 
+// Documents a status can't do without — their rows are locked in the editor
+// (no remove, fixed type): passport + visa for visa holders, a UNHCR card for
+// refugees.
+export const requiredDocTypes = (hasVisa, situation) => {
+  if (hasVisa === "true") return ["passport", "visa"];
+  if (hasVisa === "false" && situation === "refugee") return ["unhcr_document"];
+  return [];
+};
+
 // Which document types a person may upload, by status: a visa document only
 // for visa holders, a UNHCR card only for refugees.
 export const allowedDocTypes = (hasVisa, situation) => SUPPORTING_DOC_TYPES.filter((type) => {

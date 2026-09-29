@@ -21,7 +21,7 @@ import { useCreateBeneficiary, useGetStates } from "components/features/benefici
 import SupportingDocumentsEditor from "components/features/beneficiaries/components/SupportingDocumentsEditor";
 import FamilyMembersEditor from "components/features/beneficiaries/components/FamilyMembersEditor";
 import {
-  documentProblems, memberProblems, starterDocuments, documentsUntouched, allowedDocTypes, toDocumentPayload, toMemberPayload,
+  documentProblems, memberProblems, starterDocuments, documentsUntouched, allowedDocTypes, requiredDocTypes, toDocumentPayload, toMemberPayload,
 } from "components/features/beneficiaries/constants/family";
 
 /* ─────────────────────────────────────────────────
@@ -100,6 +100,8 @@ const Hero = ({ step }) => {
 const ACCOUNT_RULES = {
   profile_photo: [{ required: true }],
   full_name:     [{ required: true }, { maxLength: 255 }],
+  gender:        [{ required: true }],
+  date_of_birth: [{ required: true }],
   email:         [{ required: true }, { email: true }],
   phone_number:  [{ required: true }, { maxLength: 30 }],
 };
@@ -109,10 +111,16 @@ const AccountStep = ({ data, onChange, onNext, serverErrors, onClearServerError 
   const [errors, setErrors] = useState({});
   const set = (f, v) => { onChange((p) => ({ ...p, [f]: v })); onClearServerError?.(f); };
 
-  const allErrors = { ...errors, ...serverErrors };
+  const today = new Date().toISOString().slice(0, 10);
+  const dobInFuture = !!data.date_of_birth && data.date_of_birth > today;
+  const allErrors = {
+    ...errors, ...serverErrors,
+    ...(dobInFuture ? { date_of_birth: t("apply.dob_future") } : {}),
+  };
   const canProceed =
     !Object.entries(ACCOUNT_RULES).some(([field, rules]) => !!validate(data[field], rules)) &&
-    !Object.keys(ACCOUNT_RULES).some((field) => serverErrors?.[field]);
+    !Object.keys(ACCOUNT_RULES).some((field) => serverErrors?.[field]) &&
+    !dobInFuture;
 
   const handleNext = () => {
     const newErrors = {};
@@ -153,6 +161,13 @@ const AccountStep = ({ data, onChange, onNext, serverErrors, onClearServerError 
         />
         <InputField label={t("apply.full_name")} field="full_name" placeholder="Ahmad Faris bin Abdullah"
           formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.full_name} />
+        <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+          <SelectField label={t("beneficiaries.gender")} field="gender"
+            options={[{ value: "male", label: t("beneficiaries.gender_male") }, { value: "female", label: t("beneficiaries.gender_female") }]}
+            formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.gender} />
+          <InputField label={t("beneficiaries.date_of_birth")} field="date_of_birth" type="date"
+            formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.date_of_birth} />
+        </div>
         <InputField label={t("apply.email")} field="email" type="email" placeholder="you@example.com"
           formData={data} errors={allErrors} updateFormData={set} rules={ACCOUNT_RULES.email} />
         <InputField label={t("apply.phone")} field="phone_number" placeholder="+60 12-345 6789"
@@ -301,6 +316,7 @@ const DocumentsStep = ({ status, data, onChange, documents, onDocumentsChange, o
           publicEndpoint="register"
           problems={problems}
           allowedTypes={allowedDocTypes(status.has_visa, status.situation)}
+          requiredTypes={requiredDocTypes(status.has_visa, status.situation)}
         />
       </div>
 
@@ -426,7 +442,7 @@ const OtpStep = ({ email, channel, onBack }) => {
    back to the step that actually collected it.
 ───────────────────────────────────────────────── */
 const FIELD_TO_STEP = {
-  full_name: 1, email: 1, phone_number: 1, profile_photo: 1,
+  full_name: 1, email: 1, phone_number: 1, profile_photo: 1, gender: 1, date_of_birth: 1,
   has_visa: 2, visa_type: 2, situation: 2, country_of_origin: 2, palestine_region: 2, state: 2, address: 2,
   background: 3, supporting_documents: 3,
   family_information: 4, terms_accepted: 4,
@@ -450,7 +466,9 @@ export default function BeneficiaryRegisterForm() {
     });
   };
 
-  const [account, setAccount] = useState({ full_name: "", email: "", phone_number: "", profile_photo: null });
+  const [account, setAccount] = useState({
+    full_name: "", email: "", phone_number: "", profile_photo: null, gender: "", date_of_birth: "",
+  });
   const [status, setStatus]   = useState({
     has_visa: "", visa_type: "", situation: "", country: "", palestine_region: "", state: "", address: "",
   });
@@ -477,6 +495,8 @@ export default function BeneficiaryRegisterForm() {
         email:             account.email,
         phone_number:      account.phone_number  || undefined,
         profile_photo:     account.profile_photo || undefined,
+        gender:            account.gender,
+        date_of_birth:     account.date_of_birth,
         has_visa:          hasVisa,
         visa_type:         hasVisa  ? status.visa_type : undefined,
         situation:         !hasVisa ? status.situation : undefined,
