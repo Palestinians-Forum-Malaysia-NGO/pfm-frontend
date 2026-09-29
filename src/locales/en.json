@@ -1055,7 +1055,7 @@
     "req_add_submit": "Add Requirement",
     "req_save_btn": "Save",
     "req_name_placeholder": "Document name (e.g. Medical report)",
-    "req_type_placeholder": "Category (optional, e.g. medical, income)",
+    "req_type_placeholder": "Select document type",
     "req_desc_placeholder": "Instructions for applicants (optional)",
     "req_required": "Required",
     "req_required_badge": "Required",

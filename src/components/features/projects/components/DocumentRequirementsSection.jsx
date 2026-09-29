@@ -10,6 +10,7 @@ import {
 } from "components/features/projects/hooks";
 import { useToast } from "components/ui/toast/ToastContext";
 import useConfirmDelete from "hooks/useConfirmDelete";
+import { DOCUMENT_TYPE_VALUES } from "components/ui/constants/documentTypes";
 
 const EMPTY_FORM = { document_name: "", document_type: "", description: "", is_required: true };
 
@@ -23,8 +24,10 @@ const RequirementForm = ({ form, setForm, onCancel, onSubmit, saving, submitText
     <form onSubmit={onSubmit} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
       <input value={form.document_name} onChange={(e) => set("document_name", e.target.value)} maxLength={100} required
         placeholder={t("projects.req_name_placeholder")} className={inputCls} />
-      <input value={form.document_type} onChange={(e) => set("document_type", e.target.value)} maxLength={100}
-        placeholder={t("projects.req_type_placeholder")} className={inputCls} />
+      <select value={form.document_type} onChange={(e) => set("document_type", e.target.value)} required className={inputCls}>
+        <option value="" disabled>{t("projects.req_type_placeholder")}</option>
+        {DOCUMENT_TYPE_VALUES.map((v) => <option key={v} value={v}>{t(`documents.type_${v}`)}</option>)}
+      </select>
       <input value={form.description} onChange={(e) => set("description", e.target.value)}
         placeholder={t("projects.req_desc_placeholder")} className={inputCls} />
       <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
@@ -33,7 +36,7 @@ const RequirementForm = ({ form, setForm, onCancel, onSubmit, saving, submitText
       </label>
       <div className="flex gap-2">
         <Button variant="ghost" text={t("projects.cancel")} type="button" onClick={onCancel} className="flex-1" />
-        <Button variant="primary" text={submitText} type="submit" loading={saving} disabled={!form.document_name.trim()} className="flex-1" />
+        <Button variant="primary" text={submitText} type="submit" loading={saving} disabled={!form.document_name.trim() || !form.document_type} className="flex-1" />
       </div>
     </form>
   );
@@ -58,7 +61,7 @@ export default function DocumentRequirementsSection({ projectId }) {
 
   const toPayload = (f) => ({
     document_name: f.document_name.trim(),
-    document_type: f.document_type.trim() || null,
+    document_type: f.document_type,
     description:   f.description.trim()   || null,
     is_required:   f.is_required,
   });
@@ -102,7 +105,8 @@ export default function DocumentRequirementsSection({ projectId }) {
     setEditId(r.id);
     setEditForm({
       document_name: r.document_name ?? "",
-      document_type: r.document_type ?? "",
+      // Older requirements may hold free text from before the type list — clear it so a type gets picked.
+      document_type: DOCUMENT_TYPE_VALUES.includes(r.document_type) ? r.document_type : "",
       description:   r.description   ?? "",
       is_required:   r.is_required   ?? true,
     });
@@ -144,7 +148,7 @@ export default function DocumentRequirementsSection({ projectId }) {
                       {r.is_required ? t("projects.req_required_badge") : t("projects.req_optional_badge")}
                     </span>
                   </p>
-                  {r.document_type && <p className="mt-0.5 text-xs text-slate-400">{r.document_type}</p>}
+                  {r.document_type && <p className="mt-0.5 text-xs text-slate-400">{t(`documents.type_${r.document_type}`, { defaultValue: r.document_type })}</p>}
                   {((isAr && r.description_ar) || r.description) && (
                     <p className="mt-0.5 text-xs text-slate-500" dir={isAr && r.description_ar ? "rtl" : undefined}>
                       {(isAr && r.description_ar) || r.description}

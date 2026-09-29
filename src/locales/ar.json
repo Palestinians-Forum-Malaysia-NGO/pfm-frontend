@@ -1055,7 +1055,7 @@
     "req_add_submit": "إضافة المتطلب",
     "req_save_btn": "حفظ",
     "req_name_placeholder": "اسم المستند (مثال: تقرير طبي)",
-    "req_type_placeholder": "الفئة (اختياري، مثال: طبي، دخل)",
+    "req_type_placeholder": "اختر نوع المستند",
     "req_desc_placeholder": "تعليمات للمتقدمين (اختياري)",
     "req_required": "مطلوب",
     "req_required_badge": "مطلوب",
