@@ -28,10 +28,11 @@ const EMPTY = { document_type: "", document_name: "", remarks: "" };
  *   withNumber   – also collect a document_number (passport / UNHCR no., …)
  *   ownerName    – whose documents these are; downloads are saved as
  *                  "<document name> - <owner name>"
+ *   actionsVariant – view/download icon style (see StorageFileActions)
  */
 const DocumentManagerSection = ({
   documents = [], folder, onAdd, onUpdate, onDelete, loading,
-  typeOptions, typeRequired = false, withNumber = false, ownerName,
+  typeOptions, typeRequired = false, withNumber = false, ownerName, actionsVariant,
 }) => {
   const { t } = useTranslation();
   const DOCUMENT_TYPE_OPTIONS = typeOptions ?? DOCUMENT_TYPE_VALUES.map((value) => ({ value, label: t(`documents.type_${value}`) }));
@@ -181,7 +182,7 @@ const DocumentManagerSection = ({
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     {doc.document_file && (
-                      <StorageFileActions fileKey={doc.document_file} ownerName={ownerName}
+                      <StorageFileActions fileKey={doc.document_file} ownerName={ownerName} variant={actionsVariant}
                         name={doc.document_name || DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type} />
                     )}
                     <button type="button" onClick={() => startEdit(doc)} className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700">

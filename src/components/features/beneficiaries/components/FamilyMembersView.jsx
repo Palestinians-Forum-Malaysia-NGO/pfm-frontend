@@ -6,7 +6,7 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }) : null;
 
 /* Read-only list of a person's typed documents with a link to each file. */
-export const DocumentList = ({ documents = [], ownerName }) => {
+export const DocumentList = ({ documents = [], ownerName, actionsVariant }) => {
   const { t } = useTranslation();
   if (!documents.length) return <p className="text-xs text-slate-400">{t("beneficiaries.no_documents")}</p>;
   return (
@@ -27,7 +27,7 @@ export const DocumentList = ({ documents = [], ownerName }) => {
             )}
           </div>
           {d.document_file && (
-            <StorageFileActions fileKey={d.document_file} ownerName={ownerName}
+            <StorageFileActions fileKey={d.document_file} ownerName={ownerName} variant={actionsVariant}
               name={d.document_name || t(`beneficiaries.doc_type_${d.document_type}`, { defaultValue: d.document_type })} />
           )}
         </div>
@@ -37,7 +37,7 @@ export const DocumentList = ({ documents = [], ownerName }) => {
 };
 
 /* Read-only view of family_information: { family_in_malaysia, members[] }. */
-export default function FamilyMembersView({ family, beneficiaryName }) {
+export default function FamilyMembersView({ family, beneficiaryName, actionsVariant }) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
   const members = family?.members ?? [];
@@ -73,7 +73,7 @@ export default function FamilyMembersView({ family, beneficiaryName }) {
                 .filter(Boolean).join(" · ")}
             </p>
           )}
-          <DocumentList documents={m.documents}
+          <DocumentList documents={m.documents} actionsVariant={actionsVariant}
             ownerName={beneficiaryName ? `${m.full_name} (${beneficiaryName})` : m.full_name} />
         </div>
       ))}
